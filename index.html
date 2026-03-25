@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>.:: Purity ::.</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="result"></div>
+      <input id="username" type="text" class="input-primary" />
+      <input type="text" onkeyup="app.onTextInput(this)" class="input-primary" />
+      <button class="button-primary" onclick="app.onLogin()">Login</button>
+      <button class="button-primary" onclick="app.onLogout()">Logout</button>
+      <button class="button-primary" onclick="app.setDefaultLogin()">
+        Set explicitly value on login input
+      </button>
+      <custom-component></custom-component>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

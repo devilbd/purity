@@ -1,0 +1,8 @@
+@use '../style.scss';
+
+.custom-component {
+  @extend .window;
+  cursor: pointer;
+  padding: 20px;
+  color: var(--text-main);
+}

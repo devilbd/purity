@@ -1,0 +1,202 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* GNOME-style abstract wallpaper gradient */
+  background: 
+    radial-gradient(circle at top left, #3584e4, transparent 40%),
+    radial-gradient(circle at bottom right, #9141ac, transparent 40%),
+    #1e1e1e;
+}
+
+:root {
+  /* GNOME 50 Colors with Transparency */
+  --gnome-bg: #1e1e1e;
+  --gnome-surface: rgba(45, 45, 45, 0.7); /* Translucent */
+  --gnome-header: rgba(36, 36, 36, 0.8);
+  --gnome-input: rgba(255, 255, 255, 0.08);
+  --gnome-border: rgba(255, 255, 255, 0.1);
+  
+  /* Modern Geometry */
+  --radius-window: 16px;    /* Smoother, larger radius */
+  --radius-control: 8px;
+  
+  /* The Magic Blur */
+  --blur-effect: blur(30px) saturate(150%);
+  --shadow-deep: 0 20px 50px rgba(0, 0, 0, 0.5);
+  
+  /* Text Colors */
+  --text-main: #ffffff;
+  --text-secondary: #9a9996;    /* GNOME's specific muted text */
+  
+  /* Accent: The "Adwaita Blue" */
+  --accent: #3584e4;
+  --accent-hover: #4791eb;
+  --accent-active: #1c71d8;
+
+  /* Typography */
+  --font-main: 'Inter', 'Cantarell', 'Segoe UI', system-ui, sans-serif;
+  --font-size-base: 15px;       /* GNOME defaults slightly larger than Mac */
+  
+  /* Geometry */
+  --radius-window: 12px;
+  --radius-control: 6px;        /* GNOME controls are less rounded than Mac */
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* GNOME 50 Success/Active State */
+.active {
+  /* Adwaita Success Green: #2ec27e */
+  border-color: #2ec27e !important;
+  background-color: rgba(46, 194, 126, 0.1); /* Subtle tint */
+  
+  /* The "Glow" effect for glass surfaces */
+  box-shadow: 0 0 0 3px rgba(46, 194, 126, 0.3), 
+              inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* GNOME 50 Error State */
+.error {
+  /* Adwaita Error Red: #ed333b */
+  border-color: #ed333b !important;
+  background-color: rgba(237, 51, 59, 0.1); /* Subtle tint */
+  
+  /* The "Glow" effect for glass surfaces */
+  box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.3), 
+              inset 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Optional: Text adjustment for states */
+.error-text {
+  color: #ff7b72; /* Slightly brighter red for readability on dark glass */
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.custom-user {
+  border: 1px dashed rgb(5, 79, 148);
+}
+
+.window {
+  background: var(--gnome-surface);
+  backdrop-filter: var(--blur-effect);
+  -webkit-backdrop-filter: var(--blur-effect); /* Support for Safari/iOS */
+  
+  border: 1px solid var(--gnome-border);
+  border-radius: var(--radius-window);
+  box-shadow: var(--shadow-deep);
+  
+  width: 420px;
+  overflow: hidden;
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+}
+
+.button-primary {
+  /* Use the GNOME Accent Blue with a slight transparency */
+  background-color: rgba(53, 132, 228, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  /* GNOME 50 buttons have a very faint top-light highlight */
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), transparent);
+  
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-weight: 700; /* GNOME buttons are bold for readability */
+  font-size: 14px;
+  
+  /* Geometry */
+  padding: 10px 20px;
+  border-radius: var(--radius-control); /* 8px */
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  
+  /* Shadow for "Elevated" feel */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 
+              inset 0 1px rgba(255, 255, 255, 0.1);
+  
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: none;
+}
+
+.button-primary:hover {
+  background-color: var(--accent-hover); /* #4791eb */
+  /* Scale up slightly - a common modern "Gnome-ish" touch */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 
+              inset 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.button-primary:active {
+  background-color: var(--accent-active); /* #1c71d8 */
+  transform: translateY(0);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.button-primary:focus-visible {
+  /* GNOME 50 uses a sharp "Outline" for keyboard navigation */
+  box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.5);
+}
+
+.button-secondary {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--gnome-border);
+  color: white;
+  /* ... same padding/radius as primary ... */
+}
+
+.button-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.input-primary {
+  /* Use the translucent GNOME surface for that 'glass' feel */
+  background-color: var(--gnome-input);
+  backdrop-filter: var(--blur-effect);
+  -webkit-backdrop-filter: var(--blur-effect);
+
+  /* GNOME 50 uses a darker, more defined border than Mac */
+  border: 1px solid var(--gnome-border);
+  border-radius: var(--radius-control); /* 8px for a modern Linux feel */
+  
+  color: var(--text-main);
+  padding: 10px 16px; /* Slightly taller for better touch/click targets */
+  font-family: var(--font-main);
+  font-size: 14px;
+  
+  /* Subtle inner shadow to give it an 'inset' look against the glass */
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+  
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.input-primary::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.input-primary:hover {
+  /* GNOME 50 lightens the surface on hover rather than changing the border */
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.input-primary:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  
+  /* The Adwaita Blue focus effect */
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.3);
+}
+
+/* Optional: GNOME 'Error' state if you're validating forms */
+.input-primary.error {
+  border-color: #ed333b; /* Adwaita Red */
+  box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.2);
+}
