@@ -30,9 +30,6 @@ export class AppComponent extends HTMLElement {
         updateValues([this.usernameField], this.loggedUser());
         updateTargets([this.resultContainer], this.loggedUser(), 'Not signed in.');
         updateStyles([this.resultContainer], this.loginStatus);
-
-        // setting custom property of custom component
-        this.customComponent.customProperty.set(this.loggedUser());
       });
     }
 
@@ -70,6 +67,8 @@ export class AppComponent extends HTMLElement {
 
     setDefaultLogin() {
       this.loggedUser.set('custom_user');
+      // setting custom property of custom component
+      this.customComponent.customProperty.set(this.loggedUser());
     }
 }
 
