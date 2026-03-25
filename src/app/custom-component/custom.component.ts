@@ -1,5 +1,5 @@
-import { effect, signal } from '../core';
-import './custom-component.scss';
+import { effect, signal } from '../../framework/core';
+import './custom.component.scss';
 
 export class CustomComponent extends HTMLElement {
     customProperty = signal<string | null>(null);
