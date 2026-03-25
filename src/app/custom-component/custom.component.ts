@@ -23,9 +23,9 @@ export class CustomComponent extends HTMLElement {
         this.innerHTML = `
             <div class="custom-component" onclick="app.customComponent.onCustomPropertyClicked(this)">
                 Custom component ${this.customProperty()}
+                <input id="input1" class="input-primary" type="text" />
+                <button class="button-primary" onclick="app.customComponent.onClear()">Clear</button>
             </div>
-            <input id="input1" class="input-primary" type="text" />
-            <button class="button-primary" onclick="app.customComponent.onClear()">Clear</button>
         `;
     }
 
