@@ -1,5 +1,13 @@
-import { Component, effect, getElement, signal, updateStyles, updateTargets, updateValues } from '../framework/core';
-import '../style.scss';
+import { 
+    Component, 
+    effect, 
+    getElement, 
+    signal, 
+    updateStyles, 
+    updateTargets, 
+    updateValues 
+} from '../framework/core';
+import './app.component.scss';
 import './custom-component/custom.component';
 import type { CustomComponent } from './custom-component/custom.component';
 
@@ -42,14 +50,18 @@ export class AppComponent extends Component {
 
     render() {
         this.innerHTML = `
-            <div id="result"></div>
-            <input id="username" type="text" class="input-primary" />
-            <input type="text" onkeyup="app.onTextInput(this)" class="input-primary" />
-            <button class="button-primary" onclick="app.onLogin()">Login</button>
-            <button class="button-primary" onclick="app.onLogout()">Logout</button>
-            <button class="button-primary" onclick="app.setDefaultLogin()">
-              Set explicitly value on login input
-            </button>
+            <div class="window">
+              <div id="result"></div>
+              <input id="username" type="text" class="input-primary" value="${this.loggedUser()}" />
+              <input type="text" onkeyup="app.onTextInput(this)" class="input-primary" />
+              <div class="button-group">
+                <button class="button-primary" onclick="app.onLogin()">Login</button>
+                <button class="button-primary" onclick="app.onLogout()">Logout</button>
+                <button class="button-primary" onclick="app.setDefaultLogin()">
+                  Set explicitly value on login input
+                </button>
+              </div>
+            </div>
             <custom-component></custom-component>
         `;
     }
@@ -73,7 +85,7 @@ export class AppComponent extends Component {
     }
 
     setDefaultLogin() {
-      this.loggedUser.set('custom_user');
+      // this.loggedUser.set('custom_user');
       // setting custom property of custom component
       this.customComponent.customProperty.set(this.loggedUser());
     }

@@ -11,6 +11,15 @@ body {
     #1e1e1e;
 }
 
+/* 1. Tell the browser where the file is */
+@font-face {
+  font-family: 'Adwaita Mono';
+  src: url('./assets/mono/AdwaitaMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap; /* Prevents text from disappearing while loading */
+}
+
 :root {
   /* GNOME 50 Colors with Transparency */
   --gnome-bg: #1e1e1e;
@@ -37,7 +46,7 @@ body {
   --accent-active: #1c71d8;
 
   /* Typography */
-  --font-main: 'Inter', 'Cantarell', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'Adwaita Mono', 'Source Code Pro', monospace;
   --font-size-base: 15px;       /* GNOME defaults slightly larger than Mac */
   
   /* Geometry */
@@ -89,10 +98,20 @@ body {
   border-radius: var(--radius-window);
   box-shadow: var(--shadow-deep);
   
-  width: 420px;
   overflow: hidden;
   color: var(--text-main);
   font-family: 'Inter', sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .button-primary {
@@ -199,4 +218,44 @@ body {
 .input-primary.error {
   border-color: #ed333b; /* Adwaita Red */
   box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.2);
+}
+
+.gnome-header {
+  background: var(--gnome-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+  color: white;
+  font-family: system-ui, -apple-system, sans-serif; /* UI Font */
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Using your AdwaitaMono-Regular.ttf here */
+.mono-text {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 1.1rem;
+  color: var(--gnome-accent);
+  letter-spacing: -0.5px;
+}
+
+.nav-links a {
+  color: #d1d1d1;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+  margin: 0 4px;
+  font-size: 0.9rem;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  background: var(--gnome-surface);
+  color: white;
 }
