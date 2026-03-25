@@ -80,3 +80,13 @@ export const getElement = (selector: string): HTMLElement | null => {
   const result = document.querySelector(selector);
   return result as HTMLElement;
 };
+
+
+export abstract class Component extends HTMLElement {
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+    }
+}

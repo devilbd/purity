@@ -1,9 +1,9 @@
-import { effect, getElement, signal, updateStyles, updateTargets, updateValues } from '../framework/core';
+import { Component, effect, getElement, signal, updateStyles, updateTargets, updateValues } from '../framework/core';
 import '../style.scss';
 import './custom-component/custom.component';
 import type { CustomComponent } from './custom-component/custom.component';
 
-export class AppComponent extends HTMLElement {
+export class AppComponent extends Component {
     loggedUser = signal<string | null>(null);
 
     resultContainer!: HTMLElement;
