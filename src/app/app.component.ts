@@ -23,7 +23,6 @@ export class AppComponent extends HTMLElement {
     constructor() {
       super();
       this.render();
-
       this.domInitializer();
 
       effect(() => {
@@ -31,6 +30,14 @@ export class AppComponent extends HTMLElement {
         updateTargets([this.resultContainer], this.loggedUser(), 'Not signed in.');
         updateStyles([this.resultContainer], this.loginStatus);
       });
+    }
+
+    // consider to rework it
+    connectedCallback() {
+      // this needs to be hooked somewhere here, 
+      // the import of AppComponent and then the exection into the <app-component> will trigger the constructor twice
+      // register app to the global window object
+      (window as any).app = this;
     }
 
     render() {
@@ -72,4 +79,6 @@ export class AppComponent extends HTMLElement {
     }
 }
 
-customElements.define('app-component', AppComponent);
+if (!customElements.get('app-component')) {
+  customElements.define('app-component', AppComponent);
+}

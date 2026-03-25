@@ -38,4 +38,6 @@ export class CustomComponent extends HTMLElement {
     }
 }
 
-customElements.define('custom-component', CustomComponent);
+if (!customElements.get('custom-component')) {
+    customElements.define('custom-component', CustomComponent);
+}
