@@ -1,15 +1,15 @@
-import { 
-    Component, 
-    effect, 
-    getElement, 
-    signal, 
-    updateStyles, 
-    updateTargets, 
-    updateValues 
-} from '../framework/core';
-import './app.component.scss';
-import './custom-component/custom.component';
-import type { CustomComponent } from './custom-component/custom.component';
+import {
+    Component,
+    effect,
+    getElement,
+    signal,
+    updateStyles,
+    updateTargets,
+    updateValues,
+} from "../framework/core";
+import "./app.component.scss";
+import "./custom-component/custom.component";
+import type { CustomComponent } from "./custom-component/custom.component";
 
 export class AppComponent extends Component {
     loggedUser = signal<string | null>(null);
@@ -19,33 +19,37 @@ export class AppComponent extends Component {
     customComponent!: CustomComponent;
 
     get loginStatus() {
-      if (this.loggedUser()?.includes('custom_user')) {
-        return 'custom-user';
-      } else if (this.loggedUser()) {
-        return 'active';
-      } else {
-        return 'error';
-      }
+        if (this.loggedUser()?.includes("custom_user")) {
+            return "custom-user";
+        } else if (this.loggedUser()) {
+            return "active";
+        } else {
+            return "error";
+        }
     }
 
     constructor() {
-      super();
-      this.render();
-      this.domInitializer();
+        super();
+        this.render();
+        this.domInitializer();
 
-      effect(() => {
-        updateValues([this.usernameField], this.loggedUser());
-        updateTargets([this.resultContainer], this.loggedUser(), 'Not signed in.');
-        updateStyles([this.resultContainer], this.loginStatus);
-      });
+        effect(() => {
+            updateValues([this.usernameField], this.loggedUser());
+            updateTargets(
+                [this.resultContainer],
+                this.loggedUser(),
+                "Not signed in.",
+            );
+            updateStyles([this.resultContainer], this.loginStatus);
+        });
     }
 
     // consider to rework it
     connectedCallback() {
-      // this needs to be hooked somewhere here, 
-      // the import of AppComponent and then the exection into the <app-component> will trigger the constructor twice
-      // register app to the global window object
-      (window as any).app = this;
+        // this needs to be hooked somewhere here,
+        // the import of AppComponent and then the exection into the <app-component> will trigger the constructor twice
+        // register app to the global window object
+        (window as any).app = this;
     }
 
     render() {
@@ -67,30 +71,32 @@ export class AppComponent extends Component {
     }
 
     domInitializer() {
-      this.resultContainer = getElement('#result') as HTMLElement;
-      this.usernameField = getElement('#username') as HTMLInputElement;
-      this.customComponent = getElement('custom-component') as CustomComponent;
+        this.resultContainer = getElement("#result") as HTMLElement;
+        this.usernameField = getElement("#username") as HTMLInputElement;
+        this.customComponent = getElement(
+            "custom-component",
+        ) as CustomComponent;
     }
 
     onTextInput(element: HTMLInputElement) {
-      this.loggedUser.set(element.value);
+        this.loggedUser.set(element.value);
     }
 
     onLogin() {
-      this.loggedUser.set('some user');
+        this.loggedUser.set("some user");
     }
 
     onLogout() {
-      this.loggedUser.set(null);
+        this.loggedUser.set(null);
     }
 
     setDefaultLogin() {
-      // this.loggedUser.set('custom_user');
-      // setting custom property of custom component
-      this.customComponent.customProperty.set(this.loggedUser());
+        // this.loggedUser.set('custom_user');
+        // setting custom property of custom component
+        this.customComponent.customProperty.set(this.loggedUser());
     }
 }
 
-if (!customElements.get('app-component')) {
-  customElements.define('app-component', AppComponent);
+if (!customElements.get("app-component")) {
+    customElements.define("app-component", AppComponent);
 }
