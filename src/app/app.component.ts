@@ -23,9 +23,9 @@ export class AppComponent extends Component {
 
     get loginStatus() {
         if (this.loggedUser()?.includes('custom_user')) {
-            return 'custom-user';
+            return 'warn';
         } else if (this.loggedUser()) {
-            return 'active';
+            return 'success';
         } else {
             return 'error';
         }

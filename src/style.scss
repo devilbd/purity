@@ -27,8 +27,12 @@ body {
     --gnome-header: rgba(36, 36, 36, 0.8);
     --gnome-input: rgba(255, 255, 255, 0.08);
     --gnome-border: rgba(255, 255, 255, 0.1);
+
+    /* GNOME 50 Semantic Colors */
     --gnome-success: #2ec27e;
     --gnome-error: #ed333b;
+    --gnome-info: #3584e4;
+    --gnome-warn: #f8e45c;
 
     /* Modern Geometry */
     --radius-window: 16px; /* Smoother, larger radius */
@@ -77,34 +81,68 @@ body {
     --blink-glow-opacity: 0.2;
 }
 
-/* GNOME 50 Success/Active State */
-.active {
-    border-color: var(--gnome-success) !important;
-    background-color: rgba(46, 194, 126, var(--state-tint-opacity));
+/* Base Label Styling */
+.label-base {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 12px;
+    border-radius: 999px; /* Pill shape for a modern GNOME chip look */
+    font-size: 11px; /* Slightly smaller for that 'tag' feel */
+    font-weight: 800; /* Extra bold for better readability on small surfaces */
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 
-    /* The "Glow" effect for glass surfaces */
-    box-shadow:
-        0 0 0 3px rgba(46, 194, 126, var(--state-glow-opacity)),
-        inset 0 1px rgba(255, 255, 255, 0.1);
+    /* GNOME 50 "Shiny" effect: Subtle top highlight and vertical gradient */
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 100%
+    );
+
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    transition: all var(--transition-fast) ease;
 }
 
-/* GNOME 50 Error State */
+/* GNOME 50 Success State Label */
+.success {
+    @extend .label-base;
+    background-color: var(--gnome-success);
+    color: white;
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.3),
+        /* Top inner highlight */ 0 2px 4px rgba(46, 194, 126, 0.3); /* Outer glow */
+}
+
+/* GNOME 50 Error State Label */
 .error {
-    border-color: var(--gnome-error) !important;
-    background-color: rgba(237, 51, 59, var(--state-tint-opacity));
-
-    /* The "Glow" effect for glass surfaces */
+    @extend .label-base;
+    color: white;
+    background-color: var(--gnome-error);
     box-shadow:
-        0 0 0 3px rgba(237, 51, 59, var(--state-glow-opacity)),
-        inset 0 1px rgba(255, 255, 255, 0.1);
+        inset 0 1px rgba(255, 255, 255, 0.3),
+        0 2px 4px rgba(237, 51, 59, 0.3);
 }
 
-/* Optional: Text adjustment for states */
-.error-text {
-    color: #ff7b72; /* Slightly brighter red for readability on dark glass */
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    margin-top: var(--spacing-xs);
+/* GNOME 50 Info State Label */
+.info {
+    @extend .label-base;
+    color: white;
+    background-color: var(--gnome-info);
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.3),
+        0 2px 4px rgba(53, 132, 228, 0.3);
+}
+
+/* GNOME 50 Warning State Label */
+.warn {
+    @extend .label-base;
+    color: rgba(0, 0, 0, 0.8); /* High contrast dark text for yellow */
+    background-color: var(--gnome-warn);
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.5),
+        /* Brighter highlight for yellow */ 0 2px 4px rgba(248, 228, 92, 0.3);
 }
 
 .custom-user {
