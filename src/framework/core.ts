@@ -76,17 +76,61 @@ export const updateValues = (
     }
 };
 
-export const getElement = (selector: string): HTMLElement | null => {
-    const result = document.querySelector(selector);
-    return result as HTMLElement;
-};
+const templateCache = new Map<string, string>();
 
 export abstract class Component extends HTMLElement {
+    protected templateUrl?: string;
+    protected initialized = false;
+
     constructor() {
         super();
     }
 
-    connectedCallback() {}
+    async connectedCallback() {
+        if (this.initialized) return;
+
+        if (this.templateUrl) {
+            await this.loadTemplate();
+        }
+
+        this.onInit();
+        this.initialized = true;
+    }
+
+    protected async loadTemplate() {
+        if (!this.templateUrl) return;
+
+        if (templateCache.has(this.templateUrl)) {
+            this.innerHTML = templateCache.get(this.templateUrl)!;
+        } else {
+            try {
+                const response = await fetch(this.templateUrl);
+                const template = await response.text();
+                templateCache.set(this.templateUrl, template);
+                this.innerHTML = template;
+            } catch (error) {
+                console.error(
+                    `Failed to load template from ${this.templateUrl}`,
+                    error,
+                );
+            }
+        }
+    }
+
+    /**
+     * Called after the template is loaded and injected.
+     * Override this to perform initialization logic like signal effects and DOM selection.
+     */
+    protected onInit() {}
+
+    /**
+     * Optional: manually trigger a re-render if needed.
+     */
+    protected render(content?: string) {
+        if (content) {
+            this.innerHTML = content;
+        }
+    }
 }
 
 export const defineComponent = (name: string, component: any) => {

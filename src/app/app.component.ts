@@ -1,8 +1,6 @@
 import {
     Component,
-    defineComponent,
     effect,
-    getElement,
     signal,
     updateStyles,
     updateTargets,
@@ -13,6 +11,8 @@ import "./custom-component/custom.component";
 import type { CustomComponent } from "./custom-component/custom.component";
 
 export class AppComponent extends Component {
+    templateUrl = "./src/app/app.component.html";
+
     loggedUser = signal<string | null>(null);
 
     resultContainer!: HTMLElement;
@@ -31,7 +31,9 @@ export class AppComponent extends Component {
 
     constructor() {
         super();
-        this.render();
+    }
+
+    protected onInit() {
         this.domInitializer();
 
         effect(() => {
@@ -43,45 +45,23 @@ export class AppComponent extends Component {
             );
             updateStyles([this.resultContainer], this.loginStatus);
         });
-    }
 
-    // consider to rework it
-    connectedCallback() {
-        // this needs to be hooked somewhere here,
-        // the import of AppComponent and then the exection into the <app-component> will trigger the constructor twice
         // register app to the global window object
         (window as any).app = this;
     }
 
-    render() {
-        this.innerHTML = `
-            <div class="window">
-              <div id="result"></div>
-              <input id="username" type="text" class="input-primary" value="${this.loggedUser()}" />
-              <input type="text" onkeyup="app.onTextInput(this)" class="input-primary" />
-              <div class="button-group">
-                <button class="button-primary" onclick="app.onLogin()">Login</button>
-                <button class="button-primary" onclick="app.onLogout()">Logout</button>
-                <button class="button-primary" onclick="app.setDefaultLogin()">
-                  Set explicitly value on login input
-                </button>
-              </div>
-            </div>
-            <custom-component></custom-component>
-        `;
-    }
-
     domInitializer() {
-        this.resultContainer = getElement("#result") as HTMLElement;
-        this.usernameField = getElement("#username") as HTMLInputElement;
-        this.customComponent = getElement(
+        this.resultContainer = this.querySelector("#result") as HTMLElement;
+        this.usernameField = this.querySelector(
+            "#username",
+        ) as HTMLInputElement;
+        this.customComponent = this.querySelector(
             "custom-component",
         ) as CustomComponent;
     }
 
     onTextInput(element: HTMLInputElement) {
         this.loggedUser.set(element.value);
-        this.customComponent.customProperty.set(element.value);
     }
 
     onLogin() {
@@ -93,10 +73,10 @@ export class AppComponent extends Component {
     }
 
     setDefaultLogin() {
-        // this.loggedUser.set('custom_user');
-        // setting custom property of custom component
         this.customComponent.customProperty.set(this.loggedUser());
     }
 }
 
-defineComponent("app-component", AppComponent);
+if (!customElements.get("app-component")) {
+    customElements.define("app-component", AppComponent);
+}
