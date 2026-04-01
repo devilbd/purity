@@ -98,12 +98,17 @@ body {
 @keyframes border-blink {
     0% {
         border-color: var(--gnome-border);
+        box-shadow: var(--shadow-deep);
     }
     50% {
         border-color: rgba(255, 255, 255, 0.8);
+        box-shadow:
+            0 0 20px rgba(255, 255, 255, 0.2),
+            var(--shadow-deep);
     }
     100% {
         border-color: var(--gnome-border);
+        box-shadow: var(--shadow-deep);
     }
 }
 
@@ -126,7 +131,9 @@ body {
     flex-direction: column;
 
     /* Transition for smooth entry/exit */
-    transition: border-color 0.5s ease;
+    transition:
+        border-color 0.5s ease,
+        box-shadow 0.5s ease;
 
     &:hover {
         animation: border-blink 2s infinite ease-in-out;
