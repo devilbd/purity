@@ -29,7 +29,7 @@ export class CustomComponent extends Component {
     }
 
     domInitializer() {
-        this.input1 = this.querySelector('#input1') as HTMLInputElement;
+        this.input1 = this.querySelector('.input1') as HTMLInputElement;
         this.displaySpan = this.querySelector(
             '#custom-property-display',
         ) as HTMLElement;

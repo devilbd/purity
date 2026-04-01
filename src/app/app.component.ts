@@ -20,6 +20,7 @@ export class AppComponent extends Component {
     resultContainer!: HTMLElement;
     usernameField!: HTMLInputElement;
     customComponent!: CustomComponent;
+    customComponent2!: CustomComponent;
 
     get loginStatus() {
         if (this.loggedUser()?.includes('custom_user')) {
@@ -60,6 +61,10 @@ export class AppComponent extends Component {
         this.customComponent = this.querySelector(
             'custom-component',
         ) as CustomComponent;
+
+        this.customComponent2 = this.querySelector(
+            '#component2',
+        ) as CustomComponent;
     }
 
     onTextInput(element: HTMLInputElement) {
@@ -76,6 +81,7 @@ export class AppComponent extends Component {
 
     setDefaultLogin() {
         this.customComponent.customProperty.set(this.loggedUser());
+        this.customComponent2.customProperty.set(this.loggedUser());
     }
 }
 
