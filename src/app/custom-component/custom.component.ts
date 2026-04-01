@@ -1,5 +1,10 @@
-import { effect, signal, updateValues } from '../../framework/core';
-import './custom.component.scss';
+import {
+    defineComponent,
+    effect,
+    signal,
+    updateValues,
+} from "../../framework/core";
+import "./custom.component.scss";
 
 export class CustomComponent extends HTMLElement {
     customProperty = signal<string | null>(null);
@@ -16,7 +21,7 @@ export class CustomComponent extends HTMLElement {
     }
 
     domInitializer() {
-        this.input1 = this.querySelector('#input1') as HTMLInputElement;
+        this.input1 = this.querySelector("#input1") as HTMLInputElement;
     }
 
     render() {
@@ -38,6 +43,4 @@ export class CustomComponent extends HTMLElement {
     }
 }
 
-if (!customElements.get('custom-component')) {
-    customElements.define('custom-component', CustomComponent);
-}
+defineComponent("custom-component", CustomComponent);
