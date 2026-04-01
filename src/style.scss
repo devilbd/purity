@@ -23,7 +23,12 @@ body {
 :root {
     /* GNOME 50 Colors with Transparency */
     --gnome-bg: #1e1e1e;
-    --gnome-surface: rgba(45, 45, 45, 0.7); /* Translucent */
+    --gnome-surface: rgba(
+        45,
+        45,
+        45,
+        0.4
+    ); /* More Translucent for visible blur */
     --gnome-header: rgba(36, 36, 36, 0.8);
     --gnome-input: rgba(255, 255, 255, 0.08);
     --gnome-border: rgba(255, 255, 255, 0.1);
