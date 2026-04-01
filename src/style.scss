@@ -91,7 +91,13 @@ body {
     border: 1px dashed rgb(5, 79, 148);
 }
 
+.window-base {
+    margin: 10px;
+}
+
 .window {
+    @extend .window-base;
+
     background: var(--gnome-surface);
     backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect); /* Support for Safari/iOS */
@@ -106,16 +112,14 @@ body {
 
     display: flex;
     flex-direction: column;
-    padding: 8px 12px;
+}
+
+.button-base {
     margin: 5px;
 }
 
-.button-group {
-    display: flex;
-    flex-direction: column;
-}
-
 .button-primary {
+    @extend .button-base;
     /* Use the GNOME Accent Blue with a slight transparency */
     background-color: rgba(53, 132, 228, 0.85);
     backdrop-filter: blur(10px);
@@ -140,7 +144,7 @@ body {
 
     /* Shadow for "Elevated" feel */
     box-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.2),
+        rgba(0, 0, 0, 0.2),
         inset 0 1px rgba(255, 255, 255, 0.1);
 
     cursor: pointer;
@@ -167,6 +171,10 @@ body {
     /* GNOME 50 uses a sharp "Outline" for keyboard navigation */
     box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.5);
 }
+.button-group {
+    display: flex;
+    flex-direction: row;
+}
 
 .button-secondary {
     background-color: rgba(255, 255, 255, 0.05);
@@ -180,7 +188,13 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
+.base-input {
+    margin: 5px;
+}
+
 .input-primary {
+    @extend .base-input;
+
     /* Use the translucent GNOME surface for that 'glass' feel */
     background-color: var(--gnome-input);
     backdrop-filter: var(--blur-effect);
@@ -252,6 +266,11 @@ body {
     font-weight: 400;
     font-size: 1.1rem;
     color: var(--gnome-accent);
+    .button-group {
+        display: flex;
+        flex-direction: row;
+    }
+
     letter-spacing: -0.5px;
 }
 
@@ -269,4 +288,26 @@ body {
 .nav-links a.active {
     background: var(--gnome-surface);
     color: white;
+}
+
+.flex-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-vertical > * {
+    margin: 5px;
+}
+
+.flex-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-horizontal > * {
+    margin: 5px;
 }
