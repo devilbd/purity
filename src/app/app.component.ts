@@ -1,5 +1,6 @@
 import {
     Component,
+    defineComponent,
     effect,
     signal,
     updateStyles,
@@ -77,6 +78,4 @@ export class AppComponent extends Component {
     }
 }
 
-if (!customElements.get("app-component")) {
-    customElements.define("app-component", AppComponent);
-}
+defineComponent("app-component", AppComponent);
