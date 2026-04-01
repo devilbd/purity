@@ -1,20 +1,26 @@
-<header-component></header-component>
-<div class="window">
-    <div class="flex-vertical">
-        <div id="result"></div>
-        <input id="username" type="text" class="input-primary" />
-        <input
-            type="text"
-            onkeyup="app.onTextInput(this)"
-            class="input-primary"
-        />
+<div class="app-component">
+    <header-component></header-component>
+    <div class="window">
+        <div class="flex-vertical">
+            <div id="result"></div>
+            <input id="username" type="text" class="input-primary" />
+            <input
+                type="text"
+                onkeyup="app.onTextInput(this)"
+                class="input-primary"
+            />
+        </div>
+        <div class="flex-horizontal">
+            <button class="button-primary" onclick="app.onLogin()">
+                Login
+            </button>
+            <button class="button-primary" onclick="app.onLogout()">
+                Logout
+            </button>
+            <button class="button-primary" onclick="app.setDefaultLogin()">
+                Set explicitly value on login input
+            </button>
+        </div>
     </div>
-    <div class="flex-horizontal">
-        <button class="button-primary" onclick="app.onLogin()">Login</button>
-        <button class="button-primary" onclick="app.onLogout()">Logout</button>
-        <button class="button-primary" onclick="app.setDefaultLogin()">
-            Set explicitly value on login input
-        </button>
-    </div>
+    <custom-component></custom-component>
 </div>
-<custom-component></custom-component>
