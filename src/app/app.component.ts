@@ -81,6 +81,7 @@ export class AppComponent extends Component {
 
     onTextInput(element: HTMLInputElement) {
         this.loggedUser.set(element.value);
+        this.customComponent.customProperty.set(element.value);
     }
 
     onLogin() {
