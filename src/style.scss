@@ -27,6 +27,8 @@ body {
     --gnome-header: rgba(36, 36, 36, 0.8);
     --gnome-input: rgba(255, 255, 255, 0.08);
     --gnome-border: rgba(255, 255, 255, 0.1);
+    --gnome-success: #2ec27e;
+    --gnome-error: #ed333b;
 
     /* Modern Geometry */
     --radius-window: 16px; /* Smoother, larger radius */
@@ -47,44 +49,62 @@ body {
 
     /* Typography */
     --font-mono: 'Adwaita Mono', 'Source Code Pro', monospace;
+    --font-main: 'Inter', sans-serif;
     --font-size-base: 15px; /* GNOME defaults slightly larger than Mac */
+    --font-size-sm: 14px;
+    --font-size-xs: 12px;
 
-    /* Geometry */
-    --radius-window: 12px;
-    --radius-control: 6px; /* GNOME controls are less rounded than Mac */
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.4);
+    /* Geometry & Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 5px;
+    --spacing-md: 8px;
+    --spacing-lg: 10px;
+    --spacing-xl: 16px;
+    --spacing-xxl: 20px;
+    --header-max-width: 1200px;
+
+    /* Transitions & Animations */
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
+    --transition-slow: 0.5s;
+    --anim-blink-duration: 2s;
+
+    /* State Opacities & Colors */
+    --state-glow-opacity: 0.3;
+    --state-tint-opacity: 0.1;
+    --blink-border-opacity: 0.8;
+    --blink-glow-spread: 20px;
+    --blink-glow-opacity: 0.2;
 }
 
 /* GNOME 50 Success/Active State */
 .active {
-    /* Adwaita Success Green: #2ec27e */
-    border-color: #2ec27e !important;
-    background-color: rgba(46, 194, 126, 0.1); /* Subtle tint */
+    border-color: var(--gnome-success) !important;
+    background-color: rgba(46, 194, 126, var(--state-tint-opacity));
 
     /* The "Glow" effect for glass surfaces */
     box-shadow:
-        0 0 0 3px rgba(46, 194, 126, 0.3),
+        0 0 0 3px rgba(46, 194, 126, var(--state-glow-opacity)),
         inset 0 1px rgba(255, 255, 255, 0.1);
 }
 
 /* GNOME 50 Error State */
 .error {
-    /* Adwaita Error Red: #ed333b */
-    border-color: #ed333b !important;
-    background-color: rgba(237, 51, 59, 0.1); /* Subtle tint */
+    border-color: var(--gnome-error) !important;
+    background-color: rgba(237, 51, 59, var(--state-tint-opacity));
 
     /* The "Glow" effect for glass surfaces */
     box-shadow:
-        0 0 0 3px rgba(237, 51, 59, 0.3),
+        0 0 0 3px rgba(237, 51, 59, var(--state-glow-opacity)),
         inset 0 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Optional: Text adjustment for states */
 .error-text {
     color: #ff7b72; /* Slightly brighter red for readability on dark glass */
-    font-size: 12px;
+    font-size: var(--font-size-xs);
     font-weight: 600;
-    margin-top: 4px;
+    margin-top: var(--spacing-xs);
 }
 
 .custom-user {
@@ -92,7 +112,7 @@ body {
 }
 
 .window-base {
-    margin: 10px;
+    margin: var(--spacing-lg);
 }
 
 @keyframes border-blink {
@@ -101,9 +121,10 @@ body {
         box-shadow: var(--shadow-deep);
     }
     50% {
-        border-color: rgba(255, 255, 255, 0.8);
+        border-color: rgba(255, 255, 255, var(--blink-border-opacity));
         box-shadow:
-            0 0 20px rgba(255, 255, 255, 0.2),
+            0 0 var(--blink-glow-spread)
+                rgba(255, 255, 255, var(--blink-glow-opacity)),
             var(--shadow-deep);
     }
     100% {
@@ -125,23 +146,23 @@ body {
 
     overflow: hidden;
     color: var(--text-main);
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-main);
 
     display: flex;
     flex-direction: column;
 
     /* Transition for smooth entry/exit */
     transition:
-        border-color 0.5s ease,
-        box-shadow 0.5s ease;
+        border-color var(--transition-slow) ease,
+        box-shadow var(--transition-slow) ease;
 
     &:hover {
-        animation: border-blink 2s infinite ease-in-out;
+        animation: border-blink var(--anim-blink-duration) infinite ease-in-out;
     }
 }
 
 .button-base {
-    margin: 5px;
+    margin: var(--spacing-sm);
 }
 
 .button-primary {
@@ -161,11 +182,11 @@ body {
     color: #ffffff;
     font-family: var(--font-main);
     font-weight: 700; /* GNOME buttons are bold for readability */
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 
     /* Geometry */
     padding: 10px 20px;
-    border-radius: var(--radius-control); /* 8px */
+    border-radius: var(--radius-control);
     border: 1px solid rgba(0, 0, 0, 0.2);
 
     /* Shadow for "Elevated" feel */
@@ -174,12 +195,12 @@ body {
         inset 0 1px rgba(255, 255, 255, 0.1);
 
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all var(--transition-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
     outline: none;
 }
 
 .button-primary:hover {
-    background-color: var(--accent-hover); /* #4791eb */
+    background-color: var(--accent-hover);
     /* Scale up slightly - a common modern "Gnome-ish" touch */
     transform: translateY(-1px);
     box-shadow:
@@ -188,7 +209,7 @@ body {
 }
 
 .button-primary:active {
-    background-color: var(--accent-active); /* #1c71d8 */
+    background-color: var(--accent-active);
     transform: translateY(0);
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -207,7 +228,6 @@ body {
     backdrop-filter: blur(10px);
     border: 1px solid var(--gnome-border);
     color: white;
-    /* ... same padding/radius as primary ... */
 }
 
 .button-secondary:hover {
@@ -215,7 +235,7 @@ body {
 }
 
 .base-input {
-    margin: 5px;
+    margin: var(--spacing-sm);
 }
 
 .input-primary {
@@ -228,17 +248,17 @@ body {
 
     /* GNOME 50 uses a darker, more defined border than Mac */
     border: 1px solid var(--gnome-border);
-    border-radius: var(--radius-control); /* 8px for a modern Linux feel */
+    border-radius: var(--radius-control);
 
     color: var(--text-main);
     padding: 10px 16px; /* Slightly taller for better touch/click targets */
     font-family: var(--font-main);
-    font-size: 14px;
+    font-size: var(--font-size-sm);
 
     /* Subtle inner shadow to give it an 'inset' look against the glass */
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
 }
 
@@ -263,7 +283,7 @@ body {
 
 /* Optional: GNOME 'Error' state if you're validating forms */
 .input-primary.error {
-    border-color: #ed333b; /* Adwaita Red */
+    border-color: var(--gnome-error);
     box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.2);
 }
 
@@ -279,7 +299,7 @@ body {
 }
 
 .header-content {
-    max-width: 1200px;
+    max-width: var(--header-max-width);
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
@@ -305,8 +325,8 @@ body {
     text-decoration: none;
     padding: 0.5rem 1rem;
     border-radius: var(--radius);
-    transition: all 0.2s ease;
-    margin: 0 4px;
+    transition: all var(--transition-fast) ease;
+    margin: 0 var(--spacing-xs);
     font-size: 0.9rem;
 }
 
@@ -324,7 +344,7 @@ body {
 }
 
 .flex-vertical > * {
-    margin: 5px;
+    margin: var(--spacing-sm);
 }
 
 .flex-horizontal {
@@ -335,7 +355,7 @@ body {
 }
 
 .flex-horizontal > * {
-    margin: 5px;
+    margin: var(--spacing-sm);
 }
 
 h1,
@@ -344,5 +364,5 @@ h3,
 h4,
 h5,
 h6 {
-    margin: 8px 16px;
+    margin: var(--spacing-md) var(--spacing-xl);
 }
