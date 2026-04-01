@@ -1,5 +1,5 @@
 type Signal<T> = {
-    (): T; // The "Getter"
+    (): T; // The 'Getter'
     set(value: T): void;
     update(fn: (val: T) => T): void;
 };
@@ -17,14 +17,14 @@ export const signal = <T>(initialValue: T): Signal<T> => {
         return value;
     }) as Signal<T>;
 
-    // 2. Attach the "set" method
+    // 2. Attach the 'set' method
     getter.set = (nextValue: T) => {
         if (Object.is(value, nextValue)) return; // Angular-like optimization
         value = nextValue;
         subscriptions.forEach((sub) => sub());
     };
 
-    // 3. Attach the "update" method (syntax sugar)
+    // 3. Attach the 'update' method (syntax sugar)
     getter.update = (fn: (val: T) => T) => {
         getter.set(fn(value));
     };
@@ -47,7 +47,7 @@ export const effect = (fn: Function) => {
 export const updateTargets = (
     elements: HTMLElement[],
     newValue: string | null,
-    ifNullValue = "",
+    ifNullValue = '',
 ) => {
     if (elements) {
         elements.forEach((element) => {
@@ -67,7 +67,7 @@ export const updateStyles = (elements: HTMLElement[], newValue: string) => {
 export const updateValues = (
     elements: HTMLInputElement[],
     newValue: string | null,
-    ifNullValue = "",
+    ifNullValue = '',
 ) => {
     if (elements) {
         elements.forEach((element) => {

@@ -1,8 +1,8 @@
-import { Component, defineComponent } from "../../framework/core";
-import "./header.component.scss";
+import { Component, defineComponent } from '../../framework/core';
+import './header.component.scss';
 
 export class HeaderComponent extends Component {
-    templateUrl = "./src/app/header/header.component.html";
+    templateUrl = './src/app/header/header.component.html';
 
     constructor() {
         super();
@@ -15,4 +15,4 @@ export class HeaderComponent extends Component {
     domInitializer() {}
 }
 
-defineComponent("header-component", HeaderComponent);
+defineComponent('header-component', HeaderComponent);

@@ -5,11 +5,11 @@ import {
     signal,
     updateTargets,
     updateValues,
-} from "../../framework/core";
-import "./custom.component.scss";
+} from '../../framework/core';
+import './custom.component.scss';
 
 export class CustomComponent extends Component {
-    templateUrl = "./src/app/custom-component/custom.component.html";
+    templateUrl = './src/app/custom-component/custom.component.html';
 
     customProperty = signal<string | null>(null);
     input1!: HTMLInputElement;
@@ -29,9 +29,9 @@ export class CustomComponent extends Component {
     }
 
     domInitializer() {
-        this.input1 = this.querySelector("#input1") as HTMLInputElement;
+        this.input1 = this.querySelector('#input1') as HTMLInputElement;
         this.displaySpan = this.querySelector(
-            "#custom-property-display",
+            '#custom-property-display',
         ) as HTMLElement;
     }
 
@@ -44,4 +44,4 @@ export class CustomComponent extends Component {
     }
 }
 
-defineComponent("custom-component", CustomComponent);
+defineComponent('custom-component', CustomComponent);

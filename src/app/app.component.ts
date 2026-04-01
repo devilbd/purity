@@ -6,14 +6,14 @@ import {
     updateStyles,
     updateTargets,
     updateValues,
-} from "../framework/core";
-import "./app.component.scss";
-import "./custom-component/custom.component";
-import type { CustomComponent } from "./custom-component/custom.component";
-import "./header/header.component";
+} from '../framework/core';
+import './app.component.scss';
+import './custom-component/custom.component';
+import type { CustomComponent } from './custom-component/custom.component';
+import './header/header.component';
 
 export class AppComponent extends Component {
-    templateUrl = "./src/app/app.component.html";
+    templateUrl = './src/app/app.component.html';
 
     loggedUser = signal<string | null>(null);
 
@@ -22,12 +22,12 @@ export class AppComponent extends Component {
     customComponent!: CustomComponent;
 
     get loginStatus() {
-        if (this.loggedUser()?.includes("custom_user")) {
-            return "custom-user";
+        if (this.loggedUser()?.includes('custom_user')) {
+            return 'custom-user';
         } else if (this.loggedUser()) {
-            return "active";
+            return 'active';
         } else {
-            return "error";
+            return 'error';
         }
     }
 
@@ -43,7 +43,7 @@ export class AppComponent extends Component {
             updateTargets(
                 [this.resultContainer],
                 this.loggedUser(),
-                "Not signed in.",
+                'Not signed in.',
             );
             updateStyles([this.resultContainer], this.loginStatus);
         });
@@ -53,12 +53,12 @@ export class AppComponent extends Component {
     }
 
     domInitializer() {
-        this.resultContainer = this.querySelector("#result") as HTMLElement;
+        this.resultContainer = this.querySelector('#result') as HTMLElement;
         this.usernameField = this.querySelector(
-            "#username",
+            '#username',
         ) as HTMLInputElement;
         this.customComponent = this.querySelector(
-            "custom-component",
+            'custom-component',
         ) as CustomComponent;
     }
 
@@ -67,7 +67,7 @@ export class AppComponent extends Component {
     }
 
     onLogin() {
-        this.loggedUser.set("some user");
+        this.loggedUser.set('some user');
     }
 
     onLogout() {
@@ -79,4 +79,4 @@ export class AppComponent extends Component {
     }
 }
 
-defineComponent("app-component", AppComponent);
+defineComponent('app-component', AppComponent);
