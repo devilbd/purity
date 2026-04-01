@@ -197,6 +197,8 @@ body {
     &:hover {
         animation: border-blink var(--anim-blink-duration) infinite ease-in-out;
     }
+
+    padding: 10px;
 }
 
 .button-base {
