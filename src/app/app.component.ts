@@ -10,6 +10,7 @@ import {
 import "./app.component.scss";
 import "./custom-component/custom.component";
 import type { CustomComponent } from "./custom-component/custom.component";
+import "./header/header.component";
 
 export class AppComponent extends Component {
     templateUrl = "./src/app/app.component.html";
