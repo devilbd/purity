@@ -95,6 +95,18 @@ body {
     margin: 10px;
 }
 
+@keyframes border-blink {
+    0% {
+        border-color: var(--gnome-border);
+    }
+    50% {
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+    100% {
+        border-color: var(--gnome-border);
+    }
+}
+
 .window {
     @extend .window-base;
 
@@ -112,6 +124,13 @@ body {
 
     display: flex;
     flex-direction: column;
+
+    /* Transition for smooth entry/exit */
+    transition: border-color 0.5s ease;
+
+    &:hover {
+        animation: border-blink 2s infinite ease-in-out;
+    }
 }
 
 .button-base {
