@@ -1,0 +1,37 @@
+import {
+    Component,
+    defineComponent,
+    effect,
+    signal,
+} from '../../../../framework/core';
+import './raw-template.component.scss';
+
+export class RawTemplateComponent extends Component {
+    customProperty = signal(0);
+
+    get template() {
+        return `
+            <div class="raw-template-component-root window">
+                <h2>Raw Template Component</h2>
+                <div>${this.customProperty()}</div>
+            </div>
+        `;
+    }
+
+    constructor() {
+        super();
+    }
+
+    protected onInit() {
+        effect(() => {
+            if (this.customProperty()) {
+                this.render(this.template);
+            }
+        });
+        this.domInitializer();
+    }
+
+    domInitializer() {}
+}
+
+defineComponent('raw-template', RawTemplateComponent);
