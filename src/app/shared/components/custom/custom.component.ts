@@ -14,12 +14,11 @@ export class CustomComponent extends Component {
     templateUrl = './src/app/shared/components/custom/custom.component.html';
 
     customProperty = signal<string | null>(null);
+    elementsMap = new Map<string, HTMLElement>();
 
     get name() {
         return this.getAttribute('name') || '';
     }
-
-    elements: HTMLElement[] = [];
 
     constructor() {
         super();
@@ -30,21 +29,30 @@ export class CustomComponent extends Component {
 
         effect(() => {
             const propVal = this.customProperty();
-            updateValues([this.elements[0]], propVal);
-            updateTargets([this.elements[1]], propVal);
+            const input = this.elementsMap.get('input');
+            const display = this.elementsMap.get('display');
+
+            if (input) updateValues([input], propVal);
+            if (display) updateTargets([display], propVal);
         });
     }
 
     domInitializer() {
-        // edge case
         const rootEl = getElement(`[name="${this.name}"]`);
-        this.elements = getElements(
-            ['.input1', '.custom-property-display', '.clear-button'],
-            rootEl!,
-        );
-        this.elements[2]?.addEventListener('click', () => {
-            this.onClear();
-        });
+        if (rootEl) {
+            this.elementsMap = getElements(
+                {
+                    input: '.input1',
+                    display: '.custom-property-display',
+                    clearBtn: '.clear-button',
+                },
+                rootEl,
+            );
+
+            this.elementsMap.get('clearBtn')?.addEventListener('click', () => {
+                this.onClear();
+            });
+        }
     }
 
     onClear() {

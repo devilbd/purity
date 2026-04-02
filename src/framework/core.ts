@@ -7,7 +7,7 @@ export type Signal<T> = {
 const context: Function[] = [];
 
 /**
- * Reactivity Namespace
+ * Reactivity
  */
 export const signal = <T>(initialValue: T): Signal<T> => {
     let value = initialValue;
@@ -44,13 +44,8 @@ export const effect = (fn: Function) => {
     execute();
 };
 
-export const Reactivity = {
-    signal,
-    effect,
-};
-
 /**
- * DOM Utilities Namespace
+ * DOM Utilities
  */
 export const updateTargets = (
     elements: HTMLElement[],
@@ -107,31 +102,33 @@ export const eventListener = (
 
 export const getElement = (
     selector: string,
-    rootEl?: HTMLElement,
+    rootEl?: HTMLElement | Document,
 ): HTMLElement | null => {
-    const result = rootEl
-        ? rootEl.querySelector(selector)
-        : document.querySelector(selector);
+    const root = rootEl || document;
+    const result = root.querySelector(selector);
     return result as HTMLElement;
 };
 
 export const getElements = (
-    selectors: string[],
-    rootEl?: HTMLElement,
-): HTMLElement[] => {
-    let result: HTMLElement[] = [];
-    selectors.map((selector) => {
-        const el = rootEl
-            ? rootEl.querySelector(selector)
-            : document.querySelector(selector);
+    selectors: Record<string, string>,
+    rootEl?: HTMLElement | Document,
+): Map<string, HTMLElement> => {
+    const result = new Map<string, HTMLElement>();
+    const root = rootEl || document;
+
+    Object.entries(selectors).forEach(([key, selector]) => {
+        const el = root.querySelector(selector);
         if (el) {
-            result.push(el as HTMLElement);
+            result.set(key, el as HTMLElement);
         }
     });
 
-    return result as HTMLElement[];
+    return result;
 };
 
+/**
+ * UI Components
+ */
 const templateCache = new Map<string, string>();
 
 export abstract class Component extends HTMLElement {
@@ -144,7 +141,7 @@ export abstract class Component extends HTMLElement {
 
     async connectedCallback() {
         if (this.initialized) return;
-        this.initialized = true; // Mark as initialized immediately to prevent recursion
+        this.initialized = true;
 
         if (this.templateUrl) {
             await this.loadTemplate();

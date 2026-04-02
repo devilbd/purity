@@ -2,7 +2,7 @@ import {
     Component,
     defineComponent,
     effect,
-    getElement,
+    getElements,
     signal,
     updateStyles,
     updateTargets,
@@ -58,19 +58,27 @@ export class AppComponent extends Component {
     }
 
     domInitializer() {
-        this.resultContainer = this.querySelector('#result') as HTMLElement;
-        this.usernameField = this.querySelector(
-            '#username',
-        ) as HTMLInputElement;
-        this.customComponent1 = this.querySelector(
-            '#component1',
-        ) as CustomComponent;
-        this.customComponent2 = this.querySelector(
-            '#component2',
-        ) as CustomComponent;
-        this.rawTemplateComponent = getElement(
-            '#raw-template',
+        const elementsMap = getElements(
+            {
+                result: '#result',
+                username: '#username',
+                component1: '#component1',
+                component2: '#component2',
+                rawTemplate: '#raw-template',
+            },
             this,
+        );
+
+        this.resultContainer = elementsMap.get('result')!;
+        this.usernameField = elementsMap.get('username') as HTMLInputElement;
+        this.customComponent1 = elementsMap.get(
+            'component1',
+        ) as CustomComponent;
+        this.customComponent2 = elementsMap.get(
+            'component2',
+        ) as CustomComponent;
+        this.rawTemplateComponent = elementsMap.get(
+            'rawTemplate',
         ) as RawTemplateComponent;
     }
 
