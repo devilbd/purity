@@ -35,10 +35,7 @@ export class RawTemplateComponent extends Component {
                 this.render(this.template);
             }
         });
-        this.domInitializer();
     }
-
-    domInitializer() {}
 }
 
 defineComponent('raw-template', RawTemplateComponent);
