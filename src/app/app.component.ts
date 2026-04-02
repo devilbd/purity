@@ -2,15 +2,18 @@ import {
     Component,
     defineComponent,
     effect,
+    getElement,
     signal,
     updateStyles,
     updateTargets,
     updateValues,
 } from '../framework/core';
 import './app.component.scss';
-import './shared/components/custom-component/custom.component';
-import type { CustomComponent } from './shared/components/custom-component/custom.component';
 import './shared/components/header/header.component';
+import './shared/components/custom/custom.component';
+import './shared/components/raw-template/raw-template.component';
+import type { CustomComponent } from './shared/components/custom/custom.component';
+import type { RawTemplateComponent } from './shared/components/raw-template/raw-template.component';
 
 export class AppComponent extends Component {
     templateUrl = './src/app/app.component.html';
@@ -21,6 +24,7 @@ export class AppComponent extends Component {
     usernameField!: HTMLInputElement;
     customComponent1!: CustomComponent;
     customComponent2!: CustomComponent;
+    rawTemplateComponent!: RawTemplateComponent;
 
     get loginStatus() {
         if (this.loggedUser()?.includes('custom_user')) {
@@ -64,6 +68,10 @@ export class AppComponent extends Component {
         this.customComponent2 = this.querySelector(
             '#component2',
         ) as CustomComponent;
+        this.rawTemplateComponent = getElement(
+            '#raw-template',
+            this,
+        ) as RawTemplateComponent;
     }
 
     onTextInput(element: HTMLInputElement) {
@@ -81,6 +89,7 @@ export class AppComponent extends Component {
     setDefaultLogin() {
         this.customComponent1.customProperty.set(this.loggedUser());
         this.customComponent2.customProperty.set(this.loggedUser());
+        this.rawTemplateComponent.customProperty.update((val) => val + 1);
     }
 }
 
