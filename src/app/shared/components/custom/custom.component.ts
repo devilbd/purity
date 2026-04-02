@@ -6,6 +6,7 @@ import {
     updateTargets,
     updateValues,
     getElements,
+    getElement,
 } from '../../../../framework/core';
 import './custom.component.scss';
 
@@ -28,18 +29,22 @@ export class CustomComponent extends Component {
         this.domInitializer();
 
         effect(() => {
-            updateValues([this.elements[1]], this.customProperty());
-            updateTargets([this.elements[0]], this.customProperty());
+            const propVal = this.customProperty();
+            updateValues([this.elements[0]], propVal);
+            updateTargets([this.elements[1]], propVal);
         });
     }
 
     domInitializer() {
         // edge case
-        // const rootEl = getElement(`[name="${this.name}"]`);
+        const rootEl = getElement(`[name="${this.name}"]`);
         this.elements = getElements(
-            '.input1, .custom-property-display, .clear-button',
-            this,
+            ['.input1', '.custom-property-display', '.clear-button'],
+            rootEl!,
         );
+        this.elements[2]?.addEventListener('click', () => {
+            this.onClear();
+        });
     }
 
     onClear() {

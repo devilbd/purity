@@ -73,7 +73,7 @@ export const updateStyles = (elements: HTMLElement[], newValue: string) => {
 };
 
 export const updateValues = (
-    elements: HTMLInputElement[],
+    elements: HTMLElement[],
     newValue: string | null,
     ifNullValue = '',
 ) => {
@@ -116,12 +116,19 @@ export const getElement = (
 };
 
 export const getElements = (
-    selector: string,
+    selectors: string[],
     rootEl?: HTMLElement,
 ): HTMLElement[] => {
-    const result = rootEl
-        ? rootEl.querySelectorAll(selector)
-        : document.querySelectorAll(selector);
+    let result: HTMLElement[] = [];
+    selectors.map((selector) => {
+        const el = rootEl
+            ? rootEl.querySelector(selector)
+            : document.querySelector(selector);
+        if (el) {
+            result.push(el as HTMLElement);
+        }
+    });
+
     return result as HTMLElement[];
 };
 
