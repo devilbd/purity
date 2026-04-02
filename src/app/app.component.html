@@ -5,20 +5,12 @@
         <div class="flex-vertical">
             <div id="result"></div>
             <input id="username" type="text" class="input-primary" />
-            <input
-                type="text"
-                onkeyup="app.onTextInput(this)"
-                class="input-primary"
-            />
+            <input type="text" class="input-primary user-input" />
         </div>
         <div class="flex-horizontal">
-            <button class="button-primary" onclick="app.onLogin()">
-                Login
-            </button>
-            <button class="button-primary" onclick="app.onLogout()">
-                Logout
-            </button>
-            <button class="button-primary" onclick="app.setDefaultLogin()">
+            <button class="button-primary login-btn">Login</button>
+            <button class="button-primary logout-btn">Logout</button>
+            <button class="button-primary default-login-btn">
                 Set explicitly value on login input
             </button>
         </div>
