@@ -115,6 +115,16 @@ export const getElement = (
     return result as HTMLElement;
 };
 
+export const getElements = (
+    selector: string,
+    rootEl?: HTMLElement,
+): HTMLElement[] => {
+    const result = rootEl
+        ? rootEl.querySelectorAll(selector)
+        : document.querySelectorAll(selector);
+    return result as HTMLElement[];
+};
+
 const templateCache = new Map<string, string>();
 
 export abstract class Component extends HTMLElement {

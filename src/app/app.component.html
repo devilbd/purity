@@ -5,7 +5,11 @@
         <div class="flex-vertical">
             <div id="result"></div>
             <input id="username" type="text" class="input-primary" />
-            <input type="text" class="input-primary user-input" />
+            <input
+                type="text"
+                class="input-primary user-input"
+                oninput="app.onTextInput(this)"
+            />
         </div>
         <div class="flex-horizontal">
             <button
