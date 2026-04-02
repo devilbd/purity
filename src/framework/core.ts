@@ -1,4 +1,4 @@
-type Signal<T> = {
+export type Signal<T> = {
     (): T; // The 'Getter'
     set(value: T): void;
     update(fn: (val: T) => T): void;
@@ -6,25 +6,25 @@ type Signal<T> = {
 
 const context: Function[] = [];
 
+/**
+ * Reactivity Namespace
+ */
 export const signal = <T>(initialValue: T): Signal<T> => {
     let value = initialValue;
     const subscriptions = new Set<Function>();
 
-    // 1. Define the getter function
     const getter = (() => {
         const running = context[context.length - 1];
         if (running) subscriptions.add(running);
         return value;
     }) as Signal<T>;
 
-    // 2. Attach the 'set' method
     getter.set = (nextValue: T) => {
-        if (Object.is(value, nextValue)) return; // Angular-like optimization
+        if (Object.is(value, nextValue)) return;
         value = nextValue;
         subscriptions.forEach((sub) => sub());
     };
 
-    // 3. Attach the 'update' method (syntax sugar)
     getter.update = (fn: (val: T) => T) => {
         getter.set(fn(value));
     };
@@ -44,6 +44,14 @@ export const effect = (fn: Function) => {
     execute();
 };
 
+export const Reactivity = {
+    signal,
+    effect,
+};
+
+/**
+ * DOM Utilities Namespace
+ */
 export const updateTargets = (
     elements: HTMLElement[],
     newValue: string | null,
@@ -76,6 +84,21 @@ export const updateValues = (
     }
 };
 
+export const getElement = (selector: string): HTMLElement | null => {
+    const result = document.querySelector(selector);
+    return result as HTMLElement;
+};
+
+export const Dom = {
+    updateTargets,
+    updateStyles,
+    updateValues,
+    getElement,
+};
+
+/**
+ * UI Components Namespace
+ */
 const templateCache = new Map<string, string>();
 
 export abstract class Component extends HTMLElement {
@@ -88,13 +111,13 @@ export abstract class Component extends HTMLElement {
 
     async connectedCallback() {
         if (this.initialized) return;
+        this.initialized = true; // Mark as initialized immediately to prevent recursion
 
         if (this.templateUrl) {
             await this.loadTemplate();
         }
 
         this.onInit();
-        this.initialized = true;
     }
 
     protected async loadTemplate() {
@@ -117,15 +140,8 @@ export abstract class Component extends HTMLElement {
         }
     }
 
-    /**
-     * Called after the template is loaded and injected.
-     * Override this to perform initialization logic like signal effects and DOM selection.
-     */
     protected onInit() {}
 
-    /**
-     * Optional: manually trigger a re-render if needed.
-     */
     protected render(content?: string) {
         if (content) {
             this.innerHTML = content;
@@ -139,4 +155,18 @@ export const defineComponent = (name: string, component: any) => {
     } else {
         console.error(`Component ${name} is already defined`);
     }
+};
+
+export const UI = {
+    Component,
+    defineComponent,
+};
+
+/**
+ * Core Framework Namespace (Aggregator)
+ */
+export const Purity = {
+    Reactivity,
+    Dom,
+    UI,
 };

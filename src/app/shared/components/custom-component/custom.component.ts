@@ -5,11 +5,12 @@ import {
     signal,
     updateTargets,
     updateValues,
-} from '../../framework/core';
+} from '../../../../framework/core';
 import './custom.component.scss';
 
 export class CustomComponent extends Component {
-    templateUrl = './src/app/custom-component/custom.component.html';
+    templateUrl =
+        './src/app/shared/components/custom-component/custom.component.html';
 
     customProperty = signal<string | null>(null);
     input1!: HTMLInputElement;
