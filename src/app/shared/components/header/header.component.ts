@@ -7,12 +7,6 @@ export class HeaderComponent extends Component {
     constructor() {
         super();
     }
-
-    protected onInit() {
-        this.domInitializer();
-    }
-
-    domInitializer() {}
 }
 
 defineComponent('header-component', HeaderComponent);

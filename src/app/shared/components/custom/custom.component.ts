@@ -49,7 +49,7 @@ export class CustomComponent extends Component {
                 rootEl,
             );
 
-            // same component rendered twice but with different instances
+            // Just in case that same component rendered twice but with different instances
             this.elementsMap.get('clearBtn')?.addEventListener('click', () => {
                 this.onClear();
             });
