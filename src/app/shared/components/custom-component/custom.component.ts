@@ -5,6 +5,7 @@ import {
     signal,
     updateTargets,
     updateValues,
+    getElement,
 } from '../../../../framework/core';
 import './custom.component.scss';
 
@@ -15,8 +16,11 @@ export class CustomComponent extends Component {
     customProperty = signal<string | null>(null);
     input1!: HTMLInputElement;
     displaySpan!: HTMLElement;
-    rootElement!: HTMLElement;
-    clearBtn!: HTMLButtonElement;
+    clearButton!: HTMLButtonElement;
+
+    get name() {
+        return this.getAttribute('name') || '';
+    }
 
     constructor() {
         super();
@@ -29,30 +33,19 @@ export class CustomComponent extends Component {
             updateValues([this.input1], this.customProperty());
             updateTargets([this.displaySpan], this.customProperty());
         });
-
-        // Add event listeners to the current instance elements
-        this.rootElement.addEventListener('click', (e) =>
-            this.onCustomPropertyClicked(e),
-        );
-        this.clearBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // prevent triggering rootElement click
-            this.onClear();
-        });
     }
 
     domInitializer() {
-        this.rootElement = this.querySelector(
-            '.custom-component-root',
+        // edge case
+        const rootEl = getElement(`[name="${this.name}"]`);
+        this.input1 = rootEl?.querySelector('.input1') as HTMLInputElement;
+        this.displaySpan = rootEl?.querySelector(
+            '.custom-property-display',
         ) as HTMLElement;
-        this.clearBtn = this.querySelector('.clear-btn') as HTMLButtonElement;
-        this.input1 = this.querySelector('.input1') as HTMLInputElement;
-        this.displaySpan = this.querySelector(
-            '#custom-property-display',
-        ) as HTMLElement;
-    }
-
-    onCustomPropertyClicked(e: MouseEvent) {
-        console.log('Custom component clicked:', this.customProperty(), e);
+        this.clearButton = rootEl?.querySelector(
+            '.clear-button',
+        ) as HTMLButtonElement;
+        this.clearButton.addEventListener('click', () => this.onClear());
     }
 
     onClear() {

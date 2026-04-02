@@ -84,21 +84,37 @@ export const updateValues = (
     }
 };
 
-export const getElement = (selector: string): HTMLElement | null => {
-    const result = document.querySelector(selector);
+export const eventListener = (
+    elements: HTMLElement[],
+    event: string,
+    handler: EventListenerOrEventListenerObject,
+) => {
+    if (elements) {
+        elements.forEach((element) => {
+            element.addEventListener(event, handler);
+        });
+    }
+    return {
+        dispose: () => {
+            if (elements) {
+                elements.forEach((element) => {
+                    element.removeEventListener(event, handler);
+                });
+            }
+        },
+    };
+};
+
+export const getElement = (
+    selector: string,
+    rootEl?: HTMLElement,
+): HTMLElement | null => {
+    const result = rootEl
+        ? rootEl.querySelector(selector)
+        : document.querySelector(selector);
     return result as HTMLElement;
 };
 
-export const Dom = {
-    updateTargets,
-    updateStyles,
-    updateValues,
-    getElement,
-};
-
-/**
- * UI Components Namespace
- */
 const templateCache = new Map<string, string>();
 
 export abstract class Component extends HTMLElement {
@@ -155,18 +171,4 @@ export const defineComponent = (name: string, component: any) => {
     } else {
         console.error(`Component ${name} is already defined`);
     }
-};
-
-export const UI = {
-    Component,
-    defineComponent,
-};
-
-/**
- * Core Framework Namespace (Aggregator)
- */
-export const Purity = {
-    Reactivity,
-    Dom,
-    UI,
 };

@@ -19,13 +19,8 @@ export class AppComponent extends Component {
 
     resultContainer!: HTMLElement;
     usernameField!: HTMLInputElement;
-    customComponent!: CustomComponent;
+    customComponent1!: CustomComponent;
     customComponent2!: CustomComponent;
-
-    loginBtn!: HTMLButtonElement;
-    logoutBtn!: HTMLButtonElement;
-    defaultLoginBtn!: HTMLButtonElement;
-    userInput!: HTMLInputElement;
 
     get loginStatus() {
         if (this.loggedUser()?.includes('custom_user')) {
@@ -54,15 +49,6 @@ export class AppComponent extends Component {
             updateStyles([this.resultContainer], this.loginStatus);
         });
 
-        this.loginBtn.addEventListener('click', () => this.onLogin());
-        this.logoutBtn.addEventListener('click', () => this.onLogout());
-        this.defaultLoginBtn.addEventListener('click', () =>
-            this.setDefaultLogin(),
-        );
-        this.userInput.addEventListener('keyup', (e) =>
-            this.onTextInput(e.target as HTMLInputElement),
-        );
-
         // register app to the global window object
         (window as any).app = this;
     }
@@ -72,19 +58,12 @@ export class AppComponent extends Component {
         this.usernameField = this.querySelector(
             '#username',
         ) as HTMLInputElement;
-        this.customComponent = this.querySelector(
+        this.customComponent1 = this.querySelector(
             '#component1',
         ) as CustomComponent;
         this.customComponent2 = this.querySelector(
             '#component2',
         ) as CustomComponent;
-
-        this.loginBtn = this.querySelector('.login-btn') as HTMLButtonElement;
-        this.logoutBtn = this.querySelector('.logout-btn') as HTMLButtonElement;
-        this.defaultLoginBtn = this.querySelector(
-            '.default-login-btn',
-        ) as HTMLButtonElement;
-        this.userInput = this.querySelector('.user-input') as HTMLInputElement;
     }
 
     onTextInput(element: HTMLInputElement) {
@@ -100,7 +79,7 @@ export class AppComponent extends Component {
     }
 
     setDefaultLogin() {
-        this.customComponent.customProperty.set(this.loggedUser());
+        this.customComponent1.customProperty.set(this.loggedUser());
         this.customComponent2.customProperty.set(this.loggedUser());
     }
 }

@@ -8,13 +8,32 @@
             <input type="text" class="input-primary user-input" />
         </div>
         <div class="flex-horizontal">
-            <button class="button-primary login-btn">Login</button>
-            <button class="button-primary logout-btn">Logout</button>
-            <button class="button-primary default-login-btn">
+            <button
+                class="button-primary login-btn"
+                onclick="app.onLogin(this)"
+            >
+                Login
+            </button>
+            <button
+                class="button-primary logout-btn"
+                onclick="app.onLogout(this)"
+            >
+                Logout
+            </button>
+            <button
+                class="button-primary default-login-btn"
+                onclick="app.setDefaultLogin(this)"
+            >
                 Set explicitly value on login input
             </button>
         </div>
     </div>
-    <custom-component id="component1"></custom-component>
-    <custom-component id="component2"></custom-component>
+    <custom-component
+        id="component1"
+        name="customComponent1"
+    ></custom-component>
+    <custom-component
+        id="component2"
+        name="customComponent2"
+    ></custom-component>
 </div>
