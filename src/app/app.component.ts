@@ -14,6 +14,7 @@ import './shared/components/custom/custom.component';
 import './shared/components/raw-template/raw-template.component';
 import type { CustomComponent } from './shared/components/custom/custom.component';
 import type { RawTemplateComponent } from './shared/components/raw-template/raw-template.component';
+import { drag } from './shared/behaviors/draggable';
 
 export class AppComponent extends Component {
     templateUrl = './src/app/app.component.html';
@@ -80,6 +81,8 @@ export class AppComponent extends Component {
         this.rawTemplateComponent = elementsMap.get(
             'rawTemplate',
         ) as RawTemplateComponent;
+
+        drag({ selector: '#component1', constrainTo: 'body', snapGrid: { x: 50, y: 50 } });
     }
 
     onTextInput(element: HTMLInputElement) {
