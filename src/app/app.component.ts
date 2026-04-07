@@ -92,7 +92,16 @@ export class AppComponent extends Component {
             selector: '#component1', 
             constrainTo: 'body', 
             snapGrid: { x: 50, y: 50 },
-            handle: '.drag-handle'
+            handle: '.drag-handle',
+            onDragStart: (el: HTMLElement) => {
+                el.classList.add('dragging');
+            },
+            onDragMove: (el: HTMLElement, x: number, y: number) => {
+                el.style.transform = `translate(${x}px, ${y}px)`;
+            },
+            onDragEnd: (el: HTMLElement) => {
+                el.classList.remove('dragging');
+            }
         };
         drag(dragOptions);
     }
