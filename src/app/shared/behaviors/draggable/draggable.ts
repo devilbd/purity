@@ -1,4 +1,5 @@
-import { getElement } from '../../../framework/core';
+import { getElement } from '../../../../framework/core';
+import './draggable.scss';
 
 export interface DragOptions {
     selector: string;
@@ -20,6 +21,8 @@ export function drag(options: DragOptions) {
     let currentX = 0;
     let currentY = 0;
 
+    let lastSnappedX = 0;
+    let lastSnappedY = 0;
     let baseLeft = 0;
     let baseTop = 0;
     let containerRect: DOMRect | null = null;
@@ -59,6 +62,8 @@ export function drag(options: DragOptions) {
         const { x, y } = getTransform();
         currentX = x;
         currentY = y;
+        lastSnappedX = x;
+        lastSnappedY = y;
 
         if (container) {
             containerRect = container.getBoundingClientRect();
@@ -75,7 +80,10 @@ export function drag(options: DragOptions) {
         // Add visual feedback
         if (activeHandle) activeHandle.style.cursor = 'grabbing';
         element.style.zIndex = '1000';
-        element.style.transition = 'none'; // Disable transitions during drag
+        // Enable a snappy transition for snapping movement to smooth out the "jumps"
+        element.style.transition = options.snapGrid 
+            ? 'transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1.1)' 
+            : 'none';
         element.style.userSelect = 'none';
         
         element.classList.add('is-dragging');
@@ -105,6 +113,15 @@ export function drag(options: DragOptions) {
             nextY = Math.max(minY, Math.min(maxY, nextY));
         }
 
+        // Visual feedback when a snap occurs
+        if (options.snapGrid && (nextX !== lastSnappedX || nextY !== lastSnappedY)) {
+            lastSnappedX = nextX;
+            lastSnappedY = nextY;
+            element.classList.remove('snap-hit');
+            void element.offsetWidth; // Trigger reflow to restart animation
+            element.classList.add('snap-hit');
+        }
+
         // Use requestAnimationFrame for smoother performance
         requestAnimationFrame(() => {
             element.style.transform = `translate(${nextX}px, ${nextY}px)`;
@@ -122,7 +139,10 @@ export function drag(options: DragOptions) {
             activeHandle.style.cursor = 'grab';
         }
         element.classList.remove('is-dragging');
+        element.classList.remove('snap-hit');
         element.style.userSelect = '';
+        element.style.zIndex = '';
+        element.style.transition = '';
     };
 
     element.addEventListener('pointerdown', onPointerDown);
