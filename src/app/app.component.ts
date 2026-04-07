@@ -82,7 +82,17 @@ export class AppComponent extends Component {
             'rawTemplate',
         ) as RawTemplateComponent;
 
-        drag({ selector: '#component1', constrainTo: 'body', snapGrid: { x: 50, y: 50 } });
+        this.draggableBehavior();
+    }
+
+    draggableBehavior() {
+        const dragOptions = { 
+            selector: '#component1', 
+            constrainTo: 'body', 
+            snapGrid: { x: 50, y: 50 },
+            handle: '.drag-handle'
+        };
+        drag(dragOptions);
     }
 
     onTextInput(element: HTMLInputElement) {

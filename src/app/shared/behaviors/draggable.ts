@@ -26,7 +26,7 @@ export function drag(options: DragOptions) {
     let elementWidth = 0;
     let elementHeight = 0;
     const container = options.constrainTo ? getElement(options.constrainTo) : null;
-    const handle = options.handle ? element.querySelector(options.handle) as HTMLElement : null;
+    let activeHandle: HTMLElement | null = null;
 
     // Helper to get current transform values
     const getTransform = () => {
@@ -43,8 +43,13 @@ export function drag(options: DragOptions) {
             return;
         }
 
-        if (handle && !handle.contains(target)) {
-            return;
+        if (options.handle) {
+            activeHandle = target.closest(options.handle) as HTMLElement;
+            if (!activeHandle || !element.contains(activeHandle)) {
+                return;
+            }
+        } else {
+            activeHandle = element;
         }
 
         isDragging = true;
@@ -68,7 +73,7 @@ export function drag(options: DragOptions) {
         element.setPointerCapture(e.pointerId);
         
         // Add visual feedback
-        (handle || element).style.cursor = 'grabbing';
+        if (activeHandle) activeHandle.style.cursor = 'grabbing';
         element.style.zIndex = '1000';
         element.style.transition = 'none'; // Disable transitions during drag
         element.style.userSelect = 'none';
@@ -113,19 +118,24 @@ export function drag(options: DragOptions) {
         element.releasePointerCapture(e.pointerId);
 
         // Reset visual feedback
-        (handle || element).style.cursor = 'grab';
+        if (activeHandle) {
+            activeHandle.style.cursor = 'grab';
+        }
         element.classList.remove('is-dragging');
         element.style.userSelect = '';
     };
 
-    (handle || element).addEventListener('pointerdown', onPointerDown);
+    element.addEventListener('pointerdown', onPointerDown);
     element.addEventListener('pointermove', onPointerMove);
     element.addEventListener('pointerup', onPointerUp);
     element.addEventListener('pointercancel', onPointerUp);
 
     // Initial setup
-    const cursorTarget = handle || element;
-    if (!cursorTarget.style.cursor) {
-        cursorTarget.style.cursor = 'grab';
+    if (options.handle) {
+        element.querySelectorAll(options.handle).forEach(h => {
+            (h as HTMLElement).style.cursor = 'grab';
+        });
+    } else {
+        element.style.cursor = 'grab';
     }
 }
