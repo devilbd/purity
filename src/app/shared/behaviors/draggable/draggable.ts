@@ -1,5 +1,6 @@
 import { getElement } from '../../../../framework/core';
 import './draggable.scss';
+import { findDropTarget, type DroppableOptions } from '../droppable/droppable';
 
 export interface DragOptions {
     selector: string;
@@ -21,6 +22,7 @@ export function drag(options: DragOptions) {
     let currentX = 0;
     let currentY = 0;
 
+    let currentDropTarget: { element: HTMLElement; options: DroppableOptions } | null = null;
     let lastSnappedX = 0;
     let lastSnappedY = 0;
     let baseLeft = 0;
@@ -122,6 +124,22 @@ export function drag(options: DragOptions) {
             element.classList.add('snap-hit');
         }
 
+        // Handle Droppable detection
+        const dropTarget = findDropTarget(e.clientX, e.clientY, element);
+        if (dropTarget !== currentDropTarget) {
+            const hoverClass = currentDropTarget?.options.hoverClass || 'droppable-hover';
+            
+            if (currentDropTarget) {
+                currentDropTarget.element.classList.remove(hoverClass);
+                currentDropTarget.options.onLeave?.(element);
+            }
+            if (dropTarget) {
+                dropTarget.element.classList.add(dropTarget.options.hoverClass || 'droppable-hover');
+                dropTarget.options.onEnter?.(element);
+            }
+            currentDropTarget = dropTarget;
+        }
+
         // Use requestAnimationFrame for smoother performance
         requestAnimationFrame(() => {
             element.style.transform = `translate(${nextX}px, ${nextY}px)`;
@@ -133,6 +151,13 @@ export function drag(options: DragOptions) {
         
         isDragging = false;
         element.releasePointerCapture(e.pointerId);
+
+        // Handle Drop
+        if (currentDropTarget) {
+            currentDropTarget.element.classList.remove(currentDropTarget.options.hoverClass || 'droppable-hover');
+            currentDropTarget.options.onDrop?.(element);
+            currentDropTarget = null;
+        }
 
         // Reset visual feedback
         if (activeHandle) {

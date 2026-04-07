@@ -15,6 +15,7 @@ import './shared/components/raw-template/raw-template.component';
 import type { CustomComponent } from './shared/components/custom/custom.component';
 import type { RawTemplateComponent } from './shared/components/raw-template/raw-template.component';
 import { drag } from './shared/behaviors/draggable/draggable';
+import { droppable } from './shared/behaviors/droppable/droppable';
 
 export class AppComponent extends Component {
     templateUrl = './src/app/app.component.html';
@@ -82,6 +83,7 @@ export class AppComponent extends Component {
             'rawTemplate',
         ) as RawTemplateComponent;
 
+        this.droppableBehavior();
         this.draggableBehavior();
     }
 
@@ -93,6 +95,24 @@ export class AppComponent extends Component {
             handle: '.drag-handle'
         };
         drag(dragOptions);
+    }
+
+    droppableBehavior() {
+        const dropOptions = {
+            selector: '#droppable-container',
+            accepts: '#component1',
+            hoverClass: 'droppable-hover',
+            onDrop: (draggedEl: HTMLElement) => {
+                draggedEl.remove();
+            },
+            onEnter: (draggedEl: HTMLElement) => {
+                draggedEl.classList.add('droppable-hover');
+            },
+            onLeave: (draggedEl: HTMLElement) => {
+                draggedEl.classList.remove('droppable-hover');
+            }
+        }
+        droppable(dropOptions);
     }
 
     onTextInput(element: HTMLInputElement) {

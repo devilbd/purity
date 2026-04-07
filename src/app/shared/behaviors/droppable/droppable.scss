@@ -1,0 +1,11 @@
+.droppable-hover {
+    outline: 2px dashed var(--accent);
+    outline-offset: 4px;
+    background-color: rgba(53, 132, 228, 0.1) !important;
+    transition: all var(--transition-fast) ease;
+}
+
+.droppable-active {
+    /* Optional: style for all valid dropzones when dragging starts */
+    border-color: rgba(255, 255, 255, 0.2);
+}

@@ -1,1 +1,6 @@
 @use '../style.scss' as *;
+
+#droppable-container {
+    @extend .window;
+    padding: 20px;
+}
