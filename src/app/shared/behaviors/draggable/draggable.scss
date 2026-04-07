@@ -1,21 +1,23 @@
 /* Dragging and Snapping Animations */
 .is-dragging {
     filter: brightness(1.05);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), var(--shadow-deep) !important;
 }
 
 .snap-hit {
-    animation: snap-pulse 0.2s ease-out;
+    animation: snap-thud 0.12s ease-out;
 }
 
-@keyframes snap-pulse {
+@keyframes snap-thud {
     0% {
-        box-shadow: 0 0 0 0 rgba(53, 132, 228, 0.6), var(--shadow-deep);
+        scale: 1;
+        filter: brightness(1.05);
     }
     50% {
-        box-shadow: 0 0 20px 5px rgba(53, 132, 228, 0.3), var(--shadow-deep);
+        scale: 0.96;
+        filter: brightness(1.25);
     }
     100% {
-        box-shadow: 0 0 0 0 rgba(53, 132, 228, 0), var(--shadow-deep);
+        scale: 1;
+        filter: brightness(1.05);
     }
 }
