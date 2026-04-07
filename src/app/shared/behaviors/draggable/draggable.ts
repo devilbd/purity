@@ -6,7 +6,7 @@ export interface DraggableOptions {
     selector: string;
     constrainTo?: string;
     handle?: string;
-    snapGrid?: number | { x?: number; y?: number };
+    snapTo?: string;
     onDragStart?: (el: HTMLElement) => void;
     onDragMove?: (el: HTMLElement, x: number, y: number) => void;
     onDragEnd?: (el: HTMLElement) => void;
@@ -70,15 +70,16 @@ export function drag(options: DraggableOptions) {
         currentY = y;
         lastSnappedX = x;
         lastSnappedY = y;
+        
+        // Calculate initial dimensions and base position for accurate offset logic
+        const elementRect = element.getBoundingClientRect();
+        baseLeft = elementRect.left - currentX;
+        baseTop = elementRect.top - currentY;
+        elementWidth = elementRect.width;
+        elementHeight = elementRect.height;
 
         if (container) {
             containerRect = container.getBoundingClientRect();
-            const elementRect = element.getBoundingClientRect();
-            // Calculate position as if transform was (0,0) to determine valid translate bounds
-            baseLeft = elementRect.left - currentX;
-            baseTop = elementRect.top - currentY;
-            elementWidth = elementRect.width;
-            elementHeight = elementRect.height;
         }
 
         element.setPointerCapture(e.pointerId);
@@ -87,7 +88,7 @@ export function drag(options: DraggableOptions) {
         if (activeHandle) activeHandle.style.cursor = 'grabbing';
         element.style.zIndex = '1000';
         // Enable a snappy transition for snapping movement to smooth out the "jumps"
-        element.style.transition = options.snapGrid 
+        element.style.transition = options.snapTo 
             ? 'transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1.1)' 
             : 'none';
         element.style.userSelect = 'none';
@@ -103,14 +104,6 @@ export function drag(options: DraggableOptions) {
         let nextX = currentX + (e.clientX - startX);
         let nextY = currentY + (e.clientY - startY);
 
-        if (options.snapGrid) {
-            const snapX = typeof options.snapGrid === 'number' ? options.snapGrid : (options.snapGrid.x ?? 0);
-            const snapY = typeof options.snapGrid === 'number' ? options.snapGrid : (options.snapGrid.y ?? 0);
-
-            if (snapX > 0) nextX = Math.round(nextX / snapX) * snapX;
-            if (snapY > 0) nextY = Math.round(nextY / snapY) * snapY;
-        }
-
         if (container && containerRect) {
             const minX = containerRect.left - baseLeft;
             const maxX = containerRect.right - baseLeft - elementWidth;
@@ -119,15 +112,6 @@ export function drag(options: DraggableOptions) {
 
             nextX = Math.max(minX, Math.min(maxX, nextX));
             nextY = Math.max(minY, Math.min(maxY, nextY));
-        }
-
-        // Visual feedback when a snap occurs
-        if (options.snapGrid && (nextX !== lastSnappedX || nextY !== lastSnappedY)) {
-            lastSnappedX = nextX;
-            lastSnappedY = nextY;
-            element.classList.remove('snap-hit');
-            void element.offsetWidth; // Trigger reflow to restart animation
-            element.classList.add('snap-hit');
         }
 
         // Handle Droppable detection
@@ -144,6 +128,25 @@ export function drag(options: DraggableOptions) {
                 dropTarget.options.onEnter?.(element);
             }
             currentDropTarget = dropTarget;
+        }
+
+        // Snap to center logic: only if currentDropTarget matches options.snapTo
+        if (options.snapTo && currentDropTarget?.element.matches(options.snapTo)) {
+            const targetRect = currentDropTarget.element.getBoundingClientRect();
+            const targetCenterX = targetRect.left + targetRect.width / 2;
+            const targetCenterY = targetRect.top + targetRect.height / 2;
+
+            nextX = targetCenterX - baseLeft - elementWidth / 2;
+            nextY = targetCenterY - baseTop - elementHeight / 2;
+
+            // Visual feedback when a snap occurs
+            if (nextX !== lastSnappedX || nextY !== lastSnappedY) {
+                lastSnappedX = nextX;
+                lastSnappedY = nextY;
+                element.classList.remove('snap-hit');
+                void element.offsetWidth; 
+                element.classList.add('snap-hit');
+            }
         }
 
         options.onDragMove?.(element, nextX, nextY);
