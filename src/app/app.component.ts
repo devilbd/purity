@@ -28,6 +28,9 @@ export class AppComponent extends Component {
     customComponent2!: CustomComponent;
     rawTemplateComponent!: RawTemplateComponent;
 
+    private dragCleanup?: { destroy: () => void };
+    private dropCleanup?: { destroy: () => void };
+
     get loginStatus() {
         if (this.loggedUser()?.includes('custom_user')) {
             return 'warn';
@@ -57,6 +60,11 @@ export class AppComponent extends Component {
 
         // register app to the global window object
         (window as any).app = this;
+    }
+
+    disconnectedCallback() {
+        this.dragCleanup?.destroy();
+        this.dropCleanup?.destroy();
     }
 
     domInitializer() {
@@ -103,7 +111,7 @@ export class AppComponent extends Component {
                 el.classList.remove('dragging');
             }
         };
-        drag(dragOptions);
+        this.dragCleanup = drag(dragOptions);
     }
 
     droppableBehavior() {
@@ -121,7 +129,7 @@ export class AppComponent extends Component {
                 draggedEl.classList.remove('droppable-hover');
             }
         }
-        droppable(dropOptions);
+        this.dropCleanup = droppable(dropOptions);
     }
 
     onTextInput(element: HTMLInputElement) {

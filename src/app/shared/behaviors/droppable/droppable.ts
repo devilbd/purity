@@ -19,10 +19,17 @@ export function droppable(options: DroppableOptions) {
     const element = getElement(options.selector);
     if (!element) {
         console.warn(`Droppable behavior: Element "${options.selector}" not found.`);
-        return;
+        return { destroy: () => {} };
     }
 
-    droppables.add({ element, options });
+    const item = { element, options };
+    droppables.add(item);
+
+    return {
+        destroy: () => {
+            droppables.delete(item);
+        }
+    };
 }
 
 /**

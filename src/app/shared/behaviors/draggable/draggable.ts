@@ -16,7 +16,7 @@ export function drag(options: DraggableOptions) {
     const element = getElement(options.selector);
     if (!element) {
         console.warn(`Drag behavior: Element with selector "${options.selector}" not found.`);
-        return;
+        return { destroy: () => {} };
     }
 
     let isDragging = false;
@@ -35,6 +35,7 @@ export function drag(options: DraggableOptions) {
     let elementHeight = 0;
     const container = options.constrainTo ? getElement(options.constrainTo) : null;
     let activeHandle: HTMLElement | null = null;
+    let rafId: number | null = null;
 
     // Helper to get current transform values
     const getTransform = () => {
@@ -148,8 +149,10 @@ export function drag(options: DraggableOptions) {
         options.onDragMove?.(element, nextX, nextY);
 
         // Use requestAnimationFrame for smoother performance
-        requestAnimationFrame(() => {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
             element.style.transform = `translate(${nextX}px, ${nextY}px)`;
+        rafId = null;
         });
     };
 
@@ -192,4 +195,27 @@ export function drag(options: DraggableOptions) {
     } else {
         element.style.cursor = 'grab';
     }
+
+    return {
+        destroy: () => {
+            isDragging = false;
+            if (rafId) cancelAnimationFrame(rafId);
+
+            element.removeEventListener('pointerdown', onPointerDown);
+            element.removeEventListener('pointermove', onPointerMove);
+            element.removeEventListener('pointerup', onPointerUp);
+            element.removeEventListener('pointercancel', onPointerUp);
+
+            element.classList.remove('is-dragging', 'snap-hit');
+            element.style.cursor = '';
+            element.style.userSelect = '';
+            element.style.zIndex = '';
+            element.style.transition = '';
+            if (options.handle) {
+                element.querySelectorAll(options.handle).forEach(h => {
+                    (h as HTMLElement).style.cursor = '';
+                });
+            }
+        }
+    };
 }
