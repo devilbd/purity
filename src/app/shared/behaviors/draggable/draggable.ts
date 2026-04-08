@@ -24,6 +24,8 @@ export function drag(options: DraggableOptions) {
     let startY = 0;
     let currentX = 0;
     let currentY = 0;
+    let initialPointerX = 0;
+    let initialPointerY = 0;
 
     let currentDropTarget: { element: HTMLElement; options: DroppableOptions } | null = null;
     let lastSnappedX = 0;
@@ -36,6 +38,7 @@ export function drag(options: DraggableOptions) {
     const container = options.constrainTo ? getElement(options.constrainTo) : null;
     let activeHandle: HTMLElement | null = null;
     let rafId: number | null = null;
+    const DRAG_THRESHOLD = 3;
 
     // Helper to get current transform values
     const getTransform = () => {
@@ -91,45 +94,53 @@ export function drag(options: DraggableOptions) {
             activeHandle = element;
         }
 
-        isDragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
+        initialPointerX = e.clientX;
+        initialPointerY = e.clientY;
 
         const { x, y } = getTransform();
         currentX = x;
         currentY = y;
-        lastSnappedX = x;
-        lastSnappedY = y;
-        
-        // Calculate initial dimensions and base position for accurate offset logic
-        const elementRect = element.getBoundingClientRect();
-        baseLeft = elementRect.left - currentX;
-        baseTop = elementRect.top - currentY;
-        elementWidth = elementRect.width;
-        elementHeight = elementRect.height;
-
-        if (container) {
-            containerRect = container.getBoundingClientRect();
-        }
-
-        element.setPointerCapture(e.pointerId);
-        
-        // Add visual feedback
-        if (activeHandle) activeHandle.style.cursor = 'grabbing';
-        element.style.zIndex = '1000';
-        // Enable a snappy transition for snapping movement to smooth out the "jumps"
-        element.style.transition = options.snapTo 
-            ? 'transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1.1)' 
-            : 'none';
-        element.style.userSelect = 'none';
-        
-        element.classList.add('is-dragging');
-
-        options.onDragStart?.(element);
     };
 
     const onPointerMove = (e: PointerEvent) => {
-        if (!isDragging) return;
+        if (!activeHandle && !isDragging) return;
+
+        if (!isDragging) {
+            const dx = Math.abs(e.clientX - initialPointerX);
+            const dy = Math.abs(e.clientY - initialPointerY);
+            
+            if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
+                isDragging = true;
+                startX = initialPointerX;
+                startY = initialPointerY;
+                lastSnappedX = currentX;
+                lastSnappedY = currentY;
+
+                const elementRect = element.getBoundingClientRect();
+                baseLeft = elementRect.left - currentX;
+                baseTop = elementRect.top - currentY;
+                elementWidth = elementRect.width;
+                elementHeight = elementRect.height;
+
+                if (container) {
+                    containerRect = container.getBoundingClientRect();
+                }
+
+                element.setPointerCapture(e.pointerId);
+                
+                if (activeHandle) activeHandle.style.cursor = 'grabbing';
+                element.style.zIndex = '1000';
+                element.style.transition = options.snapTo 
+                    ? 'transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1.1)' 
+                    : 'none';
+                element.style.userSelect = 'none';
+                element.classList.add('is-dragging');
+
+                options.onDragStart?.(element);
+            } else {
+                return;
+            }
+        }
 
         let nextX = currentX + (e.clientX - startX);
         let nextY = currentY + (e.clientY - startY);
@@ -190,12 +201,17 @@ export function drag(options: DraggableOptions) {
     };
 
     const onPointerUp = (e: PointerEvent) => {
-        if (!isDragging) return;
+        if (!isDragging) {
+            activeHandle = null;
+            return;
+        }
         
         options.onDragEnd?.(element);
 
         isDragging = false;
-        element.releasePointerCapture(e.pointerId);
+        if (element.hasPointerCapture(e.pointerId)) {
+            element.releasePointerCapture(e.pointerId);
+        }
 
         // Handle Drop
         if (currentDropTarget) {
@@ -213,6 +229,7 @@ export function drag(options: DraggableOptions) {
         element.style.userSelect = '';
         element.style.zIndex = '';
         element.style.transition = '';
+        activeHandle = null;
     };
 
     element.addEventListener('pointerdown', onPointerDown);
