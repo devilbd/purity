@@ -44,6 +44,36 @@ export function drag(options: DraggableOptions) {
         return { x: matrix.m41, y: matrix.m42 };
     };
 
+    const ensureWithinBounds = () => {
+        if (!container) return;
+
+        const { x, y } = getTransform();
+        const elementRect = element.getBoundingClientRect();
+        const cRect = container.getBoundingClientRect();
+
+        // Calculate base offset (the position where translate(0,0) would place the element)
+        const bLeft = elementRect.left - x;
+        const bTop = elementRect.top - y;
+        const eWidth = elementRect.width;
+        const eHeight = elementRect.height;
+
+        const minX = cRect.left - bLeft;
+        const maxX = cRect.right - bLeft - eWidth;
+        const minY = cRect.top - bTop;
+        const maxY = cRect.bottom - bTop - eHeight;
+
+        const nextX = Math.max(minX, Math.min(maxX, x));
+        const nextY = Math.max(minY, Math.min(maxY, y));
+
+        if (nextX !== x || nextY !== y) {
+            element.style.transform = `translate(${nextX}px, ${nextY}px)`;
+        }
+    };
+
+    const onResize = () => {
+        if (!isDragging) ensureWithinBounds();
+    };
+
     const onPointerDown = (e: PointerEvent) => {
         const target = e.target as HTMLElement;
 
@@ -189,6 +219,10 @@ export function drag(options: DraggableOptions) {
     element.addEventListener('pointermove', onPointerMove);
     element.addEventListener('pointerup', onPointerUp);
     element.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('resize', onResize);
+
+    // Initial constraint check
+    ensureWithinBounds();
 
     // Initial setup
     if (options.handle) {
@@ -208,6 +242,7 @@ export function drag(options: DraggableOptions) {
             element.removeEventListener('pointermove', onPointerMove);
             element.removeEventListener('pointerup', onPointerUp);
             element.removeEventListener('pointercancel', onPointerUp);
+            window.removeEventListener('resize', onResize);
 
             element.classList.remove('is-dragging', 'snap-hit');
             element.style.cursor = '';
