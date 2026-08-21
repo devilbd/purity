@@ -186,3 +186,8 @@ export const defineComponent = (name: string, component: any) => {
         console.error(`Component ${name} is already defined`);
     }
 };
+
+/**
+ * Dependency Injection
+ */
+export * from './di';

@@ -188,7 +188,51 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 
 ---
 
-### 4. Composable Behaviors
+### 4. Dependency Injection (`@Injectable` & `inject`)
+
+Purity includes a built-in Dependency Injection container that enables service registration via TypeScript decorators and instant resolution using `inject()`:
+
+#### Declaring a Service with `@Injectable`
+
+```typescript
+import { Injectable, signal } from './framework/core';
+
+@Injectable('DataService')
+export class DataService {
+    currentUser = signal<string | null>(null);
+
+    login(username: string) {
+        this.currentUser.set(username);
+    }
+}
+```
+
+#### Injecting and Resolving Services
+
+You can resolve registered services by their name token or directly by class constructor:
+
+```typescript
+import { Component, defineComponent, inject } from './framework/core';
+import { DataService } from './data/data.service';
+
+export class AppComponent extends Component {
+    // Resolve singleton by class constructor
+    private dataService = inject(DataService);
+
+    // Or resolve by registered token name
+    // private dataService = inject<DataService>('DataService');
+
+    onLogin() {
+        this.dataService.login('Alice');
+    }
+}
+
+defineComponent('app-component', AppComponent);
+```
+
+---
+
+### 5. Composable Behaviors
 
 Enhance elements without deep inheritance trees:
 

@@ -100,6 +100,29 @@ Helper functions for declarative DOM updates:
 * `updateStyles(elements, className)`: Sets `className` across target elements.
 * `eventListener(elements, event, handler)`: Attaches event listeners and returns a `{ dispose() }` handle.
 
+### 4. Dependency Injection (`di.ts`)
+
+Purity includes a built-in Dependency Injection container with decorator support:
+
+* **`@Injectable(name?: string | InjectableOptions)` / `@Service(name?: string)`**:
+  Class decorator that registers the service into the global DI container by token name and constructor.
+  ```typescript
+  @Injectable('DataService')
+  export class DataService {
+      currentUser = signal<User | null>(null);
+  }
+  ```
+
+* **`inject<T>(token: Token<T>): T`**:
+  Resolves and returns the singleton instance of the requested service by its registered name or class constructor.
+  ```typescript
+  // Resolve by string name:
+  const dataService = inject<DataService>('DataService');
+
+  // Or resolve by class constructor:
+  const dataService = inject(DataService);
+  ```
+
 ---
 
 ## Composable Behaviors (`src/app/shared/behaviors/`)

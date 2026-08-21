@@ -3,11 +3,13 @@ import {
     defineComponent,
     effect,
     getElements,
+    inject,
     signal,
     updateStyles,
     updateTargets,
     updateValues,
 } from '../framework/core';
+import { DataService } from '../data/data.service';
 import './app.component.scss';
 import './shared/components/header/header.component';
 import './shared/components/custom/custom.component';
@@ -20,6 +22,7 @@ import { droppable } from './shared/behaviors/droppable/droppable';
 export class AppComponent extends Component {
     templateUrl = './src/app/app.component.html';
 
+    private dataService = inject(DataService);
     loggedUser = signal<string | null>(null);
 
     resultContainer!: HTMLElement;
@@ -134,10 +137,12 @@ export class AppComponent extends Component {
     }
 
     onLogin() {
-        this.loggedUser.set('some user');
+        const user = this.dataService.login('some user');
+        this.loggedUser.set(user.name);
     }
 
     onLogout() {
+        this.dataService.logout();
         this.loggedUser.set(null);
     }
 
