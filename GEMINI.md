@@ -26,6 +26,7 @@ purity/
     │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
+    │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
     ├── data/                    # Data services and state management
     │   └── data.service.ts      # Service layer
@@ -39,6 +40,7 @@ purity/
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
             ├── directives/      # Reusable DOM directives (e.g. highlight)
+            ├── validators/      # Form & field validation classes
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
@@ -152,6 +154,39 @@ Directives attach custom behavior and reactivity to DOM elements:
 
       onDOMChange(record: MutationRecord | Event) {
           // Detects attribute, property, or input changes on the host DOM element
+      }
+  }
+  ```
+
+### 6. Form Validation (`validator.ts`)
+
+Form Validators decouple validation rules and CSS class application from UI components:
+
+* **`@Validator(options: ValidatorOptions)`**:
+  Class decorator that binds form validation rules directly to matching forms and fields.
+  - **`form: string`**: Form selector (e.g. `'.forms-validation-form'`).
+  - **`fields: Record<string, string | FieldValidationConfig>`**: Map of field keys to selectors or config objects.
+  - **`validClass?: string`**: CSS class applied when a field is valid (default: `'is-valid'`).
+  - **`invalidClass?: string`**: CSS class applied when a field is invalid (default: `'is-invalid'`).
+  - **`validate[FieldName](value, element)`**: Validation method defined on the class for each field.
+
+  ```typescript
+  @Validator({
+      form: '.forms-validation-form',
+      fields: {
+          input1: '#input1',
+          input2: '#input2',
+      },
+      validClass: 'is-valid',
+      invalidClass: 'is-invalid',
+  })
+  export class FormsValidationValidator extends BaseValidator {
+      validateInput1(value: string): boolean {
+          return value.trim().length >= 3;
+      }
+
+      validateInput2(value: string): boolean {
+          return value.trim().length >= 5;
       }
   }
   ```

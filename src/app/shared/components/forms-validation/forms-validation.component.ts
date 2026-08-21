@@ -1,5 +1,6 @@
 import { Component } from '../../../../framework/core';
 import './forms-validation.component.scss';
+import '../../validators/forms-validation.validator';
 
 @Component({
     selector: 'forms-validation',

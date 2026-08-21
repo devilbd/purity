@@ -132,3 +132,4 @@ export const getElements = (
 export * from './component';
 export * from './di';
 export * from './directive';
+export * from './validator';

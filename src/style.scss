@@ -325,9 +325,17 @@ body {
 }
 
 /* Optional: GNOME 'Error' state if you're validating forms */
-.input-primary.error {
-    border-color: var(--gnome-error);
-    box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.2);
+.input-primary.error,
+.input-primary.is-invalid,
+.is-invalid {
+    border-color: var(--gnome-error) !important;
+    box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.2) !important;
+}
+
+.input-primary.is-valid,
+.is-valid {
+    border-color: var(--gnome-success) !important;
+    box-shadow: 0 0 0 3px rgba(46, 194, 126, 0.2) !important;
 }
 
 .gnome-header {

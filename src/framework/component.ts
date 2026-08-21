@@ -1,5 +1,6 @@
 import { effect } from './core';
 import { bindDirectives } from './directive';
+import { bindValidators } from './validator';
 
 export interface ComponentOptions {
     selector?: string;
@@ -60,6 +61,10 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             this.activeDirectives.forEach((d: { destroy: () => void }) => d.destroy());
             this.activeDirectives = [];
         }
+        if (this.activeValidators) {
+            this.activeValidators.forEach((v: { destroy: () => void }) => v.destroy());
+            this.activeValidators = [];
+        }
         this.onDestroy?.();
     };
 
@@ -75,10 +80,17 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
         if (!this.activeDirectives) {
             this.activeDirectives = [];
         }
+        if (!this.activeValidators) {
+            this.activeValidators = [];
+        }
 
         // Bind Directives
         const directives = bindDirectives(rootEl, this);
         this.activeDirectives.push(...directives);
+
+        // Bind Form Validators
+        const validators = bindValidators(rootEl, this);
+        this.activeValidators.push(...validators);
 
         const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
         const textNodes: Text[] = [];

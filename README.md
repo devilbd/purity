@@ -65,6 +65,7 @@ purity/
     │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
+    │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
     ├── data/                    # Data services & global state management
     │   └── data.service.ts      # Service layer
@@ -76,6 +77,7 @@ purity/
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
+            ├── validators/      # Form & field validation classes
             └── components/      # UI Web Components (custom, header, raw-template, forms-validation, directive-sample)
 ```
 
@@ -277,7 +279,38 @@ export class HighlightDirective extends BaseDirective {
 
 ---
 
-### 6. Composable Behaviors
+### 6. Form Validation (`@Validator` & `BaseValidator`)
+
+Form Validators decouple validation logic from UI templates, automatically tracking field mutations and applying customizable CSS state classes:
+
+#### Declaring a Form Validator
+
+```typescript
+import { Validator, BaseValidator } from './framework/core';
+
+@Validator({
+    form: '.forms-validation-form',
+    fields: {
+        input1: '#input1',
+        input2: '#input2',
+    },
+    validClass: 'is-valid',
+    invalidClass: 'is-invalid',
+})
+export class FormsValidationValidator extends BaseValidator {
+    validateInput1(value: string): boolean {
+        return value.trim().length >= 3;
+    }
+
+    validateInput2(value: string): boolean {
+        return value.trim().length >= 5;
+    }
+}
+```
+
+---
+
+### 7. Composable Behaviors
 
 Enhance elements without deep inheritance trees:
 

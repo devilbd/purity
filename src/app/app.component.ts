@@ -10,6 +10,7 @@ import './shared/components/custom/custom.component';
 import './shared/components/raw-template/raw-template.component';
 import './shared/components/forms-validation/forms-validation.component';
 import './shared/components/directive-sample/directive-sample.component';
+import './shared/validators/forms-validation.validator';
 import type { CustomComponent } from './shared/components/custom/custom.component';
 import type { RawTemplateComponent } from './shared/components/raw-template/raw-template.component';
 import type { FormsValidationComponent } from './shared/components/forms-validation/forms-validation.component';
