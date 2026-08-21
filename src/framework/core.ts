@@ -68,12 +68,12 @@ export const updateStyles = (elements: HTMLElement[], newValue: string) => {
 };
 
 export const updateValues = (
-    elements: HTMLElement[],
+    elements: HTMLInputElement[],
     newValue: string | null,
     ifNullValue = '',
 ) => {
     if (elements) {
-        elements.forEach((element) => {
+        elements.forEach((element: HTMLInputElement) => {
             element.value = newValue ?? ifNullValue;
         });
     }

@@ -14,7 +14,7 @@ export class CustomComponent extends Component {
     templateUrl = './src/app/shared/components/custom/custom.component.html';
 
     customProperty = signal<string | null>(null);
-    elementsMap = new Map<string, HTMLElement>();
+    elementsMap = new Map<string, HTMLElement | HTMLInputElement>();
 
     get name() {
         return this.getAttribute('name') || '';
@@ -32,7 +32,7 @@ export class CustomComponent extends Component {
             const input = this.elementsMap.get('input');
             const display = this.elementsMap.get('display');
 
-            if (input) updateValues([input], propVal);
+            if (input instanceof HTMLInputElement) updateValues([input], propVal);
             if (display) updateTargets([display], propVal);
         });
     }
