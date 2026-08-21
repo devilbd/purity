@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/app/assets/purity_logo.png" alt="Purity Logo" width="190" height="190" />
+  <img src="public/purity_logo.png" alt="Purity Logo" width="190" height="190" />
 </p>
 
 <h1 align="center">Purity</h1>
@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/TypeScript-Strict-blue?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Web_Components-Custom_Elements_v1-orange?logo=web-components" alt="Web Components" />
   <img src="https://img.shields.io/badge/Vite-Bundler-646CFF?logo=vite" alt="Vite" />
+  <img src="https://img.shields.io/badge/Firebase-Hosting-FFCA28?logo=firebase" alt="Firebase Hosting" />
   <img src="https://img.shields.io/badge/Dependencies-Zero_Runtime-brightgreen" alt="Zero Dependencies" />
 </p>
 
@@ -25,12 +26,13 @@
 
 - ⚡ **Zero Heavy Runtime Dependencies**: Built with pure TypeScript targeting native Web APIs.
 - 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automatic dependency tracking.
-- 🧩 **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements with built-in template loading, caching, and lifecycle hooks.
+- 🧩 **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements with automatic template inlining, expression compilation caching, and lifecycle hooks.
 - 💉 **Dependency Injection**: First-class `@Injectable` decorator with instant singleton resolution via `inject()`.
 - 🏷️ **Custom Directives**: Attribute-level reactivity and DOM tracking via `@Directive` and `BaseDirective`.
-- 📋 **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes.
-- 🎯 **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based `drag` & `droppable` with snap, boundary constraints, and hover states) that attach without inheritance overhead.
+- 📋 **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
+- 🎯 **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based `drag` & `droppable` with GPU acceleration, center snap, boundary constraints, and hover states) that attach without inheritance overhead.
 - 🎨 **GNOME Adwaita Design**: Modern, glassmorphic UI styling foundation built with SCSS.
+- 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and one-step deployment script (`npm run deploy`).
 
 ---
 
@@ -60,9 +62,15 @@ npm install
 
 ```
 purity/
+├── public/                      # Static assets served at root (purity_logo.png, favicon)
+│   └── purity_logo.png
 ├── index.html                   # HTML entry point mounting <app-component>
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
+├── firebase.json                # Firebase Hosting configuration (public: dist, SPA rewrites)
+├── .firebaserc                  # Firebase project ID mapping
+├── .env.example                 # Environment variables reference template
+├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
 ├── README.md                    # Project documentation
 ├── GEMINI.md                    # Agent context & architecture reference
 └── src/
@@ -75,8 +83,9 @@ purity/
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
-    ├── data/                    # Data services & global state management
-    │   └── data.service.ts      # Service layer
+    ├── data/                    # Data services & Firebase configuration
+    │   ├── data.service.ts      # Service layer
+    │   └── firebase.ts          # Firebase config & service
     └── app/                     # Sample application
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styling
@@ -122,7 +131,7 @@ effect(() => {
 
 ### 2. Native Web Components (`@Component` Decorator)
 
-Classes are decorated with `@Component` to turn them into native Web Components with fine-grained reactivity, template resolution, and lifecycle hooks:
+Classes are decorated with `@Component` to turn them into native Web Components with fine-grained reactivity, template inlining, and lifecycle hooks:
 
 #### Example: Component with External Template
 
@@ -343,8 +352,8 @@ const dragInstance = drag({
     constrainTo: 'body',
     handle: '.drag-handle',
     snapTo: '#drop-zone',
-    onDragStart: (el) => el.classList.add('dragging'),
-    onDragEnd: (el) => el.classList.remove('dragging'),
+    onDragStart: (el) => el.classList.add('is-dragging'),
+    onDragEnd: (el) => el.classList.remove('is-dragging'),
 });
 
 // Teardown when component disconnects
@@ -389,20 +398,11 @@ dropInstance.destroy();
    All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`) rather than mutating `element.style` directly.
 
 3. **Component Lifecycle & Memory Management**:
-   - Setup queries and `effect()` bindings in `protected onInit()`.
+   - Setup DOM queries and behaviors inside `protected onInit()`.
    - Clean up event listeners and behavior instances in `onDestroy()` / `disconnectedCallback()`.
 
 4. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
-
----
-
-## 🔮 Future Roadmap (`src/framework/`)
-
-- [ ] **Router**: Client-side history-based routing engine with outlet components (`<router-outlet>`).
-- [ ] **Scoped Styling**: Optional Shadow DOM or scoped attribute-based style isolation.
-- [ ] **Reactive Store**: Centralized state management primitives.
-- [ ] **SSR & Hydration**: Server-side rendering and client-side hydration support.
 
 ---
 

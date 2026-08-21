@@ -4,11 +4,11 @@
 
 **Purity** is a lightweight, native TypeScript frontend framework built from scratch on top of modern web standards:
 - **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`) with automatic dependency tracking.
-- **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with asynchronous template resolution, caching, and lifecycle management.
+- **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with synchronous template inlining, expression caching, and lifecycle management.
 - **Dependency Injection**: First-class DI container with `@Injectable` decorator and `inject()` resolution.
 - **Custom Directives**: Attribute-level reactivity and DOM augmentation with `@Directive` and `BaseDirective`.
-- **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes.
-- **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with boundary constraints and snap support) that attach seamlessly without inheritance.
+- **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
+- **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with GPU acceleration, boundary constraints, and snap support) that attach seamlessly without inheritance.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
 ---
@@ -17,10 +17,17 @@
 
 ```
 purity/
+├── public/                      # Static assets served at root (purity_logo.png, favicon)
+│   └── purity_logo.png
 ├── index.html                   # Application entry HTML mounting <app-component>
 ├── package.json                 # Project dependencies, scripts (Vite + TypeScript + Sass)
 ├── tsconfig.json                # Strict TypeScript configuration
+├── firebase.json                # Firebase Hosting configuration (public: dist, SPA rewrites)
+├── .firebaserc                  # Firebase project ID mapping
+├── .env.example                 # Environment variables reference template
+├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
 ├── GEMINI.md                    # Project context & architecture guide (this file)
+├── README.md                    # Public documentation
 └── src/
     ├── main.ts                  # Application entry point (registers root components)
     ├── style.scss               # Global styles & GNOME Adwaita-inspired design system
@@ -32,7 +39,8 @@ purity/
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
     ├── data/                    # Data services and state management
-    │   └── data.service.ts      # Service layer
+    │   ├── data.service.ts      # Service layer
+    │   └── firebase.ts          # Firebase configuration and service
     └── app/                     # Demo / application source
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styles
@@ -47,8 +55,8 @@ purity/
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
-                ├── forms-validation/ # <forms-validation> sample form component
-                ├── header/      # <header-component> navigation bar
+                ├── forms-validation/ # <forms-validation> sample form component with submit validation
+                ├── header/      # <header-component> navigation bar with logo
                 ├── modal/       # Modal dialog components
                 └── raw-template/# <raw-template> dynamic inline template rendering
 ```
@@ -83,11 +91,11 @@ Purity features a synchronous reactive primitives engine:
 * **`@Component(options: string | ComponentOptions)`**:
   Class decorator transforming standard TypeScript classes into native Custom Elements:
   - **`selector?: string`**: Custom element tag name (e.g. `'app-component'`). If omitted, inferred from class name in kebab-case.
-  - **`templateUrl?: string`**: Path to an external HTML template. Templates are fetched once via `fetch()` and cached in `templateCache`.
+  - **`templateUrl?: string`**: Path to an external HTML template. Templates are automatically inlined at build/transpile time by Vite via `?raw` imports, guaranteeing instant synchronous rendering with zero network roundtrips.
   - **`template?: string`**: Inline HTML template string or dynamic getter (`get template()`).
-  - **`onInit(): void`**: Lifecycle method invoked after the template is loaded and the component is mounted in the DOM.
+  - **`onInit(): void`**: Lifecycle method invoked after template elements are mounted in the DOM.
   - **`onDestroy(): void`**: Lifecycle method invoked when the component is disconnected from the DOM.
-  - **`bindTemplate(root?: HTMLElement)`**: Automatically parses and binds reactive `{{ expression }}` handlebars interpolations in text nodes and attributes, and binds directives and validators.
+  - **`bindTemplate(root?: HTMLElement)`**: Parses and binds reactive `{{ expression }}` handlebars interpolations using cached compiled expression functions (`expressionCache`), and initializes active directives and validators.
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
@@ -170,11 +178,11 @@ Form Validators decouple validation rules and CSS class application from UI comp
   Class decorator that binds form validation rules directly to matching forms and fields.
   - **`form: string`**: Form selector (e.g. `'.forms-validation-form'`).
   - **`fields: Record<string, string | FieldValidationConfig>`**: Map of field keys to selectors or config objects.
-  - **`validClass?: string`**: CSS class applied when a field is valid (default: `'is-valid'`).
-  - **`invalidClass?: string`**: CSS class applied when a field is invalid (default: `'is-invalid'`).
+  - **`validClass?: string`**: CSS class applied when a field/form is valid (default: `'is-valid'`).
+  - **`invalidClass?: string`**: CSS class applied when a field/form is invalid (default: `'is-invalid'`).
   - **`validate[FieldName](value, element)`**: Validation method defined on the class for each field.
   - **`validateAll()`**: Method automatically provided to trigger validation across all configured fields.
-  - **Form State & Submit Buttons**: Automatically toggles `form.classList` and enables/disables `<button type="submit">` when all validations pass/fail.
+  - **Form State & Submit Buttons**: Automatically tracks field mutations, manages form CSS classes (`is-valid` / `is-invalid`), and toggles submit button `disabled` states and `.disabled` class.
 
   ```typescript
   @Validator({
@@ -208,14 +216,15 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
   - Container boundary constraints (`constrainTo`).
   - Handle selector support (`handle`).
   - Drop target integration & center snapping (`snapTo`).
+  - GPU-accelerated transforms (`translate3d`) with zero transition drag lag.
   - Smooth animation frame scheduling via `requestAnimationFrame`.
-  - CSS state classes (`.draggable-target`, `.is-dragging`, `.has-snap`, `.snap-hit`).
+  - CSS state classes (`.draggable-target`, `.is-dragging`, `.snap-hit`).
   - Returns `{ destroy() }` for clean teardown.
 
 * **Droppable (`droppable`)**:
   - Registers elements as valid drop zones with selector filtering (`accepts`).
+  - Fast geometric bounding box collision detection without DOM layout thrashing.
   - Automatic hover detection (`hoverClass`, `onEnter`, `onLeave`, `onDrop`).
-  - CSS state classes (`.droppable-checking`, `.droppable-hover`).
   - Returns `{ destroy() }` for unregistering.
 
 ---
@@ -238,7 +247,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`) rather than mutating `element.style` directly.
 
 3. **Component Lifecycle & Memory Management**:
-   - Initialize behaviors, services, and setup inside `protected onInit()`.
+   - Setup DOM queries and behaviors inside `protected onInit()`.
    - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
 
 4. **Reactivity inside Components**:
