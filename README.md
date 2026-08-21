@@ -72,7 +72,8 @@ purity/
         ├── assets/              # Fonts (Adwaita Mono) and static assets
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
-            └── components/      # UI Web Components (custom, header, raw-template, modal)
+            ├── directives/      # Reusable DOM directives (highlight)
+            └── components/      # UI Web Components (custom, header, raw-template, forms-validation, directive-sample)
 ```
 
 ---
@@ -234,7 +235,46 @@ defineComponent('app-component', AppComponent);
 
 ---
 
-### 5. Composable Behaviors
+### 5. Directives (`@Directive` & `BaseDirective`)
+
+Directives attach custom behavior, styling, and reactive listeners directly to DOM elements via attributes:
+
+#### Declaring a Directive
+
+```typescript
+import { Directive, BaseDirective } from './framework/core';
+import './highlight.directive.scss';
+
+@Directive('highlight')
+export class HighlightDirective extends BaseDirective {
+    onInit() {
+        // Access host DOM element and attach CSS classes
+        this.element.classList.add('p-highlight');
+        this.onChanges(this.value);
+    }
+
+    onChanges(newValue: any) {
+        // Toggle modifier CSS class when value or reactive {{ expression }} changes
+        this.element.classList.toggle('p-highlight--active', !!newValue);
+    }
+
+    onDOMChange(record: MutationRecord | Event) {
+        // Triggered when DOM properties/attributes change or input events occur
+        console.log('DOM changed on element:', record);
+    }
+}
+```
+
+#### Using Directives in Templates
+
+```html
+<p highlight="gold">Static highlight</p>
+<div highlight="{{activeVariant()}}">Reactive highlight</div>
+```
+
+---
+
+### 6. Composable Behaviors
 
 Enhance elements without deep inheritance trees:
 

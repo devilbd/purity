@@ -1,0 +1,25 @@
+<div class="directive-sample-root window">
+    <h3>Directive Sample Component</h3>
+    
+    <div class="directive-demo-box" highlight="{{highlightVariant()}}">
+        <p>This element has <code>highlight="{{highlightVariant()}}"</code> directive</p>
+        <span>Active CSS class: <code>p-highlight--{{highlightVariant()}}</code></span>
+    </div>
+
+    <div class="flex-horizontal button-group">
+        <button class="button-primary" onclick="this.closest('directive-sample').setGreen()">Green</button>
+        <button class="button-primary" onclick="this.closest('directive-sample').setBlue()">Blue</button>
+        <button class="button-primary" onclick="this.closest('directive-sample').setGold()">Gold</button>
+        <button class="button-primary" onclick="this.closest('directive-sample').setRed()">Red</button>
+    </div>
+
+    <div class="input-demo">
+        <label>DOM input with highlight directive and onDOMChange CSS class toggle:</label>
+        <input 
+            type="text" 
+            class="input-primary" 
+            placeholder="Type > 5 characters to toggle p-highlight--valid..." 
+            highlight="blue"
+        />
+    </div>
+</div>

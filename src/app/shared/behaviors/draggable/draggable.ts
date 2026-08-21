@@ -128,13 +128,10 @@ export function drag(options: DraggableOptions) {
 
                 element.setPointerCapture(e.pointerId);
                 
-                if (activeHandle) activeHandle.style.cursor = 'grabbing';
-                element.style.zIndex = '1000';
-                element.style.transition = options.snapTo 
-                    ? 'transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1.1)' 
-                    : 'none';
-                element.style.userSelect = 'none';
                 element.classList.add('is-dragging');
+                if (options.snapTo) {
+                    element.classList.add('has-snap');
+                }
 
                 options.onDragStart?.(element);
             } else {
@@ -193,10 +190,10 @@ export function drag(options: DraggableOptions) {
         options.onDragMove?.(element, nextX, nextY);
 
         // Use requestAnimationFrame for smoother performance
-    if (rafId) cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(() => {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
             element.style.transform = `translate(${nextX}px, ${nextY}px)`;
-        rafId = null;
+            rafId = null;
         });
     };
 
@@ -220,15 +217,7 @@ export function drag(options: DraggableOptions) {
             currentDropTarget = null;
         }
 
-        // Reset visual feedback
-        if (activeHandle) {
-            activeHandle.style.cursor = 'grab';
-        }
-        element.classList.remove('is-dragging');
-        element.classList.remove('snap-hit');
-        element.style.userSelect = '';
-        element.style.zIndex = '';
-        element.style.transition = '';
+        element.classList.remove('is-dragging', 'has-snap', 'snap-hit');
         activeHandle = null;
     };
 
@@ -242,13 +231,7 @@ export function drag(options: DraggableOptions) {
     ensureWithinBounds();
 
     // Initial setup
-    if (options.handle) {
-        element.querySelectorAll(options.handle).forEach(h => {
-            (h as HTMLElement).style.cursor = 'grab';
-        });
-    } else {
-        element.style.cursor = 'grab';
-    }
+    element.classList.add('draggable-target');
 
     return {
         destroy: () => {
@@ -261,16 +244,7 @@ export function drag(options: DraggableOptions) {
             element.removeEventListener('pointercancel', onPointerUp);
             window.removeEventListener('resize', onResize);
 
-            element.classList.remove('is-dragging', 'snap-hit');
-            element.style.cursor = '';
-            element.style.userSelect = '';
-            element.style.zIndex = '';
-            element.style.transition = '';
-            if (options.handle) {
-                element.querySelectorAll(options.handle).forEach(h => {
-                    (h as HTMLElement).style.cursor = '';
-                });
-            }
+            element.classList.remove('draggable-target', 'is-dragging', 'has-snap', 'snap-hit');
         }
     };
 }

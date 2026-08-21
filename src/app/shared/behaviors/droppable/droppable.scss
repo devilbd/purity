@@ -9,3 +9,7 @@
     /* Optional: style for all valid dropzones when dragging starts */
     border-color: rgba(255, 255, 255, 0.2);
 }
+
+.droppable-checking {
+    pointer-events: none !important;
+}

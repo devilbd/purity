@@ -1,3 +1,5 @@
+import { bindDirectives } from './directive';
+
 export type Signal<T> = {
     (): T; // The 'Getter'
     set(value: T): void;
@@ -180,10 +182,21 @@ export abstract class Component extends HTMLElement {
         }
     }
 
+    protected activeDirectives: Array<{ destroy: () => void }> = [];
+
+    disconnectedCallback() {
+        this.activeDirectives.forEach((d) => d.destroy());
+        this.activeDirectives = [];
+    }
+
     /**
      * Parses and binds reactive handlebars-style {{ expression }} interpolations in text nodes and attributes.
      */
     protected bindTemplate(root: HTMLElement = this) {
+        // Bind Directives
+        const directives = bindDirectives(root, this);
+        this.activeDirectives.push(...directives);
+
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         const textNodes: Text[] = [];
         let node: Node | null;
@@ -294,3 +307,8 @@ export const defineComponent = (name: string, component: any) => {
  * Dependency Injection
  */
 export * from './di';
+
+/**
+ * Directives
+ */
+export * from './directive';

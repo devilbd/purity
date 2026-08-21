@@ -35,8 +35,11 @@ purity/
             ├── behaviors/       # Composable DOM behaviors
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
+            ├── directives/      # Reusable DOM directives (e.g. highlight)
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
+                ├── directive-sample/ # <directive-sample> demonstrating directive usage
+                ├── forms-validation/ # <forms-validation> sample form component
                 ├── header/      # <header-component> navigation bar
                 ├── modal/       # Modal dialog components
                 └── raw-template/# <raw-template> dynamic inline template rendering
@@ -122,6 +125,30 @@ Purity includes a built-in Dependency Injection container with decorator support
 
   // Or resolve by class constructor:
   const dataService = inject(DataService);
+  ```
+
+### 5. Directives (`directive.ts`)
+
+Directives attach custom behavior and reactivity to DOM elements:
+
+* **`@Directive(selector: string | DirectiveOptions)`**:
+  Class decorator that registers a directive matching an element attribute (e.g. `@Directive('highlight')` or `@Directive('[highlight]')`).
+  ```typescript
+  @Directive('highlight')
+  export class HighlightDirective extends BaseDirective {
+      onInit() {
+          this.element.classList.add('p-highlight');
+          this.onChanges(this.value);
+      }
+
+      onChanges(newValue: any) {
+          this.element.classList.toggle('p-highlight--active', !!newValue);
+      }
+
+      onDOMChange(record: MutationRecord | Event) {
+          // Detects attribute, property, or input changes on the host DOM element
+      }
+  }
   ```
 
 ---

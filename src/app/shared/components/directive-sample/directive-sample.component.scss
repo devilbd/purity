@@ -1,0 +1,24 @@
+.directive-sample-root {
+    .directive-demo-box {
+        margin: var(--spacing-sm, 5px) 0;
+        text-align: center;
+    }
+
+    .button-group {
+        margin: var(--spacing-md, 8px) 0;
+        flex-wrap: wrap;
+    }
+
+    .input-demo {
+        display: flex;
+        flex-direction: column;
+        margin-top: var(--spacing-md, 8px);
+
+        label {
+            font-size: var(--font-size-sm, 14px);
+            color: var(--text-secondary, #9a9996);
+            margin-bottom: var(--spacing-xs, 4px);
+            margin-left: var(--spacing-sm, 5px);
+        }
+    }
+}

@@ -37,10 +37,9 @@ export function droppable(options: DroppableOptions) {
  */
 export function findDropTarget(x: number, y: number, draggedEl: HTMLElement) {
     // Temporarily disable pointer events on the dragged element to see what's underneath
-    const originalPointerEvents = draggedEl.style.pointerEvents;
-    draggedEl.style.pointerEvents = 'none';
+    draggedEl.classList.add('droppable-checking');
     const targetAtPoint = document.elementFromPoint(x, y);
-    draggedEl.style.pointerEvents = originalPointerEvents;
+    draggedEl.classList.remove('droppable-checking');
 
     if (!targetAtPoint) return null;
 
