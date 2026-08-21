@@ -21,10 +21,12 @@
 
 - ⚡ **Zero Heavy Runtime Dependencies**: Built with pure TypeScript targeting native Web APIs.
 - 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automatic dependency tracking.
-- 🧩 **Native Web Components**: Standard `HTMLElement` custom elements with built-in template loading, caching, and lifecycle hooks.
-- 🛠️ **Declarative DOM Helpers**: Lightweight utilities for querying and batch-updating targets, values, and styles.
+- 🧩 **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements with built-in template loading, caching, and lifecycle hooks.
+- 💉 **Dependency Injection**: First-class `@Injectable` decorator with instant singleton resolution via `inject()`.
+- 🏷️ **Custom Directives**: Attribute-level reactivity and DOM tracking via `@Directive` and `BaseDirective`.
+- 📋 **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes.
 - 🎯 **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based `drag` & `droppable` with snap, boundary constraints, and hover states) that attach without inheritance overhead.
-- 🎨 **GNOME Adwaita Design**: Modern, glassmorphic UI styling foundation.
+- 🎨 **GNOME Adwaita Design**: Modern, glassmorphic UI styling foundation built with SCSS.
 
 ---
 
@@ -77,7 +79,7 @@ purity/
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
-            ├── validators/      # Form & field validation classes
+            ├── validators/      # Form & field validation classes (forms-validation)
             └── components/      # UI Web Components (custom, header, raw-template, forms-validation, directive-sample)
 ```
 
@@ -142,7 +144,7 @@ export class CustomComponent {
 
 #### Example: Reactive Handlebars Template Interpolation
 
-Purity supports declarative `{{ expression }}` template interpolations. Text nodes and attributes automatically bind to signals and re-render fine-grained when signal dependencies change:
+Purity supports declarative `{{ expression }}` template interpolations. Text nodes and element attributes automatically bind to signals and re-render fine-grained when signal dependencies change:
 
 ```html
 <!-- app.component.html -->
@@ -152,28 +154,36 @@ Purity supports declarative `{{ expression }}` template interpolations. Text nod
 </div>
 ```
 
-#### Example: Inline Template Rendering
+#### Example: Dynamic Inline Template Rendering
 
 ```typescript
+// src/app/shared/components/raw-template/raw-template.component.ts
 import { Component, effect, signal } from '../../../../framework/core';
+import './raw-template.component.scss';
 
 @Component({
     selector: 'raw-template',
 })
 export class RawTemplateComponent {
-    count = signal(0);
+    customProperty = signal(0);
+    declare render: (content: string) => void;
+
+    get status() {
+        return this.customProperty() % 2 === 0 ? 'success' : 'error';
+    }
 
     get template() {
         return `
-            <div class="counter-box">
-                <h2>Count: {{count()}}</h2>
+            <div class="raw-template-component-root window">
+                <h2>Raw Template Component</h2>
+                <div class="${this.status}">${this.customProperty()}</div>
             </div>
         `;
     }
 
     protected onInit() {
         effect(() => {
-            (this as any).render?.(this.template);
+            this.render(this.template);
         });
     }
 }
@@ -198,7 +208,7 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 
 ### 4. Dependency Injection (`@Injectable` & `inject`)
 
-Purity includes a built-in Dependency Injection container that enables service registration via TypeScript decorators and instant resolution using `inject()`:
+Purity includes a built-in Dependency Injection container that enables service registration via decorators and instant resolution using `inject()`:
 
 #### Declaring a Service with `@Injectable`
 
@@ -217,13 +227,17 @@ export class DataService {
 
 #### Injecting and Resolving Services
 
-You can resolve registered services by their name token or directly by class constructor:
+You can resolve registered services by their class constructor or by registered token name:
 
 ```typescript
-import { Component, defineComponent, inject } from './framework/core';
+import { Component, inject } from './framework/core';
 import { DataService } from './data/data.service';
 
-export class AppComponent extends Component {
+@Component({
+    selector: 'app-component',
+    templateUrl: './src/app/app.component.html',
+})
+export class AppComponent {
     // Resolve singleton by class constructor
     private dataService = inject(DataService);
 
@@ -234,8 +248,6 @@ export class AppComponent extends Component {
         this.dataService.login('Alice');
     }
 }
-
-defineComponent('app-component', AppComponent);
 ```
 
 ---
@@ -286,7 +298,8 @@ Form Validators decouple validation logic from UI templates, automatically track
 #### Declaring a Form Validator
 
 ```typescript
-import { Validator, BaseValidator } from './framework/core';
+// src/app/shared/validators/forms-validation.validator.ts
+import { Validator, BaseValidator } from '../../../framework/core';
 
 @Validator({
     form: '.forms-validation-form',
@@ -354,32 +367,36 @@ dropInstance.destroy();
 
 ## 📐 Best Practices & Conventions
 
-1. **Side-Effect Imports for Custom Elements**:
-   Components register themselves upon module evaluation. Import them using side-effect imports:
+1. **Side-Effect Imports for Custom Elements, Directives, and Validators**:
+   Components, directives, and validators register themselves upon module evaluation. Import them using side-effect imports:
    ```typescript
    import './shared/components/custom/custom.component';
+   import './shared/directives/highlight.directive';
+   import './shared/validators/forms-validation.validator';
    ```
-   For TypeScript type references, use explicit type imports:
+   For TypeScript type references, use explicit type-only imports:
    ```typescript
    import type { CustomComponent } from './shared/components/custom/custom.component';
    ```
 
-2. **Component Lifecycle & Memory Management**:
-   - Setup queries and `effect()` bindings in `protected onInit()`.
-   - Clean up event listeners and behavior instances in `disconnectedCallback()`.
+2. **CSS Classes over Inline Styles**:
+   All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`) rather than mutating `element.style` directly.
 
-3. **Strict TypeScript**:
+3. **Component Lifecycle & Memory Management**:
+   - Setup queries and `effect()` bindings in `protected onInit()`.
+   - Clean up event listeners and behavior instances in `onDestroy()` / `disconnectedCallback()`.
+
+4. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
 
 ---
 
 ## 🔮 Future Roadmap (`src/framework/`)
 
-- [ ] **Router**: Client-side history-based routing engine with outlet components.
-- [ ] **Service & State Management**: Dependency injection or centralized reactive store primitives.
-- [ ] **Fine-Grained Template Parser**: Inline reactive attribute and text-node bindings without full `innerHTML` re-renders.
+- [ ] **Router**: Client-side history-based routing engine with outlet components (`<router-outlet>`).
 - [ ] **Scoped Styling**: Optional Shadow DOM or scoped attribute-based style isolation.
-- [ ] **Form Control Primitives**: Declarative two-way bindings for complex forms.
+- [ ] **Reactive Store**: Centralized state management primitives.
+- [ ] **SSR & Hydration**: Server-side rendering and client-side hydration support.
 
 ---
 

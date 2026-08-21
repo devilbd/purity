@@ -3,9 +3,12 @@
 ## Overview
 
 **Purity** is a lightweight, native TypeScript frontend framework built from scratch on top of modern web standards:
-- **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`).
-- **Native Web Components**: Components extend native `HTMLElement` (Custom Elements v1) with asynchronous template resolution, caching, and lifecycle management.
-- **Composable Behaviors**: Modular interaction modules (e.g., drag and drop) that attach seamlessly to DOM elements.
+- **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`) with automatic dependency tracking.
+- **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with asynchronous template resolution, caching, and lifecycle management.
+- **Dependency Injection**: First-class DI container with `@Injectable` decorator and `inject()` resolution.
+- **Custom Directives**: Attribute-level reactivity and DOM augmentation with `@Directive` and `BaseDirective`.
+- **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes.
+- **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with boundary constraints and snap support) that attach seamlessly without inheritance.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
 ---
@@ -40,7 +43,7 @@ purity/
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
             ├── directives/      # Reusable DOM directives (e.g. highlight)
-            ├── validators/      # Form & field validation classes
+            ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
@@ -59,7 +62,7 @@ purity/
 Purity features a synchronous reactive primitives engine:
 
 * **`signal<T>(initialValue: T): Signal<T>`**:
-  Creates a reactive value container.
+  Creates a reactive value container with getter syntax, `.set()`, and `.update()`.
   ```typescript
   const count = signal(0);
   console.log(count()); // Read: 0
@@ -75,17 +78,18 @@ Purity features a synchronous reactive primitives engine:
   });
   ```
 
-### 2. Web Component Model (`@Component` Decorator)
+### 2. Web Component Model (`component.ts`)
 
 * **`@Component(options: string | ComponentOptions)`**:
   Class decorator transforming standard TypeScript classes into native Custom Elements:
   - **`selector?: string`**: Custom element tag name (e.g. `'app-component'`). If omitted, inferred from class name in kebab-case.
   - **`templateUrl?: string`**: Path to an external HTML template. Templates are fetched once via `fetch()` and cached in `templateCache`.
-  - **`template?: string`**: Inline HTML template string.
+  - **`template?: string`**: Inline HTML template string or dynamic getter (`get template()`).
   - **`onInit(): void`**: Lifecycle method invoked after the template is loaded and the component is mounted in the DOM.
-  - **`bindTemplate(root?: HTMLElement)`**: Automatically parses and binds reactive `{{ expression }}` handlebars interpolations in text nodes and attributes, and binds directives.
+  - **`onDestroy(): void`**: Lifecycle method invoked when the component is disconnected from the DOM.
+  - **`bindTemplate(root?: HTMLElement)`**: Automatically parses and binds reactive `{{ expression }}` handlebars interpolations in text nodes and attributes, and binds directives and validators.
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
-  - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up subscriptions and behavior instances.
+  - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
   ```typescript
   @Component({
@@ -101,7 +105,7 @@ Purity features a synchronous reactive primitives engine:
   }
   ```
 
-### 3. DOM Utilities
+### 3. DOM Utilities (`core.ts`)
 
 Helper functions for declarative DOM updates:
 * `getElement(selector, rootEl?)`: Query selector returning `HTMLElement | null`.
@@ -127,11 +131,11 @@ Purity includes a built-in Dependency Injection container with decorator support
 * **`inject<T>(token: Token<T>): T`**:
   Resolves and returns the singleton instance of the requested service by its registered name or class constructor.
   ```typescript
-  // Resolve by string name:
-  const dataService = inject<DataService>('DataService');
-
-  // Or resolve by class constructor:
+  // Resolve by class constructor:
   const dataService = inject(DataService);
+
+  // Or resolve by string token name:
+  const dataService = inject<DataService>('DataService');
   ```
 
 ### 5. Directives (`directive.ts`)
@@ -169,6 +173,7 @@ Form Validators decouple validation rules and CSS class application from UI comp
   - **`validClass?: string`**: CSS class applied when a field is valid (default: `'is-valid'`).
   - **`invalidClass?: string`**: CSS class applied when a field is invalid (default: `'is-invalid'`).
   - **`validate[FieldName](value, element)`**: Validation method defined on the class for each field.
+  - **`validateAll()`**: Method automatically provided to trigger validation across all configured fields.
 
   ```typescript
   @Validator({
@@ -203,36 +208,43 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
   - Handle selector support (`handle`).
   - Drop target integration & center snapping (`snapTo`).
   - Smooth animation frame scheduling via `requestAnimationFrame`.
+  - CSS state classes (`.draggable-target`, `.is-dragging`, `.has-snap`, `.snap-hit`).
   - Returns `{ destroy() }` for clean teardown.
 
 * **Droppable (`droppable`)**:
   - Registers elements as valid drop zones with selector filtering (`accepts`).
   - Automatic hover detection (`hoverClass`, `onEnter`, `onLeave`, `onDrop`).
+  - CSS state classes (`.droppable-checking`, `.droppable-hover`).
   - Returns `{ destroy() }` for unregistering.
 
 ---
 
 ## Key Conventions & Best Practices
 
-1. **Side-Effect Imports for Components**:
-   Because components register themselves with `defineComponent` at module evaluation time, import them as side effects:
+1. **Side-Effect Imports for Custom Elements, Directives, and Validators**:
+   Because components, directives, and validators register themselves automatically with decorators at module evaluation time, import them as side effects:
    ```typescript
    import './shared/components/custom/custom.component';
+   import './shared/directives/highlight.directive';
+   import './shared/validators/forms-validation.validator';
    ```
-   If referencing component types for TypeScript typings, use explicit type-only imports:
+   If referencing types for TypeScript typings, use explicit type-only imports:
    ```typescript
    import type { CustomComponent } from './shared/components/custom/custom.component';
    ```
 
-2. **Component Lifecycle & Memory Management**:
-   - Initialize behaviors, services, and setup inside `protected onInit()`.
-   - Clean up event listeners, behaviors, or timers inside `disconnectedCallback()`.
+2. **CSS Classes over Inline Styles**:
+   All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`) rather than mutating `element.style` directly.
 
-3. **Reactivity inside Components**:
+3. **Component Lifecycle & Memory Management**:
+   - Initialize behaviors, services, and setup inside `protected onInit()`.
+   - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
+
+4. **Reactivity inside Components**:
    - Use declarative `{{ expression }}` template interpolations in HTML templates for fine-grained reactive updates.
    - Use `effect(() => { ... })` for custom side effects when needed.
 
-4. **TypeScript Configuration**:
+5. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
    - Avoid unused variable declarations and make imports type-explicit where appropriate.
 
@@ -251,5 +263,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 ### Adding New Features
 
 * **New Framework Features**: Place core abstractions (e.g. state management, routing, template parsers) in `src/framework/`.
-* **New UI Components**: Place custom elements in `src/app/shared/components/<component-name>/` with their corresponding `.ts`, `.html`, and `.scss` files, and call `defineComponent('tag-name', ClassName)`.
+* **New UI Components**: Place custom elements in `src/app/shared/components/<component-name>/` with their corresponding `.ts`, `.html`, and `.scss` files, decorated with `@Component(...)`.
+* **New Directives**: Place custom directives in `src/app/shared/directives/` decorated with `@Directive(...)` extending `BaseDirective`.
+* **New Validators**: Place form validation rules in `src/app/shared/validators/` decorated with `@Validator(...)` extending `BaseValidator`.
 * **New Behaviors**: Place modular interaction helpers in `src/app/shared/behaviors/<behavior-name>/`.
