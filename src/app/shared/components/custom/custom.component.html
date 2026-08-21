@@ -1,10 +1,10 @@
 <div class="custom-component-root window">
     <h3>
         <span>Custom component</span>
-        <span class="custom-property-display"></span>
+        <span class="custom-property-display">{{customProperty()}}</span>
         <div class="drag-handle">Handle me for drag</div>
     </h3>
-    <input class="input1 input-primary" type="text" />
+    <input class="input1 input-primary" type="text" value="{{customProperty()}}" oninput="this.closest('custom-component').onInput(this)" />
     <button class="button-primary">Format the input</button>
-    <button class="button-primary clear-button">Clear</button>
+    <button class="button-primary clear-button" onclick="this.closest('custom-component').onClear()">Clear</button>
 </div>

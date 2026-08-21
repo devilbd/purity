@@ -3,8 +3,8 @@
     <div class="window">
         <h3>App component</h3>
         <div class="flex-vertical">
-            <div id="result"></div>
-            <input id="username" type="text" class="input-primary" />
+            <div id="result" class="{{loginStatus}}">{{loggedUser() ?? 'Not signed in.'}}</div>
+            <input id="username" type="text" class="input-primary" value="{{loggedUser()}}" />
             <input
                 type="text"
                 class="input-primary user-input"
@@ -31,7 +31,7 @@
                 Set explicitly value on login input
             </button>
         </div>
-        <div id="customComponentCustomProperty"></div>
+        <div id="customComponentCustomProperty">{{customComponent1?.customProperty()}}</div>
         <custom-component
             id="component1"
             name="customComponent1"

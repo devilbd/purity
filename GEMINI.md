@@ -72,7 +72,8 @@ Purity features a synchronous reactive primitives engine:
 * **`Component`**: Abstract class extending `HTMLElement`.
   - **`templateUrl?: string`**: Path to an external HTML template. Templates are fetched once via `fetch()` and cached in `templateCache`.
   - **`onInit(): void`**: Lifecycle method invoked after the template is loaded and the component is mounted in the DOM.
-  - **`render(content?: string): void`**: Programmatically assigns template strings directly to `innerHTML`.
+  - **`bindTemplate(root?: HTMLElement)`**: Automatically parses and binds reactive `{{ expression }}` handlebars interpolations in text nodes and attributes.
+  - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up subscriptions and behavior instances.
 
 * **`defineComponent(name: string, component: CustomElementConstructor)`**:
@@ -157,12 +158,12 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    ```
 
 2. **Component Lifecycle & Memory Management**:
-   - Always initialize element mappings and effects inside `protected onInit()`.
+   - Initialize behaviors, services, and setup inside `protected onInit()`.
    - Clean up event listeners, behaviors, or timers inside `disconnectedCallback()`.
 
 3. **Reactivity inside Components**:
-   - Place DOM update bindings inside `effect(() => { ... })` callbacks.
-   - Use `updateTargets`, `updateValues`, and `updateStyles` inside effects to minimize boilerplate.
+   - Use declarative `{{ expression }}` template interpolations in HTML templates for fine-grained reactive updates.
+   - Use `effect(() => { ... })` for custom side effects when needed.
 
 4. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.

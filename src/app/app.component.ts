@@ -1,13 +1,8 @@
 import {
     Component,
     defineComponent,
-    effect,
-    getElements,
     inject,
     signal,
-    updateStyles,
-    updateTargets,
-    updateValues,
 } from '../framework/core';
 import { DataService } from '../data/data.service';
 import './app.component.scss';
@@ -25,16 +20,20 @@ export class AppComponent extends Component {
     private dataService = inject(DataService);
     loggedUser = signal<string | null>(null);
 
-    resultContainer!: HTMLElement;
-    customComponentCustomProperty!: HTMLElement;
-
-    usernameField!: HTMLInputElement;
-    customComponent1!: CustomComponent;
-    customComponent2!: CustomComponent;
-    rawTemplateComponent!: RawTemplateComponent;
-
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };
+
+    get customComponent1(): CustomComponent | null {
+        return this.querySelector('#component1');
+    }
+
+    get customComponent2(): CustomComponent | null {
+        return this.querySelector('#component2');
+    }
+
+    get rawTemplateComponent(): RawTemplateComponent | null {
+        return this.querySelector('#raw-template');
+    }
 
     get loginStatus() {
         if (this.loggedUser()?.includes('custom_user')) {
@@ -51,56 +50,16 @@ export class AppComponent extends Component {
     }
 
     protected onInit() {
-        this.domInitializer();
-
-        effect(() => {
-            updateValues([this.usernameField], this.loggedUser());
-            updateTargets(
-                [this.resultContainer],
-                this.loggedUser(),
-                'Not signed in.',
-            );
-            updateTargets([this.customComponentCustomProperty], this.customComponent1.customProperty());
-            updateStyles([this.resultContainer], this.loginStatus);
-        });
-
         // register app to the global window object
         (window as any).app = this;
+
+        this.droppableBehavior();
+        this.draggableBehavior();
     }
 
     disconnectedCallback() {
         this.dragCleanup?.destroy();
         this.dropCleanup?.destroy();
-    }
-
-    domInitializer() {
-        const elementsMap = getElements(
-            {
-                result: '#result',
-                username: '#username',
-                component1: '#component1',
-                component2: '#component2',
-                rawTemplate: '#raw-template',
-                customComponentCustomProperty: '#customComponentCustomProperty',
-            },
-            this,
-        );
-
-        this.customComponentCustomProperty = elementsMap.get('customComponentCustomProperty')!;
-        this.resultContainer = elementsMap.get('result')!;
-        this.usernameField = elementsMap.get('username') as HTMLInputElement;
-        this.customComponent1 = elementsMap.get(
-            'component1',
-        ) as CustomComponent;
-        this.customComponent2 = elementsMap.get(
-            'component2',
-        ) as CustomComponent;
-        this.rawTemplateComponent = elementsMap.get(
-            'rawTemplate',
-        ) as RawTemplateComponent;
-
-        this.droppableBehavior();
-        this.draggableBehavior();
     }
 
     draggableBehavior() {
@@ -133,7 +92,7 @@ export class AppComponent extends Component {
             onLeave: (draggedEl: HTMLElement) => {
                 draggedEl.classList.remove('droppable-hover');
             }
-        }
+        };
         this.dropCleanup = droppable(dropOptions);
     }
 
@@ -152,9 +111,9 @@ export class AppComponent extends Component {
     }
 
     setDefaultLogin() {
-        this.customComponent1.customProperty.set(this.loggedUser());
-        this.customComponent2.customProperty.set(this.loggedUser());
-        this.rawTemplateComponent.customProperty.update((val) => val + 1);
+        this.customComponent1?.customProperty.set(this.loggedUser());
+        this.customComponent2?.customProperty.set(this.loggedUser());
+        this.rawTemplateComponent?.customProperty.update((val) => val + 1);
     }
 }
 

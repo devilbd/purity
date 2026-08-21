@@ -148,6 +148,7 @@ export abstract class Component extends HTMLElement {
         }
 
         this.onInit();
+        this.bindTemplate();
     }
 
     protected async loadTemplate() {
@@ -175,6 +176,108 @@ export abstract class Component extends HTMLElement {
     protected render(content?: string) {
         if (content) {
             this.innerHTML = content;
+            this.bindTemplate();
+        }
+    }
+
+    /**
+     * Parses and binds reactive handlebars-style {{ expression }} interpolations in text nodes and attributes.
+     */
+    protected bindTemplate(root: HTMLElement = this) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const textNodes: Text[] = [];
+        let node: Node | null;
+
+        while ((node = walker.nextNode())) {
+            if (node.nodeValue && node.nodeValue.includes('{{')) {
+                textNodes.push(node as Text);
+            }
+        }
+
+        const interpolationRegex = /\{\{\s*([\s\S]*?)\s*\}\}/g;
+
+        for (const textNode of textNodes) {
+            const textContent = textNode.nodeValue;
+            if (!textContent) continue;
+
+            const parent = textNode.parentNode;
+            if (!parent) continue;
+
+            let lastIndex = 0;
+            let match: RegExpExecArray | null;
+            const fragments: Node[] = [];
+            let hasMatch = false;
+
+            interpolationRegex.lastIndex = 0;
+            while ((match = interpolationRegex.exec(textContent)) !== null) {
+                hasMatch = true;
+                const staticText = textContent.slice(lastIndex, match.index);
+                if (staticText) {
+                    fragments.push(document.createTextNode(staticText));
+                }
+
+                const expr = match[1].trim();
+                const dynamicNode = document.createTextNode('');
+                fragments.push(dynamicNode);
+
+                effect(() => {
+                    try {
+                        const fn = new Function(`with (this) { return ${expr}; }`);
+                        const val = fn.call(this);
+                        dynamicNode.nodeValue =
+                            val !== null && val !== undefined ? String(val) : '';
+                    } catch {
+                        dynamicNode.nodeValue = '';
+                    }
+                });
+
+                lastIndex = match.index + match[0].length;
+            }
+
+            if (hasMatch) {
+                const remainingText = textContent.slice(lastIndex);
+                if (remainingText) {
+                    fragments.push(document.createTextNode(remainingText));
+                }
+
+                for (const frag of fragments) {
+                    parent.insertBefore(frag, textNode);
+                }
+                parent.removeChild(textNode);
+            }
+        }
+
+        const elementsWithAttrs = [root, ...Array.from(root.querySelectorAll('*'))];
+        for (const el of elementsWithAttrs) {
+            if (!(el instanceof HTMLElement)) continue;
+            for (const attr of Array.from(el.attributes)) {
+                if (attr.value.includes('{{')) {
+                    const rawValue = attr.value;
+                    const attrName = attr.name;
+                    effect(() => {
+                        const replaced = rawValue.replace(
+                            /\{\{\s*([\s\S]*?)\s*\}\}/g,
+                            (_, expr) => {
+                                try {
+                                    const fn = new Function(
+                                        `with (this) { return ${expr.trim()}; }`,
+                                    );
+                                    const val = fn.call(this);
+                                    return val !== null && val !== undefined
+                                        ? String(val)
+                                        : '';
+                                } catch {
+                                    return '';
+                                }
+                            },
+                        );
+                        if (el instanceof HTMLInputElement && attrName === 'value') {
+                            el.value = replaced;
+                        }
+                        el.setAttribute(attrName, replaced);
+                    });
+                }
+            }
         }
     }
 }

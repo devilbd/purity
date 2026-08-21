@@ -114,35 +114,37 @@ Components extend `Component` (which subclasses `HTMLElement`).
 
 ```typescript
 // src/app/shared/components/custom/custom.component.ts
-import { Component, defineComponent, effect, signal, getElements, updateTargets, updateValues } from '../../../../framework/core';
+import { Component, defineComponent, signal } from '../../../../framework/core';
 import './custom.component.scss';
 
 export class CustomComponent extends Component {
-    // External template loaded asynchronously and cached
     templateUrl = './src/app/shared/components/custom/custom.component.html';
 
     customProperty = signal<string | null>(null);
 
-    protected onInit() {
-        const elements = getElements({
-            input: '.input-field',
-            display: '.display-target'
-        }, this);
+    onInput(element: HTMLInputElement) {
+        this.customProperty.set(element.value);
+    }
 
-        // Bind reactivity to DOM
-        effect(() => {
-            const val = this.customProperty();
-            const input = elements.get('input') as HTMLInputElement;
-            const display = elements.get('display');
-
-            if (input) updateValues([input], val);
-            if (display) updateTargets([display], val, 'No value');
-        });
+    onClear() {
+        this.customProperty.set(null);
     }
 }
 
 // Register the custom element
 defineComponent('custom-component', CustomComponent);
+```
+
+#### Example: Reactive Handlebars Template Interpolation
+
+Purity supports declarative `{{ expression }}` template interpolations. Text nodes and attributes automatically bind to signals and re-render fine-grained when signal dependencies change:
+
+```html
+<!-- app.component.html -->
+<div class="user-card">
+    <h3>User: {{loggedUser()}}</h3>
+    <div id="custom-status">{{customComponent1?.customProperty()}}</div>
+</div>
 ```
 
 #### Example: Inline Template Rendering
@@ -156,7 +158,7 @@ export class RawTemplateComponent extends Component {
     get template() {
         return `
             <div class="counter-box">
-                <h2>Count: ${this.count()}</h2>
+                <h2>Count: {{count()}}</h2>
             </div>
         `;
     }
