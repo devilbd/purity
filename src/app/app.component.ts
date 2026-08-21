@@ -26,6 +26,8 @@ export class AppComponent extends Component {
     loggedUser = signal<string | null>(null);
 
     resultContainer!: HTMLElement;
+    customComponentCustomProperty!: HTMLElement;
+
     usernameField!: HTMLInputElement;
     customComponent1!: CustomComponent;
     customComponent2!: CustomComponent;
@@ -58,6 +60,7 @@ export class AppComponent extends Component {
                 this.loggedUser(),
                 'Not signed in.',
             );
+            updateTargets([this.customComponentCustomProperty], this.customComponent1.customProperty());
             updateStyles([this.resultContainer], this.loginStatus);
         });
 
@@ -78,10 +81,12 @@ export class AppComponent extends Component {
                 component1: '#component1',
                 component2: '#component2',
                 rawTemplate: '#raw-template',
+                customComponentCustomProperty: '#customComponentCustomProperty',
             },
             this,
         );
 
+        this.customComponentCustomProperty = elementsMap.get('customComponentCustomProperty')!;
         this.resultContainer = elementsMap.get('result')!;
         this.usernameField = elementsMap.get('username') as HTMLInputElement;
         this.customComponent1 = elementsMap.get(
