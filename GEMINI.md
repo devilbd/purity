@@ -260,6 +260,8 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 | `npm run dev` | Starts Vite development server with HMR |
 | `npm run build` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
 | `npm run preview` | Previews the production build locally |
+| `npm run deploy` | Builds the app and deploys to Firebase Hosting |
+| `npm run deploy:hosting` | Builds the app and deploys only to Firebase Hosting |
 
 ### Adding New Features
 

@@ -51,6 +51,8 @@ npm install
 | `npm run dev` | Starts the Vite development server with Hot Module Replacement (HMR) |
 | `npm run build` | Runs TypeScript type checks (`tsc`) and builds the production bundle with Vite |
 | `npm run preview` | Serves the production build locally for testing |
+| `npm run deploy` | Builds the app and deploys to Firebase Hosting |
+| `npm run deploy:hosting` | Builds the app and deploys only to Firebase Hosting |
 
 ---
 
