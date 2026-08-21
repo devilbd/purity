@@ -1,5 +1,15 @@
 @use '../style.scss' as *;
 
+.demo-container {
+    &.demo-hidden {
+        display: none !important;
+    }
+
+    &.demo-visible {
+        display: flex !important;
+    }
+}
+
 #droppable-container {
     @extend .window;
     padding: 20px;

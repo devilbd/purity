@@ -30,11 +30,6 @@ export function drag(options: DraggableOptions) {
     let currentDropTarget: { element: HTMLElement; options: DroppableOptions } | null = null;
     let lastSnappedX = 0;
     let lastSnappedY = 0;
-    let baseLeft = 0;
-    let baseTop = 0;
-    let containerRect: DOMRect | null = null;
-    let elementWidth = 0;
-    let elementHeight = 0;
     const container = options.constrainTo ? getElement(options.constrainTo) : null;
     let activeHandle: HTMLElement | null = null;
     let rafId: number | null = null;
@@ -42,46 +37,22 @@ export function drag(options: DraggableOptions) {
 
     // Helper to get current transform values
     const getTransform = () => {
+        if (!element.style.transform) return { x: 0, y: 0 };
         const style = window.getComputedStyle(element);
-        const matrix = new DOMMatrix(style.transform);
-        return { x: matrix.m41, y: matrix.m42 };
-    };
-
-    const ensureWithinBounds = () => {
-        if (!container) return;
-
-        const { x, y } = getTransform();
-        const elementRect = element.getBoundingClientRect();
-        const cRect = container.getBoundingClientRect();
-
-        // Calculate base offset (the position where translate(0,0) would place the element)
-        const bLeft = elementRect.left - x;
-        const bTop = elementRect.top - y;
-        const eWidth = elementRect.width;
-        const eHeight = elementRect.height;
-
-        const minX = cRect.left - bLeft;
-        const maxX = cRect.right - bLeft - eWidth;
-        const minY = cRect.top - bTop;
-        const maxY = cRect.bottom - bTop - eHeight;
-
-        const nextX = Math.max(minX, Math.min(maxX, x));
-        const nextY = Math.max(minY, Math.min(maxY, y));
-
-        if (nextX !== x || nextY !== y) {
-            element.style.transform = `translate3d(${nextX}px, ${nextY}px, 0px)`;
+        if (!style.transform || style.transform === 'none') return { x: 0, y: 0 };
+        try {
+            const matrix = new DOMMatrix(style.transform);
+            return { x: matrix.m41, y: matrix.m42 };
+        } catch {
+            return { x: 0, y: 0 };
         }
-    };
-
-    const onResize = () => {
-        if (!isDragging) ensureWithinBounds();
     };
 
     const onPointerDown = (e: PointerEvent) => {
         const target = e.target as HTMLElement;
 
-        // Prevent drag on certain elements if needed (e.g., buttons, inputs)
-        if (target.closest('button, input, textarea, a')) {
+        // Prevent drag on interactive elements
+        if (target.closest('button, input, textarea, a, select')) {
             return;
         }
 
@@ -116,16 +87,6 @@ export function drag(options: DraggableOptions) {
                 lastSnappedX = currentX;
                 lastSnappedY = currentY;
 
-                const elementRect = element.getBoundingClientRect();
-                baseLeft = elementRect.left - currentX;
-                baseTop = elementRect.top - currentY;
-                elementWidth = elementRect.width;
-                elementHeight = elementRect.height;
-
-                if (container) {
-                    containerRect = container.getBoundingClientRect();
-                }
-
                 element.setPointerCapture(e.pointerId);
                 element.classList.add('is-dragging');
 
@@ -138,11 +99,14 @@ export function drag(options: DraggableOptions) {
         let nextX = currentX + (e.clientX - startX);
         let nextY = currentY + (e.clientY - startY);
 
-        if (container && containerRect) {
-            const minX = containerRect.left - baseLeft;
-            const maxX = containerRect.right - baseLeft - elementWidth;
-            const minY = containerRect.top - baseTop;
-            const maxY = containerRect.bottom - baseTop - elementHeight;
+        // Container boundary constraints (if constrained to a container other than body)
+        if (container && container !== document.body) {
+            const cRect = container.getBoundingClientRect();
+            const eRect = element.getBoundingClientRect();
+            const minX = currentX - (eRect.left - cRect.left);
+            const maxX = currentX + (cRect.right - eRect.right);
+            const minY = currentY - (eRect.top - cRect.top);
+            const maxY = currentY + (cRect.bottom - eRect.bottom);
 
             nextX = Math.max(minX, Math.min(maxX, nextX));
             nextY = Math.max(minY, Math.min(maxY, nextY));
@@ -167,13 +131,16 @@ export function drag(options: DraggableOptions) {
         // Snap to center logic: only if currentDropTarget matches options.snapTo
         if (options.snapTo && currentDropTarget?.element.matches(options.snapTo)) {
             const targetRect = currentDropTarget.element.getBoundingClientRect();
+            const eRect = element.getBoundingClientRect();
             const targetCenterX = targetRect.left + targetRect.width / 2;
             const targetCenterY = targetRect.top + targetRect.height / 2;
+            const elementCenterX = eRect.left + eRect.width / 2;
+            const elementCenterY = eRect.top + eRect.height / 2;
 
-            nextX = targetCenterX - baseLeft - elementWidth / 2;
-            nextY = targetCenterY - baseTop - elementHeight / 2;
+            nextX = nextX + (targetCenterX - elementCenterX);
+            nextY = nextY + (targetCenterY - elementCenterY);
 
-            if (nextX !== lastSnappedX || nextY !== lastSnappedY) {
+            if (Math.abs(nextX - lastSnappedX) > 1 || Math.abs(nextY - lastSnappedY) > 1) {
                 lastSnappedX = nextX;
                 lastSnappedY = nextY;
                 element.classList.add('snap-hit');
@@ -220,10 +187,6 @@ export function drag(options: DraggableOptions) {
     element.addEventListener('pointermove', onPointerMove);
     element.addEventListener('pointerup', onPointerUp);
     element.addEventListener('pointercancel', onPointerUp);
-    window.addEventListener('resize', onResize);
-
-    // Initial constraint check
-    ensureWithinBounds();
 
     // Initial setup
     element.classList.add('draggable-target');
@@ -237,7 +200,6 @@ export function drag(options: DraggableOptions) {
             element.removeEventListener('pointermove', onPointerMove);
             element.removeEventListener('pointerup', onPointerUp);
             element.removeEventListener('pointercancel', onPointerUp);
-            window.removeEventListener('resize', onResize);
 
             element.classList.remove('draggable-target', 'is-dragging', 'snap-hit');
         },

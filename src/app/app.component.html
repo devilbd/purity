@@ -1,7 +1,8 @@
 <div class="app-component-root">
     <header-component></header-component>
-    <div class="window">
-        <h3>App component</h3>
+    <intro-component></intro-component>
+    <div id="demo-window" class="window demo-container {{demoVisibilityClass}}">
+        <h3>App Component (Live Framework Demo)</h3>
         <div class="flex-vertical">
             <div id="result" class="{{loginStatus}}">{{loggedUser() ?? 'Not signed in.'}}</div>
             <input id="username" type="text" class="input-primary" value="{{loggedUser()}}" />

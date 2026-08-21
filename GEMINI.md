@@ -57,6 +57,7 @@ purity/
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
                 ├── forms-validation/ # <forms-validation> sample form component with submit validation
                 ├── header/      # <header-component> navigation bar with logo
+                ├── intro/       # <intro-component> framework overview & code samples
                 ├── modal/       # Modal dialog components
                 └── raw-template/# <raw-template> dynamic inline template rendering
 ```

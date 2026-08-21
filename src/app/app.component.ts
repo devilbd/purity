@@ -5,6 +5,7 @@ import {
 } from '../framework/core';
 import { DataService } from '../data/data.service';
 import './app.component.scss';
+import './shared/components/intro/intro.component';
 import './shared/components/header/header.component';
 import './shared/components/custom/custom.component';
 import './shared/components/raw-template/raw-template.component';
@@ -24,9 +25,32 @@ import { droppable } from './shared/behaviors/droppable/droppable';
 export class AppComponent {
     private dataService = inject(DataService);
     loggedUser = signal<string | null>(null);
+    showDemo = signal<boolean>(false);
 
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };
+
+    get demoVisibilityClass(): string {
+        return this.showDemo() ? 'demo-visible' : 'demo-hidden';
+    }
+
+    onTryIt() {
+        this.showDemo.set(true);
+        setTimeout(() => {
+            if (!this.dragCleanup) {
+                this.draggableBehavior();
+            }
+            if (!this.dropCleanup) {
+                this.droppableBehavior();
+            }
+            const demoEl = (this as any).querySelector?.('#demo-window');
+            demoEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+    }
+
+    toggleDemo() {
+        this.showDemo.update((v) => !v);
+    }
 
     get customComponent1(): CustomComponent | null {
         return (this as any).querySelector?.('#component1');
