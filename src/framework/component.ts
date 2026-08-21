@@ -9,6 +9,26 @@ export interface ComponentOptions {
 }
 
 const templateCache = new Map<string, string>();
+const expressionCache = new Map<string, Function>();
+
+function evaluateExpression(expr: string, context: any): string {
+    let fn = expressionCache.get(expr);
+    if (!fn) {
+        try {
+            fn = new Function(`with (this) { return ${expr}; }`);
+            expressionCache.set(expr, fn);
+        } catch {
+            fn = () => '';
+            expressionCache.set(expr, fn);
+        }
+    }
+    try {
+        const val = fn.call(context);
+        return val !== null && val !== undefined ? String(val) : '';
+    } catch {
+        return '';
+    }
+}
 
 function toKebabCase(str: string): string {
     return str
@@ -43,13 +63,13 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
         if (this.initialized) return;
         this.initialized = true;
 
-        const url = this.templateUrl || options.templateUrl;
         const inlineTemplate = this.template || options.template;
+        const url = this.templateUrl || options.templateUrl;
 
-        if (url) {
-            await this.loadTemplate();
-        } else if (inlineTemplate && !this.innerHTML) {
+        if (inlineTemplate && !this.innerHTML) {
             this.innerHTML = inlineTemplate;
+        } else if (url && !this.innerHTML) {
+            await this.loadTemplate();
         }
 
         this.onInit?.();
@@ -129,14 +149,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
                 fragments.push(dynamicNode);
 
                 effect(() => {
-                    try {
-                        const fn = new Function(`with (this) { return ${expr}; }`);
-                        const val = fn.call(this);
-                        dynamicNode.nodeValue =
-                            val !== null && val !== undefined ? String(val) : '';
-                    } catch {
-                        dynamicNode.nodeValue = '';
-                    }
+                    dynamicNode.nodeValue = evaluateExpression(expr, this);
                 });
 
                 lastIndex = match.index + match[0].length;
@@ -165,24 +178,16 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
                     effect(() => {
                         const replaced = rawValue.replace(
                             /\{\{\s*([\s\S]*?)\s*\}\}/g,
-                            (_, expr) => {
-                                try {
-                                    const fn = new Function(
-                                        `with (this) { return ${expr.trim()}; }`,
-                                    );
-                                    const val = fn.call(this);
-                                    return val !== null && val !== undefined
-                                        ? String(val)
-                                        : '';
-                                } catch {
-                                    return '';
-                                }
-                            },
+                            (_, expr) => evaluateExpression(expr.trim(), this),
                         );
-                        if (el instanceof HTMLInputElement && attrName === 'value') {
-                            el.value = replaced;
+                        if (attrName === 'class') {
+                            el.className = replaced.trim();
+                        } else {
+                            if (el instanceof HTMLInputElement && attrName === 'value') {
+                                el.value = replaced;
+                            }
+                            el.setAttribute(attrName, replaced);
                         }
-                        el.setAttribute(attrName, replaced);
                     });
                 }
             }

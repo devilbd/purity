@@ -1,6 +1,7 @@
 /* Draggable Styles and Animations */
 .draggable-target {
     cursor: grab;
+    touch-action: none;
 
     .drag-handle {
         cursor: grab;
@@ -12,13 +13,11 @@
     user-select: none !important;
     filter: brightness(1.05);
     cursor: grabbing !important;
+    transition: none !important; /* CRITICAL: Smooth instantaneous dragging without transform delay */
+    will-change: transform;
 
     .drag-handle {
         cursor: grabbing !important;
-    }
-
-    &.has-snap {
-        transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1.1);
     }
 }
 

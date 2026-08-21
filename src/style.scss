@@ -105,7 +105,6 @@ body {
     );
 
     border: 1px solid rgba(0, 0, 0, 0.2);
-    transition: all var(--transition-fast) ease;
 }
 
 /* GNOME 50 Success State Label */
@@ -156,24 +155,6 @@ body {
     margin: var(--spacing-lg);
 }
 
-@keyframes border-blink {
-    0% {
-        border-color: var(--gnome-border);
-        box-shadow: var(--shadow-deep);
-    }
-    50% {
-        border-color: rgba(255, 255, 255, var(--blink-border-opacity));
-        box-shadow:
-            0 0 var(--blink-glow-spread)
-                rgba(255, 255, 255, var(--blink-glow-opacity)),
-            var(--shadow-deep);
-    }
-    100% {
-        border-color: var(--gnome-border);
-        box-shadow: var(--shadow-deep);
-    }
-}
-
 .window {
     @extend .window-base;
 
@@ -191,15 +172,6 @@ body {
 
     display: flex;
     flex-direction: column;
-
-    /* Transition for smooth entry/exit */
-    transition:
-        border-color var(--transition-slow) ease,
-        box-shadow var(--transition-slow) ease;
-
-    &:hover {
-        animation: border-blink var(--anim-blink-duration) infinite ease-in-out;
-    }
 
     padding: 10px;
 }

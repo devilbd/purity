@@ -28,23 +28,23 @@ export function droppable(options: DroppableOptions) {
     return {
         destroy: () => {
             droppables.delete(item);
-        }
+        },
     };
 }
 
 /**
- * Internal helper for Draggable to find valid targets at coordinates.
+ * Internal helper for Draggable to find valid targets at coordinates without forced layout recalculations.
  */
 export function findDropTarget(x: number, y: number, draggedEl: HTMLElement) {
-    // Temporarily disable pointer events on the dragged element to see what's underneath
-    draggedEl.classList.add('droppable-checking');
-    const targetAtPoint = document.elementFromPoint(x, y);
-    draggedEl.classList.remove('droppable-checking');
-
-    if (!targetAtPoint) return null;
-
     for (const item of droppables) {
-        if (item.element === targetAtPoint || item.element.contains(targetAtPoint)) {
+        if (item.element === draggedEl) continue;
+        const rect = item.element.getBoundingClientRect();
+        if (
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom
+        ) {
             // Check if this target accepts the current element
             if (optionsMatch(item.options, draggedEl)) {
                 return item;

@@ -69,7 +69,7 @@ export function drag(options: DraggableOptions) {
         const nextY = Math.max(minY, Math.min(maxY, y));
 
         if (nextX !== x || nextY !== y) {
-            element.style.transform = `translate(${nextX}px, ${nextY}px)`;
+            element.style.transform = `translate3d(${nextX}px, ${nextY}px, 0px)`;
         }
     };
 
@@ -108,7 +108,7 @@ export function drag(options: DraggableOptions) {
         if (!isDragging) {
             const dx = Math.abs(e.clientX - initialPointerX);
             const dy = Math.abs(e.clientY - initialPointerY);
-            
+
             if (dx > DRAG_THRESHOLD || dy > DRAG_THRESHOLD) {
                 isDragging = true;
                 startX = initialPointerX;
@@ -127,11 +127,7 @@ export function drag(options: DraggableOptions) {
                 }
 
                 element.setPointerCapture(e.pointerId);
-                
                 element.classList.add('is-dragging');
-                if (options.snapTo) {
-                    element.classList.add('has-snap');
-                }
 
                 options.onDragStart?.(element);
             } else {
@@ -156,7 +152,7 @@ export function drag(options: DraggableOptions) {
         const dropTarget = findDropTarget(e.clientX, e.clientY, element);
         if (dropTarget !== currentDropTarget) {
             const hoverClass = currentDropTarget?.options.hoverClass || 'droppable-hover';
-            
+
             if (currentDropTarget) {
                 currentDropTarget.element.classList.remove(hoverClass);
                 currentDropTarget.options.onLeave?.(element);
@@ -177,22 +173,21 @@ export function drag(options: DraggableOptions) {
             nextX = targetCenterX - baseLeft - elementWidth / 2;
             nextY = targetCenterY - baseTop - elementHeight / 2;
 
-            // Visual feedback when a snap occurs
             if (nextX !== lastSnappedX || nextY !== lastSnappedY) {
                 lastSnappedX = nextX;
                 lastSnappedY = nextY;
-                element.classList.remove('snap-hit');
-                void element.offsetWidth; 
                 element.classList.add('snap-hit');
             }
+        } else {
+            element.classList.remove('snap-hit');
         }
 
         options.onDragMove?.(element, nextX, nextY);
 
-        // Use requestAnimationFrame for smoother performance
+        // Schedule hardware-accelerated transform update
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
-            element.style.transform = `translate(${nextX}px, ${nextY}px)`;
+            element.style.transform = `translate3d(${nextX}px, ${nextY}px, 0px)`;
             rafId = null;
         });
     };
@@ -202,7 +197,7 @@ export function drag(options: DraggableOptions) {
             activeHandle = null;
             return;
         }
-        
+
         options.onDragEnd?.(element);
 
         isDragging = false;
@@ -217,7 +212,7 @@ export function drag(options: DraggableOptions) {
             currentDropTarget = null;
         }
 
-        element.classList.remove('is-dragging', 'has-snap', 'snap-hit');
+        element.classList.remove('is-dragging', 'snap-hit');
         activeHandle = null;
     };
 
@@ -244,7 +239,7 @@ export function drag(options: DraggableOptions) {
             element.removeEventListener('pointercancel', onPointerUp);
             window.removeEventListener('resize', onResize);
 
-            element.classList.remove('draggable-target', 'is-dragging', 'has-snap', 'snap-hit');
-        }
+            element.classList.remove('draggable-target', 'is-dragging', 'snap-hit');
+        },
     };
 }
