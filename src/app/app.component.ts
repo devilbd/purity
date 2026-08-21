@@ -9,8 +9,10 @@ import './app.component.scss';
 import './shared/components/header/header.component';
 import './shared/components/custom/custom.component';
 import './shared/components/raw-template/raw-template.component';
+import './shared/components/forms-validation/forms-validation.component';
 import type { CustomComponent } from './shared/components/custom/custom.component';
 import type { RawTemplateComponent } from './shared/components/raw-template/raw-template.component';
+import type { FormsValidation } from './shared/components/forms-validation/forms-validation.component';
 import { drag } from './shared/behaviors/draggable/draggable';
 import { droppable } from './shared/behaviors/droppable/droppable';
 
@@ -33,6 +35,10 @@ export class AppComponent extends Component {
 
     get rawTemplateComponent(): RawTemplateComponent | null {
         return this.querySelector('#raw-template');
+    }
+
+    get formsValidation(): FormsValidation | null {
+        return this.querySelector('#forms-validation');
     }
 
     get loginStatus() {

@@ -1,0 +1,21 @@
+.forms-validation-root {
+    .forms-validation-form {
+        width: 100%;
+        max-width: 400px;
+        align-items: stretch;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-bottom: var(--spacing-sm, 5px);
+
+        label {
+            font-size: var(--font-size-sm, 14px);
+            color: var(--text-secondary, #9a9996);
+            margin-bottom: var(--spacing-xs, 4px);
+            margin-left: var(--spacing-sm, 5px);
+        }
+    }
+}
