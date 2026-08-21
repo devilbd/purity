@@ -174,6 +174,7 @@ Form Validators decouple validation rules and CSS class application from UI comp
   - **`invalidClass?: string`**: CSS class applied when a field is invalid (default: `'is-invalid'`).
   - **`validate[FieldName](value, element)`**: Validation method defined on the class for each field.
   - **`validateAll()`**: Method automatically provided to trigger validation across all configured fields.
+  - **Form State & Submit Buttons**: Automatically toggles `form.classList` and enables/disables `<button type="submit">` when all validations pass/fail.
 
   ```typescript
   @Validator({

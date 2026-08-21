@@ -293,7 +293,7 @@ export class HighlightDirective extends BaseDirective {
 
 ### 6. Form Validation (`@Validator` & `BaseValidator`)
 
-Form Validators decouple validation logic from UI templates, automatically tracking field mutations and applying customizable CSS state classes:
+Form Validators decouple validation logic from UI templates, automatically tracking field mutations, managing overall form validity, updating submit button `disabled` states, and applying customizable CSS state classes:
 
 #### Declaring a Form Validator
 

@@ -9,31 +9,35 @@ export interface FieldValidationConfig {
 
 export interface ValidatorOptions {
     form: string; // Form selector, e.g. 'form', '.forms-validation-form', '#myForm'
-    fields: Record<string, string | FieldValidationConfig>; // Map of field names to their selectors or configs
-    validClass?: string; // Default CSS class when field is valid (default: 'is-valid')
-    invalidClass?: string; // Default CSS class when field is invalid (default: 'is-invalid')
+    fields: Record<string, string | FieldValidationConfig>; // Map of field names to selectors/configs
+    validClass?: string; // Default CSS class when field/form is valid (default: 'is-valid')
+    invalidClass?: string; // Default CSS class when field/form is invalid (default: 'is-invalid')
     events?: string[]; // Events to trigger validation on (default: ['input', 'change', 'blur'])
 }
 
 export interface ValidatorLifecycle {
     form: HTMLFormElement | HTMLElement | null;
     fields: Map<string, HTMLElement>;
+    submitButtons: HTMLElement[];
     isValid: boolean;
     onInit?(): void;
     onDestroy?(): void;
     validateAll?(): boolean;
+    updateFormState?(isValid: boolean): void;
     onFieldChange?(
         fieldName: string,
         value: string,
         isValid: boolean,
         element: HTMLElement,
     ): void;
+    onStateChange?(isValid: boolean, validator: this): void;
     [key: string]: any;
 }
 
 export abstract class BaseValidator implements ValidatorLifecycle {
     form: HTMLFormElement | HTMLElement | null = null;
     fields: Map<string, HTMLElement> = new Map();
+    submitButtons: HTMLElement[] = [];
     isValid: boolean = false;
 
     onInit?(): void;
@@ -44,9 +48,14 @@ export abstract class BaseValidator implements ValidatorLifecycle {
         isValid: boolean,
         element: HTMLElement,
     ): void;
+    onStateChange?(isValid: boolean, validator: this): void;
 
     validateAll(): boolean {
         return this.isValid;
+    }
+
+    updateFormState(isValid: boolean): void {
+        this.isValid = isValid;
     }
 }
 
@@ -60,7 +69,7 @@ export const validatorRegistry = new Map<
 
 /**
  * Decorator to register a class as a Form Validator.
- * Uses the form selector and described fields to attach validation.
+ * Automatically tracks field mutations and toggles submit button disabled states and CSS classes.
  *
  * @example
  * ```typescript
@@ -96,7 +105,6 @@ export function Validator(options: ValidatorOptions) {
 
 /**
  * Helper to resolve the validation method name on a validator instance.
- * E.g., for field 'input1' -> 'validateInput1', 'validate_input1', 'validateinput1', 'input1', or 'validateField'
  */
 function findValidationMethod(
     instance: any,
@@ -126,7 +134,7 @@ function findValidationMethod(
 }
 
 /**
- * Scans a DOM tree for forms matching registered validators and attaches field validations.
+ * Scans a DOM tree for forms matching registered validators and attaches form and field validation.
  */
 export function bindValidators(
     root: HTMLElement,
@@ -148,12 +156,73 @@ export function bindValidators(
             instance.form = formEl;
             instance.fields = new Map();
 
+            // Locate submit buttons inside the form
+            const submitButtons = Array.from(
+                formEl.querySelectorAll<HTMLButtonElement | HTMLInputElement>(
+                    'button[type="submit"], input[type="submit"], button:not([type]), .form-submit-btn',
+                ),
+            ).filter(
+                (el) =>
+                    el.tagName === 'BUTTON' ||
+                    (el instanceof HTMLInputElement && el.type === 'submit') ||
+                    (el as any).type === 'submit',
+            );
+            instance.submitButtons = submitButtons;
+
             const defaultValidClass = options.validClass || 'is-valid';
             const defaultInvalidClass = options.invalidClass || 'is-invalid';
             const eventNames = options.events || ['input', 'change', 'blur'];
 
             const listenersToClean: Array<() => void> = [];
             const fieldValidationState = new Map<string, boolean>();
+
+            // Method to update form state, CSS classes, and submit buttons
+            const updateFormState = (isValid: boolean) => {
+                instance.isValid = isValid;
+
+                for (const btn of submitButtons) {
+                    if ('disabled' in btn) {
+                        (btn as HTMLButtonElement).disabled = !isValid;
+                    }
+                    if (isValid) {
+                        btn.classList.remove('disabled');
+                    } else {
+                        btn.classList.add('disabled');
+                    }
+                }
+
+                if (isValid) {
+                    formEl.classList.remove(defaultInvalidClass);
+                    formEl.classList.add(defaultValidClass);
+                } else {
+                    formEl.classList.remove(defaultValidClass);
+                    formEl.classList.add(defaultInvalidClass);
+                }
+
+                instance.onStateChange?.(isValid, instance);
+            };
+            instance.updateFormState = updateFormState;
+
+            // Evaluates whether a field value is valid without modifying DOM classes
+            const evaluateFieldValidity = (
+                fieldName: string,
+                fieldEl: HTMLElement,
+                fieldConfig: string | FieldValidationConfig,
+            ): boolean => {
+                const value =
+                    'value' in fieldEl
+                        ? String((fieldEl as any).value ?? '')
+                        : fieldEl.textContent || '';
+
+                const method =
+                    (typeof fieldConfig === 'object' && fieldConfig.validate) ||
+                    findValidationMethod(instance, fieldName);
+
+                if (method) {
+                    return !!method.call(instance, value, fieldEl);
+                }
+                return value.trim().length > 0;
+            };
 
             const validateSingleField = (
                 fieldName: string,
@@ -168,24 +237,11 @@ export function bindValidators(
                     defaultInvalidClass;
 
                 const value =
-                    fieldEl instanceof HTMLInputElement ||
-                    fieldEl instanceof HTMLTextAreaElement ||
-                    fieldEl instanceof HTMLSelectElement
-                        ? fieldEl.value
+                    'value' in fieldEl
+                        ? String((fieldEl as any).value ?? '')
                         : fieldEl.textContent || '';
 
-                let isValid = false;
-
-                const method =
-                    (typeof fieldConfig === 'object' && fieldConfig.validate) ||
-                    findValidationMethod(instance, fieldName);
-
-                if (method) {
-                    isValid = !!method.call(instance, value, fieldEl);
-                } else {
-                    // Default validation: non-empty check
-                    isValid = value.trim().length > 0;
-                }
+                const isValid = evaluateFieldValidity(fieldName, fieldEl, fieldConfig);
 
                 if (isValid) {
                     fieldEl.classList.remove(invalidClass);
@@ -198,7 +254,11 @@ export function bindValidators(
                 fieldValidationState.set(fieldName, isValid);
                 instance.onFieldChange?.(fieldName, value, isValid, fieldEl);
 
-                instance.isValid = Array.from(fieldValidationState.values()).every(Boolean);
+                const allValid =
+                    fieldValidationState.size === Object.keys(options.fields).length &&
+                    Array.from(fieldValidationState.values()).every(Boolean);
+
+                updateFormState(allValid);
                 return isValid;
             };
 
@@ -213,7 +273,10 @@ export function bindValidators(
 
                 if (fieldEl) {
                     instance.fields.set(fieldName, fieldEl);
-                    fieldValidationState.set(fieldName, false);
+
+                    // Compute initial validity for each field
+                    const initiallyValid = evaluateFieldValidity(fieldName, fieldEl, fieldConfig);
+                    fieldValidationState.set(fieldName, initiallyValid);
 
                     const handler = () => {
                         validateSingleField(fieldName, fieldEl, fieldConfig);
@@ -225,8 +288,16 @@ export function bindValidators(
                             fieldEl.removeEventListener(evt, handler),
                         );
                     }
+                } else {
+                    fieldValidationState.set(fieldName, false);
                 }
             }
+
+            // Set initial form state and disable submit button if form is invalid
+            const initialAllValid =
+                fieldValidationState.size === Object.keys(options.fields).length &&
+                Array.from(fieldValidationState.values()).every(Boolean);
+            updateFormState(initialAllValid);
 
             // Provide validateAll method
             instance.validateAll = (): boolean => {
@@ -236,9 +307,11 @@ export function bindValidators(
                     if (fieldEl) {
                         const fieldValid = validateSingleField(fieldName, fieldEl, fieldConfig);
                         if (!fieldValid) allValid = false;
+                    } else {
+                        allValid = false;
                     }
                 }
-                instance.isValid = allValid;
+                updateFormState(allValid);
                 return allValid;
             };
 

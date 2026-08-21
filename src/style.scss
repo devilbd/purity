@@ -233,6 +233,16 @@ body {
     /* GNOME 50 uses a sharp "Outline" for keyboard navigation */
     box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.5);
 }
+
+.button-primary:disabled,
+.button-primary.disabled,
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
+}
 .button-group {
     display: flex;
     flex-direction: row;
