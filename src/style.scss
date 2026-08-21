@@ -1,12 +1,25 @@
-html,
+html {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background-color: #1e1e1e;
+}
+
 body {
     margin: 0;
-    height: 100%;
-    /* GNOME-style abstract wallpaper gradient */
+    padding: 0;
+    min-height: 100vh;
+    /* GNOME-style abstract wallpaper gradient spanning entire page smoothly */
     background:
-        radial-gradient(circle at top left, #3584e4, transparent 40%),
-        radial-gradient(circle at bottom right, #9141ac, transparent 40%),
+        radial-gradient(circle at top left, rgba(53, 132, 228, 0.45), transparent 45%),
+        radial-gradient(circle at bottom right, rgba(145, 65, 172, 0.45), transparent 45%),
         #1e1e1e;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: #1e1e1e;
+    color: var(--text-main);
+    font-family: var(--font-main);
 }
 
 /* 1. Tell the browser where the file is */
