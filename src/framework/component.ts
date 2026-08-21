@@ -118,6 +118,10 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
 
         while ((node = walker.nextNode())) {
             if (node.nodeValue && node.nodeValue.includes('{{')) {
+                const parentEl = node.parentElement;
+                if (parentEl?.closest('pre, code, [data-no-bind]')) {
+                    continue;
+                }
                 textNodes.push(node as Text);
             }
         }
@@ -171,6 +175,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
         const elementsWithAttrs = [rootEl, ...Array.from(rootEl.querySelectorAll('*'))];
         for (const el of elementsWithAttrs) {
             if (!(el instanceof HTMLElement)) continue;
+            if (el.closest('pre, code, [data-no-bind]')) continue;
             for (const attr of Array.from(el.attributes)) {
                 if (attr.value.includes('{{')) {
                     const rawValue = attr.value;

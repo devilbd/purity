@@ -79,19 +79,35 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
         <!-- 3. HTML Templates -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>3. 📄 Declarative HTML Template Interpolation (<code>{{ expression }}</code>)</h4>
-                <p>Reactive expressions compiled once and cached in <code>expressionCache</code>, dynamically updating text and attributes:</p>
+                <h4>3. 📄 Handlebars Template Interpolation (<code>{{ expression }}</code>)</h4>
+                <p>Embed reactive signals directly into HTML templates using handlebars syntax. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
             </div>
-            <pre><code><span class="cmt">&lt;!-- src/app/app.component.html --&gt;</span>
+            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering --&gt;</span>
 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"window"</span><span class="tag">&gt;</span>
-    <span class="cmt">&lt;!-- Reactive class and text interpolations --&gt;</span>
-    <span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="str">"result"</span> <span class="attr">class</span>=<span class="str">"{{loginStatus}}"</span><span class="tag">&gt;</span>
-        <span class="expr">{{loggedUser() ?? 'Not signed in.'}}</span>
+    <span class="cmt">&lt;!-- Reactive text content bound to signals --&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{currentUser()}}</span>!<span class="tag">&lt;/h3&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Count: <span class="expr">{{count()}}</span> (Doubled: <span class="expr">{{count() * 2}}</span>)<span class="tag">&lt;/p&gt;</span>
+
+    <span class="cmt">&lt;!-- Reactive attribute and CSS class interpolation --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"badge {{statusClass()}}"</span><span class="tag">&gt;</span>
+        Status: <span class="expr">{{statusText}}</span>
     <span class="tag">&lt;/div&gt;</span>
 
-    <span class="cmt">&lt;!-- Two-way attribute binding --&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">id</span>=<span class="str">"username"</span> <span class="attr">type</span>=<span class="str">"text"</span> <span class="attr">class</span>=<span class="str">"input-primary"</span> <span class="attr">value</span>=<span class="str">"{{loggedUser()}}"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;/div&gt;</span></code></pre>
+    <span class="cmt">&lt;!-- Dynamic input value binding --&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"text"</span> <span class="attr">value</span>=<span class="str">"{{currentUser()}}"</span> <span class="attr">class</span>=<span class="str">"input-primary"</span> <span class="tag">/&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: Signal Definitions --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'user-card'</span>, templateUrl: <span class="str">'./user-card.html'</span> })
+<span class="kw">export class</span> <span class="typ">UserCardComponent</span> {
+    currentUser = <span class="fn">signal</span>(<span class="str">'Alice'</span>);
+    count = <span class="fn">signal</span>(<span class="num">5</span>);
+    statusClass = <span class="fn">signal</span>(<span class="str">'is-online'</span>);
+
+    <span class="kw">get</span> <span class="fn">statusText</span>() {
+        <span class="kw">return</span> <span class="kw">this</span>.currentUser() ? <span class="str">'Active'</span> : <span class="str">'Offline'</span>;
+    }
+}</code></pre>
         </div>
 
         <!-- 4. Dependency Injection -->
