@@ -1,4 +1,8 @@
-# Purity
+<p align="center">
+  <img src="src/app/assets/purity_logo.png" alt="Purity Logo" width="190" height="190" />
+</p>
+
+<h1 align="center">Purity</h1>
 
 <p align="center">
   <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components.</strong>

@@ -1,15 +1,32 @@
-.header {
-    padding: 10px;
-    text-align: center;
+.header-component-root {
+    padding: 16px 20px;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm, 8px);
+}
+
+.header-logo-img {
+    width: 190px;
+    height: 190px;
+    object-fit: contain;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 .main-logo {
     text-align: center;
-    font-size: 2.8rem; /* Slightly larger, more impactful */
-    font-family: var(--font-main); /* Use the main GNOME-like sans-serif font */
-    font-weight: 800; /* Bold and clear */
-    letter-spacing: -1.5px; /* Tighter for a modern look */
-    color: var(--text-main); /* Default text color */
+    font-size: 2.8rem;
+    font-family: var(--font-main);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: var(--text-main);
+    margin: 0;
 
     /* GNOME 50 "Shiny" effect: Subtle gradient and accent glow */
     background: linear-gradient(
@@ -23,8 +40,8 @@
 
     text-shadow:
         0 0 5px rgba(53, 132, 228, 0.5),
-        /* Soft glow with accent color */ 0 2px 4px rgba(0, 0, 0, 0.4); /* Deeper shadow for contrast */
+        0 2px 4px rgba(0, 0, 0, 0.4);
 
-    transform: none; /* Ensure no unwanted transforms */
+    transform: none;
     display: inline-block;
 }
