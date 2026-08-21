@@ -107,6 +107,7 @@ export class AppComponent {
     onLogin() {
         const user = this.dataService.login('some user');
         this.loggedUser.set(user.name);
+        this.setDefaultLogin();
     }
 
     onLogout() {

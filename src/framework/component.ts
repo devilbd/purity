@@ -202,19 +202,30 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
 
         if (target.prototype instanceof HTMLElement) {
             CustomElementClass = target as unknown as CustomElementConstructor;
+            if (options.templateUrl && !(CustomElementClass.prototype as any).templateUrl) {
+                (CustomElementClass.prototype as any).templateUrl = options.templateUrl;
+            }
+            if (options.template && !(CustomElementClass.prototype as any).template) {
+                (CustomElementClass.prototype as any).template = options.template;
+            }
             attachComponentLifecycle(CustomElementClass.prototype, options);
         } else {
             class ComponentElement extends HTMLElement {
-                protected templateUrl?: string = options.templateUrl;
-                protected template?: string = options.template;
                 protected initialized = false;
                 protected activeDirectives: Array<{ destroy: () => void }> = [];
 
                 constructor() {
                     super();
 
-                    // Instantiate the user target class to copy instance properties (signals, fields, etc.)
                     const userInstance = new (target as any)();
+
+                    const frameworkProtectedMethods = new Set([
+                        'render',
+                        'connectedCallback',
+                        'disconnectedCallback',
+                        'loadTemplate',
+                        'bindTemplate',
+                    ]);
 
                     const propKeys = [
                         ...Object.getOwnPropertyNames(userInstance),
@@ -223,15 +234,17 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
                     for (const key of propKeys) {
                         const desc = Object.getOwnPropertyDescriptor(userInstance, key);
                         if (desc) {
+                            if (
+                                typeof key === 'string' &&
+                                frameworkProtectedMethods.has(key) &&
+                                desc.value === undefined &&
+                                !desc.get &&
+                                !desc.set
+                            ) {
+                                continue;
+                            }
                             Object.defineProperty(this, key, desc);
                         }
-                    }
-
-                    if (userInstance.templateUrl) {
-                        this.templateUrl = userInstance.templateUrl;
-                    }
-                    if (userInstance.template) {
-                        this.template = userInstance.template;
                     }
                 }
             }
@@ -242,6 +255,13 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
                 if (key !== 'constructor') {
                     Object.defineProperty(ComponentElement.prototype, key, desc);
                 }
+            }
+
+            if (options.templateUrl && !(ComponentElement.prototype as any).templateUrl) {
+                (ComponentElement.prototype as any).templateUrl = options.templateUrl;
+            }
+            if (options.template && !(ComponentElement.prototype as any).template) {
+                (ComponentElement.prototype as any).template = options.template;
             }
 
             attachComponentLifecycle(ComponentElement.prototype, options);

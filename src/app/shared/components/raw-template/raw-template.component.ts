@@ -10,6 +10,7 @@ import './raw-template.component.scss';
 })
 export class RawTemplateComponent {
     customProperty = signal(0);
+    declare render: (content: string) => void;
 
     get status() {
         if (this.customProperty() % 2 === 0) {
@@ -29,7 +30,7 @@ export class RawTemplateComponent {
 
     onInit() {
         effect(() => {
-            (this as any).render?.(this.template);
+            this.render(this.template);
         });
     }
 }
