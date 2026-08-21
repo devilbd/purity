@@ -1,12 +1,14 @@
 import {
     Component,
-    defineComponent,
     effect,
     signal,
 } from '../../../../framework/core';
 import './raw-template.component.scss';
 
-export class RawTemplateComponent extends Component {
+@Component({
+    selector: 'raw-template',
+})
+export class RawTemplateComponent {
     customProperty = signal(0);
 
     get status() {
@@ -25,17 +27,9 @@ export class RawTemplateComponent extends Component {
         `;
     }
 
-    constructor() {
-        super();
-    }
-
-    protected onInit() {
+    onInit() {
         effect(() => {
-            if (this.customProperty()) {
-                this.render(this.template);
-            }
+            (this as any).render?.(this.template);
         });
     }
 }
-
-defineComponent('raw-template', RawTemplateComponent);

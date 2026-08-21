@@ -22,8 +22,11 @@ purity/
     ├── main.ts                  # Application entry point (registers root components)
     ├── style.scss               # Global styles & GNOME Adwaita-inspired design system
     ├── framework/               # Core framework modules
-    │   ├── core.ts              # Signals, effects, Component base class, DOM helpers, defineComponent
-    │   └── common.ts            # Shared utilities and future framework extensions
+    │   ├── core.ts              # Signals, effects, DOM helpers, and module re-exports
+    │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader
+    │   ├── di.ts                # Dependency Injection container and @Injectable decorator
+    │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
+    │   └── common.ts            # Shared framework exports
     ├── data/                    # Data services and state management
     │   └── data.service.ts      # Service layer
     └── app/                     # Demo / application source
@@ -70,28 +73,30 @@ Purity features a synchronous reactive primitives engine:
   });
   ```
 
-### 2. Web Component Model (`Component` & `defineComponent`)
+### 2. Web Component Model (`@Component` Decorator)
 
-* **`Component`**: Abstract class extending `HTMLElement`.
+* **`@Component(options: string | ComponentOptions)`**:
+  Class decorator transforming standard TypeScript classes into native Custom Elements:
+  - **`selector?: string`**: Custom element tag name (e.g. `'app-component'`). If omitted, inferred from class name in kebab-case.
   - **`templateUrl?: string`**: Path to an external HTML template. Templates are fetched once via `fetch()` and cached in `templateCache`.
+  - **`template?: string`**: Inline HTML template string.
   - **`onInit(): void`**: Lifecycle method invoked after the template is loaded and the component is mounted in the DOM.
-  - **`bindTemplate(root?: HTMLElement)`**: Automatically parses and binds reactive `{{ expression }}` handlebars interpolations in text nodes and attributes.
+  - **`bindTemplate(root?: HTMLElement)`**: Automatically parses and binds reactive `{{ expression }}` handlebars interpolations in text nodes and attributes, and binds directives.
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up subscriptions and behavior instances.
 
-* **`defineComponent(name: string, component: CustomElementConstructor)`**:
-  Safely registers the custom element with `customElements.define` if not already registered.
-
   ```typescript
-  export class MyComponent extends Component {
-      templateUrl = './src/app/my-component.html';
+  @Component({
+      selector: 'my-component',
+      templateUrl: './src/app/my-component.html',
+  })
+  export class MyComponent {
+      count = signal(0);
 
       protected onInit() {
-          // Initialize signals, DOM queries, effects
+          // Initialize signals, behaviors, effects
       }
   }
-
-  defineComponent('my-component', MyComponent);
   ```
 
 ### 3. DOM Utilities

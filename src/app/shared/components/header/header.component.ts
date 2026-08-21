@@ -1,12 +1,8 @@
-import { Component, defineComponent } from '../../../../framework/core';
+import { Component } from '../../../../framework/core';
 import './header.component.scss';
 
-export class HeaderComponent extends Component {
-    templateUrl = './src/app/shared/components/header/header.component.html';
-
-    constructor() {
-        super();
-    }
-}
-
-defineComponent('header-component', HeaderComponent);
+@Component({
+    selector: 'header-component',
+    templateUrl: './src/app/shared/components/header/header.component.html',
+})
+export class HeaderComponent {}

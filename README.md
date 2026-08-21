@@ -61,8 +61,11 @@ purity/
     ├── main.ts                  # Application entry point (registers root components)
     ├── style.scss               # Global styles (GNOME Adwaita design system)
     ├── framework/               # Core framework modules
-    │   ├── core.ts              # Signals, effects, Component base class, DOM utilities, defineComponent
-    │   └── common.ts            # Shared utilities & framework extensions
+    │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
+    │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader
+    │   ├── di.ts                # Dependency Injection container and @Injectable decorator
+    │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
+    │   └── common.ts            # Shared framework exports
     ├── data/                    # Data services & global state management
     │   └── data.service.ts      # Service layer
     └── app/                     # Sample application
@@ -107,20 +110,22 @@ effect(() => {
 
 ---
 
-### 2. Native Web Components (`Component` & `defineComponent`)
+### 2. Native Web Components (`@Component` Decorator)
 
-Components extend `Component` (which subclasses `HTMLElement`).
+Classes are decorated with `@Component` to turn them into native Web Components with fine-grained reactivity, template resolution, and lifecycle hooks:
 
 #### Example: Component with External Template
 
 ```typescript
 // src/app/shared/components/custom/custom.component.ts
-import { Component, defineComponent, signal } from '../../../../framework/core';
+import { Component, signal } from '../../../../framework/core';
 import './custom.component.scss';
 
-export class CustomComponent extends Component {
-    templateUrl = './src/app/shared/components/custom/custom.component.html';
-
+@Component({
+    selector: 'custom-component',
+    templateUrl: './src/app/shared/components/custom/custom.component.html',
+})
+export class CustomComponent {
     customProperty = signal<string | null>(null);
 
     onInput(element: HTMLInputElement) {
@@ -131,9 +136,6 @@ export class CustomComponent extends Component {
         this.customProperty.set(null);
     }
 }
-
-// Register the custom element
-defineComponent('custom-component', CustomComponent);
 ```
 
 #### Example: Reactive Handlebars Template Interpolation
@@ -151,9 +153,12 @@ Purity supports declarative `{{ expression }}` template interpolations. Text nod
 #### Example: Inline Template Rendering
 
 ```typescript
-import { Component, defineComponent, effect, signal } from '../../../../framework/core';
+import { Component, effect, signal } from '../../../../framework/core';
 
-export class RawTemplateComponent extends Component {
+@Component({
+    selector: 'raw-template',
+})
+export class RawTemplateComponent {
     count = signal(0);
 
     get template() {
@@ -166,12 +171,10 @@ export class RawTemplateComponent extends Component {
 
     protected onInit() {
         effect(() => {
-            this.render(this.template);
+            (this as any).render?.(this.template);
         });
     }
 }
-
-defineComponent('raw-template', RawTemplateComponent);
 ```
 
 ---

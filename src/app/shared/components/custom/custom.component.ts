@@ -1,21 +1,15 @@
-import {
-    Component,
-    defineComponent,
-    signal,
-} from '../../../../framework/core';
+import { Component, signal } from '../../../../framework/core';
 import './custom.component.scss';
 
-export class CustomComponent extends Component {
-    templateUrl = './src/app/shared/components/custom/custom.component.html';
-
+@Component({
+    selector: 'custom-component',
+    templateUrl: './src/app/shared/components/custom/custom.component.html',
+})
+export class CustomComponent {
     customProperty = signal<string | null>(null);
 
-    get name() {
-        return this.getAttribute('name') || '';
-    }
-
-    constructor() {
-        super();
+    get name(): string {
+        return (this as any).getAttribute?.('name') || '';
     }
 
     onInput(element: HTMLInputElement) {
@@ -26,5 +20,3 @@ export class CustomComponent extends Component {
         this.customProperty.set(null);
     }
 }
-
-defineComponent('custom-component', CustomComponent);

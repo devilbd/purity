@@ -1,6 +1,5 @@
 import {
     Component,
-    defineComponent,
     inject,
     signal,
 } from '../framework/core';
@@ -17,9 +16,11 @@ import type { FormsValidationComponent } from './shared/components/forms-validat
 import { drag } from './shared/behaviors/draggable/draggable';
 import { droppable } from './shared/behaviors/droppable/droppable';
 
-export class AppComponent extends Component {
-    templateUrl = './src/app/app.component.html';
-
+@Component({
+    selector: 'app-component',
+    templateUrl: './src/app/app.component.html',
+})
+export class AppComponent {
     private dataService = inject(DataService);
     loggedUser = signal<string | null>(null);
 
@@ -27,19 +28,19 @@ export class AppComponent extends Component {
     private dropCleanup?: { destroy: () => void };
 
     get customComponent1(): CustomComponent | null {
-        return this.querySelector('#component1');
+        return (this as any).querySelector?.('#component1');
     }
 
     get customComponent2(): CustomComponent | null {
-        return this.querySelector('#component2');
+        return (this as any).querySelector?.('#component2');
     }
 
     get rawTemplateComponent(): RawTemplateComponent | null {
-        return this.querySelector('#raw-template');
+        return (this as any).querySelector?.('#raw-template');
     }
 
     get formsValidation(): FormsValidationComponent | null {
-        return this.querySelector('#forms-validation');
+        return (this as any).querySelector?.('#forms-validation');
     }
 
     get loginStatus() {
@@ -50,10 +51,6 @@ export class AppComponent extends Component {
         } else {
             return 'error';
         }
-    }
-
-    constructor() {
-        super();
     }
 
     protected onInit() {
@@ -123,5 +120,3 @@ export class AppComponent extends Component {
         this.rawTemplateComponent?.customProperty.update((val) => val + 1);
     }
 }
-
-defineComponent('app-component', AppComponent);
