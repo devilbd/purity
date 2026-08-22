@@ -80,4 +80,10 @@ function decoratorsPlugin(): Plugin {
 
 export default defineConfig({
     plugins: [decoratorsPlugin()],
+    resolve: {
+        alias: {
+            '@purity/core': path.resolve(import.meta.dirname, 'src/framework/core.ts'),
+            '@purity': path.resolve(import.meta.dirname, 'src/framework'),
+        },
+    },
 });

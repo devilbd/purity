@@ -1,4 +1,4 @@
-import { getElement } from '../../../../framework/core';
+import { getElement } from '@purity/core';
 import './draggable.scss';
 import { findDropTarget, type DroppableOptions } from '../droppable/droppable';
 

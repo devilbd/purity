@@ -1,4 +1,4 @@
-import { getElement } from '../../../../framework/core';
+import { getElement } from '@purity/core';
 import './droppable.scss';
 
 export interface DroppableOptions {

@@ -107,7 +107,7 @@ purity/
 Purity provides fine-grained reactive primitives:
 
 ```typescript
-import { signal, effect } from './framework/core';
+import { signal, effect } from '@purity/core';
 
 // Create a signal
 const username = signal<string | null>(null);
@@ -137,7 +137,7 @@ Classes are decorated with `@Component` to turn them into native Web Components 
 
 ```typescript
 // src/app/shared/components/custom/custom.component.ts
-import { Component, signal } from '../../../../framework/core';
+import { Component, signal } from '@purity/core';
 import './custom.component.scss';
 
 @Component({
@@ -162,7 +162,7 @@ export class CustomComponent {
 Use the `@ViewChild(selector)` decorator to query child DOM elements and child components:
 
 ```typescript
-import { Component, ViewChild } from './framework/core';
+import { Component, ViewChild } from '@purity/core';
 import type { CustomComponent } from './shared/components/custom/custom.component';
 
 @Component({
@@ -195,7 +195,7 @@ Purity supports declarative `{{ expression }}` template interpolations. Text nod
 
 ```typescript
 // src/app/shared/components/raw-template/raw-template.component.ts
-import { Component, effect, signal } from '../../../../framework/core';
+import { Component, effect, signal } from '@purity/core';
 import './raw-template.component.scss';
 
 @Component({
@@ -250,7 +250,7 @@ Purity includes a built-in Dependency Injection container that enables service r
 #### Declaring a Service with `@Injectable`
 
 ```typescript
-import { Injectable, signal } from './framework/core';
+import { Injectable, signal } from '@purity/core';
 
 @Injectable('DataService')
 export class DataService {
@@ -267,7 +267,7 @@ export class DataService {
 You can resolve registered services by their class constructor or by registered token name:
 
 ```typescript
-import { Component, inject } from './framework/core';
+import { Component, inject } from '@purity/core';
 import { DataService } from './data/data.service';
 
 @Component({
@@ -296,7 +296,7 @@ Directives attach custom behavior, styling, and reactive listeners directly to D
 #### Declaring a Directive
 
 ```typescript
-import { Directive, BaseDirective } from './framework/core';
+import { Directive, BaseDirective } from '@purity/core';
 import './highlight.directive.scss';
 
 @Directive('highlight')
@@ -336,7 +336,7 @@ Form Validators decouple validation logic from UI templates, automatically track
 
 ```typescript
 // src/app/shared/validators/forms-validation.validator.ts
-import { Validator, BaseValidator } from '../../../framework/core';
+import { Validator, BaseValidator } from '@purity/core';
 
 @Validator({
     form: '.forms-validation-form',

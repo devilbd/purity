@@ -1,4 +1,4 @@
-import { Validator, BaseValidator } from '../../../framework/core';
+import { Validator, BaseValidator } from '@purity/core';
 
 @Validator({
     form: '.forms-validation-form',

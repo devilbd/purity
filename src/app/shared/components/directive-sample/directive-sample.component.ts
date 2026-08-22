@@ -1,4 +1,4 @@
-import { Component, signal } from '../../../../framework/core';
+import { Component, signal } from '@purity/core';
 import '../../directives/highlight.directive';
 import './directive-sample.component.scss';
 

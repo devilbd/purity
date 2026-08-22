@@ -2,7 +2,7 @@ import {
     Component,
     effect,
     signal,
-} from '../../../../framework/core';
+} from '@purity/core';
 import './raw-template.component.scss';
 
 @Component({

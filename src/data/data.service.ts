@@ -1,4 +1,4 @@
-import { Injectable, signal } from '../framework/core';
+import { Injectable, signal } from '@purity/core';
 
 export interface User {
     id: number;

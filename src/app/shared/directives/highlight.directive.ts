@@ -1,4 +1,4 @@
-import { Directive, BaseDirective } from '../../../framework/core';
+import { Directive, BaseDirective } from '@purity/core';
 import './highlight.directive.scss';
 
 @Directive('highlight')

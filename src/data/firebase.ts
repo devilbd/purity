@@ -1,4 +1,4 @@
-import { Injectable } from '../framework/core';
+import { Injectable } from '@purity/core';
 
 export interface FirebaseConfig {
     apiKey: string;

@@ -1,4 +1,4 @@
-import { Component } from '../../../../framework/core';
+import { Component } from '@purity/core';
 import './forms-validation.component.scss';
 import '../../validators/forms-validation.validator';
 

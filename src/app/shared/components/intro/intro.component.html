@@ -32,7 +32,7 @@
                 <h4>1. 🔄 Fine-Grained Reactive Signals &amp; Effects (<code>core.ts</code>)</h4>
                 <p>Synchronous reactivity primitives with automated dependency tracking and sub-microsecond updates:</p>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
+            <pre><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="cmt">// Create a reactive signal container</span>
 <span class="kw">const</span> count = <span class="fn">signal</span>(<span class="num">0</span>);
@@ -56,7 +56,7 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
                 <h4>2. 🧩 Native Web Components &amp; Child Views (<code>component.ts</code>)</h4>
                 <p>Native Custom Elements with automatic template inlining, lifecycle hooks, and <code>@ViewChild</code> query decorators:</p>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import type</span> { <span class="typ">CustomComponent</span> } <span class="kw">from</span> <span class="str">'./custom.component'</span>;
 
 <span class="dec">@Component</span>({
@@ -115,7 +115,7 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
                 <h4>4. 💉 Dependency Injection (<code>di.ts</code>)</h4>
                 <p>Singleton service registration with <code>@Injectable</code> and fast token resolution via <code>inject()</code>:</p>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Injectable</span>, <span class="fn">signal</span>, <span class="fn">inject</span>, <span class="fn">Component</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
+            <pre><code><span class="kw">import</span> { <span class="fn">Injectable</span>, <span class="fn">signal</span>, <span class="fn">inject</span>, <span class="fn">Component</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Injectable</span>(<span class="str">'DataService'</span>)
 <span class="kw">export class</span> <span class="typ">DataService</span> {
@@ -138,7 +138,7 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
                 <h4>5. 📋 Decoupled Form Validation (<code>validator.ts</code>)</h4>
                 <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
+            <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Validator</span>({
     form: <span class="str">'.forms-validation-form'</span>,
@@ -166,7 +166,7 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
                 <h4>6. 🏷️ Custom Directives (<code>directive.ts</code>)</h4>
                 <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
+            <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Directive</span>(<span class="str">'highlight'</span>)
 <span class="kw">export class</span> <span class="typ">HighlightDirective</span> <span class="kw">extends</span> <span class="typ">BaseDirective</span> {

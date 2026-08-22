@@ -3,7 +3,7 @@ import {
     inject,
     signal,
     ViewChild,
-} from '../framework/core';
+} from '@purity/core';
 import { DataService } from '../data/data.service';
 import './app.component.scss';
 import './shared/components/intro/intro.component';
