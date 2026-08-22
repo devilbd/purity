@@ -1,0 +1,59 @@
+<div class="window for-sample-root">
+    <div class="for-header">
+        <h4>🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
+        <span class="count-badge">Total: {{memberCount}}</span>
+    </div>
+    <p class="for-desc">
+        Demonstrating dynamic loop rendering with <code>&lt;div for="let obj, index of members"&gt;</code>, object property binding, index tracking, and nested loops for arrays:
+    </p>
+
+    <!-- Input form to add elements dynamically -->
+    <div class="for-controls">
+        <input
+            type="text"
+            class="input-primary"
+            placeholder="Member name (e.g. Dana Scully)..."
+            value="{{newName()}}"
+            oninput="forSample.onNameInput(this)"
+        />
+        <input
+            type="text"
+            class="input-primary"
+            placeholder="Role (e.g. Systems Analyst)..."
+            value="{{newRole()}}"
+            oninput="forSample.onRoleInput(this)"
+        />
+        <button
+            type="button"
+            class="button-primary add-member-btn"
+            onclick="forSample.onAddMember()"
+        >
+            ➕ Add Member
+        </button>
+    </div>
+
+    <!-- The Repeated List -->
+    <div class="members-grid">
+        <div for="let obj, index of members" class="member-card window">
+            <div class="member-card-header">
+                <div class="member-info">
+                    <span class="member-index">#{{index + 1}}</span>
+                    <strong class="member-name">{{obj.name | uppercase}}</strong>
+                    <span class="status-indicator status-{{obj.status}}">{{obj.status}}</span>
+                </div>
+                <button
+                    type="button"
+                    class="button-cancel delete-btn"
+                    title="Remove member"
+                    onclick="forSample.onRemoveMember({{obj.id}})"
+                >
+                    ✕
+                </button>
+            </div>
+            <div class="member-role">{{obj.role}}</div>
+            <div class="member-tags">
+                <span for="let tag of obj.tags" class="tag-badge">{{tag}}</span>
+            </div>
+        </div>
+    </div>
+</div>

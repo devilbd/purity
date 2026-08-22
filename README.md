@@ -34,6 +34,7 @@
 - 🧩 **Native Web Components**: Standard classes decorated with `@Component` transformed into Custom Elements with automatic template inlining and lifecycle management.
 - 🔍 **Child View Queries (`@ViewChild`)**: Automatic child element and component querying by CSS selector with fallback resolution for teleported/body-prepended elements.
 - 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
+- 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
@@ -102,7 +103,7 @@ purity/
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # UI Web Components (intro, header, demo, custom, modal, pipe-sample, raw-template, forms-validation, directive-sample)
+            └── components/      # UI Web Components (intro, header, demo, custom, modal, pipe-sample, for-sample, raw-template, forms-validation, directive-sample)
 ```
 
 ---
@@ -414,7 +415,51 @@ export class UserCardComponent {
 
 ---
 
-### 10. 📦 Generic Components & Content Projection (`<slot>`)
+### 10. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+
+Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
+
+```html
+<!-- 1. HTML Template: Array Repeater, Index Tracking & Nested Loops -->
+<div for="let obj, index of members" class="member-card window">
+    <div class="member-info">
+        <span class="member-index">#{{index + 1}}</span>
+        <strong>{{obj.name | uppercase}}</strong>
+        <span class="status-pill">{{obj.status}}</span>
+    </div>
+    <div class="member-role">{{obj.role}}</div>
+
+    <!-- Nested loop for array properties -->
+    <div class="member-tags">
+        <span for="let tag of obj.tags" class="tag-badge">{{tag}}</span>
+    </div>
+</div>
+```
+
+```typescript
+// 2. Component Class: Array Signal with Reactive Mutations
+@Component({ selector: 'team-list', templateUrl: './team-list.html' })
+export class TeamListComponent {
+    members = signal([
+        { id: 1, name: 'Alice Cooper', role: 'Lead Architect', status: 'active', tags: ['TypeScript', 'Signals'] },
+        { id: 2, name: 'Bob Dylan', role: 'Senior Engineer', status: 'busy', tags: ['SCSS', 'Components'] },
+    ]);
+
+    addMember(name: string, role: string) {
+        this.members.update(list => [...list, {
+            id: Date.now(),
+            name,
+            role,
+            status: 'active',
+            tags: ['New Member', 'Purity'],
+        }]);
+    }
+}
+```
+
+---
+
+### 11. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -440,7 +485,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 11. 🪟 Modal Dialogs (`<modal-view>`)
+### 12. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 

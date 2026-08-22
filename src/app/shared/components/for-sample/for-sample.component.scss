@@ -1,0 +1,162 @@
+@use '../../../../style.scss' as *;
+
+.for-sample-root {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+
+    .for-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h4 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .count-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(53, 132, 228, 0.2);
+            color: #79c0ff;
+            border: 1px solid rgba(53, 132, 228, 0.35);
+        }
+    }
+
+    .for-desc {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text-secondary);
+
+        code {
+            color: #79c0ff;
+            background: rgba(53, 132, 228, 0.15);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+    }
+
+    .for-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+
+        input {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .add-member-btn {
+            white-space: nowrap;
+        }
+    }
+
+    .members-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 4px;
+    }
+
+    .member-card {
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: var(--radius-control, 6px);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+
+        &:hover {
+            border-color: rgba(53, 132, 228, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .member-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+
+            .member-info {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .member-index {
+                font-family: var(--font-mono, monospace);
+                font-size: 11px;
+                color: #8b949e;
+            }
+
+            .member-name {
+                font-size: 13.5px;
+                color: var(--text-main);
+            }
+
+            .status-indicator {
+                font-size: 10px;
+                font-weight: 700;
+                padding: 1px 6px;
+                border-radius: 4px;
+                text-transform: uppercase;
+
+                &.status-active {
+                    background: rgba(46, 160, 67, 0.2);
+                    color: #7ee787;
+                    border: 1px solid rgba(46, 160, 67, 0.35);
+                }
+                &.status-busy {
+                    background: rgba(210, 153, 34, 0.2);
+                    color: #e3b341;
+                    border: 1px solid rgba(210, 153, 34, 0.35);
+                }
+                &.status-offline {
+                    background: rgba(255, 255, 255, 0.1);
+                    color: #8b949e;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                }
+            }
+
+            .delete-btn {
+                padding: 3px 8px;
+                font-size: 11px;
+                cursor: pointer;
+            }
+        }
+
+        .member-role {
+            font-size: 12.5px;
+            color: var(--text-secondary);
+        }
+
+        .member-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+
+            .tag-badge {
+                font-size: 10.5px;
+                padding: 2px 7px;
+                border-radius: 4px;
+                background: rgba(53, 132, 228, 0.12);
+                color: #79c0ff;
+                border: 1px solid rgba(53, 132, 228, 0.25);
+            }
+        }
+    }
+}

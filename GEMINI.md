@@ -59,6 +59,7 @@ purity/
                 ├── demo/        # <demo-component> live framework interactive showcase
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
                 ├── forms-validation/ # <forms-validation> sample form component with submit validation
+                ├── for-sample/  # <for-sample> demonstrating structural for array repeater
                 ├── header/      # <header-component> navigation bar with logo
                 ├── intro/       # <intro-component> framework overview & code samples
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
@@ -116,6 +117,20 @@ Purity features a synchronous reactive primitives engine:
           this.childComponent?.customProperty.set('value');
       }
   }
+  ```
+
+* **Structural Array Repeater (`for="let obj of myArray"`)**:
+  Components support declarative structural loop templates with `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically creates scoped item contexts, tracks array signals reactively, supports nested loops, and seamlessly updates on array mutations (`.update()`, `.set()`):
+
+  ```html
+  <div for="let member, index of members" class="member-card">
+      <span>#{{index + 1}}: {{member.name | uppercase}}</span>
+      <p>{{member.role}}</p>
+      <!-- Nested loop -->
+      <div class="tags">
+          <span for="let tag of member.tags" class="tag-badge">{{tag}}</span>
+      </div>
+  </div>
   ```
 
 * **`<slot>` Content Projection**:

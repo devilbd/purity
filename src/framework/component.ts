@@ -144,7 +144,7 @@ export function transformPipeExpression(rawExpr: string): string {
     return result;
 }
 
-function evaluateExpression(expr: string, context: any): string {
+function evaluateValue(expr: string, context: any): any {
     const transformedExpr = transformPipeExpression(expr);
     let fn = expressionCache.get(transformedExpr);
     if (!fn) {
@@ -152,16 +152,28 @@ function evaluateExpression(expr: string, context: any): string {
             fn = new Function('__pipe', `with (this) { return ${transformedExpr}; }`);
             expressionCache.set(transformedExpr, fn);
         } catch {
-            fn = () => '';
+            fn = () => null;
             expressionCache.set(transformedExpr, fn);
         }
     }
     try {
-        const val = fn.call(context, executePipe);
-        return val !== null && val !== undefined ? String(val) : '';
+        let val = fn.call(context, executePipe);
+        if (typeof val === 'function' && !Array.isArray(val)) {
+            try {
+                val = val();
+            } catch {
+                // Not a signal/getter
+            }
+        }
+        return val;
     } catch {
-        return '';
+        return null;
     }
+}
+
+function evaluateExpression(expr: string, context: any): string {
+    const val = evaluateValue(expr, context);
+    return val !== null && val !== undefined ? String(val) : '';
 }
 
 function toKebabCase(str: string): string {
@@ -169,6 +181,188 @@ function toKebabCase(str: string): string {
         .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
         .replace(/[\s_]+/g, '-')
         .toLowerCase();
+}
+
+/**
+ * Recursively binds structural for loops, text interpolations, attribute bindings,
+ * directives, and validators across a DOM subtree with a specific context.
+ */
+function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: any) {
+    if (!rootEl) return;
+
+    // 1. Process structural `for` loops inside rootEl
+    const allForElements = Array.from(rootEl.querySelectorAll('[for]'));
+    const topLevelForElements = allForElements.filter((el) => {
+        let p = el.parentElement;
+        while (p && p !== rootEl) {
+            if (p.hasAttribute('for')) return false;
+            p = p.parentElement;
+        }
+        return true;
+    });
+
+    for (const el of topLevelForElements) {
+        if (!(el instanceof HTMLElement)) continue;
+        if (el.closest('pre, code, [data-no-bind]')) continue;
+
+        const forAttr = el.getAttribute('for');
+        if (!forAttr) continue;
+
+        // Matches: let item of items, let item, index of items, let (item, i) of items, item of items
+        const match = forAttr.match(
+            /^(?:let\s+)?(?:\(?\s*([a-zA-Z0-9_$]+)(?:\s*,\s*([a-zA-Z0-9_$]+))?\s*\)?)\s+of\s+([\s\S]+)$/,
+        );
+        if (!match) continue;
+
+        const itemVar = match[1];
+        const indexVar = match[2] || 'index';
+        const arrayExpr = match[3].trim();
+
+        const parent = el.parentNode;
+        if (!parent) continue;
+
+        const anchor = document.createComment(`for: ${forAttr}`);
+        parent.insertBefore(anchor, el);
+
+        const templateEl = el.cloneNode(true) as HTMLElement;
+        templateEl.removeAttribute('for');
+        parent.removeChild(el);
+
+        let currentNodes: HTMLElement[] = [];
+
+        effect(() => {
+            // Clean up previous rendered nodes
+            for (const node of currentNodes) {
+                if (node.parentNode) {
+                    node.parentNode.removeChild(node);
+                }
+            }
+            currentNodes = [];
+
+            const rawArray = evaluateValue(arrayExpr, context);
+            const list = Array.isArray(rawArray) ? rawArray : [];
+
+            if (!anchor.parentNode) return;
+
+            list.forEach((item, index) => {
+                const clone = templateEl.cloneNode(true) as HTMLElement;
+                const itemContext = Object.assign(Object.create(context), {
+                    [itemVar]: item,
+                    [indexVar]: index,
+                    index,
+                    $index: index,
+                    $first: index === 0,
+                    $last: index === list.length - 1,
+                });
+
+                anchor.parentNode?.insertBefore(clone, anchor);
+                currentNodes.push(clone);
+
+                // Recursively bind the cloned subtree with item context
+                bindTemplateTree(clone, itemContext, componentInstance);
+            });
+        });
+    }
+
+    // 2. Bind Directives and Validators
+    if (componentInstance) {
+        const directives = bindDirectives(rootEl, componentInstance);
+        if (componentInstance.activeDirectives) {
+            componentInstance.activeDirectives.push(...directives);
+        }
+        const validators = bindValidators(rootEl, componentInstance);
+        if (componentInstance.activeValidators) {
+            componentInstance.activeValidators.push(...validators);
+        }
+    }
+
+    // 3. Bind Text Node interpolations
+    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
+    const textNodes: Text[] = [];
+    let node: Node | null;
+
+    while ((node = walker.nextNode())) {
+        if (node.nodeValue && node.nodeValue.includes('{{')) {
+            const parentEl = node.parentElement;
+            if (parentEl?.closest('pre, code, [data-no-bind]')) {
+                continue;
+            }
+            textNodes.push(node as Text);
+        }
+    }
+
+    const interpolationRegex = /\{\{\s*([\s\S]*?)\s*\}\}/g;
+
+    for (const textNode of textNodes) {
+        const textContent = textNode.nodeValue;
+        if (!textContent) continue;
+
+        const parent = textNode.parentNode;
+        if (!parent) continue;
+
+        let lastIndex = 0;
+        let match: RegExpExecArray | null;
+        const fragments: Node[] = [];
+        let hasMatch = false;
+
+        interpolationRegex.lastIndex = 0;
+        while ((match = interpolationRegex.exec(textContent)) !== null) {
+            hasMatch = true;
+            const staticText = textContent.slice(lastIndex, match.index);
+            if (staticText) {
+                fragments.push(document.createTextNode(staticText));
+            }
+
+            const expr = match[1].trim();
+            const dynamicNode = document.createTextNode('');
+            fragments.push(dynamicNode);
+
+            effect(() => {
+                dynamicNode.nodeValue = evaluateExpression(expr, context);
+            });
+
+            lastIndex = match.index + match[0].length;
+        }
+
+        if (hasMatch) {
+            const remainingText = textContent.slice(lastIndex);
+            if (remainingText) {
+                fragments.push(document.createTextNode(remainingText));
+            }
+
+            for (const frag of fragments) {
+                parent.insertBefore(frag, textNode);
+            }
+            parent.removeChild(textNode);
+        }
+    }
+
+    // 4. Bind Element Attributes
+    const elementsWithAttrs = [rootEl, ...Array.from(rootEl.querySelectorAll('*'))];
+    for (const el of elementsWithAttrs) {
+        if (!(el instanceof HTMLElement)) continue;
+        if (el.closest('pre, code, [data-no-bind]')) continue;
+        for (const attr of Array.from(el.attributes)) {
+            if (attr.value.includes('{{')) {
+                const rawValue = attr.value;
+                const attrName = attr.name;
+                effect(() => {
+                    const replaced = rawValue.replace(
+                        /\{\{\s*([\s\S]*?)\s*\}\}/g,
+                        (_, expr) => evaluateExpression(expr.trim(), context),
+                    );
+                    if (attrName === 'class') {
+                        el.className = replaced.trim();
+                    } else {
+                        if (el instanceof HTMLInputElement && attrName === 'value') {
+                            el.value = replaced;
+                        }
+                        el.setAttribute(attrName, replaced);
+                    }
+                });
+            }
+        }
+    }
 }
 
 /**
@@ -276,99 +470,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             this.activeValidators = [];
         }
 
-        // Bind Directives
-        const directives = bindDirectives(rootEl, this);
-        this.activeDirectives.push(...directives);
-
-        // Bind Form Validators
-        const validators = bindValidators(rootEl, this);
-        this.activeValidators.push(...validators);
-
-        const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
-        const textNodes: Text[] = [];
-        let node: Node | null;
-
-        while ((node = walker.nextNode())) {
-            if (node.nodeValue && node.nodeValue.includes('{{')) {
-                const parentEl = node.parentElement;
-                if (parentEl?.closest('pre, code, [data-no-bind]')) {
-                    continue;
-                }
-                textNodes.push(node as Text);
-            }
-        }
-
-        const interpolationRegex = /\{\{\s*([\s\S]*?)\s*\}\}/g;
-
-        for (const textNode of textNodes) {
-            const textContent = textNode.nodeValue;
-            if (!textContent) continue;
-
-            const parent = textNode.parentNode;
-            if (!parent) continue;
-
-            let lastIndex = 0;
-            let match: RegExpExecArray | null;
-            const fragments: Node[] = [];
-            let hasMatch = false;
-
-            interpolationRegex.lastIndex = 0;
-            while ((match = interpolationRegex.exec(textContent)) !== null) {
-                hasMatch = true;
-                const staticText = textContent.slice(lastIndex, match.index);
-                if (staticText) {
-                    fragments.push(document.createTextNode(staticText));
-                }
-
-                const expr = match[1].trim();
-                const dynamicNode = document.createTextNode('');
-                fragments.push(dynamicNode);
-
-                effect(() => {
-                    dynamicNode.nodeValue = evaluateExpression(expr, this);
-                });
-
-                lastIndex = match.index + match[0].length;
-            }
-
-            if (hasMatch) {
-                const remainingText = textContent.slice(lastIndex);
-                if (remainingText) {
-                    fragments.push(document.createTextNode(remainingText));
-                }
-
-                for (const frag of fragments) {
-                    parent.insertBefore(frag, textNode);
-                }
-                parent.removeChild(textNode);
-            }
-        }
-
-        const elementsWithAttrs = [rootEl, ...Array.from(rootEl.querySelectorAll('*'))];
-        for (const el of elementsWithAttrs) {
-            if (!(el instanceof HTMLElement)) continue;
-            if (el.closest('pre, code, [data-no-bind]')) continue;
-            for (const attr of Array.from(el.attributes)) {
-                if (attr.value.includes('{{')) {
-                    const rawValue = attr.value;
-                    const attrName = attr.name;
-                    effect(() => {
-                        const replaced = rawValue.replace(
-                            /\{\{\s*([\s\S]*?)\s*\}\}/g,
-                            (_, expr) => evaluateExpression(expr.trim(), this),
-                        );
-                        if (attrName === 'class') {
-                            el.className = replaced.trim();
-                        } else {
-                            if (el instanceof HTMLInputElement && attrName === 'value') {
-                                el.value = replaced;
-                            }
-                            el.setAttribute(attrName, replaced);
-                        }
-                    });
-                }
-            }
-        }
+        bindTemplateTree(rootEl, this, this);
     };
 }
 

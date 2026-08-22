@@ -315,10 +315,41 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 10. Slot Content Projection -->
+        <!-- 10. Structural Array Repeater -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>10. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                <h4>10. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
+                <p>Repeat elements and components dynamically with object property access, index variables, and nested loops:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Array Repeater &amp; Nested Loops --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">for</span>=<span class="str">"let obj, index of members"</span> <span class="attr">class</span>=<span class="str">"member-card"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span&gt;</span>#<span class="expr">{{index + 1}}</span>: <span class="tag">&lt;strong&gt;</span><span class="expr">{{obj.name | uppercase}}</span><span class="tag">&lt;/strong&gt;&lt;/span&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Role: <span class="expr">{{obj.role}}</span><span class="tag">&lt;/p&gt;</span>
+
+    <span class="cmt">&lt;!-- Nested array loop --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"tags"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;span</span> <span class="attr">for</span>=<span class="str">"let tag of obj.tags"</span> <span class="attr">class</span>=<span class="str">"tag-badge"</span><span class="tag">&gt;</span><span class="expr">{{tag}}</span><span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: Array Signal with Reactive Mutations --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'team-list'</span>, templateUrl: <span class="str">'./team-list.html'</span> })
+<span class="kw">export class</span> <span class="typ">TeamListComponent</span> {
+    members = <span class="fn">signal</span>([
+        { id: <span class="num">1</span>, name: <span class="str">'Alice Cooper'</span>, role: <span class="str">'Lead Architect'</span>, tags: [<span class="str">'TypeScript'</span>, <span class="str">'Signals'</span>] },
+        { id: <span class="num">2</span>, name: <span class="str">'Bob Dylan'</span>, role: <span class="str">'Senior Engineer'</span>, tags: [<span class="str">'SCSS'</span>, <span class="str">'Components'</span>] },
+    ]);
+
+    <span class="fn">addMember</span>(name: <span class="typ">string</span>, role: <span class="typ">string</span>) {
+        <span class="kw">this</span>.members.<span class="fn">update</span>(list =&gt; [...list, { id: Date.<span class="fn">now</span>(), name, role, tags: [<span class="str">'Purity'</span>] }]);
+    }
+}</code></pre>
+        </div>
+
+        <!-- 11. Slot Content Projection -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>11. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
                 <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
             </div>
             <pre><code><span class="cmt">&lt;!-- 1. Consumer Template: Passing arbitrary HTML &amp; components into &lt;modal-view&gt; --&gt;</span>
@@ -340,10 +371,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 11. Modal Dialogs -->
+        <!-- 12. Modal Dialogs -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>11. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                <h4>12. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
                 <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, automatic <code>document.body</code> prepending, and <code>z-index: 1000</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
