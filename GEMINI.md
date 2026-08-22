@@ -100,6 +100,20 @@ Purity features a synchronous reactive primitives engine:
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
+* **`@ViewChild(selector: string)`**:
+  Property decorator that automatically queries and binds matching child elements or custom components by CSS selector:
+  ```typescript
+  @Component({ selector: 'my-component' })
+  export class MyComponent {
+      @ViewChild('#childComponent')
+      childComponent?: CustomComponent | null;
+
+      protected onInit() {
+          this.childComponent?.customProperty.set('value');
+      }
+  }
+  ```
+
   ```typescript
   @Component({
       selector: 'my-component',

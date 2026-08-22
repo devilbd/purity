@@ -72,6 +72,19 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             await this.loadTemplate();
         }
 
+        // Ensure child view getters are bound
+        if (this.__childViews) {
+            for (const { propertyKey, selector } of this.__childViews) {
+                Object.defineProperty(this, propertyKey, {
+                    get() {
+                        return this.querySelector?.(selector) ?? null;
+                    },
+                    enumerable: true,
+                    configurable: true,
+                });
+            }
+        }
+
         this.onInit?.();
         this.bindTemplate?.();
     };
@@ -265,6 +278,10 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
                             ) {
                                 continue;
                             }
+                            const protoDesc = Object.getOwnPropertyDescriptor(target.prototype, key);
+                            if (protoDesc && protoDesc.get && desc.value === undefined && !desc.get && !desc.set) {
+                                continue;
+                            }
                             Object.defineProperty(this, key, desc);
                         }
                     }
@@ -297,6 +314,73 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
         return CustomElementClass;
     };
 }
+
+export interface ViewChildOptions {
+    read?: 'element' | 'component';
+}
+
+export type ChildViewOptions = ViewChildOptions;
+
+/**
+ * ViewChild Decorator
+ * Automatically queries and binds child elements / custom components matching the selector
+ * when accessing the decorated property on the component instance.
+ *
+ * @param selector CSS selector for the child element or component (e.g. '#component1' or 'custom-component')
+ */
+export function ViewChild(selector: string, _options?: ViewChildOptions): any {
+    return function (target: any, propertyKeyOrContext: any): any {
+        // Stage 3 Decorators (Context object)
+        if (
+            typeof propertyKeyOrContext === 'object' &&
+            propertyKeyOrContext !== null &&
+            'name' in propertyKeyOrContext
+        ) {
+            const propertyName = propertyKeyOrContext.name;
+            if (typeof propertyKeyOrContext.addInitializer === 'function') {
+                propertyKeyOrContext.addInitializer(function (this: any) {
+                    Object.defineProperty(this, propertyName, {
+                        get() {
+                            return this.querySelector?.(selector) ?? null;
+                        },
+                        enumerable: true,
+                        configurable: true,
+                    });
+                });
+            }
+            return function (this: any, initialValue: any) {
+                Object.defineProperty(this, propertyName, {
+                    get() {
+                        return this.querySelector?.(selector) ?? null;
+                    },
+                    enumerable: true,
+                    configurable: true,
+                });
+                return initialValue;
+            };
+        }
+
+        // Standard / TypeScript Property Decorator
+        const propertyKey = propertyKeyOrContext;
+        if (!target.__childViews) {
+            target.__childViews = [];
+        }
+        target.__childViews.push({ propertyKey, selector });
+
+        Object.defineProperty(target, propertyKey, {
+            get(this: any) {
+                return this.querySelector?.(selector) ?? null;
+            },
+            set(_value: any) {
+                // allow property override
+            },
+            enumerable: true,
+            configurable: true,
+        });
+    };
+}
+
+export const ChildView = ViewChild;
 
 export const defineComponent = (name: string, component: any) => {
     if (!customElements.get(name)) {

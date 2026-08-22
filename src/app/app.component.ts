@@ -2,6 +2,7 @@ import {
     Component,
     inject,
     signal,
+    ViewChild,
 } from '../framework/core';
 import { DataService } from '../data/data.service';
 import './app.component.scss';
@@ -27,6 +28,21 @@ export class AppComponent {
     loggedUser = signal<string | null>(null);
     showDemo = signal<boolean>(false);
 
+    @ViewChild('#demo-window')
+    demoWindow?: HTMLElement | null;
+
+    @ViewChild('#component1')
+    customComponent1?: CustomComponent | null;
+
+    @ViewChild('#component2')
+    customComponent2?: CustomComponent | null;
+
+    @ViewChild('#raw-template')
+    rawTemplateComponent?: RawTemplateComponent | null;
+
+    @ViewChild('#forms-validation')
+    formsValidation?: FormsValidationComponent | null;
+
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };
 
@@ -43,29 +59,12 @@ export class AppComponent {
             if (!this.dropCleanup) {
                 this.droppableBehavior();
             }
-            const demoEl = (this as any).querySelector?.('#demo-window');
-            demoEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            this.demoWindow?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
     }
 
     toggleDemo() {
         this.showDemo.update((v) => !v);
-    }
-
-    get customComponent1(): CustomComponent | null {
-        return (this as any).querySelector?.('#component1');
-    }
-
-    get customComponent2(): CustomComponent | null {
-        return (this as any).querySelector?.('#component2');
-    }
-
-    get rawTemplateComponent(): RawTemplateComponent | null {
-        return (this as any).querySelector?.('#raw-template');
-    }
-
-    get formsValidation(): FormsValidationComponent | null {
-        return (this as any).querySelector?.('#forms-validation');
     }
 
     get loginStatus() {

@@ -157,6 +157,28 @@ export class CustomComponent {
 }
 ```
 
+#### Example: Child View & Component References (`@ViewChild`)
+
+Use the `@ViewChild(selector)` decorator to query child DOM elements and child components:
+
+```typescript
+import { Component, ViewChild } from './framework/core';
+import type { CustomComponent } from './shared/components/custom/custom.component';
+
+@Component({
+    selector: 'app-component',
+    templateUrl: './src/app/app.component.html',
+})
+export class AppComponent {
+    @ViewChild('#component1')
+    customComponent1?: CustomComponent | null;
+
+    protected onInit() {
+        this.customComponent1?.customProperty.set('Hello Purity');
+    }
+}
+```
+
 #### Example: Reactive Handlebars Template Interpolation
 
 Purity supports declarative `{{ expression }}` template interpolations. Text nodes and element attributes automatically bind to signals and re-render fine-grained when signal dependencies change:

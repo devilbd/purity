@@ -50,28 +50,27 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
 });</code></pre>
         </div>
 
-        <!-- 2. Web Components -->
+        <!-- 2. Web Components & Child Views -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>2. 🧩 Native Web Components (<code>component.ts</code>)</h4>
-                <p>Plain TypeScript classes transformed into native Custom Elements with synchronous template inlining and lifecycle management:</p>
+                <h4>2. 🧩 Native Web Components &amp; Child Views (<code>component.ts</code>)</h4>
+                <p>Native Custom Elements with automatic template inlining, lifecycle hooks, and <code>@ViewChild</code> query decorators:</p>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
-<span class="kw">import</span> <span class="str">'./custom.component.scss'</span>;
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'./framework/core'</span>;
+<span class="kw">import type</span> { <span class="typ">CustomComponent</span> } <span class="kw">from</span> <span class="str">'./custom.component'</span>;
 
 <span class="dec">@Component</span>({
-    selector: <span class="str">'custom-component'</span>,
-    templateUrl: <span class="str">'./custom.component.html'</span>,
+    selector: <span class="str">'app-component'</span>,
+    templateUrl: <span class="str">'./app.component.html'</span>,
 })
-<span class="kw">export class</span> <span class="typ">CustomComponent</span> {
-    customProperty = <span class="fn">signal</span>&lt;<span class="typ">string</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
+<span class="kw">export class</span> <span class="typ">AppComponent</span> {
+    <span class="cmt">// Automatically query child elements/components by CSS selector</span>
+    <span class="dec">@ViewChild</span>(<span class="str">'#childComponent'</span>)
+    childComponent?: <span class="typ">CustomComponent</span> | <span class="kw">null</span>;
 
     <span class="kw">protected</span> <span class="fn">onInit</span>() {
-        <span class="cmt">// Runs after template DOM nodes are mounted</span>
-    }
-
-    <span class="fn">onInput</span>(element: <span class="typ">HTMLInputElement</span>) {
-        <span class="kw">this</span>.customProperty.<span class="fn">set</span>(element.value);
+        <span class="cmt">// Access child component cleanly after initialization</span>
+        <span class="kw">this</span>.childComponent?.customProperty.<span class="fn">set</span>(<span class="str">'Hello Purity'</span>);
     }
 }</code></pre>
         </div>
