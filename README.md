@@ -226,6 +226,30 @@ export class RawTemplateComponent {
 }
 ```
 
+#### Example: Content Projection (`<slot>`)
+
+Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
+
+```html
+<!-- Parent Template -->
+<modal-view id="demo-modal">
+    <div class="custom-body">
+        <h4>📦 Projected Header</h4>
+        <p>This content is rendered inside the &lt;slot&gt; of modal-view!</p>
+        <custom-component id="modal-subcomponent"></custom-component>
+    </div>
+</modal-view>
+
+<!-- Component Template (modal-view.component.html) -->
+<div class="modal-dialog window">
+    <div class="modal-body">
+        <slot>
+            <p>Default fallback content when no children are provided</p>
+        </slot>
+    </div>
+</div>
+```
+
 ---
 
 ### 3. DOM Utilities
@@ -416,14 +440,23 @@ dropInstance.destroy();
    import type { CustomComponent } from './shared/components/custom/custom.component';
    ```
 
-2. **CSS Classes over Inline Styles**:
-   All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`) rather than mutating `element.style` directly.
+2. **Use `@purity/core` Path Alias**:
+   Import framework primitives cleanly via the `@purity/core` alias without relative `../../` paths:
+   ```typescript
+   import { Component, signal, effect, ViewChild, inject } from '@purity/core';
+   ```
 
-3. **Component Lifecycle & Memory Management**:
+3. **CSS Classes over Inline Styles**:
+   All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
+
+4. **Modal Dialog Positioning**:
+   Modal dialogs and backdrop overlays must use **`position: absolute`** (never `position: fixed`) relative to `document.body` (`body { position: relative; }`), automatically prepend to `document.body` upon initialization, and sit at `z-index: 1000`.
+
+5. **Component Lifecycle & Memory Management**:
    - Setup DOM queries and behaviors inside `protected onInit()`.
    - Clean up event listeners and behavior instances in `onDestroy()` / `disconnectedCallback()`.
 
-4. **Strict TypeScript**:
+6. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
 
 ---

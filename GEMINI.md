@@ -102,7 +102,7 @@ Purity features a synchronous reactive primitives engine:
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
 * **`@ViewChild(selector: string)`**:
-  Property decorator that automatically queries and binds matching child elements or custom components by CSS selector:
+  Property decorator that automatically queries and binds matching child elements or custom components by CSS selector (with fallback resolution across teleported / body-prepended elements):
   ```typescript
   @Component({ selector: 'my-component' })
   export class MyComponent {
@@ -113,6 +113,16 @@ Purity features a synchronous reactive primitives engine:
           this.childComponent?.customProperty.set('value');
       }
   }
+  ```
+
+* **`<slot>` Content Projection**:
+  Components can define `<slot></slot>` tags in their template. Any nested HTML elements, components, or text passed into the custom element are automatically projected into the slot during initialization, while retaining reactive bindings.
+
+  ```html
+  <!-- Modal component with slot -->
+  <div class="modal-body">
+      <slot>Default fallback content</slot>
+  </div>
   ```
 
   ```typescript
@@ -259,18 +269,27 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    import type { CustomComponent } from './shared/components/custom/custom.component';
    ```
 
-2. **CSS Classes over Inline Styles**:
-   All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`) rather than mutating `element.style` directly.
+2. **Use `@purity/core` Path Alias**:
+   All framework imports should use the `@purity/core` alias rather than relative `../../` paths:
+   ```typescript
+   import { Component, signal, effect, ViewChild, inject } from '@purity/core';
+   ```
 
-3. **Component Lifecycle & Memory Management**:
+3. **CSS Classes over Inline Styles**:
+   All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
+
+4. **Modal Dialog Positioning**:
+   Modal dialogs and backdrop overlays must use **`position: absolute`** (never `position: fixed`) relative to `document.body` (`body { position: relative; }`), automatically prepend to `document.body` on initialization, and sit at `z-index: 1000`.
+
+5. **Component Lifecycle & Memory Management**:
    - Setup DOM queries and behaviors inside `protected onInit()`.
    - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
 
-4. **Reactivity inside Components**:
+6. **Reactivity inside Components**:
    - Use declarative `{{ expression }}` template interpolations in HTML templates for fine-grained reactive updates.
    - Use `effect(() => { ... })` for custom side effects when needed.
 
-5. **TypeScript Configuration**:
+7. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
    - Avoid unused variable declarations and make imports type-explicit where appropriate.
 
