@@ -5,7 +5,7 @@
 <h1 align="center">Purity</h1>
 
 <p align="center">
-  <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components.</strong>
+  <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, and Composable Behaviors.</strong>
 </p>
 
 <p align="center">
@@ -20,19 +20,23 @@
 
 ## 📖 Overview
 
-**Purity** is a minimalist, modern frontend framework built from scratch on top of web standards. It avoids the bloat of heavy virtual DOM engines by combining **fine-grained reactive signals** with standard **Custom Elements v1**.
+**Purity** is a minimalist, modern frontend framework built from scratch on top of web standards. It avoids the overhead of virtual DOM reconciliation by combining **fine-grained reactive signals** with standard **Custom Elements v1**, a lightweight **Dependency Injection** container, **Decoupled Form Validation**, and **Composable DOM Behaviors**.
 
 ### Key Highlights
 
-- ⚡ **Zero Heavy Runtime Dependencies**: Built with pure TypeScript targeting native Web APIs.
-- 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automatic dependency tracking.
-- 🧩 **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements with automatic template inlining, expression compilation caching, and lifecycle hooks.
-- 💉 **Dependency Injection**: First-class `@Injectable` decorator with instant singleton resolution via `inject()`.
-- 🏷️ **Custom Directives**: Attribute-level reactivity and DOM tracking via `@Directive` and `BaseDirective`.
-- 📋 **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
-- 🎯 **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based `drag` & `droppable` with GPU acceleration, center snap, boundary constraints, and hover states) that attach without inheritance overhead.
-- 🎨 **GNOME Adwaita Design**: Modern, glassmorphic UI styling foundation built with SCSS.
-- 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and one-step deployment script (`npm run deploy`).
+- ⚡ **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
+- 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automated dependency tracking.
+- 💉 **First-Class Dependency Injection**: Built-in DI container with `@Injectable` decorator and `inject()` token resolution.
+- 📋 **Decoupled Form Validation Engine**: Validation rules decoupled with `@Validator` and `BaseValidator`, managing CSS states and submit buttons.
+- 🏷️ **Reactive Custom Directives**: Attribute-level reactivity and DOM mutation monitoring via `@Directive` and `BaseDirective`.
+- 🎯 **Composable Behaviors**: Pointer-based `drag` and `droppable` interactions with GPU acceleration (`translate3d`), boundary constraints, and center snap.
+- 🧩 **Native Web Components**: Standard classes decorated with `@Component` transformed into Custom Elements with automatic template inlining and lifecycle management.
+- 🔍 **Child View Queries (`@ViewChild`)**: Automatic child element and component querying by CSS selector with fallback resolution for teleported/body-prepended elements.
+- 📄 **Handlebars Template Interpolation**: Reactive `{{ expression }}` handlebars syntax with compiled expression caching (`expressionCache`).
+- 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
+- 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
+- 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
+- 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and single-command deployment (`npm run deploy`).
 
 ---
 
@@ -71,14 +75,14 @@ purity/
 ├── .firebaserc                  # Firebase project ID mapping
 ├── .env.example                 # Environment variables reference template
 ├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
-├── README.md                    # Project documentation
+├── README.md                    # Project documentation (this file)
 ├── GEMINI.md                    # Agent context & architecture reference
 └── src/
     ├── main.ts                  # Application entry point (registers root components)
     ├── style.scss               # Global styles (GNOME Adwaita design system)
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
-    │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader
+    │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
@@ -100,245 +104,129 @@ purity/
 
 ---
 
-## 🧩 Framework Core Concepts & API
+## 💻 Core Framework Architecture & Primitives
 
-### 1. Reactivity (`signal` & `effect`)
+### 1. 🔄 Fine-Grained Reactive Signals & Effects (`core.ts`)
 
-Purity provides fine-grained reactive primitives:
+Purity features a synchronous reactivity engine with automated dependency tracking and sub-microsecond updates:
 
 ```typescript
 import { signal, effect } from '@purity/core';
 
-// Create a signal
-const username = signal<string | null>(null);
+// 1. Create typed reactive signals
+const count = signal<number>(0);
+const multiplier = signal<number>(2);
 
-// Read current value (getter)
-console.log(username()); // null
+// 2. Read value via getter call
+console.log(count()); // 0
 
-// Set new value
-username.set('Alice');
+// 3. Mutate value with .set() or computed .update()
+count.set(10);
+count.update(n => n + 1); // 11
 
-// Update based on current value
-username.update(prev => `${prev} Cooper`);
-
-// Effects automatically track accessed signals and re-run on changes
+// 4. Effects automatically register signal dependencies and re-run on changes
 effect(() => {
-    console.log(`Current user: ${username()}`);
+    const total = count() * multiplier();
+    console.log(`Calculated total: ${total} (count: ${count()})`);
 });
 ```
 
 ---
 
-### 2. Native Web Components (`@Component` Decorator)
+### 2. 💉 First-Class Dependency Injection (`di.ts`)
 
-Classes are decorated with `@Component` to turn them into native Web Components with fine-grained reactivity, template inlining, and lifecycle hooks:
-
-#### Example: Component with External Template
+Singleton service registration with the `@Injectable` decorator and instant token resolution using `inject()`:
 
 ```typescript
-// src/app/shared/components/custom/custom.component.ts
-import { Component, signal } from '@purity/core';
-import './custom.component.scss';
+import { Injectable, signal, inject, Component } from '@purity/core';
 
-@Component({
-    selector: 'custom-component',
-    templateUrl: './src/app/shared/components/custom/custom.component.html',
-})
-export class CustomComponent {
-    customProperty = signal<string | null>(null);
-
-    onInput(element: HTMLInputElement) {
-        this.customProperty.set(element.value);
-    }
-
-    onClear() {
-        this.customProperty.set(null);
-    }
+export interface User {
+    id: number;
+    name: string;
+    role: string;
 }
-```
 
-#### Example: Child View & Component References (`@ViewChild`)
-
-Use the `@ViewChild(selector)` decorator to query child DOM elements and child components:
-
-```typescript
-import { Component, ViewChild } from '@purity/core';
-import type { CustomComponent } from './shared/components/custom/custom.component';
-
-@Component({
-    selector: 'app-component',
-    templateUrl: './src/app/app.component.html',
-})
-export class AppComponent {
-    @ViewChild('#component1')
-    customComponent1?: CustomComponent | null;
-
-    protected onInit() {
-        this.customComponent1?.customProperty.set('Hello Purity');
-    }
-}
-```
-
-#### Example: Reactive Handlebars Template Interpolation
-
-Purity supports declarative `{{ expression }}` template interpolations. Text nodes and element attributes automatically bind to signals and re-render fine-grained when signal dependencies change:
-
-```html
-<!-- app.component.html -->
-<div class="user-card">
-    <h3>User: {{loggedUser()}}</h3>
-    <div id="custom-status">{{customComponent1?.customProperty()}}</div>
-</div>
-```
-
-#### Example: Dynamic Inline Template Rendering
-
-```typescript
-// src/app/shared/components/raw-template/raw-template.component.ts
-import { Component, effect, signal } from '@purity/core';
-import './raw-template.component.scss';
-
-@Component({
-    selector: 'raw-template',
-})
-export class RawTemplateComponent {
-    customProperty = signal(0);
-    declare render: (content: string) => void;
-
-    get status() {
-        return this.customProperty() % 2 === 0 ? 'success' : 'error';
-    }
-
-    get template() {
-        return `
-            <div class="raw-template-component-root window">
-                <h2>Raw Template Component</h2>
-                <div class="${this.status}">${this.customProperty()}</div>
-            </div>
-        `;
-    }
-
-    protected onInit() {
-        effect(() => {
-            this.render(this.template);
-        });
-    }
-}
-```
-
-#### Example: Content Projection (`<slot>`)
-
-Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
-
-```html
-<!-- Parent Template -->
-<modal-view id="demo-modal">
-    <div class="custom-body">
-        <h4>📦 Projected Header</h4>
-        <p>This content is rendered inside the &lt;slot&gt; of modal-view!</p>
-        <custom-component id="modal-subcomponent"></custom-component>
-    </div>
-</modal-view>
-
-<!-- Component Template (modal-view.component.html) -->
-<div class="modal-dialog window">
-    <div class="modal-body">
-        <slot>
-            <p>Default fallback content when no children are provided</p>
-        </slot>
-    </div>
-</div>
-```
-
----
-
-### 3. DOM Utilities
-
-Purity includes lightweight helpers for efficient DOM querying and synchronization:
-
-| Utility | Description | Example |
-|---|---|---|
-| `getElement(selector, rootEl?)` | Query a single element | `const btn = getElement('.save-btn', this);` |
-| `getElements(selectorsMap, rootEl?)` | Batch queries returning `Map<string, HTMLElement>` | `const map = getElements({ title: '#title' }, this);` |
-| `updateTargets(elements, newValue, ifNullValue?)` | Batch update `innerHTML` | `updateTargets([displayEl], user(), 'Guest');` |
-| `updateValues(elements, newValue, ifNullValue?)` | Batch update `HTMLInputElement.value` | `updateValues([inputEl], user());` |
-| `updateStyles(elements, className)` | Batch update `element.className` | `updateStyles([statusEl], 'success');` |
-| `eventListener(elements, event, handler)` | Attach listener with `{ dispose() }` cleanup | `const sub = eventListener([btn], 'click', handler);` |
-
----
-
-### 4. Dependency Injection (`@Injectable` & `inject`)
-
-Purity includes a built-in Dependency Injection container that enables service registration via decorators and instant resolution using `inject()`:
-
-#### Declaring a Service with `@Injectable`
-
-```typescript
-import { Injectable, signal } from '@purity/core';
-
+// 1. Declare injectable singleton service
 @Injectable('DataService')
 export class DataService {
-    currentUser = signal<string | null>(null);
+    currentUser = signal<User | null>(null);
 
-    login(username: string) {
-        this.currentUser.set(username);
+    login(username: string): User {
+        const user: User = { id: Date.now(), name: username, role: 'admin' };
+        this.currentUser.set(user);
+        return user;
+    }
+
+    logout(): void {
+        this.currentUser.set(null);
     }
 }
-```
 
-#### Injecting and Resolving Services
-
-You can resolve registered services by their class constructor or by registered token name:
-
-```typescript
-import { Component, inject } from '@purity/core';
-import { DataService } from './data/data.service';
-
-@Component({
-    selector: 'app-component',
-    templateUrl: './src/app/app.component.html',
-})
-export class AppComponent {
-    // Resolve singleton by class constructor
+// 2. Inject singleton service anywhere by constructor or token
+@Component({ selector: 'user-profile' })
+export class UserProfileComponent {
     private dataService = inject(DataService);
 
-    // Or resolve by registered token name
-    // private dataService = inject<DataService>('DataService');
-
-    onLogin() {
-        this.dataService.login('Alice');
+    onLogout() {
+        this.dataService.logout();
     }
 }
 ```
 
 ---
 
-### 5. Directives (`@Directive` & `BaseDirective`)
+### 3. 📋 Decoupled Form Validation Engine (`validator.ts`)
+
+Form Validators decouple validation logic from UI templates, automatically tracking field mutations, managing overall form validity, updating submit button `disabled` states, and applying customizable CSS state classes:
+
+```typescript
+import { Validator, BaseValidator } from '@purity/core';
+
+// Decorator binds validation rules directly to matching form elements
+@Validator({
+    form: '.forms-validation-form',
+    fields: {
+        username: '#input1',
+        password: '#input2',
+    },
+    validClass: 'is-valid',
+    invalidClass: 'is-invalid',
+})
+export class UserFormValidator extends BaseValidator {
+    validateUsername(value: string): boolean {
+        return value.trim().length >= 3;
+    }
+
+    validatePassword(value: string): boolean {
+        return value.trim().length >= 6;
+    }
+}
+```
+
+---
+
+### 4. 🏷️ Reactive Custom Directives (`directive.ts`)
 
 Directives attach custom behavior, styling, and reactive listeners directly to DOM elements via attributes:
 
-#### Declaring a Directive
-
 ```typescript
 import { Directive, BaseDirective } from '@purity/core';
-import './highlight.directive.scss';
 
 @Directive('highlight')
 export class HighlightDirective extends BaseDirective {
     onInit() {
-        // Access host DOM element and attach CSS classes
         this.element.classList.add('p-highlight');
         this.onChanges(this.value);
     }
 
     onChanges(newValue: any) {
-        // Toggle modifier CSS class when value or reactive {{ expression }} changes
+        // Toggle modifier class when bound value or {{ expression }} changes
         this.element.classList.toggle('p-highlight--active', !!newValue);
     }
 
     onDOMChange(record: MutationRecord | Event) {
-        // Triggered when DOM properties/attributes change or input events occur
-        console.log('DOM changed on element:', record);
+        // Detects host element attribute and input changes
+        console.log('Host DOM changed:', record);
     }
 }
 ```
@@ -352,77 +240,217 @@ export class HighlightDirective extends BaseDirective {
 
 ---
 
-### 6. Form Validation (`@Validator` & `BaseValidator`)
+### 5. 🎯 Composable Interaction Behaviors (`behaviors/`)
 
-Form Validators decouple validation logic from UI templates, automatically tracking field mutations, managing overall form validity, updating submit button `disabled` states, and applying customizable CSS state classes:
-
-#### Declaring a Form Validator
+Enhance elements without deep inheritance trees. Behaviors attach modular interactions like pointer drag-and-drop with GPU acceleration (`translate3d`), boundary constraints, and center snapping:
 
 ```typescript
-// src/app/shared/validators/forms-validation.validator.ts
-import { Validator, BaseValidator } from '@purity/core';
+import { drag } from './shared/behaviors/draggable/draggable';
+import { droppable } from './shared/behaviors/droppable/droppable';
 
-@Validator({
-    form: '.forms-validation-form',
-    fields: {
-        input1: '#input1',
-        input2: '#input2',
-    },
-    validClass: 'is-valid',
-    invalidClass: 'is-invalid',
+// 1. Register droppable drop target
+const dropCleanup = droppable({
+    selector: '#droppable-container',
+    accepts: '#component1',
+    hoverClass: 'droppable-hover',
+    onDrop: (draggedEl) => draggedEl.remove(),
+});
+
+// 2. Attach pointer drag interaction with boundaries & center snapping
+const dragCleanup = drag({
+    selector: '#component1',
+    constrainTo: 'body',
+    snapTo: '#droppable-container',
+    handle: '.drag-handle',
+    onDragStart: (el) => el.classList.add('dragging'),
+    onDragEnd: (el) => el.classList.remove('dragging'),
+});
+
+// Teardown during component destruction
+// dragCleanup.destroy();
+// dropCleanup.destroy();
+```
+
+---
+
+## 🧩 UI Web Components, Templating & Views
+
+### 6. 🧩 Native Web Components (`@Component` Decorator)
+
+Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
+
+```typescript
+import { Component, signal } from '@purity/core';
+import './custom.component.scss';
+
+@Component({
+    selector: 'custom-component',
+    templateUrl: './src/app/shared/components/custom/custom.component.html',
 })
-export class FormsValidationValidator extends BaseValidator {
-    validateInput1(value: string): boolean {
-        return value.trim().length >= 3;
+export class CustomComponent {
+    customProperty = signal<string | null>(null);
+
+    protected onInit() {
+        // Invoked after template DOM elements are mounted
     }
 
-    validateInput2(value: string): boolean {
-        return value.trim().length >= 5;
+    onInput(element: HTMLInputElement) {
+        this.customProperty.set(element.value);
+    }
+
+    onClear() {
+        this.customProperty.set(null);
+    }
+
+    protected onDestroy() {
+        // Teardown subscriptions, timers, and listeners
     }
 }
 ```
 
 ---
 
-### 7. Composable Behaviors
+### 7. 🔍 Child View & Component Queries (`@ViewChild`)
 
-Enhance elements without deep inheritance trees:
-
-#### Draggable (`drag`)
+Use the `@ViewChild(selector)` decorator to query child DOM elements and child components with fallback resolution for teleported or body-prepended elements:
 
 ```typescript
-import { drag } from './shared/behaviors/draggable/draggable';
+import { Component, ViewChild, signal } from '@purity/core';
+import type { CustomComponent } from './shared/components/custom/custom.component';
+import type { ModalViewComponent } from './shared/components/modal/modal-view.component';
 
-const dragInstance = drag({
-    selector: '#my-draggable-card',
-    constrainTo: 'body',
-    handle: '.drag-handle',
-    snapTo: '#drop-zone',
-    onDragStart: (el) => el.classList.add('is-dragging'),
-    onDragEnd: (el) => el.classList.remove('is-dragging'),
-});
+@Component({
+    selector: 'demo-component',
+    templateUrl: './demo.component.html',
+})
+export class DemoComponent {
+    // Automatically query child elements / components
+    @ViewChild('#component1')
+    customComponent1?: CustomComponent | null;
 
-// Teardown when component disconnects
-dragInstance.destroy();
-```
+    @ViewChild('#demo-modal')
+    modalView?: ModalViewComponent | null;
 
-#### Droppable (`droppable`)
-
-```typescript
-import { droppable } from './shared/behaviors/droppable/droppable';
-
-const dropInstance = droppable({
-    selector: '#drop-zone',
-    accepts: '#my-draggable-card',
-    hoverClass: 'droppable-hover',
-    onDrop: (draggedEl) => {
-        console.log('Element dropped:', draggedEl);
+    onTriggerChild() {
+        // Clean property access without manual querySelector boilerplate
+        this.customComponent1?.customProperty.set('Updated by parent');
+        this.modalView?.open({ title: 'Queried Modal' });
     }
-});
-
-// Teardown when component disconnects
-dropInstance.destroy();
+}
 ```
+
+---
+
+### 8. 📄 Handlebars Template Interpolation (`{{ expression }}`)
+
+Purity supports declarative `{{ expression }}` template interpolations. Text nodes and element attributes automatically bind to signals and re-render fine-grained when signal dependencies change:
+
+```html
+<!-- 1. HTML Template: Declarative Signal Rendering -->
+<div class="user-card window {{loginStatus}}">
+    <!-- Reactive text content bound to signals -->
+    <h3>Welcome, {{currentUser() ?? 'Guest'}}!</h3>
+    <p>Count: {{count()}} (Doubled: {{count() * 2}})</p>
+
+    <!-- Dynamic input value binding -->
+    <input type="text" value="{{currentUser()}}" class="input-primary" oninput="app.onTextInput(this)" />
+
+    <!-- Child component signal binding -->
+    <div class="child-status">
+        Child: {{customComponent1?.customProperty()}}
+    </div>
+</div>
+```
+
+```typescript
+// 2. Component Class: Signal Definitions
+@Component({ selector: 'user-card', templateUrl: './user-card.html' })
+export class UserCardComponent {
+    currentUser = signal('Alice');
+    count = signal(5);
+    loginStatus = signal('success');
+}
+```
+
+---
+
+### 9. 📦 Generic Components & Content Projection (`<slot>`)
+
+Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
+
+```html
+<!-- 1. Consumer Template: Passing arbitrary HTML & components into <modal-view> -->
+<modal-view id="demo-modal">
+    <div class="custom-projected-body">
+        <h4>📦 Projected Modal Content</h4>
+        <p>This content is rendered inside the slot of modal-view!</p>
+        <custom-component id="projected-component"></custom-component>
+    </div>
+</modal-view>
+
+<!-- 2. Component Template (modal-view.component.html) -->
+<div class="modal-dialog window">
+    <div class="modal-body">
+        <slot>
+            <p>Default fallback content when no children are passed</p>
+        </slot>
+    </div>
+</div>
+```
+
+---
+
+### 10. 🪟 Modal Dialogs (`<modal-view>`)
+
+Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
+
+```typescript
+import { Component, signal } from '@purity/core';
+import './modal-view.component.scss';
+
+@Component({
+    selector: 'modal-view',
+    templateUrl: './modal-view.component.html',
+})
+export class ModalViewComponent {
+    isOpen = signal<boolean>(false);
+    isMaximized = signal<boolean>(false);
+    title = signal<string>('Purity Modal Dialog');
+
+    protected onInit() {
+        // Always prepends to document.body with position: absolute & z-index: 1000
+        document.body.prepend(this as any);
+    }
+
+    open(options?: { title?: string }) {
+        if (options?.title) this.title.set(options.title);
+        this.isOpen.set(true);
+    }
+
+    close() {
+        this.isOpen.set(false);
+    }
+
+    maximize() {
+        this.isMaximized.update(v => !v);
+    }
+}
+```
+
+---
+
+## 🛠️ DOM Utilities
+
+Purity includes lightweight helpers for efficient DOM querying and synchronization:
+
+| Utility | Description | Example |
+|---|---|---|
+| `getElement(selector, rootEl?)` | Query a single element | `const btn = getElement('.save-btn', this);` |
+| `getElements(selectorsMap, rootEl?)` | Batch queries returning `Map<string, HTMLElement>` | `const map = getElements({ title: '#title' }, this);` |
+| `updateTargets(elements, newValue, ifNullValue?)` | Batch update `innerHTML` | `updateTargets([displayEl], user(), 'Guest');` |
+| `updateValues(elements, newValue, ifNullValue?)` | Batch update `HTMLInputElement.value` | `updateValues([inputEl], user());` |
+| `updateStyles(elements, className)` | Batch update `element.className` | `updateStyles([statusEl], 'success');` |
+| `eventListener(elements, event, handler)` | Attach listener with `{ dispose() }` cleanup | `const sub = eventListener([btn], 'click', handler);` |
 
 ---
 
