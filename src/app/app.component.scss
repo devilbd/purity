@@ -1,16 +1,11 @@
 @use '../style.scss' as *;
 
-.demo-container {
+demo-component {
     &.demo-hidden {
         display: none !important;
     }
 
     &.demo-visible {
-        display: flex !important;
+        display: block !important;
     }
-}
-
-#droppable-container {
-    @extend .window;
-    padding: 20px;
 }

@@ -54,6 +54,7 @@ purity/
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
+                ├── demo/        # <demo-component> live framework interactive showcase
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
                 ├── forms-validation/ # <forms-validation> sample form component with submit validation
                 ├── header/      # <header-component> navigation bar with logo

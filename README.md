@@ -95,7 +95,7 @@ purity/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # UI Web Components (intro, header, custom, modal, raw-template, forms-validation, directive-sample)
+            └── components/      # UI Web Components (intro, header, demo, custom, modal, raw-template, forms-validation, directive-sample)
 ```
 
 ---
