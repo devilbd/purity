@@ -8,10 +8,6 @@ import './custom.component.scss';
 export class CustomComponent {
     customProperty = signal<string | null>(null);
 
-    get name(): string {
-        return (this as any).getAttribute?.('name') || '';
-    }
-
     onInput(element: HTMLInputElement) {
         this.customProperty.set(element.value);
     }
