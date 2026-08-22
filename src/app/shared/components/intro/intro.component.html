@@ -26,6 +26,16 @@
 
     <!-- Vertical Stack of Framework Architecture Code Samples -->
     <div class="intro-samples-stack">
+
+        <!-- ========================================== -->
+        <!-- GROUP 1: CORE FRAMEWORK CODE & PRIMITIVES  -->
+        <!-- ========================================== -->
+        <div class="intro-section-divider">
+            <span class="section-icon">💻</span>
+            <h3 class="section-title">Core Framework Architecture &amp; Primitives</h3>
+            <span class="section-badge">Code &amp; Primitives</span>
+        </div>
+
         <!-- 1. Reactivity -->
         <div class="intro-sample-card">
             <div class="sample-header">
@@ -34,136 +44,98 @@
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
-<span class="cmt">// Create a reactive signal container</span>
-<span class="kw">const</span> count = <span class="fn">signal</span>(<span class="num">0</span>);
+<span class="cmt">// 1. Create typed reactive signals</span>
+<span class="kw">const</span> count = <span class="fn">signal</span>&lt;<span class="typ">number</span>&gt;(<span class="num">0</span>);
+<span class="kw">const</span> multiplier = <span class="fn">signal</span>&lt;<span class="typ">number</span>&gt;(<span class="num">2</span>);
 
-<span class="cmt">// Read value</span>
+<span class="cmt">// 2. Read value via getter call</span>
 console.<span class="fn">log</span>(count()); <span class="cmt">// 0</span>
 
-<span class="cmt">// Mutate via .set() or .update()</span>
-count.<span class="fn">set</span>(<span class="num">5</span>);
-count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
+<span class="cmt">// 3. Mutate value with .set() or computed .update()</span>
+count.<span class="fn">set</span>(<span class="num">10</span>);
+count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <span class="cmt">// 11</span>
 
-<span class="cmt">// Effects track signal reads automatically and re-run on changes</span>
+<span class="cmt">// 4. Effects automatically register signal dependencies and re-run on changes</span>
 <span class="fn">effect</span>(() =&gt; {
-    console.<span class="fn">log</span>(<span class="str">`Current counter: ${count()}`</span>);
+    <span class="kw">const</span> total = count() * multiplier();
+    console.<span class="fn">log</span>(<span class="str">`Calculated total: ${total} (count: ${count()})`</span>);
 });</code></pre>
         </div>
 
-        <!-- 2. Web Components & Child Views -->
+        <!-- 2. Dependency Injection -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>2. 🧩 Native Web Components &amp; Child Views (<code>component.ts</code>)</h4>
-                <p>Native Custom Elements with automatic template inlining, lifecycle hooks, and <code>@ViewChild</code> query decorators:</p>
-            </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
-<span class="kw">import type</span> { <span class="typ">CustomComponent</span> } <span class="kw">from</span> <span class="str">'./custom.component'</span>;
-
-<span class="dec">@Component</span>({
-    selector: <span class="str">'app-component'</span>,
-    templateUrl: <span class="str">'./app.component.html'</span>,
-})
-<span class="kw">export class</span> <span class="typ">AppComponent</span> {
-    <span class="cmt">// Automatically query child elements/components by CSS selector</span>
-    <span class="dec">@ViewChild</span>(<span class="str">'#childComponent'</span>)
-    childComponent?: <span class="typ">CustomComponent</span> | <span class="kw">null</span>;
-
-    <span class="kw">protected</span> <span class="fn">onInit</span>() {
-        <span class="cmt">// Access child component cleanly after initialization</span>
-        <span class="kw">this</span>.childComponent?.customProperty.<span class="fn">set</span>(<span class="str">'Hello Purity'</span>);
-    }
-}</code></pre>
-        </div>
-
-        <!-- 3. HTML Templates -->
-        <div class="intro-sample-card">
-            <div class="sample-header">
-                <h4>3. 📄 Handlebars Template Interpolation (<code>{{ expression }}</code>)</h4>
-                <p>Embed reactive signals directly into HTML templates using handlebars syntax. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
-            </div>
-            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering --&gt;</span>
-<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"window"</span><span class="tag">&gt;</span>
-    <span class="cmt">&lt;!-- Reactive text content bound to signals --&gt;</span>
-    <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{currentUser()}}</span>!<span class="tag">&lt;/h3&gt;</span>
-    <span class="tag">&lt;p&gt;</span>Count: <span class="expr">{{count()}}</span> (Doubled: <span class="expr">{{count() * 2}}</span>)<span class="tag">&lt;/p&gt;</span>
-
-    <span class="cmt">&lt;!-- Reactive attribute and CSS class interpolation --&gt;</span>
-    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"badge {{statusClass()}}"</span><span class="tag">&gt;</span>
-        Status: <span class="expr">{{statusText}}</span>
-    <span class="tag">&lt;/div&gt;</span>
-
-    <span class="cmt">&lt;!-- Dynamic input value binding --&gt;</span>
-    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"text"</span> <span class="attr">value</span>=<span class="str">"{{currentUser()}}"</span> <span class="attr">class</span>=<span class="str">"input-primary"</span> <span class="tag">/&gt;</span>
-<span class="tag">&lt;/div&gt;</span>
-
-<span class="cmt">&lt;!-- 2. Component Class: Signal Definitions --&gt;</span>
-<span class="dec">@Component</span>({ selector: <span class="str">'user-card'</span>, templateUrl: <span class="str">'./user-card.html'</span> })
-<span class="kw">export class</span> <span class="typ">UserCardComponent</span> {
-    currentUser = <span class="fn">signal</span>(<span class="str">'Alice'</span>);
-    count = <span class="fn">signal</span>(<span class="num">5</span>);
-    statusClass = <span class="fn">signal</span>(<span class="str">'is-online'</span>);
-
-    <span class="kw">get</span> <span class="fn">statusText</span>() {
-        <span class="kw">return</span> <span class="kw">this</span>.currentUser() ? <span class="str">'Active'</span> : <span class="str">'Offline'</span>;
-    }
-}</code></pre>
-        </div>
-
-        <!-- 4. Dependency Injection -->
-        <div class="intro-sample-card">
-            <div class="sample-header">
-                <h4>4. 💉 Dependency Injection (<code>di.ts</code>)</h4>
-                <p>Singleton service registration with <code>@Injectable</code> and fast token resolution via <code>inject()</code>:</p>
+                <h4>2. 💉 First-Class Dependency Injection (<code>di.ts</code>)</h4>
+                <p>Singleton service registration with <code>@Injectable</code> and instant token resolution via <code>inject()</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Injectable</span>, <span class="fn">signal</span>, <span class="fn">inject</span>, <span class="fn">Component</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
+<span class="kw">export interface</span> <span class="typ">User</span> {
+    id: <span class="typ">number</span>;
+    name: <span class="typ">string</span>;
+    role: <span class="typ">string</span>;
+}
+
+<span class="cmt">// 1. Declare injectable singleton service</span>
 <span class="dec">@Injectable</span>(<span class="str">'DataService'</span>)
 <span class="kw">export class</span> <span class="typ">DataService</span> {
-    currentUser = <span class="fn">signal</span>&lt;<span class="typ">string</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
+    currentUser = <span class="fn">signal</span>&lt;<span class="typ">User</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
 
-    <span class="fn">login</span>(name: <span class="typ">string</span>) {
-        <span class="kw">this</span>.currentUser.<span class="fn">set</span>(name);
+    <span class="fn">login</span>(username: <span class="typ">string</span>): <span class="typ">User</span> {
+        <span class="kw">const</span> user: <span class="typ">User</span> = { id: Date.<span class="fn">now</span>(), name: username, role: <span class="str">'admin'</span> };
+        <span class="kw">this</span>.currentUser.<span class="fn">set</span>(user);
+        <span class="kw">return</span> user;
+    }
+
+    <span class="fn">logout</span>(): <span class="typ">void</span> {
+        <span class="kw">this</span>.currentUser.<span class="fn">set</span>(<span class="kw">null</span>);
     }
 }
 
-<span class="dec">@Component</span>({ selector: <span class="str">'app-component'</span> })
-<span class="kw">export class</span> <span class="typ">AppComponent</span> {
+<span class="cmt">// 2. Inject singleton service anywhere by constructor or token</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'user-profile'</span> })
+<span class="kw">export class</span> <span class="typ">UserProfileComponent</span> {
     <span class="kw">private</span> dataService = <span class="fn">inject</span>(<span class="typ">DataService</span>);
+
+    <span class="fn">onLogout</span>() {
+        <span class="kw">this</span>.dataService.<span class="fn">logout</span>();
+    }
 }</code></pre>
         </div>
 
-        <!-- 5. Form Validation -->
+        <!-- 3. Form Validation -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>5. 📋 Decoupled Form Validation (<code>validator.ts</code>)</h4>
+                <h4>3. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
                 <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
+<span class="cmt">// Decorator binds validation rules directly to matching form elements</span>
 <span class="dec">@Validator</span>({
     form: <span class="str">'.forms-validation-form'</span>,
     fields: {
-        input1: <span class="str">'#input1'</span>,
-        input2: <span class="str">'#input2'</span>,
+        username: <span class="str">'#input1'</span>,
+        password: <span class="str">'#input2'</span>,
     },
     validClass: <span class="str">'is-valid'</span>,
     invalidClass: <span class="str">'is-invalid'</span>,
 })
-<span class="kw">export class</span> <span class="typ">FormsValidationValidator</span> <span class="kw">extends</span> <span class="typ">BaseValidator</span> {
-    <span class="fn">validateInput1</span>(value: <span class="typ">string</span>): <span class="typ">boolean</span> {
+<span class="kw">export class</span> <span class="typ">UserFormValidator</span> <span class="kw">extends</span> <span class="typ">BaseValidator</span> {
+    <span class="fn">validateUsername</span>(value: <span class="typ">string</span>): <span class="typ">boolean</span> {
         <span class="kw">return</span> value.trim().length &gt;= <span class="num">3</span>;
     }
 
-    <span class="fn">validateInput2</span>(value: <span class="typ">string</span>): <span class="typ">boolean</span> {
-        <span class="kw">return</span> value.trim().length &gt;= <span class="num">5</span>;
+    <span class="fn">validatePassword</span>(value: <span class="typ">string</span>): <span class="typ">boolean</span> {
+        <span class="kw">return</span> value.trim().length &gt;= <span class="num">6</span>;
     }
 }</code></pre>
         </div>
 
-        <!-- 6. Custom Directives -->
+        <!-- 4. Custom Directives -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>6. 🏷️ Custom Directives (<code>directive.ts</code>)</h4>
+                <h4>4. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
                 <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -172,38 +144,213 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>);
 <span class="kw">export class</span> <span class="typ">HighlightDirective</span> <span class="kw">extends</span> <span class="typ">BaseDirective</span> {
     <span class="fn">onInit</span>() {
         <span class="kw">this</span>.element.classList.<span class="fn">add</span>(<span class="str">'p-highlight'</span>);
+        <span class="kw">this</span>.<span class="fn">onChanges</span>(<span class="kw">this</span>.value);
     }
 
     <span class="fn">onChanges</span>(newValue: <span class="typ">any</span>) {
+        <span class="cmt">// Toggle modifier class when bound value or {{ expression }} changes</span>
         <span class="kw">this</span>.element.classList.<span class="fn">toggle</span>(<span class="str">'p-highlight--active'</span>, !!newValue);
+    }
+
+    <span class="fn">onDOMChange</span>(record: <span class="typ">MutationRecord</span> | <span class="typ">Event</span>) {
+        <span class="cmt">// Detects host element attribute and input changes</span>
+        console.<span class="fn">log</span>(<span class="str">'Host DOM changed:'</span>, record);
     }
 }</code></pre>
         </div>
 
-        <!-- 7. Composable Behaviors -->
+        <!-- 5. Composable Behaviors -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>7. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
+                <h4>5. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
                 <p>Pointer-based drag interactions with GPU acceleration (<code>translate3d</code>), boundary constraints, and center snapping:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">drag</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/draggable/draggable'</span>;
 <span class="kw">import</span> { <span class="fn">droppable</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/droppable/droppable'</span>;
 
-<span class="cmt">// Register droppable drop zone</span>
-<span class="kw">const</span> dropZone = <span class="fn">droppable</span>({
+<span class="cmt">// 1. Register droppable drop target</span>
+<span class="kw">const</span> dropCleanup = <span class="fn">droppable</span>({
     selector: <span class="str">'#droppable-container'</span>,
     accepts: <span class="str">'#component1'</span>,
     hoverClass: <span class="str">'droppable-hover'</span>,
-    onDrop: (el) =&gt; el.<span class="fn">remove</span>(),
+    onDrop: (draggedEl) =&gt; draggedEl.<span class="fn">remove</span>(),
 });
 
-<span class="cmt">// Attach drag behavior</span>
-<span class="kw">const</span> dragHandle = <span class="fn">drag</span>({
+<span class="cmt">// 2. Attach pointer drag interaction with boundaries &amp; center snapping</span>
+<span class="kw">const</span> dragCleanup = <span class="fn">drag</span>({
     selector: <span class="str">'#component1'</span>,
     constrainTo: <span class="str">'body'</span>,
     snapTo: <span class="str">'#droppable-container'</span>,
     handle: <span class="str">'.drag-handle'</span>,
+    onDragStart: (el) =&gt; el.classList.<span class="fn">add</span>(<span class="str">'dragging'</span>),
+    onDragEnd: (el) =&gt; el.classList.<span class="fn">remove</span>(<span class="str">'dragging'</span>),
 });</code></pre>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- GROUP 2: WEB COMPONENTS & TEMPLATING       -->
+        <!-- ========================================== -->
+        <div class="intro-section-divider">
+            <span class="section-icon">🧩</span>
+            <h3 class="section-title">UI Web Components, Templating &amp; Views</h3>
+            <span class="section-badge">Components &amp; Views</span>
+        </div>
+
+        <!-- 6. Web Components -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>6. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
+                <p>Plain classes transformed into Custom Elements with automatic template inlining, signal bindings, and lifecycle hooks:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> <span class="str">'./custom.component.scss'</span>;
+
+<span class="dec">@Component</span>({
+    selector: <span class="str">'custom-component'</span>,
+    templateUrl: <span class="str">'./src/app/shared/components/custom/custom.component.html'</span>,
+})
+<span class="kw">export class</span> <span class="typ">CustomComponent</span> {
+    customProperty = <span class="fn">signal</span>&lt;<span class="typ">string</span> | <span class="kw">null</span>&gt;(<span class="kw">null</span>);
+
+    <span class="kw">protected</span> <span class="fn">onInit</span>() {
+        <span class="cmt">// Invoked after template DOM elements are mounted</span>
+    }
+
+    <span class="fn">onInput</span>(element: <span class="typ">HTMLInputElement</span>) {
+        <span class="kw">this</span>.customProperty.<span class="fn">set</span>(element.value);
+    }
+
+    <span class="fn">onClear</span>() {
+        <span class="kw">this</span>.customProperty.<span class="fn">set</span>(<span class="kw">null</span>);
+    }
+
+    <span class="kw">protected</span> <span class="fn">onDestroy</span>() {
+        <span class="cmt">// Teardown subscriptions and listeners</span>
+    }
+}</code></pre>
+        </div>
+
+        <!-- 7. ViewChild Queries -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>7. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
+                <p>Property decorator that queries child elements or custom components by CSS selector with fallback resolution for teleported/body-prepended elements:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import type</span> { <span class="typ">CustomComponent</span> } <span class="kw">from</span> <span class="str">'./shared/components/custom/custom.component'</span>;
+<span class="kw">import type</span> { <span class="typ">ModalViewComponent</span> } <span class="kw">from</span> <span class="str">'./shared/components/modal/modal-view.component'</span>;
+
+<span class="dec">@Component</span>({
+    selector: <span class="str">'demo-component'</span>,
+    templateUrl: <span class="str">'./demo.component.html'</span>,
+})
+<span class="kw">export class</span> <span class="typ">DemoComponent</span> {
+    <span class="cmt">// Automatically query child elements / components</span>
+    <span class="dec">@ViewChild</span>(<span class="str">'#component1'</span>)
+    customComponent1?: <span class="typ">CustomComponent</span> | <span class="kw">null</span>;
+
+    <span class="dec">@ViewChild</span>(<span class="str">'#demo-modal'</span>)
+    modalView?: <span class="typ">ModalViewComponent</span> | <span class="kw">null</span>;
+
+    <span class="fn">onTriggerChild</span>() {
+        <span class="cmt">// Clean property access without manual querySelector boilerplate</span>
+        <span class="kw">this</span>.customComponent1?.customProperty.<span class="fn">set</span>(<span class="str">'Updated by parent'</span>);
+        <span class="kw">this</span>.modalView?.<span class="fn">open</span>({ title: <span class="str">'Queried Modal'</span> });
+    }
+}</code></pre>
+        </div>
+
+        <!-- 8. Handlebars Interpolation -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>8. 📄 Handlebars Template Interpolation (<code>{{ expression }}</code>)</h4>
+                <p>Embed reactive signals directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"window {{loginStatus}}"</span><span class="tag">&gt;</span>
+    <span class="cmt">&lt;!-- Reactive text content bound to signals --&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{currentUser() ?? 'Guest'}}</span>!<span class="tag">&lt;/h3&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Count: <span class="expr">{{count()}}</span> (Doubled: <span class="expr">{{count() * 2}}</span>)<span class="tag">&lt;/p&gt;</span>
+
+    <span class="cmt">&lt;!-- Dynamic input value binding --&gt;</span>
+    <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"text"</span> <span class="attr">value</span>=<span class="str">"{{currentUser()}}"</span> <span class="attr">class</span>=<span class="str">"input-primary"</span> <span class="tag">/&gt;</span>
+
+    <span class="cmt">&lt;!-- Child component signal binding --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"child-status"</span><span class="tag">&gt;</span>
+        Child: <span class="expr">{{customComponent1?.customProperty()}}</span>
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: Signal Definitions --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'user-card'</span>, templateUrl: <span class="str">'./user-card.html'</span> })
+<span class="kw">export class</span> <span class="typ">UserCardComponent</span> {
+    currentUser = <span class="fn">signal</span>(<span class="str">'Alice'</span>);
+    count = <span class="fn">signal</span>(<span class="num">5</span>);
+    loginStatus = <span class="fn">signal</span>(<span class="str">'success'</span>);
+}</code></pre>
+        </div>
+
+        <!-- 9. Slot Content Projection -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>9. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. Consumer Template: Passing arbitrary HTML &amp; components into &lt;modal-view&gt; --&gt;</span>
+<span class="tag">&lt;modal-view</span> <span class="attr">id</span>=<span class="str">"demo-modal"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"custom-projected-body"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;h4&gt;</span>📦 Projected Modal Content<span class="tag">&lt;/h4&gt;</span>
+        <span class="tag">&lt;p&gt;</span>This content is rendered inside the slot of modal-view!<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;custom-component</span> <span class="attr">id</span>=<span class="str">"projected-component"</span><span class="tag">&gt;&lt;/custom-component&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/modal-view&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Template (modal-view.component.html) --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"modal-dialog window"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"modal-body"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;slot&gt;</span>
+            <span class="tag">&lt;p&gt;</span>Default fallback content when no children are passed<span class="tag">&lt;/p&gt;</span>
+        <span class="tag">&lt;/slot&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+        </div>
+
+        <!-- 10. Modal Dialogs -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>10. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, automatic <code>document.body</code> prepending, and <code>z-index: 1000</code>:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> <span class="str">'./modal-view.component.scss'</span>;
+
+<span class="dec">@Component</span>({
+    selector: <span class="str">'modal-view'</span>,
+    templateUrl: <span class="str">'./modal-view.component.html'</span>,
+})
+<span class="kw">export class</span> <span class="typ">ModalViewComponent</span> {
+    isOpen = <span class="fn">signal</span>&lt;<span class="typ">boolean</span>&gt;(<span class="kw">false</span>);
+    isMaximized = <span class="fn">signal</span>&lt;<span class="typ">boolean</span>&gt;(<span class="kw">false</span>);
+    title = <span class="fn">signal</span>&lt;<span class="typ">string</span>&gt;(<span class="str">'Purity Modal Dialog'</span>);
+
+    <span class="kw">protected</span> <span class="fn">onInit</span>() {
+        <span class="cmt">// Always prepends to document.body with position: absolute &amp; z-index: 1000</span>
+        document.body.<span class="fn">prepend</span>(<span class="kw">this</span> <span class="kw">as any</span>);
+    }
+
+    <span class="fn">open</span>(options?: { title?: <span class="typ">string</span> }) {
+        <span class="kw">if</span> (options?.title) <span class="kw">this</span>.title.<span class="fn">set</span>(options.title);
+        <span class="kw">this</span>.isOpen.<span class="fn">set</span>(<span class="kw">true</span>);
+    }
+
+    <span class="fn">close</span>() {
+        <span class="kw">this</span>.isOpen.<span class="fn">set</span>(<span class="kw">false</span>);
+    }
+
+    <span class="fn">maximize</span>() {
+        <span class="kw">this</span>.isMaximized.<span class="fn">update</span>(v =&gt; !v);
+    }
+}</code></pre>
         </div>
     </div>
 

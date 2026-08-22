@@ -19,12 +19,9 @@ export class ModalViewComponent {
     protected onInit() {
         (window as any).modal = this;
 
-        // Automatically prepend to document.body so it sits above all other DOM elements
-        const host = this as any as HTMLElement;
-        if (host.parentElement && host.parentElement !== document.body) {
-            document.body.prepend(host);
-        }
-
+        // Always prepend to document.body so it sits above all other DOM elements
+        document.body.prepend(this as any);
+        
         window.addEventListener('keydown', this.keydownHandler);
     }
 

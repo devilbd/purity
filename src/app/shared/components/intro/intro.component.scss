@@ -71,6 +71,44 @@
     }
 }
 
+/* Section Category Dividers separating Code and Components */
+.intro-section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 14px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+    &:first-child {
+        margin-top: 0;
+    }
+
+    .section-icon {
+        font-size: 20px;
+    }
+
+    .section-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--text-main);
+        letter-spacing: -0.2px;
+    }
+
+    .section-badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: rgba(53, 132, 228, 0.2);
+        color: #79c0ff;
+        border: 1px solid rgba(53, 132, 228, 0.35);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+}
+
 /* Vertical Stack: Each sample card is positioned above/below each other */
 .intro-samples-stack {
     display: flex;
