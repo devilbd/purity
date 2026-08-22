@@ -5,7 +5,7 @@
 <h1 align="center">Purity</h1>
 
 <p align="center">
-  <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, and Composable Behaviors.</strong>
+  <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, Transform Pipes, and Composable Behaviors.</strong>
 </p>
 
 <p align="center">
@@ -20,19 +20,20 @@
 
 ## 📖 Overview
 
-**Purity** is a minimalist, modern frontend framework built from scratch on top of web standards. It avoids the overhead of virtual DOM reconciliation by combining **fine-grained reactive signals** with standard **Custom Elements v1**, a lightweight **Dependency Injection** container, **Decoupled Form Validation**, and **Composable DOM Behaviors**.
+**Purity** is a minimalist, modern frontend framework built from scratch on top of web standards. It avoids the overhead of virtual DOM reconciliation by combining **fine-grained reactive signals** with standard **Custom Elements v1**, a lightweight **Dependency Injection** container, **Transform Pipes**, **Decoupled Form Validation**, and **Composable DOM Behaviors**.
 
 ### Key Highlights
 
 - ⚡ **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 - 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automated dependency tracking.
 - 💉 **First-Class Dependency Injection**: Built-in DI container with `@Injectable` decorator and `inject()` token resolution.
+- ⚡ **Transform Pipes**: Reusable formatting classes with `@Pipe` and `BasePipe`, supporting static arguments and dynamic reactive signal parameters in templates (`{{ val | myPipe: isDynamicSignal() }}`).
 - 📋 **Decoupled Form Validation Engine**: Validation rules decoupled with `@Validator` and `BaseValidator`, managing CSS states and submit buttons.
 - 🏷️ **Reactive Custom Directives**: Attribute-level reactivity and DOM mutation monitoring via `@Directive` and `BaseDirective`.
 - 🎯 **Composable Behaviors**: Pointer-based `drag` and `droppable` interactions with GPU acceleration (`translate3d`), boundary constraints, and center snap.
 - 🧩 **Native Web Components**: Standard classes decorated with `@Component` transformed into Custom Elements with automatic template inlining and lifecycle management.
 - 🔍 **Child View Queries (`@ViewChild`)**: Automatic child element and component querying by CSS selector with fallback resolution for teleported/body-prepended elements.
-- 📄 **Handlebars Template Interpolation**: Reactive `{{ expression }}` handlebars syntax with compiled expression caching (`expressionCache`).
+- 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
@@ -82,8 +83,9 @@ purity/
     ├── style.scss               # Global styles (GNOME Adwaita design system)
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
-    │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot engine
+    │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
+    │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
@@ -98,8 +100,9 @@ purity/
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
+            ├── pipes/           # Reusable transform pipes (transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # UI Web Components (intro, header, demo, custom, modal, raw-template, forms-validation, directive-sample)
+            └── components/      # UI Web Components (intro, header, demo, custom, modal, pipe-sample, raw-template, forms-validation, directive-sample)
 ```
 
 ---
@@ -175,7 +178,43 @@ export class UserProfileComponent {
 
 ---
 
-### 3. 📋 Decoupled Form Validation Engine (`validator.ts`)
+### 3. ⚡ Transform Pipes & Dynamic Parameters (`pipe.ts`)
+
+Transform Pipes decouple data transformation and formatting logic from UI components and templates. They integrate directly with Handlebars template expressions (`{{ value | pipeName: arg1 : arg2 }}`), supporting static values as well as dynamic reactive signal parameters that automatically re-run transformations when dependencies update:
+
+```typescript
+import { Pipe, BasePipe } from '@purity/core';
+
+// 1. Declare transform pipe with typed arguments
+@Pipe('myTransformPipe')
+export class MyTransformPipe extends BasePipe {
+    transform(value: any, isUppercase: boolean = false, prefix?: string): string {
+        if (value === null || value === undefined) return '';
+        let str = String(value);
+        if (isUppercase) {
+            str = str.toUpperCase();
+        }
+        return prefix ? `${prefix}: ${str}` : str;
+    }
+}
+```
+
+#### Handlebars Usage with Dynamic Signal Parameters
+
+```html
+<!-- Pipe with dynamic reactive signal parameter -->
+<div>{{ myValue() | myTransformPipe: isUppercaseSignal() : '✨ Output' }}</div>
+
+<!-- Pipe with static parameter -->
+<div>{{ count() | myTransformPipe: true }}</div>
+
+<!-- Chained pipes -->
+<div>{{ total() | currency: '$' : 2 | bold }}</div>
+```
+
+---
+
+### 4. 📋 Decoupled Form Validation Engine (`validator.ts`)
 
 Form Validators decouple validation logic from UI templates, automatically tracking field mutations, managing overall form validity, updating submit button `disabled` states, and applying customizable CSS state classes:
 
@@ -205,7 +244,7 @@ export class UserFormValidator extends BaseValidator {
 
 ---
 
-### 4. 🏷️ Reactive Custom Directives (`directive.ts`)
+### 5. 🏷️ Reactive Custom Directives (`directive.ts`)
 
 Directives attach custom behavior, styling, and reactive listeners directly to DOM elements via attributes:
 
@@ -240,7 +279,7 @@ export class HighlightDirective extends BaseDirective {
 
 ---
 
-### 5. 🎯 Composable Interaction Behaviors (`behaviors/`)
+### 6. 🎯 Composable Interaction Behaviors (`behaviors/`)
 
 Enhance elements without deep inheritance trees. Behaviors attach modular interactions like pointer drag-and-drop with GPU acceleration (`translate3d`), boundary constraints, and center snapping:
 
@@ -275,7 +314,7 @@ const dragCleanup = drag({
 
 ## 🧩 UI Web Components, Templating & Views
 
-### 6. 🧩 Native Web Components (`@Component` Decorator)
+### 7. 🧩 Native Web Components (`@Component` Decorator)
 
 Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
 
@@ -310,7 +349,7 @@ export class CustomComponent {
 
 ---
 
-### 7. 🔍 Child View & Component Queries (`@ViewChild`)
+### 8. 🔍 Child View & Component Queries (`@ViewChild`)
 
 Use the `@ViewChild(selector)` decorator to query child DOM elements and child components with fallback resolution for teleported or body-prepended elements:
 
@@ -341,16 +380,16 @@ export class DemoComponent {
 
 ---
 
-### 8. 📄 Handlebars Template Interpolation (`{{ expression }}`)
+### 9. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
-Purity supports declarative `{{ expression }}` template interpolations. Text nodes and element attributes automatically bind to signals and re-render fine-grained when signal dependencies change:
+Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change:
 
 ```html
-<!-- 1. HTML Template: Declarative Signal Rendering -->
+<!-- 1. HTML Template: Declarative Signal Rendering & Pipe Transformation -->
 <div class="user-card window {{loginStatus}}">
-    <!-- Reactive text content bound to signals -->
-    <h3>Welcome, {{currentUser() ?? 'Guest'}}!</h3>
-    <p>Count: {{count()}} (Doubled: {{count() * 2}})</p>
+    <!-- Reactive text content and transform pipe -->
+    <h3>Welcome, {{currentUser() | uppercase}}!</h3>
+    <p>Formatted: {{count() | myTransformPipe: isVip() : 'Points'}}</p>
 
     <!-- Dynamic input value binding -->
     <input type="text" value="{{currentUser()}}" class="input-primary" oninput="app.onTextInput(this)" />
@@ -368,13 +407,14 @@ Purity supports declarative `{{ expression }}` template interpolations. Text nod
 export class UserCardComponent {
     currentUser = signal('Alice');
     count = signal(5);
+    isVip = signal(true);
     loginStatus = signal('success');
 }
 ```
 
 ---
 
-### 9. 📦 Generic Components & Content Projection (`<slot>`)
+### 10. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -400,7 +440,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 10. 🪟 Modal Dialogs (`<modal-view>`)
+### 11. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 
@@ -456,11 +496,12 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 
 ## 📐 Best Practices & Conventions
 
-1. **Side-Effect Imports for Custom Elements, Directives, and Validators**:
-   Components, directives, and validators register themselves upon module evaluation. Import them using side-effect imports:
+1. **Side-Effect Imports for Custom Elements, Directives, Pipes, and Validators**:
+   Components, directives, pipes, and validators register themselves upon module evaluation. Import them using side-effect imports:
    ```typescript
    import './shared/components/custom/custom.component';
    import './shared/directives/highlight.directive';
+   import './shared/pipes/transform-sample.pipe';
    import './shared/validators/forms-validation.validator';
    ```
    For TypeScript type references, use explicit type-only imports:
@@ -471,7 +512,7 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 2. **Use `@purity/core` Path Alias**:
    Import framework primitives cleanly via the `@purity/core` alias without relative `../../` paths:
    ```typescript
-   import { Component, signal, effect, ViewChild, inject } from '@purity/core';
+   import { Component, signal, effect, ViewChild, inject, Pipe, BasePipe } from '@purity/core';
    ```
 
 3. **CSS Classes over Inline Styles**:

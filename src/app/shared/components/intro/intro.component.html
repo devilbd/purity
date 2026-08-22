@@ -103,10 +103,34 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 3. Form Validation -->
+        <!-- 3. Transform Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>3. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
+                <h4>3. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
+                <p>Classes decorated with <code>@Pipe</code> transform template values and accept reactive signals as dynamic parameters:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Pipe</span>, <span class="typ">BasePipe</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+
+<span class="cmt">// 1. Declare transform pipe with typed arguments</span>
+<span class="dec">@Pipe</span>(<span class="str">'myTransformPipe'</span>)
+<span class="kw">export class</span> <span class="typ">MyTransformPipe</span> <span class="kw">extends</span> <span class="typ">BasePipe</span> {
+    <span class="fn">transform</span>(value: <span class="typ">any</span>, isUppercase: <span class="typ">boolean</span> = <span class="kw">false</span>, prefix?: <span class="typ">string</span>): <span class="typ">string</span> {
+        <span class="kw">if</span> (value === <span class="kw">null</span> || value === <span class="kw">undefined</span>) <span class="kw">return</span> <span class="str">''</span>;
+        <span class="kw">let</span> str = String(value);
+        <span class="kw">if</span> (isUppercase) str = str.<span class="fn">toUpperCase</span>();
+        <span class="kw">return</span> prefix ? <span class="str">`${prefix}: ${str}`</span> : str;
+    }
+}
+
+<span class="cmt">&lt;!-- 2. Use in handlebars with static or dynamic signal parameters --&gt;</span>
+<span class="tag">&lt;div&gt;</span><span class="expr">{{ myValue() | myTransformPipe: isUppercaseSignal() : '✨ Output' }}</span><span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div&gt;</span><span class="expr">{{ count() | myTransformPipe: true }}</span><span class="tag">&lt;/div&gt;</span></code></pre>
+        </div>
+
+        <!-- 4. Form Validation -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>4. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
                 <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -132,10 +156,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 4. Custom Directives -->
+        <!-- 5. Custom Directives -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>4. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
+                <h4>5. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
                 <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -159,10 +183,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 5. Composable Behaviors -->
+        <!-- 6. Composable Behaviors -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>5. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
+                <h4>6. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
                 <p>Pointer-based drag interactions with GPU acceleration (<code>translate3d</code>), boundary constraints, and center snapping:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">drag</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/draggable/draggable'</span>;
@@ -196,10 +220,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
             <span class="section-badge">Components &amp; Views</span>
         </div>
 
-        <!-- 6. Web Components -->
+        <!-- 7. Web Components -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>6. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
+                <h4>7. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
                 <p>Plain classes transformed into Custom Elements with automatic template inlining, signal bindings, and lifecycle hooks:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -230,10 +254,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 7. ViewChild Queries -->
+        <!-- 8. ViewChild Queries -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>7. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
+                <h4>8. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
                 <p>Property decorator that queries child elements or custom components by CSS selector with fallback resolution for teleported/body-prepended elements:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -260,17 +284,17 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 8. Handlebars Interpolation -->
+        <!-- 9. Handlebars Interpolation & Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>8. 📄 Handlebars Template Interpolation (<code>{{ expression }}</code>)</h4>
-                <p>Embed reactive signals directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
+                <h4>9. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
+                <p>Embed reactive signals and transform pipes directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering --&gt;</span>
+            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering &amp; Pipe Transformation --&gt;</span>
 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"window {{loginStatus}}"</span><span class="tag">&gt;</span>
-    <span class="cmt">&lt;!-- Reactive text content bound to signals --&gt;</span>
-    <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{currentUser() ?? 'Guest'}}</span>!<span class="tag">&lt;/h3&gt;</span>
-    <span class="tag">&lt;p&gt;</span>Count: <span class="expr">{{count()}}</span> (Doubled: <span class="expr">{{count() * 2}}</span>)<span class="tag">&lt;/p&gt;</span>
+    <span class="cmt">&lt;!-- Reactive text content and transform pipe --&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{currentUser() | uppercase}}</span>!<span class="tag">&lt;/h3&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Formatted: <span class="expr">{{count() | myTransformPipe: isVip() : 'Points'}}</span><span class="tag">&lt;/p&gt;</span>
 
     <span class="cmt">&lt;!-- Dynamic input value binding --&gt;</span>
     <span class="tag">&lt;input</span> <span class="attr">type</span>=<span class="str">"text"</span> <span class="attr">value</span>=<span class="str">"{{currentUser()}}"</span> <span class="attr">class</span>=<span class="str">"input-primary"</span> <span class="tag">/&gt;</span>
@@ -286,14 +310,15 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="kw">export class</span> <span class="typ">UserCardComponent</span> {
     currentUser = <span class="fn">signal</span>(<span class="str">'Alice'</span>);
     count = <span class="fn">signal</span>(<span class="num">5</span>);
+    isVip = <span class="fn">signal</span>(<span class="kw">true</span>);
     loginStatus = <span class="fn">signal</span>(<span class="str">'success'</span>);
 }</code></pre>
         </div>
 
-        <!-- 9. Slot Content Projection -->
+        <!-- 10. Slot Content Projection -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>9. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                <h4>10. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
                 <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
             </div>
             <pre><code><span class="cmt">&lt;!-- 1. Consumer Template: Passing arbitrary HTML &amp; components into &lt;modal-view&gt; --&gt;</span>
@@ -315,10 +340,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 10. Modal Dialogs -->
+        <!-- 11. Modal Dialogs -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>10. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                <h4>11. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
                 <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, automatic <code>document.body</code> prepending, and <code>z-index: 1000</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;

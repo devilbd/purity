@@ -1,6 +1,7 @@
 import { effect } from './core';
 import { bindDirectives } from './directive';
 import { bindValidators } from './validator';
+import { executePipe } from './pipe';
 
 export interface ComponentOptions {
     selector?: string;
@@ -11,19 +12,152 @@ export interface ComponentOptions {
 const templateCache = new Map<string, string>();
 const expressionCache = new Map<string, Function>();
 
+/**
+ * Transforms template pipe expressions (e.g. `value | myPipe: true : arg2`)
+ * into executable JavaScript function calls (e.g. `__pipe('myPipe', (value), true, arg2)`).
+ */
+export function transformPipeExpression(rawExpr: string): string {
+    const trimmed = rawExpr.trim();
+    if (!trimmed.includes('|')) {
+        return trimmed;
+    }
+
+    // Tokenize top-level pipes (ignoring strings, parentheses, brackets, and logical OR '||')
+    const segments: string[] = [];
+    let current = '';
+    let inString: string | null = null;
+    let depth = 0;
+
+    for (let i = 0; i < trimmed.length; i++) {
+        const char = trimmed[i];
+        const nextChar = i + 1 < trimmed.length ? trimmed[i + 1] : '';
+
+        // Handle string boundaries
+        if (inString) {
+            current += char;
+            if (char === inString && trimmed[i - 1] !== '\\') {
+                inString = null;
+            }
+            continue;
+        }
+
+        if (char === "'" || char === '"' || char === '`') {
+            inString = char;
+            current += char;
+            continue;
+        }
+
+        // Handle bracket / parenthesis depth
+        if (char === '(' || char === '[' || char === '{') {
+            depth++;
+            current += char;
+            continue;
+        }
+        if (char === ')' || char === ']' || char === '}') {
+            if (depth > 0) depth--;
+            current += char;
+            continue;
+        }
+
+        // Check for logical OR `||`
+        if (char === '|' && nextChar === '|') {
+            current += '||';
+            i++;
+            continue;
+        }
+
+        // Top-level pipe delimiter
+        if (char === '|' && depth === 0) {
+            segments.push(current.trim());
+            current = '';
+            continue;
+        }
+
+        current += char;
+    }
+
+    if (current.trim().length > 0) {
+        segments.push(current.trim());
+    }
+
+    if (segments.length <= 1) {
+        return trimmed;
+    }
+
+    let result = `(${segments[0]})`;
+
+    for (let s = 1; s < segments.length; s++) {
+        const pipeSegment = segments[s];
+        const pipeParts: string[] = [];
+        let part = '';
+        let partInString: string | null = null;
+        let partDepth = 0;
+
+        for (let j = 0; j < pipeSegment.length; j++) {
+            const pChar = pipeSegment[j];
+
+            if (partInString) {
+                part += pChar;
+                if (pChar === partInString && pipeSegment[j - 1] !== '\\') {
+                    partInString = null;
+                }
+                continue;
+            }
+
+            if (pChar === "'" || pChar === '"' || pChar === '`') {
+                partInString = pChar;
+                part += pChar;
+                continue;
+            }
+
+            if (pChar === '(' || pChar === '[' || pChar === '{') {
+                partDepth++;
+                part += pChar;
+                continue;
+            }
+            if (pChar === ')' || pChar === ']' || pChar === '}') {
+                if (partDepth > 0) partDepth--;
+                part += pChar;
+                continue;
+            }
+
+            if (pChar === ':' && partDepth === 0) {
+                pipeParts.push(part.trim());
+                part = '';
+                continue;
+            }
+
+            part += pChar;
+        }
+
+        if (part.trim().length > 0) {
+            pipeParts.push(part.trim());
+        }
+
+        const pipeName = pipeParts[0];
+        const pipeArgs = pipeParts.slice(1);
+
+        const argsStr = pipeArgs.length > 0 ? ', ' + pipeArgs.join(', ') : '';
+        result = `__pipe('${pipeName}', ${result}${argsStr})`;
+    }
+
+    return result;
+}
+
 function evaluateExpression(expr: string, context: any): string {
-    let fn = expressionCache.get(expr);
+    const transformedExpr = transformPipeExpression(expr);
+    let fn = expressionCache.get(transformedExpr);
     if (!fn) {
         try {
-            fn = new Function(`with (this) { return ${expr}; }`);
-            expressionCache.set(expr, fn);
+            fn = new Function('__pipe', `with (this) { return ${transformedExpr}; }`);
+            expressionCache.set(transformedExpr, fn);
         } catch {
             fn = () => '';
-            expressionCache.set(expr, fn);
+            expressionCache.set(transformedExpr, fn);
         }
     }
     try {
-        const val = fn.call(context);
+        const val = fn.call(context, executePipe);
         return val !== null && val !== undefined ? String(val) : '';
     } catch {
         return '';

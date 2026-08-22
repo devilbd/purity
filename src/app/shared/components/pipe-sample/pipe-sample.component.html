@@ -1,0 +1,40 @@
+<div class="window pipe-sample-root">
+    <h4>⚡ Handlebars Pipe Transformation (<code>@Pipe</code>)</h4>
+    <p class="pipe-desc">
+        Demonstrating <code>&#123;&#123; pipeValue() | myTransformPipe: isPipeUpper() : '✨ Dynamic' &#125;&#125;</code> with dynamic signal parameters:
+    </p>
+    <div class="pipe-controls">
+        <input
+            type="text"
+            class="input-primary"
+            value="{{pipeValue()}}"
+            placeholder="Type something to transform..."
+            oninput="pipeSample.onPipeInput(this)"
+        />
+        <button
+            type="button"
+            class="button-secondary"
+            onclick="pipeSample.onTogglePipeCase()"
+        >
+            🔀 Toggle Uppercase (Signal: {{isPipeUpper() ? 'TRUE' : 'FALSE'}})
+        </button>
+    </div>
+    <div class="pipe-results">
+        <div class="pipe-row">
+            <span class="pipe-label">Raw Value:</span>
+            <span class="pipe-val">{{pipeValue()}}</span>
+        </div>
+        <div class="pipe-row">
+            <span class="pipe-label">&#123;&#123; val | myTransformPipe: isPipeUpper() : '✨ Dynamic' &#125;&#125;:</span>
+            <span class="pipe-val highlight">{{pipeValue() | myTransformPipe: isPipeUpper() : '✨ Dynamic'}}</span>
+        </div>
+        <div class="pipe-row">
+            <span class="pipe-label">&#123;&#123; val | myTransformPipe: true &#125;&#125;:</span>
+            <span class="pipe-val">{{pipeValue() | myTransformPipe: true}}</span>
+        </div>
+        <div class="pipe-row">
+            <span class="pipe-label">&#123;&#123; val | uppercase &#125;&#125;:</span>
+            <span class="pipe-val">{{pipeValue() | uppercase}}</span>
+        </div>
+    </div>
+</div>

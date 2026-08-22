@@ -10,11 +10,15 @@ import '../custom/custom.component';
 import '../raw-template/raw-template.component';
 import '../forms-validation/forms-validation.component';
 import '../directive-sample/directive-sample.component';
+import '../pipe-sample/pipe-sample.component';
 import '../modal/modal-view.component';
 import '../../validators/forms-validation.validator';
+import '../../pipes/transform-sample.pipe';
+import '../../pipes/uppercase.pipe';
 import type { CustomComponent } from '../custom/custom.component';
 import type { RawTemplateComponent } from '../raw-template/raw-template.component';
 import type { FormsValidationComponent } from '../forms-validation/forms-validation.component';
+import type { PipeSampleComponent } from '../pipe-sample/pipe-sample.component';
 import type { ModalViewComponent } from '../modal/modal-view.component';
 import { drag } from '../../behaviors/draggable/draggable';
 import { droppable } from '../../behaviors/droppable/droppable';
@@ -38,6 +42,9 @@ export class DemoComponent {
 
     @ViewChild('#forms-validation')
     formsValidation?: FormsValidationComponent | null;
+
+    @ViewChild('#pipe-sample')
+    pipeSample?: PipeSampleComponent | null;
 
     @ViewChild('#demo-modal')
     modalView?: ModalViewComponent | null;

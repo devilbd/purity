@@ -33,8 +33,9 @@ purity/
     ├── style.scss               # Global styles & GNOME Adwaita-inspired design system
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM helpers, and module re-exports
-    │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader
+    │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
+    │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
@@ -51,6 +52,7 @@ purity/
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
             ├── directives/      # Reusable DOM directives (e.g. highlight)
+            ├── pipes/           # Reusable transform pipes (e.g. transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
@@ -60,6 +62,7 @@ purity/
                 ├── header/      # <header-component> navigation bar with logo
                 ├── intro/       # <intro-component> framework overview & code samples
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
+                ├── pipe-sample/ # <pipe-sample> demonstrating handlebars pipe transformations
                 └── raw-template/# <raw-template> dynamic inline template rendering
 ```
 
@@ -172,7 +175,39 @@ Purity includes a built-in Dependency Injection container with decorator support
   const dataService = inject<DataService>('DataService');
   ```
 
-### 5. Directives (`directive.ts`)
+### 5. Transform Pipes (`pipe.ts`)
+
+Transform Pipes decouple data transformation and formatting logic from components and templates. They integrate directly with Handlebars template expressions (`{{ value | pipeName: arg1 : arg2 }}`), supporting static arguments as well as dynamic reactive signals that automatically re-run transformations when signals change:
+
+* **`@Pipe(name: string | PipeOptions)` / `BasePipe` / `PipeTransform`**:
+  Class decorator and base class registering a transform pipe by token name:
+  ```typescript
+  @Pipe('myTransformPipe')
+  export class MyTransformPipe extends BasePipe {
+      transform(value: any, isUppercase: boolean = false, prefix?: string): string {
+          if (value === null || value === undefined) return '';
+          let str = String(value);
+          if (isUppercase) {
+              str = str.toUpperCase();
+          }
+          return prefix ? `${prefix}: ${str}` : str;
+      }
+  }
+  ```
+
+* **Handlebars Pipe Usage**:
+  ```html
+  <!-- Static arguments -->
+  <div>{{ count() | myTransformPipe: true }}</div>
+
+  <!-- Dynamic reactive signal arguments -->
+  <div>{{ user() | myTransformPipe: isVipSignal() : 'VIP' }}</div>
+
+  <!-- Chained pipes -->
+  <div>{{ total() | currency: '$' : 2 | bold }}</div>
+  ```
+
+### 6. Directives (`directive.ts`)
 
 Directives attach custom behavior and reactivity to DOM elements:
 
@@ -196,7 +231,7 @@ Directives attach custom behavior and reactivity to DOM elements:
   }
   ```
 
-### 6. Form Validation (`validator.ts`)
+### 7. Form Validation (`validator.ts`)
 
 Form Validators decouple validation rules and CSS class application from UI components:
 
@@ -257,11 +292,12 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 
 ## Key Conventions & Best Practices
 
-1. **Side-Effect Imports for Custom Elements, Directives, and Validators**:
-   Because components, directives, and validators register themselves automatically with decorators at module evaluation time, import them as side effects:
+1. **Side-Effect Imports for Custom Elements, Directives, Pipes, and Validators**:
+   Because components, directives, pipes, and validators register themselves automatically with decorators at module evaluation time, import them as side effects:
    ```typescript
    import './shared/components/custom/custom.component';
    import './shared/directives/highlight.directive';
+   import './shared/pipes/transform-sample.pipe';
    import './shared/validators/forms-validation.validator';
    ```
    If referencing types for TypeScript typings, use explicit type-only imports:
@@ -272,7 +308,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 2. **Use `@purity/core` Path Alias**:
    All framework imports should use the `@purity/core` alias rather than relative `../../` paths:
    ```typescript
-   import { Component, signal, effect, ViewChild, inject } from '@purity/core';
+   import { Component, signal, effect, ViewChild, inject, Pipe, BasePipe } from '@purity/core';
    ```
 
 3. **CSS Classes over Inline Styles**:
@@ -312,5 +348,6 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 * **New Framework Features**: Place core abstractions (e.g. state management, routing, template parsers) in `src/framework/`.
 * **New UI Components**: Place custom elements in `src/app/shared/components/<component-name>/` with their corresponding `.ts`, `.html`, and `.scss` files, decorated with `@Component(...)`.
 * **New Directives**: Place custom directives in `src/app/shared/directives/` decorated with `@Directive(...)` extending `BaseDirective`.
+* **New Pipes**: Place custom transform pipes in `src/app/shared/pipes/` decorated with `@Pipe(...)` extending `BasePipe`.
 * **New Validators**: Place form validation rules in `src/app/shared/validators/` decorated with `@Validator(...)` extending `BaseValidator`.
 * **New Behaviors**: Place modular interaction helpers in `src/app/shared/behaviors/<behavior-name>/`.
