@@ -6,6 +6,7 @@ html {
 }
 
 body {
+    position: relative;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -262,14 +263,114 @@ button:disabled {
 }
 
 .button-secondary {
-    background-color: rgba(255, 255, 255, 0.05);
+    @extend .button-base;
+    background-color: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.06),
+        transparent
+    );
     border: 1px solid var(--gnome-border);
-    color: white;
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    padding: 10px 20px;
+    border-radius: var(--radius-control);
+    cursor: pointer;
+    transition: all var(--transition-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
 }
 
 .button-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.button-secondary:active {
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: translateY(0);
+}
+
+.button-secondary:focus-visible {
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.button-secondary:disabled,
+.button-secondary.disabled {
+    opacity: 0.45;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* GNOME 50 Error / Cancel / Destructive Button */
+.button-error,
+.button-danger,
+.button-cancel {
+    @extend .button-base;
+    background-color: var(--gnome-error);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    color: #ffffff;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    padding: 10px 20px;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow:
+        inset 0 1px rgba(255, 255, 255, 0.3),
+        0 2px 4px rgba(237, 51, 59, 0.35);
+    cursor: pointer;
+    transition: all var(--transition-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+}
+
+.button-error:hover,
+.button-danger:hover,
+.button-cancel:hover {
+    background-color: #e01b24;
+    transform: translateY(-1px);
+    box-shadow:
+        0 4px 12px rgba(237, 51, 59, 0.4),
+        inset 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.button-error:active,
+.button-danger:active,
+.button-cancel:active {
+    background-color: #c01c28;
+    transform: translateY(0);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.button-error:focus-visible,
+.button-danger:focus-visible,
+.button-cancel:focus-visible {
+    box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.5);
+}
+
+.button-error:disabled,
+.button-error.disabled,
+.button-danger:disabled,
+.button-danger.disabled,
+.button-cancel:disabled,
+.button-cancel.disabled {
+    opacity: 0.45;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
 .base-input {

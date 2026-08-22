@@ -65,11 +65,36 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
 
         const inlineTemplate = this.template || options.template;
         const url = this.templateUrl || options.templateUrl;
+        const initialContent = this.innerHTML;
 
-        if (inlineTemplate && !this.innerHTML) {
-            this.innerHTML = inlineTemplate;
-        } else if (url && !this.innerHTML) {
-            await this.loadTemplate();
+        let templateToRender = inlineTemplate;
+
+        if (!templateToRender && url) {
+            if (templateCache.has(url)) {
+                templateToRender = templateCache.get(url)!;
+            } else {
+                try {
+                    const response = await fetch(url);
+                    templateToRender = await response.text();
+                    templateCache.set(url, templateToRender);
+                } catch (error) {
+                    console.error(`Failed to load template from ${url}`, error);
+                }
+            }
+        }
+
+        if (templateToRender) {
+            if (templateToRender.includes('<slot')) {
+                templateToRender = templateToRender.replace(
+                    /<slot\s*>\s*([\s\S]*?)\s*<\/slot>|<slot\s*\/>/gi,
+                    (_: string, fallback?: string) => {
+                        return initialContent && initialContent.trim().length > 0
+                            ? initialContent
+                            : (fallback || '');
+                    },
+                );
+            }
+            this.innerHTML = templateToRender;
         }
 
         // Ensure child view getters are bound
@@ -77,7 +102,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             for (const { propertyKey, selector } of this.__childViews) {
                 Object.defineProperty(this, propertyKey, {
                     get() {
-                        return this.querySelector?.(selector) ?? null;
+                        return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
                     },
                     enumerable: true,
                     configurable: true,
@@ -341,7 +366,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
                 propertyKeyOrContext.addInitializer(function (this: any) {
                     Object.defineProperty(this, propertyName, {
                         get() {
-                            return this.querySelector?.(selector) ?? null;
+                            return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
                         },
                         enumerable: true,
                         configurable: true,
@@ -351,7 +376,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
             return function (this: any, initialValue: any) {
                 Object.defineProperty(this, propertyName, {
                     get() {
-                        return this.querySelector?.(selector) ?? null;
+                        return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
                     },
                     enumerable: true,
                     configurable: true,
@@ -369,7 +394,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
 
         Object.defineProperty(target, propertyKey, {
             get(this: any) {
-                return this.querySelector?.(selector) ?? null;
+                return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
             },
             set(_value: any) {
                 // allow property override

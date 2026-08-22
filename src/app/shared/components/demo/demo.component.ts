@@ -10,10 +10,12 @@ import '../custom/custom.component';
 import '../raw-template/raw-template.component';
 import '../forms-validation/forms-validation.component';
 import '../directive-sample/directive-sample.component';
+import '../modal/modal-view.component';
 import '../../validators/forms-validation.validator';
 import type { CustomComponent } from '../custom/custom.component';
 import type { RawTemplateComponent } from '../raw-template/raw-template.component';
 import type { FormsValidationComponent } from '../forms-validation/forms-validation.component';
+import type { ModalViewComponent } from '../modal/modal-view.component';
 import { drag } from '../../behaviors/draggable/draggable';
 import { droppable } from '../../behaviors/droppable/droppable';
 
@@ -36,6 +38,9 @@ export class DemoComponent {
 
     @ViewChild('#forms-validation')
     formsValidation?: FormsValidationComponent | null;
+
+    @ViewChild('#demo-modal')
+    modalView?: ModalViewComponent | null;
 
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };
@@ -109,6 +114,11 @@ export class DemoComponent {
     onLogout() {
         this.dataService.logout();
         this.loggedUser.set(null);
+    }
+
+    onOpenModal() {
+        const modal = this.modalView || (document.querySelector('modal-view') as any) || (window as any).modal;
+        modal?.open({ title: 'Purity Modal Dialog Showcase' });
     }
 
     setDefaultLogin() {

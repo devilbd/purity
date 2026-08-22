@@ -59,7 +59,7 @@ purity/
                 ├── forms-validation/ # <forms-validation> sample form component with submit validation
                 ├── header/      # <header-component> navigation bar with logo
                 ├── intro/       # <intro-component> framework overview & code samples
-                ├── modal/       # Modal dialog components
+                ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
                 └── raw-template/# <raw-template> dynamic inline template rendering
 ```
 

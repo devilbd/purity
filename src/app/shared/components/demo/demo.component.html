@@ -17,7 +17,7 @@
             Login
         </button>
         <button
-            class="button-primary logout-btn"
+            class="button-cancel logout-btn"
             onclick="demo.onLogout(this)"
         >
             Logout
@@ -27,6 +27,12 @@
             onclick="demo.setDefaultLogin(this)"
         >
             Set explicitly value on login input
+        </button>
+        <button
+            class="button-primary modal-open-btn"
+            onclick="demo.onOpenModal(this)"
+        >
+            🪟 Open Modal Dialog
         </button>
     </div>
 
@@ -44,5 +50,13 @@
 
     <forms-validation id="forms-validation"></forms-validation>
 
-    <directive-sample></directive-sample>        
+    <directive-sample></directive-sample>
+
+    <modal-view id="demo-modal">
+        <div class="custom-modal-body">
+            <h4>📦 Custom Projected Modal Content</h4>
+            <p>This template and child components were passed directly into the <code>&lt;modal-view&gt;</code> body via <code>&lt;slot&gt;</code> content projection!</p>
+            <custom-component id="modal-custom-component" name="modalCustom"></custom-component>
+        </div>
+    </modal-view>
 </div>

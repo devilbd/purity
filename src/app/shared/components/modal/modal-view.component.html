@@ -1,0 +1,56 @@
+<div
+    class="modal-backdrop {{isOpen() ? 'is-open' : 'is-closed'}} {{isMaximized() ? 'is-maximized' : ''}}"
+    onclick="modal.onBackdropClick(event)"
+>
+    <div class="modal-dialog window" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-title-area">
+                <span class="modal-icon">🪟</span>
+                <h3 class="modal-title">{{title()}}</h3>
+            </div>
+            <div class="modal-controls">
+                <button
+                    type="button"
+                    class="modal-control-btn maximize-btn"
+                    title="{{isMaximized() ? 'Restore' : 'Maximize'}}"
+                    onclick="modal.maximize()"
+                >
+                    {{isMaximized() ? '🗗' : '🗖'}}
+                </button>
+                <button
+                    type="button"
+                    class="modal-control-btn close-btn"
+                    title="Close"
+                    onclick="modal.close()"
+                >
+                    ✕
+                </button>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <div class="modal-content-area">
+                <slot>
+                    <p>Welcome to the <strong>Purity Modal Dialog Component</strong>.</p>
+                    <p>
+                        This modal is managed reactively via Purity signals and automatically prepended to
+                        <code>document.body</code> with <code>z-index: 1000</code> to seamlessly overlay the entire application.
+                    </p>
+                    <div class="modal-info-card">
+                        <div><strong>Status:</strong> <span class="status-pill is-active">Active</span></div>
+                        <div><strong>Maximized:</strong> {{isMaximized() ? 'Yes' : 'No'}}</div>
+                    </div>
+                </slot>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="button-cancel" onclick="modal.close()">
+                Cancel
+            </button>
+            <button type="button" class="button-primary" onclick="modal.close()">
+                Done
+            </button>
+        </div>
+    </div>
+</div>
