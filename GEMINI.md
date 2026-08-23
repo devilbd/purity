@@ -69,6 +69,7 @@ purity/
                 ├── intro/       # <intro-component> framework overview & code samples
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
                 ├── pipe-sample/ # <pipe-sample> demonstrating handlebars pipe transformations
+                ├── playground/  # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
                 └── raw-template/# <raw-template> dynamic inline template rendering
 ```
 

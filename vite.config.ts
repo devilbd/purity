@@ -1,5 +1,6 @@
 import { defineConfig, type Plugin } from 'vite';
 import path from 'path';
+import fs from 'fs';
 
 /**
  * Vite plugin to transpile class decorators into standard ES expressions for browsers
@@ -18,37 +19,52 @@ function decoratorsPlugin(): Plugin {
             const rawImports: string[] = [];
             let tplCounter = 0;
 
-            // Automatically inline component templates for instant synchronous mounting
-            let processedCode = code.replace(
-                /@Component\s*\(\s*\{([\s\S]*?)\}\s*\)/g,
-                (match, inner) => {
-                    const urlMatch = inner.match(/templateUrl\s*:\s*['"]([^'"]+)['"]/);
+            // 1. Mask string literals (template literals, single/double quoted strings)
+            // to prevent matching decorators inside code sample strings or regexes
+            const stringLiterals: string[] = [];
+            const placeholderCode = code.replace(
+                /(`(?:\\`|[\s\S])*?`|"(?:\\"|[^"\n\r])*"|'(?:\\'|[^'\n\r])*')/g,
+                (match) => {
+                    const placeholder = `__PURITY_MASKED_STR_${stringLiterals.length}__`;
+                    stringLiterals.push(match);
+                    return placeholder;
+                },
+            );
+
+            // 2. Automatically inline component templates for instant synchronous mounting
+            let processedCode = placeholderCode.replace(
+                /@Component\s*\(\s*\{([\s\S]*?)\}\s*\)\s*(?:\r?\n\s*)?(export\s+class|class)\s+([a-zA-Z0-9_$]+)/g,
+                (match, inner, classKeyword, className) => {
+                    // Temporarily unmask strings inside component config to extract templateUrl
+                    const unmaskedInner = inner.replace(
+                        /__PURITY_MASKED_STR_(\d+)__/g,
+                        (_: string, idx: string) => stringLiterals[Number(idx)],
+                    );
+                    const urlMatch = unmaskedInner.match(/templateUrl\s*:\s*['"]([^'"]+)['"]/);
                     if (urlMatch) {
                         const url = urlMatch[1];
                         const fileDir = path.dirname(id);
-                        let importPath = url;
-                        if (url.startsWith('./src/')) {
-                            const absTarget = path.resolve(process.cwd(), url);
+                        const absTarget = url.startsWith('./src/')
+                            ? path.resolve(process.cwd(), url)
+                            : path.resolve(fileDir, url);
+
+                        if (fs.existsSync(absTarget)) {
                             let rel = path.relative(fileDir, absTarget);
                             if (!rel.startsWith('.')) rel = './' + rel;
-                            importPath = rel;
+                            const varName = '__purity_tpl_' + (tplCounter++);
+                            rawImports.push(`import ${varName} from '${rel}?raw';`);
+                            const newInner = inner.replace(
+                                /templateUrl\s*:\s*__PURITY_MASKED_STR_\d+__/,
+                                `templateUrl: '${url}', template: ${varName}`,
+                            );
+                            return `@Component({${newInner}})\n${classKeyword} ${className}`;
                         }
-                        const varName = '__purity_tpl_' + (tplCounter++);
-                        rawImports.push(`import ${varName} from '${importPath}?raw';`);
-                        const newInner = inner.replace(
-                            urlMatch[0],
-                            `templateUrl: '${url}', template: ${varName}`,
-                        );
-                        return `@Component({${newInner}})`;
                     }
                     return match;
                 },
             );
 
-            // Match patterns like:
-            // @Decorator(...) export class Foo
-            // export @Decorator(...) class Foo
-            // @Decorator(...) class Foo
+            // 3. Match real class decorators
             const transformed = processedCode.replace(
                 /(?:@([a-zA-Z0-9_$]+(?:\([^)]*\))?)\s*(?:\r?\n\s*)?export\s+class\s+([a-zA-Z0-9_$]+)|export\s+@([a-zA-Z0-9_$]+(?:\([^)]*\))?)\s*(?:\r?\n\s*)?class\s+([a-zA-Z0-9_$]+)|@([a-zA-Z0-9_$]+(?:\([^)]*\))?)\s*(?:\r?\n\s*)?class\s+([a-zA-Z0-9_$]+))/g,
                 (match, d1, c1, d2, c2, d3, c3) => {
@@ -70,8 +86,16 @@ function decoratorsPlugin(): Plugin {
             if (!modified && rawImports.length === 0) return null;
 
             const prefix = rawImports.length > 0 ? rawImports.join('\n') + '\n' : '';
+            const rawCombined = `${prefix}${transformed}\n${statementsToAppend.join('\n')}\n`;
+
+            // 4. Restore all masked string literals across the entire code output
+            const finalCode = rawCombined.replace(
+                /__PURITY_MASKED_STR_(\d+)__/g,
+                (_, idx) => stringLiterals[Number(idx)],
+            );
+
             return {
-                code: `${prefix}${transformed}\n${statementsToAppend.join('\n')}\n`,
+                code: finalCode,
                 map: null,
             };
         },

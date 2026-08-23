@@ -1,0 +1,125 @@
+<div class="playground-container window">
+    <!-- Playground Top Header Bar -->
+    <div class="playground-header-bar">
+        <div class="playground-title-group">
+            <span class="header-icon">🎮</span>
+            <div class="playground-title">
+                <strong>Purity Playground</strong>
+                <span class="version-tag">Palenight Edition</span>
+            </div>
+        </div>
+
+        <div class="preset-selector-group">
+            <label for="preset-select">Preset:</label>
+            <select
+                id="preset-select"
+                class="preset-select"
+                onchange="playground.onPresetSelect(this.value)"
+            >
+                <option value="counter" selected>⚡ Reactive Signals & Counter</option>
+                <option value="pipes">🔀 Handlebars Transform Pipes</option>
+                <option value="array-loop">🔁 Structural Array Repeater</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Main Two-Column Split Layout -->
+    <div class="playground-split-body">
+        <!-- LEFT COLUMN: Editor Pane (GNOME 50 / Palenight) -->
+        <div class="playground-editor-pane">
+            <div class="editor-tabs-bar">
+                <div class="tabs-list">
+                    <button
+                        type="button"
+                        class="editor-tab {{activeTab() === 'ts' ? 'active' : ''}}"
+                        onclick="playground.setTab('ts')"
+                    >
+                        <span class="tab-icon ts-icon">TS</span>
+                        app.component.ts
+                    </button>
+                    <button
+                        type="button"
+                        class="editor-tab {{activeTab() === 'html' ? 'active' : ''}}"
+                        onclick="playground.setTab('html')"
+                    >
+                        <span class="tab-icon html-icon">&lt;&gt;</span>
+                        template.html
+                    </button>
+                    <button
+                        type="button"
+                        class="editor-tab {{activeTab() === 'scss' ? 'active' : ''}}"
+                        onclick="playground.setTab('scss')"
+                    >
+                        <span class="tab-icon scss-icon">#</span>
+                        style.scss
+                    </button>
+                </div>
+
+                <div class="editor-actions">
+                    <button
+                        type="button"
+                        class="action-btn copy-btn"
+                        title="Copy active code"
+                        onclick="playground.copyCode()"
+                    >
+                        📋 Copy
+                    </button>
+                </div>
+            </div>
+
+            <!-- Code Editor Area with Line Numbers and Real-Time Syntax Highlighting -->
+            <div class="editor-workspace">
+                <div class="line-numbers" aria-hidden="true">
+                    <div for="let num of lineNumbers" class="line-num">{{num}}</div>
+                </div>
+                <div class="editor-layer-container">
+                    <pre class="highlight-layer" aria-hidden="true"><code id="highlight-code" class="language-{{activeTab()}}"></code></pre>
+                    <textarea
+                        class="code-textarea"
+                        value="{{currentCode}}"
+                        spellcheck="false"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        onkeydown="playground.onKeyDown(event, this)"
+                        oninput="playground.onCodeChange(this.value)"
+                        onscroll="playground.onScroll(this)"
+                    ></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Live Result Preview Pane -->
+        <div class="playground-preview-pane">
+            <div class="preview-browser-header">
+                <div class="preview-title">
+                    <span>🖥️ Live Preview</span>
+                </div>
+                <div class="preview-actions">
+                    <span class="status-badge {{isError() ? 'status-error' : 'status-live'}}">
+                        {{statusMessage()}}
+                    </span>
+                    <button
+                        type="button"
+                        class="action-btn run-btn"
+                        title="Recompile & Run"
+                        onclick="playground.runCompile()"
+                    >
+                        ↻ Run
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div class="error-banner {{isError() ? 'visible' : ''}}">
+                <strong>⚠ Compilation Error:</strong>
+                <span>{{errorMessage()}}</span>
+            </div>
+
+            <!-- Live Output Canvas -->
+            <div id="playground-preview-canvas" class="preview-canvas">
+                <!-- Live Custom Element mounts here dynamically -->
+            </div>
+        </div>
+    </div>
+</div>

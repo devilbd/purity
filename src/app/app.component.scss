@@ -1,5 +1,11 @@
 @use '../style.scss' as *;
 
+playground-view {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 demo-component {
     &.demo-hidden {
         display: none !important;

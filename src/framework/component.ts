@@ -354,7 +354,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     if (attrName === 'class') {
                         el.className = replaced.trim();
                     } else {
-                        if (el instanceof HTMLInputElement && attrName === 'value') {
+                        if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && attrName === 'value') {
                             el.value = replaced;
                         }
                         el.setAttribute(attrName, replaced);

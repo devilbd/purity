@@ -6,8 +6,10 @@ import {
 import './app.component.scss';
 import './shared/components/intro/intro.component';
 import './shared/components/header/header.component';
+import './shared/components/playground/playground.component';
 import './shared/components/demo/demo.component';
 import type { DemoComponent } from './shared/components/demo/demo.component';
+import type { PlaygroundComponent } from './shared/components/playground/playground.component';
 
 @Component({
     selector: 'app-component',
@@ -18,6 +20,9 @@ export class AppComponent {
 
     @ViewChild('#demo-window')
     demoComponent?: (DemoComponent & HTMLElement) | null;
+
+    @ViewChild('#playground-window')
+    playgroundComponent?: (PlaygroundComponent & HTMLElement) | null;
 
     get demoVisibilityClass(): string {
         return this.showDemo() ? 'demo-visible' : 'demo-hidden';
@@ -32,6 +37,10 @@ export class AppComponent {
         setTimeout(() => {
             this.demoComponent?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 50);
+    }
+
+    onGoToPlayground() {
+        this.playgroundComponent?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     toggleDemo() {
