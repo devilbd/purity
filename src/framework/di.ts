@@ -31,6 +31,13 @@ class DependencyContainer {
     }
 
     /**
+     * Registers a pre-existing value or instance under a specific token.
+     */
+    registerValue<T>(token: Token<T>, value: T): void {
+        this.instances.set(token, value);
+    }
+
+    /**
      * Resolves and returns an instance of the requested service.
      */
     resolve<T>(token: Token<T>): T {
@@ -136,4 +143,11 @@ export const Service = Injectable;
  */
 export function inject<T>(token: Token<T>): T {
     return container.resolve<T>(token);
+}
+
+/**
+ * Registers an existing value or instance in the DI container.
+ */
+export function registerValue<T>(token: Token<T>, value: T): void {
+    container.registerValue(token, value);
 }

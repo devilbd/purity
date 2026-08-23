@@ -36,7 +36,7 @@
 - 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
-- 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
+- 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
 - 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and single-command deployment (`npm run deploy`).
 
@@ -58,9 +58,11 @@ npm install
 |---|---|
 | `npm run dev` | Starts the Vite development server with Hot Module Replacement (HMR) |
 | `npm run build` | Runs TypeScript type checks (`tsc`) and builds the production bundle with Vite |
+| `npm run build:dev` | Builds the application using development environment profile |
+| `npm run build:prod` | Builds the application using production environment profile |
 | `npm run preview` | Serves the production build locally for testing |
-| `npm run deploy` | Builds the app and deploys to Firebase Hosting |
-| `npm run deploy:hosting` | Builds the app and deploys only to Firebase Hosting |
+| `npm run deploy` | Builds production bundle and deploys to Firebase Hosting |
+| `npm run deploy:hosting` | Builds production bundle and deploys only to Firebase Hosting |
 
 ---
 
@@ -80,16 +82,21 @@ purity/
 ├── README.md                    # Project documentation (this file)
 ├── GEMINI.md                    # Agent context & architecture reference
 └── src/
-    ├── main.ts                  # Application entry point (registers root components)
+    ├── main.ts                  # Application entry point (bootstraps root component)
     ├── style.scss               # Global styles (GNOME Adwaita design system)
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
     │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
+    │   ├── bootstrap.ts         # bootstrapApplication entry, providers, and environment tokens
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
+    ├── environments/            # Build configuration & environment profiles
+    │   ├── environment.interface.ts # Environment configuration contract
+    │   ├── environment.ts       # Development environment (default)
+    │   └── environment.prod.ts  # Production environment (swapped on build)
     ├── data/                    # Data services & Firebase configuration
     │   ├── data.service.ts      # Service layer
     │   └── firebase.ts          # Firebase config & service
@@ -313,9 +320,36 @@ const dragCleanup = drag({
 
 ---
 
+### 7. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
+
+Purity provides a clean `bootstrapApplication()` initialization API that binds environment profiles, registers custom service providers, and mounts root Web Components:
+
+```typescript
+import { bootstrapApplication } from '@purity/core';
+import { AppComponent } from './app/app.component';
+import { environment } from './environments/environment';
+
+bootstrapApplication(AppComponent, {
+    environment,
+    providers: [
+        // Custom providers or singleton services
+    ],
+}).catch((err) => {
+    console.error('Failed to bootstrap Purity application:', err);
+});
+```
+
+#### Environment Configuration Files
+
+- `src/environments/environment.ts`: Default development profile (`production: false`, debug diagnostics enabled).
+- `src/environments/environment.prod.ts`: Production profile (`production: true`).
+- Swapped automatically at build time by Vite depending on `--mode production` (`npm run build:prod`) or `--mode development` (`npm run build:dev`).
+
+---
+
 ## 🧩 UI Web Components, Templating & Views
 
-### 7. 🧩 Native Web Components (`@Component` Decorator)
+### 8. 🧩 Native Web Components (`@Component` Decorator)
 
 Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
 
@@ -350,7 +384,7 @@ export class CustomComponent {
 
 ---
 
-### 8. 🔍 Child View & Component Queries (`@ViewChild`)
+### 9. 🔍 Child View & Component Queries (`@ViewChild`)
 
 Use the `@ViewChild(selector)` decorator to query child DOM elements and child components with fallback resolution for teleported or body-prepended elements:
 
@@ -381,7 +415,7 @@ export class DemoComponent {
 
 ---
 
-### 9. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
+### 10. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
 Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change:
 
@@ -415,7 +449,7 @@ export class UserCardComponent {
 
 ---
 
-### 10. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+### 11. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
 
 Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
 
@@ -459,7 +493,7 @@ export class TeamListComponent {
 
 ---
 
-### 11. 📦 Generic Components & Content Projection (`<slot>`)
+### 12. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -485,7 +519,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 12. 🪟 Modal Dialogs (`<modal-view>`)
+### 13. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 

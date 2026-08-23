@@ -1,4 +1,5 @@
 import { Injectable } from '@purity/core';
+import { environment } from '../environments/environment';
 
 export interface FirebaseConfig {
     apiKey: string;
@@ -10,7 +11,7 @@ export interface FirebaseConfig {
     measurementId?: string;
 }
 
-export const firebaseConfig: FirebaseConfig = {
+export const firebaseConfig: FirebaseConfig = environment.firebase || {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '',
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || '',

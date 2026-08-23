@@ -35,10 +35,15 @@ purity/
     │   ├── core.ts              # Signals, effects, DOM helpers, and module re-exports
     │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
+    │   ├── bootstrap.ts         # bootstrapApplication entry, providers, and environment tokens
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   └── common.ts            # Shared framework exports
+    ├── environments/            # Build configuration & environment profiles
+    │   ├── environment.interface.ts # Environment configuration contract
+    │   ├── environment.ts       # Development environment (default)
+    │   └── environment.prod.ts  # Production environment (swapped on build)
     ├── data/                    # Data services and state management
     │   ├── data.service.ts      # Service layer
     │   └── firebase.ts          # Firebase configuration and service
@@ -280,6 +285,36 @@ Form Validators decouple validation rules and CSS class application from UI comp
       }
   }
   ```
+
+### 8. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
+
+Purity provides a first-class bootstrapping API that initializes root components, binds environment configurations into DI, registers custom providers, and manages application lifecycles:
+
+* **`bootstrapApplication(rootComponent, options?: BootstrapOptions)`**:
+  - Registers the active environment configuration under the `'ENVIRONMENT'` token.
+  - Automatically queries and mounts the root custom element.
+  - Exposes debug tools on `(window as any).__PURITY_APP__` in development mode.
+  - Returns a Promise resolving to `ApplicationRef` with `.destroy()`, `.rootElement`, and `.environment`.
+
+  ```typescript
+  import { bootstrapApplication } from '@purity/core';
+  import { AppComponent } from './app/app.component';
+  import { environment } from './environments/environment';
+
+  bootstrapApplication(AppComponent, {
+      environment,
+      providers: [
+          // Custom providers or singleton services
+      ],
+  }).catch((err) => {
+      console.error('Failed to bootstrap Purity application:', err);
+  });
+  ```
+
+* **Environment Swapping for Different Builds**:
+  - `src/environments/environment.ts` for development (`production: false`, debug logging enabled).
+  - `src/environments/environment.prod.ts` for production builds (`production: true`).
+  - Swapped automatically at compile/build time via Vite depending on `--mode production` (`npm run build:prod`) or `--mode development` (`npm run build:dev`).
 
 ---
 

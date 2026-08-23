@@ -78,12 +78,39 @@ function decoratorsPlugin(): Plugin {
     };
 }
 
-export default defineConfig({
-    plugins: [decoratorsPlugin()],
-    resolve: {
-        alias: {
-            '@purity/core': path.resolve(import.meta.dirname, 'src/framework/core.ts'),
-            '@purity': path.resolve(import.meta.dirname, 'src/framework'),
+function environmentPlugin(isProd: boolean): Plugin {
+    return {
+        name: 'purity-environment-plugin',
+        enforce: 'pre',
+        resolveId(source, importer) {
+            if (
+                isProd &&
+                (source.endsWith('environments/environment') ||
+                    source.endsWith('environments/environment.ts') ||
+                    source === './environments/environment' ||
+                    source === '../environments/environment')
+            ) {
+                return path.resolve(
+                    import.meta.dirname,
+                    'src/environments/environment.prod.ts',
+                );
+            }
+            return null;
         },
-    },
+    };
+}
+
+export default defineConfig(({ mode }) => {
+    const isProd = mode === 'production';
+
+    return {
+        plugins: [decoratorsPlugin(), environmentPlugin(isProd)],
+        resolve: {
+            alias: {
+                '@purity/core': path.resolve(import.meta.dirname, 'src/framework/core.ts'),
+                '@purity': path.resolve(import.meta.dirname, 'src/framework'),
+                '@environments': path.resolve(import.meta.dirname, 'src/environments'),
+            },
+        },
+    };
 });
