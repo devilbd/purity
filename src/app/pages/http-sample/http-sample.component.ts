@@ -1,4 +1,5 @@
-import { Component, signal, inject, HttpClient } from '@purity/core';
+import { Component, signal, inject, ViewChild, HttpClient } from '@purity/core';
+import type { LoaderComponent } from '@components/loader/loader.component';
 import './http-sample.component.scss';
 
 export interface PostItem {
@@ -14,6 +15,9 @@ export interface PostItem {
 })
 export class HttpSampleComponent {
     private http = inject(HttpClient);
+
+    @ViewChild('#http-loader')
+    public httpLoader?: LoaderComponent | null;
 
     // Reactive State Signals
     public requestMethod = signal<string>('GET');
@@ -84,6 +88,8 @@ export class HttpSampleComponent {
         this.responseBody.set('Loading response...');
         this.responseHeaders.set('Loading headers...');
 
+        this.httpLoader?.show();
+
         try {
             const res = await action();
             this.responseStatus.set(`${res.status} ${res.statusText || 'OK'}`);
@@ -115,6 +121,7 @@ export class HttpSampleComponent {
             );
         } finally {
             this.isRequestLoading.set(false);
+            this.httpLoader?.hide();
         }
     }
 }

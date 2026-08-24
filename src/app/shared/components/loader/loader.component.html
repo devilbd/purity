@@ -1,0 +1,9 @@
+<div class="loader-inline-root {{isLoading() ? 'visible' : ''}}" aria-hidden="{{!isLoading()}}">
+    <div class="loader-spinner-box">
+        <svg class="loader-svg" viewBox="0 0 50 50" aria-label="Loading">
+            <circle class="loader-track" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+            <circle class="loader-head" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+        </svg>
+    </div>
+    <span class="loader-text">{{message()}}</span>
+</div>

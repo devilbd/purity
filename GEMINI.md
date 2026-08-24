@@ -91,6 +91,7 @@ purity/
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # Reusable UI Web Components
                 ├── date-time-picker/ # <date-time-picker> reactive date & time picker component with body teleportation
+                ├── loader/      # <loader-component> reactive HTTP request loader with glassmorphism & show/hide methods
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
                 └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
 ```

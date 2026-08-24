@@ -128,7 +128,7 @@ purity/
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # Reusable UI Web Components (modal, date-time-picker, radial-context-menu)
+            └── components/      # Reusable UI Web Components (modal, loader, date-time-picker, radial-context-menu)
 ```
 
 ---

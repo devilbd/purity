@@ -17,6 +17,7 @@ import '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import '@pages/http-sample/http-sample.component';
 import '@components/modal/modal-view.component';
 import '@components/date-time-picker/date-time-picker.component';
+import '@components/loader/loader.component';
 import '@validators/forms-validation.validator';
 import '@pipes/transform-sample.pipe';
 import '@pipes/uppercase.pipe';
@@ -27,6 +28,7 @@ import type { FormsValidationComponent } from '@pages/forms-validation/forms-val
 import type { PipeSampleComponent } from '@pages/pipe-sample/pipe-sample.component';
 import type { ForSampleComponent } from '@pages/for-sample/for-sample.component';
 import type { ModalViewComponent } from '@components/modal/modal-view.component';
+import type { LoaderComponent } from '@components/loader/loader.component';
 import type { DateTimePickerSampleComponent } from '@pages/date-time-picker-sample/date-time-picker-sample.component';
 import type { RadialContextMenuSampleComponent } from '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import { drag } from '@behaviors/draggable/draggable';
@@ -66,6 +68,9 @@ export class DemoComponent {
 
     @ViewChild('#demo-modal')
     modalView?: ModalViewComponent | null;
+
+    @ViewChild('#app-loader')
+    loader?: LoaderComponent | null;
 
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };
