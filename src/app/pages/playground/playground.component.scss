@@ -28,6 +28,7 @@
     box-sizing: border-box;
     width: auto;
     max-width: 100%;
+    min-height: calc(100vh - 40px);
     margin: var(--spacing-lg, 10px) !important;
     padding: 0 !important;
     background: var(--pn-bg);
@@ -113,7 +114,8 @@
     .playground-split-body {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        min-height: 500px;
+        flex: 1;
+        min-height: calc(100vh - 110px);
         background: var(--pn-bg-dark);
         width: 100%;
         max-width: 100%;
@@ -121,6 +123,7 @@
 
         @media (max-width: 900px) {
             grid-template-columns: minmax(0, 1fr);
+            min-height: auto;
         }
     }
 
@@ -233,7 +236,11 @@
             flex: 1;
             position: relative;
             background: var(--pn-bg);
-            min-height: 440px;
+            min-height: calc(100vh - 160px);
+
+            @media (max-width: 900px) {
+                min-height: 480px;
+            }
 
             .line-numbers {
                 padding: 16px 10px 16px 14px;
@@ -470,12 +477,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 440px;
+            min-height: calc(100vh - 160px);
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
             scrollbar-color: var(--pn-bg-active) var(--pn-bg-dark);
             background: radial-gradient(circle at center, #232635 0%, #161821 100%);
+
+            @media (max-width: 900px) {
+                min-height: 480px;
+            }
 
             &::-webkit-scrollbar {
                 width: 6px;
