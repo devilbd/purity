@@ -56,67 +56,96 @@ export class DateTimePickerComponent {
     public onDateSelected?: (date: Date) => void;
 
     private _hostEl?: HTMLElement;
+    private _overlayEl?: HTMLElement;
+    private _openedAt = 0;
+    private _boundDocClick?: (e: MouseEvent) => void;
+    private _boundKeydown?: (e: KeyboardEvent) => void;
+    private _boundResize?: () => void;
+    private _boundScroll?: () => void;
 
     private getHost(): HTMLElement | null {
-        if (this._hostEl && typeof this._hostEl.querySelector === 'function') {
-            return this._hostEl;
+        if (this._hostEl) return this._hostEl;
+        const self = this as unknown as HTMLElement;
+        if (self && typeof self.querySelector === 'function') {
+            return self;
         }
-        if (this && typeof (this as any).querySelector === 'function') {
-            return this as unknown as HTMLElement;
-        }
-        return document.querySelector('date-time-picker') as HTMLElement | null;
+        return null;
     }
 
-    private onDocumentClick = (event: MouseEvent) => {
-        if (!this.isOpen()) return;
-        const host = this.getHost();
-        if (!host) return;
-
-        const path = event.composedPath ? event.composedPath() : [];
-        if (path.includes(host)) {
-            return;
-        }
-
-        const target = event.target as Node | null;
-        if (target && typeof host.contains === 'function' && host.contains(target)) {
-            return;
-        }
-
-        this.close();
-    };
-
-    private onKeydown = (event: KeyboardEvent) => {
-        if (event.key === 'Escape' && this.isOpen()) {
-            this.close();
-        }
-    };
-
-    private onWindowResize = () => {
-        if (this.isOpen()) {
-            this.updateOverlayPosition();
-        }
-    };
-
-    private onWindowScroll = () => {
-        if (this.isOpen()) {
-            this.updateOverlayPosition();
-        }
-    };
-
     protected onInit(): void {
-        this._hostEl = this as unknown as HTMLElement;
+        const host = this as unknown as HTMLElement;
+        this._hostEl = host;
+        (host as any)._picker = this;
         this.initWorkingState();
-        document.addEventListener('click', this.onDocumentClick);
-        window.addEventListener('keydown', this.onKeydown);
-        window.addEventListener('resize', this.onWindowResize);
-        window.addEventListener('scroll', this.onWindowScroll, true);
+
+        // Move the dropdown overlay element directly to document.body so it sits
+        // above all other stacking contexts, cards, and windows at z-index: 9999
+        setTimeout(() => {
+            const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
+            if (overlay && overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
+                this._overlayEl = overlay;
+                (overlay as any)._picker = this;
+            }
+        }, 0);
+
+        this._boundDocClick = (event: MouseEvent) => {
+            if (!this.isOpen()) return;
+            if (Date.now() - this._openedAt < 150) return;
+
+            const path = event.composedPath ? event.composedPath() : [];
+            if (host && path.includes(host)) {
+                return;
+            }
+            if (this._overlayEl && path.includes(this._overlayEl)) {
+                return;
+            }
+
+            const target = event.target as Node | null;
+            if (host && target && typeof host.contains === 'function' && host.contains(target)) {
+                return;
+            }
+            if (this._overlayEl && target && typeof this._overlayEl.contains === 'function' && this._overlayEl.contains(target)) {
+                return;
+            }
+
+            this.close();
+        };
+
+        this._boundKeydown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape' && this.isOpen()) {
+                this.close();
+            }
+        };
+
+        this._boundResize = () => {
+            if (this.isOpen()) {
+                this.updateOverlayPosition();
+            }
+        };
+
+        this._boundScroll = () => {
+            if (this.isOpen()) {
+                this.updateOverlayPosition();
+            }
+        };
+
+        document.addEventListener('click', this._boundDocClick);
+        window.addEventListener('keydown', this._boundKeydown);
+        window.addEventListener('resize', this._boundResize);
+        window.addEventListener('scroll', this._boundScroll, true);
     }
 
     public onDestroy(): void {
-        document.removeEventListener('click', this.onDocumentClick);
-        window.removeEventListener('keydown', this.onKeydown);
-        window.removeEventListener('resize', this.onWindowResize);
-        window.removeEventListener('scroll', this.onWindowScroll, true);
+        if (this._boundDocClick) document.removeEventListener('click', this._boundDocClick);
+        if (this._boundKeydown) window.removeEventListener('keydown', this._boundKeydown);
+        if (this._boundResize) window.removeEventListener('resize', this._boundResize);
+        if (this._boundScroll) window.removeEventListener('scroll', this._boundScroll, true);
+
+        if (this._overlayEl && this._overlayEl.parentNode) {
+            this._overlayEl.parentNode.removeChild(this._overlayEl);
+            this._overlayEl = undefined;
+        }
     }
 
     public disconnectedCallback(): void {
@@ -318,54 +347,73 @@ export class DateTimePickerComponent {
     }
 
     public updateOverlayPosition(): void {
-        const host = this as unknown as HTMLElement;
-        if (!host) return;
-
-        const toggleBtn = host.querySelector('.picker-toggle') as HTMLElement | null;
-        if (!toggleBtn) return;
+        const host = this.getHost();
+        const overlay = this._overlayEl || (host?.querySelector?.('.picker-overlay') as HTMLElement | null);
+        const toggleBtn = host?.querySelector?.('.picker-toggle') as HTMLElement | null;
+        if (!overlay || !toggleBtn) return;
 
         const btnRect = toggleBtn.getBoundingClientRect();
-        const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
-        const overlayHeight = overlay && overlay.offsetHeight > 0 ? overlay.offsetHeight : 380;
-        const overlayWidth = overlay && overlay.offsetWidth > 0 ? overlay.offsetWidth : 280;
+        const overlayHeight = overlay.offsetHeight > 0 ? overlay.offsetHeight : 390;
+        const overlayWidth = overlay.offsetWidth > 0 ? overlay.offsetWidth : 290;
 
         const spaceBelow = window.innerHeight - btnRect.bottom;
         const spaceAbove = btnRect.top;
 
-        // If not enough room below and more space above, flip to top
+        // Vertical placement (flip to top if cramped below)
+        let top: number;
         if (spaceBelow < overlayHeight + 12 && spaceAbove > spaceBelow) {
+            top = Math.max(12, btnRect.top - overlayHeight - 6);
             this.placement.set('placement-top');
         } else {
+            top = Math.min(window.innerHeight - overlayHeight - 12, btnRect.bottom + 6);
             this.placement.set('placement-bottom');
         }
 
-        // Horizontal alignment check
-        const spaceRight = window.innerWidth - btnRect.left;
-        if (spaceRight < overlayWidth + 12 && btnRect.right >= overlayWidth) {
+        // Horizontal placement (flip to right if cramped on right)
+        let left: number;
+        if (btnRect.left + overlayWidth > window.innerWidth - 12) {
+            left = Math.max(12, btnRect.right - overlayWidth);
             this.alignPlacement.set('align-right');
         } else {
+            left = Math.max(12, btnRect.left);
             this.alignPlacement.set('align-left');
         }
+
+        overlay.style.position = 'fixed';
+        overlay.style.top = `${Math.round(top)}px`;
+        overlay.style.left = `${Math.round(left)}px`;
+        overlay.style.zIndex = '9999';
     }
 
-    public togglePicker(): void {
+    public togglePicker(event?: MouseEvent): void {
+        event?.stopPropagation();
         if (!this.isOpen()) {
-            this.initWorkingState();
-            this.viewMode.set('calendar');
-            this.updateOverlayPosition();
-            this.isOpen.set(true);
-            setTimeout(() => this.updateOverlayPosition(), 0);
+            this.open();
         } else {
-            this.isOpen.set(false);
+            this.close();
         }
     }
 
     public open(): void {
+        const host = this.getHost();
+        if (!this._overlayEl && host) {
+            const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
+            if (overlay && overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
+                this._overlayEl = overlay;
+                (overlay as any)._picker = this;
+            }
+        }
+
+        this._openedAt = Date.now();
         this.initWorkingState();
         this.viewMode.set('calendar');
-        this.updateOverlayPosition();
         this.isOpen.set(true);
-        setTimeout(() => this.updateOverlayPosition(), 0);
+
+        requestAnimationFrame(() => {
+            this.updateOverlayPosition();
+        });
+        setTimeout(() => this.updateOverlayPosition(), 50);
     }
 
     public close(): void {
@@ -594,8 +642,8 @@ export class DateTimePickerComponent {
         const date = this.selectedDate();
         if (date) {
             this.onDateSelected?.(date);
-            const host = this as unknown as HTMLElement;
-            host.dispatchEvent?.(
+            const host = this.getHost();
+            host?.dispatchEvent?.(
                 new CustomEvent('date-selected', {
                     detail: { date },
                     bubbles: true,
