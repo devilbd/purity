@@ -63,6 +63,7 @@ purity/
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
+        │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> interactive showcase for radial menu
         │   └── raw-template/    # <raw-template> dynamic inline template rendering
         └── shared/
             ├── behaviors/       # Composable DOM behaviors
@@ -73,7 +74,8 @@ purity/
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # Reusable UI Web Components
                 ├── date-time-picker/ # <date-time-picker> reactive date & time picker component
-                └── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
+                ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
+                └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
 ```
 
 ---

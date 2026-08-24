@@ -37,6 +37,7 @@
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
 - 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita Dark aesthetic, featuring smart viewport auto-placement, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dynamic polygon pie slices, multi-level nested submenus, center button navigation, and viewport boundary detection.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
@@ -108,13 +109,13 @@ purity/
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, date-time-picker-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # Reusable UI Web Components (modal, date-time-picker)
+            └── components/      # Reusable UI Web Components (modal, date-time-picker, radial-context-menu)
 ```
 
 ---
@@ -610,6 +611,68 @@ export class BookingViewComponent {
                 // Subscribe to date selections
                 this.picker.onDateSelected = (date: Date) => {
                     this.selectedDate.set(date);
+                };
+            }
+        }, 0);
+    }
+}
+```
+
+---
+
+### 15. 🎯 Radial Context Menu System (`<radial-context-menu>`)
+
+Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita Dark styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, and configurable DOM selector triggers:
+
+* **Dynamic Pie Slices**: Automatically computes mathematical polygon clip paths (`innerDist = 26%`, `outerDist = 49.5%`) for any number of menu items.
+* **Multi-Level Navigation**: Push/pop navigation stack for nested `children` submenus with smooth zoom/fade animations.
+* **Viewport Boundaries**: Clamps menu coordinates so radial menus never overflow outside the viewport.
+* **Multiple Icon Representations**: Supports both Unicode Emojis and inlined/imported Lucide SVG vector icons (`home.svg`, `edit.svg`, `search.svg`, `settings.svg`, `share.svg`, `user.svg`) with dynamic theme color inheritance.
+* **Center Navigation**: Displays back arrow `←` during nested navigation, close `×` at root, and shows active hovered segment names in real time.
+
+```html
+<!-- Register radial context menu in template -->
+<radial-context-menu id="my-radial-menu"></radial-context-menu>
+
+<!-- Trigger zone -->
+<div class="interactive-zone">Right click here</div>
+```
+
+```typescript
+import { Component, signal, ViewChild } from '@purity/core';
+import type { RadialContextMenuComponent, MenuItem } from '@components/radial-context-menu/radial-context-menu.component';
+import '@components/radial-context-menu/radial-context-menu.component';
+
+const menuItems: MenuItem[] = [
+    {
+        name: 'Home',
+        image: '🏠',
+        children: [
+            { name: 'Dashboard', image: '📊' },
+            { name: 'Analytics', image: '📈' },
+        ],
+    },
+    { name: 'Edit', image: '✏️' },
+    { name: 'Delete', image: '🗑️' },
+];
+
+@Component({
+    selector: 'my-view',
+    templateUrl: './src/app/pages/my-view/my-view.component.html',
+})
+export class MyViewComponent {
+    @ViewChild('#my-radial-menu')
+    radialMenu?: RadialContextMenuComponent | null;
+
+    protected onInit() {
+        setTimeout(() => {
+            if (this.radialMenu) {
+                this.radialMenu.setItems(menuItems);
+                this.radialMenu.setSelector('.interactive-zone');
+                this.radialMenu.setBlur(true);
+
+                this.radialMenu.onSelectItem = (item: MenuItem) => {
+                    console.log('Selected action:', item.name);
                 };
             }
         }, 0);

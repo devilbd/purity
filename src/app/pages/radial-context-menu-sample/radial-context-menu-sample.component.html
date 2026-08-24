@@ -1,0 +1,161 @@
+<div class="window radial-context-menu-sample-root">
+    <div class="sample-header">
+        <h4>🎯 Radial Context Menu Showcase (<code>&lt;radial-context-menu&gt;</code>)</h4>
+        <span class="badge-pill">Web Component + Signals</span>
+    </div>
+    <p class="sample-desc">
+        Purity provides native circular radial context menus with glassmorphism GNOME 50 blur, dynamic mathematical polygon slices, multi-level submenus, and center button navigation. Below are both representation usages running simultaneously:
+    </p>
+
+    <div class="dual-sample-layout">
+        <!-- ================= VARIANT 1: EMOJI ICONS ================= -->
+        <div class="variant-card window">
+            <div class="variant-header">
+                <div class="variant-title-group">
+                    <span class="variant-icon">🎨</span>
+                    <div>
+                        <h5>Usage 1: Unicode Emoji Icons</h5>
+                        <p class="variant-subtitle">Classic emoji slices with multi-level nested menus</p>
+                    </div>
+                </div>
+                <span class="variant-pill emoji-pill">Emoji Variant</span>
+            </div>
+
+            <!-- Emoji Interactive Trigger Zone -->
+            <div
+                class="radial-interactive-zone emoji-interactive-zone"
+                title="Right-click inside this zone for Emoji menu"
+            >
+                <div class="zone-watermark">
+                    <span class="zone-icon">🏠</span>
+                    <h6>Emoji Context Zone</h6>
+                    <p class="zone-hint">
+                        <strong>Right-click</strong> here or click below to trigger the <strong>Emoji Radial Menu</strong>.
+                    </p>
+                    <div class="zone-actions">
+                        <button
+                            type="button"
+                            class="button-primary btn-sm"
+                            onclick="radialSample.openEmojiMenu(event)"
+                        >
+                            ⚡ Open Emoji Menu
+                        </button>
+                        <button
+                            type="button"
+                            class="button-secondary btn-sm"
+                            onclick="radialSample.toggleEmojiBlur(event)"
+                        >
+                            ✨ Blur ({{emojiBlur() ? 'ON' : 'OFF'}})
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emoji Telemetry -->
+            <div class="telemetry-card">
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">Status:</span>
+                        <code class="telemetry-value status-val">{{emojiMenuState()}}</code>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">Hovered:</span>
+                        <code class="telemetry-value hover-val">{{emojiHovered()}}</code>
+                    </div>
+                    <div class="telemetry-item full-width">
+                        <span class="telemetry-label">Last Selected:</span>
+                        <code class="telemetry-value action-val">{{emojiLastSelected()}}</code>
+                    </div>
+                </div>
+                <div class="hierarchy-summary">
+                    <span class="summary-label">Structure:</span>
+                    <div class="tags-cluster">
+                        <span class="tag-badge">🏠 Home</span>
+                        <span class="tag-badge">✏️ Edit</span>
+                        <span class="tag-badge">🗑️ Delete</span>
+                        <span class="tag-badge">🔗 Share</span>
+                        <span class="tag-badge">⚙️ Settings</span>
+                        <span class="tag-badge">👤 Profile</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= VARIANT 2: SVG VECTOR ICONS ================= -->
+        <div class="variant-card window">
+            <div class="variant-header">
+                <div class="variant-title-group">
+                    <span class="variant-icon">⚡</span>
+                    <div>
+                        <h5>Usage 2: Lucide SVG Vector Icons</h5>
+                        <p class="variant-subtitle">Vector assets from <code>src/app/assets/radial-context-menu/</code></p>
+                    </div>
+                </div>
+                <span class="variant-pill svg-pill">SVG Vector Variant</span>
+            </div>
+
+            <!-- SVG Interactive Trigger Zone -->
+            <div
+                class="radial-interactive-zone svg-interactive-zone"
+                title="Right-click inside this zone for SVG menu"
+            >
+                <div class="zone-watermark">
+                    <span class="zone-icon">⚡</span>
+                    <h6>SVG Vector Context Zone</h6>
+                    <p class="zone-hint">
+                        <strong>Right-click</strong> here or click below to trigger the <strong>SVG Vector Radial Menu</strong>.
+                    </p>
+                    <div class="zone-actions">
+                        <button
+                            type="button"
+                            class="button-primary btn-sm"
+                            onclick="radialSample.openSvgMenu(event)"
+                        >
+                            ⚡ Open SVG Menu
+                        </button>
+                        <button
+                            type="button"
+                            class="button-secondary btn-sm"
+                            onclick="radialSample.toggleSvgBlur(event)"
+                        >
+                            ✨ Blur ({{svgBlur() ? 'ON' : 'OFF'}})
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG Telemetry -->
+            <div class="telemetry-card">
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">Status:</span>
+                        <code class="telemetry-value status-val">{{svgMenuState()}}</code>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">Hovered:</span>
+                        <code class="telemetry-value hover-val">{{svgHovered()}}</code>
+                    </div>
+                    <div class="telemetry-item full-width">
+                        <span class="telemetry-label">Last Selected:</span>
+                        <code class="telemetry-value action-val">{{svgLastSelected()}}</code>
+                    </div>
+                </div>
+                <div class="hierarchy-summary">
+                    <span class="summary-label">Structure:</span>
+                    <div class="tags-cluster">
+                        <span class="tag-badge">🏠 home.svg</span>
+                        <span class="tag-badge">✏️ edit.svg</span>
+                        <span class="tag-badge">🔍 search.svg</span>
+                        <span class="tag-badge">🔗 share.svg</span>
+                        <span class="tag-badge">⚙️ settings.svg</span>
+                        <span class="tag-badge">👤 user.svg</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Both custom element instances -->
+    <radial-context-menu id="emoji-radial-menu"></radial-context-menu>
+    <radial-context-menu id="svg-radial-menu"></radial-context-menu>
+</div>

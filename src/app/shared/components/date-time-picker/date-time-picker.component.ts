@@ -55,9 +55,21 @@ export class DateTimePickerComponent {
     // Callback hook
     public onDateSelected?: (date: Date) => void;
 
+    private _hostEl?: HTMLElement;
+
+    private getHost(): HTMLElement | null {
+        if (this._hostEl && typeof this._hostEl.querySelector === 'function') {
+            return this._hostEl;
+        }
+        if (this && typeof (this as any).querySelector === 'function') {
+            return this as unknown as HTMLElement;
+        }
+        return document.querySelector('date-time-picker') as HTMLElement | null;
+    }
+
     private onDocumentClick = (event: MouseEvent) => {
         if (!this.isOpen()) return;
-        const host = this as unknown as HTMLElement;
+        const host = this.getHost();
         if (!host) return;
 
         const path = event.composedPath ? event.composedPath() : [];
@@ -66,7 +78,7 @@ export class DateTimePickerComponent {
         }
 
         const target = event.target as Node | null;
-        if (target && host.contains(target)) {
+        if (target && typeof host.contains === 'function' && host.contains(target)) {
             return;
         }
 
@@ -92,6 +104,7 @@ export class DateTimePickerComponent {
     };
 
     protected onInit(): void {
+        this._hostEl = this as unknown as HTMLElement;
         this.initWorkingState();
         document.addEventListener('click', this.onDocumentClick);
         window.addEventListener('keydown', this.onKeydown);
