@@ -3,13 +3,14 @@
 ## Overview
 
 **Purity** is a lightweight, native TypeScript frontend framework built from scratch on top of modern web standards:
-- **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`) with automatic dependency tracking.
+- **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`) with automatic dependency tracking and sub-microsecond synchronous updates.
 - **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with synchronous template inlining, expression caching, and lifecycle management.
 - **Dependency Injection**: First-class DI container with `@Injectable` decorator and `inject()` resolution.
 - **Custom Directives**: Attribute-level reactivity and DOM augmentation with `@Directive` and `BaseDirective`.
 - **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
+- **Transform Pipes**: Data transformation and formatting engine with `@Pipe` and `BasePipe`, supporting static arguments as well as dynamic reactive signal parameters in templates.
 - **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with GPU acceleration, boundary constraints, and snap support) that attach seamlessly without inheritance.
-- **Modular SCSS Theming & Theme Engine**: Clean SCSS token architecture with Dark and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
+- **Modular SCSS Theming & Theme Engine**: Clean SCSS token architecture with GNOME Adwaita Dark (baseline) and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
 ---
@@ -30,15 +31,15 @@ purity/
 ├── GEMINI.md                    # Project context & architecture guide (this file)
 ├── README.md                    # Public documentation
 └── src/
-    ├── main.ts                  # Application entry point (registers root components & services)
+    ├── main.ts                  # Application entry point (bootstraps root component & imports global style.scss)
     ├── style.scss               # Master global stylesheet importing modular design system
     ├── styles/                  # Modular SCSS architecture & Theme Engine
-    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions)
+    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters)
     │   ├── _mixins.scss         # SCSS mixins (glassmorphism, flex, button lifts, scrollbars)
-    │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens
+    │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens (baseline default)
     │   ├── _theme-light.scss    # GNOME Adwaita Light theme tokens
-    │   ├── _themes.scss         # Theme loader (binds [data-theme='dark'|'light'] & prefers-color-scheme)
-    │   ├── _base.scss           # Base typography, body, window, buttons, and inputs
+    │   ├── _themes.scss         # Theme loader (binds :root, html, body & [data-theme='dark'|'light'])
+    │   ├── _base.scss           # Base typography, body, window, buttons, code blocks, and inputs
     │   └── index.scss           # Barrel export for @use '@styles' as *;
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM helpers, and module re-exports
@@ -122,7 +123,7 @@ Purity features a synchronous reactive primitives engine:
   - **`template?: string`**: Inline HTML template string or dynamic getter (`get template()`).
   - **`onInit(): void`**: Lifecycle method invoked after template elements are mounted in the DOM.
   - **`onDestroy(): void`**: Lifecycle method invoked when the component is disconnected from the DOM.
-  - **`bindTemplate(root?: HTMLElement)`**: Parses and binds reactive `{{ expression }}` handlebars interpolations using cached compiled expression functions (`expressionCache`), and initializes active directives and validators.
+  - **`bindTemplate(root?: HTMLElement)`**: Parses and binds reactive `{{ expression }}` handlebars interpolations using cached compiled expression functions (`expressionCache`), and initializes active directives and validators. Skips `<pre>` documentation blocks and `[data-no-bind]` elements while fully binding dynamic standalone `<code>` elements.
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
@@ -162,20 +163,6 @@ Purity features a synchronous reactive primitives engine:
   <div class="modal-body">
       <slot>Default fallback content</slot>
   </div>
-  ```
-
-  ```typescript
-  @Component({
-      selector: 'my-component',
-      templateUrl: './src/app/pages/custom/custom.component.html',
-  })
-  export class MyComponent {
-      count = signal(0);
-
-      protected onInit() {
-          // Initialize signals, behaviors, effects
-      }
-  }
   ```
 
 ### 3. DOM Utilities (`core.ts`)
@@ -425,13 +412,15 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 4. **Overlay & Popover Layering**:
    Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context traps.
 
-5. **Component Lifecycle & Memory Management**:
-   - Setup DOM queries and behaviors inside `protected onInit()`.
+5. **Component Lifecycle & Closure Binding**:
+   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()` (e.g. `this._boundContextMenu = (e) => this.onDocumentContextMenu(e);`).
    - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
+   - Never initialize event listener closures in class field initializers, as they capture the internal prototype instance rather than the wrapped Custom Element instance.
 
-6. **Reactivity inside Components**:
+6. **Reactivity inside Components & Templates**:
    - Use declarative `{{ expression }}` template interpolations in HTML templates for fine-grained reactive updates.
    - Use `effect(() => { ... })` for custom side effects when needed.
+   - Dynamic expressions inside inline `<code>` tags are fully supported and evaluated reactively.
 
 7. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
@@ -447,9 +436,11 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 |---|---|
 | `npm run dev` | Starts Vite development server with HMR |
 | `npm run build` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
+| `npm run build:dev` | Runs TypeScript compiler (`tsc`) and Vite development bundle |
+| `npm run build:prod` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
 | `npm run preview` | Previews the production build locally |
-| `npm run deploy` | Builds the app and deploys to Firebase Hosting |
-| `npm run deploy:hosting` | Builds the app and deploys only to Firebase Hosting |
+| `npm run deploy` | Builds the app with production profile and deploys to Firebase Hosting |
+| `npm run deploy:hosting` | Builds the app with production profile and deploys only to Firebase Hosting |
 
 ### Adding New Features
 

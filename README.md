@@ -33,12 +33,12 @@
 - 🎯 **Composable Behaviors**: Pointer-based `drag` and `droppable` interactions with GPU acceleration (`translate3d`), boundary constraints, and center snap.
 - 🧩 **Native Web Components**: Standard classes decorated with `@Component` transformed into Custom Elements with automatic template inlining and lifecycle management.
 - 🔍 **Child View Queries (`@ViewChild`)**: Automatic child element and component querying by CSS selector with fallback resolution for teleported/body-prepended elements.
-- 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
+- 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`). Standalone `<code>` tags evaluate signal expressions dynamically while `<pre>` blocks preserve unparsed code snippets.
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
-- 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss`, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, and header switch toggle.
-- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
-- 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, and viewport boundary detection.
+- 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
+- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
@@ -88,15 +88,15 @@ purity/
 ├── README.md                    # Project documentation (this file)
 ├── GEMINI.md                    # Agent context & architecture reference
 └── src/
-    ├── main.ts                  # Application entry point (bootstraps root component & services)
+    ├── main.ts                  # Application entry point (bootstraps root component & imports global style.scss)
     ├── style.scss               # Master global stylesheet importing modular design system
     ├── styles/                  # Modular SCSS architecture & Theme Engine
-    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions)
+    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters)
     │   ├── _mixins.scss         # SCSS mixins (glassmorphism, flex, button lifts, scrollbars)
-    │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens
+    │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens (baseline default)
     │   ├── _theme-light.scss    # GNOME Adwaita Light theme tokens
-    │   ├── _themes.scss         # Theme loader (binds [data-theme='dark'|'light'] & prefers-color-scheme)
-    │   ├── _base.scss           # Base typography, body, window, buttons, and inputs
+    │   ├── _themes.scss         # Theme loader (binds :root, html, body & [data-theme='dark'|'light'])
+    │   ├── _base.scss           # Base typography, body, window, buttons, code blocks, and inputs
     │   └── index.scss           # Barrel export for @use '@styles' as *;
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
@@ -204,7 +204,7 @@ export class UserProfileComponent {
 
 ### 3. 🌓 Modular SCSS Theming & ThemeService (`theme.service.ts`)
 
-Purity provides a first-class theming engine supporting **Dark** (GNOME Adwaita Dark) and **Light** (GNOME Adwaita Light) modes. Variables are mapped dynamically to `:root`, `html[data-theme='dark']`, and `html[data-theme='light']`:
+Purity provides a first-class theming engine supporting **Dark** (GNOME Adwaita Dark, set as default base foundation) and **Light** (GNOME Adwaita Light) modes. Variables are mapped dynamically to `:root`, `html[data-theme='dark']`, and `html[data-theme='light']`:
 
 ```typescript
 import { inject } from '@purity/core';
@@ -459,7 +459,7 @@ export class DemoComponent {
 
 ### 11. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
-Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change:
+Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change. The engine preserves `<pre>` documentation snippets and `[data-no-bind]` blocks while fully binding dynamic expressions inside standalone `<code>` tags:
 
 ```html
 <!-- 1. HTML Template: Declarative Signal Rendering & Pipe Transformation -->
@@ -660,7 +660,7 @@ export class BookingViewComponent {
 
 ### 16. 🎯 Radial Context Menu System (`<radial-context-menu>`)
 
-Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, and configurable DOM selector triggers:
+Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, real-time telemetry state signals, and single-source-of-truth right-click delegation via `setSelector()`:
 
 * **Dynamic Pie Slices**: Automatically computes mathematical polygon clip paths (`innerDist = 26%`, `outerDist = 49.5%`) for any number of menu items.
 * **Multi-Level Navigation**: Push/pop navigation stack for nested `children` submenus with smooth zoom/fade animations.
@@ -668,6 +668,7 @@ Purity provides a native circular radial context menu component with glassmorphi
 * **Dual Icon Representations**: Supports both Unicode Emojis and inlined Lucide SVG vector icons (`home.svg`, `edit.svg`, `search.svg`, `settings.svg`, `share.svg`, `user.svg` in `src/app/assets/radial-context-menu/`) with theme-adaptive stroke styling.
 * **Direct Body Attachment**: Renders directly on `document.body` at `z-index: 9999`, immune to parent stacking contexts.
 * **Center Navigation**: Displays back arrow `←` during nested navigation, close `×` at root, and shows active hovered segment names in real time.
+* **Clean Context Menu Delegation**: Set trigger zones with `setSelector('.interactive-zone')`. The component automatically listens for right-clicks matching the selector and opens at cursor coordinates without conflicting duplicate event handlers.
 
 ```html
 <!-- Register radial context menu in template -->
@@ -771,9 +772,10 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 4. **Overlay & Popover Layering**:
    Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context clipping.
 
-5. **Component Lifecycle & Memory Management**:
-   - Setup DOM queries and behaviors inside `protected onInit()`.
+5. **Component Lifecycle & Event Listener Binding**:
+   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()` (e.g. `this._boundContextMenu = (e) => this.onDocumentContextMenu(e);`).
    - Clean up event listeners and behavior instances in `onDestroy()` / `disconnectedCallback()`.
+   - Never initialize event listener closures in class field initializers, as they capture the internal user instance rather than the wrapped Custom Element instance.
 
 6. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
