@@ -11,7 +11,7 @@ export interface TeamMember {
 
 @Component({
     selector: 'for-sample',
-    templateUrl: './src/app/shared/components/for-sample/for-sample.component.html',
+    templateUrl: './src/app/pages/for-sample/for-sample.component.html',
 })
 export class ForSampleComponent {
     newName = signal<string>('');

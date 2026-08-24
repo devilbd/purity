@@ -1,11 +1,11 @@
 import { Component, signal } from '@purity/core';
 import './pipe-sample.component.scss';
-import '../../pipes/transform-sample.pipe';
-import '../../pipes/uppercase.pipe';
+import '../../shared/pipes/transform-sample.pipe';
+import '../../shared/pipes/uppercase.pipe';
 
 @Component({
     selector: 'pipe-sample',
-    templateUrl: './src/app/shared/components/pipe-sample/pipe-sample.component.html',
+    templateUrl: './src/app/pages/pipe-sample/pipe-sample.component.html',
 })
 export class PipeSampleComponent {
     pipeValue = signal<string>('Purity Framework');

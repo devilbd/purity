@@ -1,10 +1,10 @@
 import { Component, signal } from '@purity/core';
-import '../../directives/highlight.directive';
+import '../../shared/directives/highlight.directive';
 import './directive-sample.component.scss';
 
 @Component({
     selector: 'directive-sample',
-    templateUrl: './src/app/shared/components/directive-sample/directive-sample.component.html',
+    templateUrl: './src/app/pages/directive-sample/directive-sample.component.html',
 })
 export class DirectiveSampleComponent {
     highlightVariant = signal('green');

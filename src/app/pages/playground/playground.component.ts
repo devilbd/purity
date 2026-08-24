@@ -331,7 +331,7 @@ export class PlaygroundDemoComponent {
 
 @Component({
     selector: 'playground-view',
-    templateUrl: './src/app/shared/components/playground/playground.component.html',
+    templateUrl: './src/app/pages/playground/playground.component.html',
 })
 export class PlaygroundComponent {
     activeTab = signal<'ts' | 'html' | 'scss'>('ts');

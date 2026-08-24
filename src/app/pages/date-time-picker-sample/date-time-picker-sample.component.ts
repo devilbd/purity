@@ -1,10 +1,10 @@
 import { Component, signal, ViewChild } from '@purity/core';
-import type { DateTimePickerComponent, DateRestriction } from '../date-time-picker/date-time-picker.component';
+import type { DateTimePickerComponent, DateRestriction } from '../../shared/components/date-time-picker/date-time-picker.component';
 import './date-time-picker-sample.component.scss';
 
 @Component({
     selector: 'date-time-picker-sample',
-    templateUrl: './src/app/shared/components/date-time-picker-sample/date-time-picker-sample.component.html',
+    templateUrl: './src/app/pages/date-time-picker-sample/date-time-picker-sample.component.html',
 })
 export class DateTimePickerSampleComponent {
     // 1. Standard Date & Time

@@ -4,7 +4,7 @@ import {
     signal,
     ViewChild,
 } from '@purity/core';
-import { DataService } from '../../../../data/data.service';
+import { DataService } from '../../../data/data.service';
 import './demo.component.scss';
 import '../custom/custom.component';
 import '../raw-template/raw-template.component';
@@ -12,26 +12,26 @@ import '../forms-validation/forms-validation.component';
 import '../directive-sample/directive-sample.component';
 import '../pipe-sample/pipe-sample.component';
 import '../for-sample/for-sample.component';
-import '../modal/modal-view.component';
-import '../date-time-picker/date-time-picker.component';
 import '../date-time-picker-sample/date-time-picker-sample.component';
-import '../../validators/forms-validation.validator';
-import '../../pipes/transform-sample.pipe';
-import '../../pipes/uppercase.pipe';
-import '../../pipes/date.pipe';
+import '../../shared/components/modal/modal-view.component';
+import '../../shared/components/date-time-picker/date-time-picker.component';
+import '../../shared/validators/forms-validation.validator';
+import '../../shared/pipes/transform-sample.pipe';
+import '../../shared/pipes/uppercase.pipe';
+import '../../shared/pipes/date.pipe';
 import type { CustomComponent } from '../custom/custom.component';
 import type { RawTemplateComponent } from '../raw-template/raw-template.component';
 import type { FormsValidationComponent } from '../forms-validation/forms-validation.component';
 import type { PipeSampleComponent } from '../pipe-sample/pipe-sample.component';
 import type { ForSampleComponent } from '../for-sample/for-sample.component';
-import type { ModalViewComponent } from '../modal/modal-view.component';
+import type { ModalViewComponent } from '../../shared/components/modal/modal-view.component';
 import type { DateTimePickerSampleComponent } from '../date-time-picker-sample/date-time-picker-sample.component';
-import { drag } from '../../behaviors/draggable/draggable';
-import { droppable } from '../../behaviors/droppable/droppable';
+import { drag } from '../../shared/behaviors/draggable/draggable';
+import { droppable } from '../../shared/behaviors/droppable/droppable';
 
 @Component({
     selector: 'demo-component',
-    templateUrl: './src/app/shared/components/demo/demo.component.html',
+    templateUrl: './src/app/pages/demo/demo.component.html',
 })
 export class DemoComponent {
     private dataService = inject(DataService);

@@ -103,17 +103,18 @@ purity/
     ├── data/                    # Data services & Firebase configuration
     │   ├── data.service.ts      # Service layer
     │   └── firebase.ts          # Firebase config & service
-    └── app/                     # Sample application
+    └── app/                     # Sample application & showcases
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets
+        ├── pages/               # Application pages, views & feature showcases (intro, playground, demo, date-time-picker-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # UI Web Components (intro, header, playground, demo, custom, modal, date-time-picker, date-time-picker-sample, pipe-sample, for-sample, raw-template, forms-validation, directive-sample)
+            └── components/      # Reusable UI Web Components (header, modal, date-time-picker)
 ```
 
 ---

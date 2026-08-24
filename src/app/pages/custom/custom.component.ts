@@ -3,7 +3,7 @@ import './custom.component.scss';
 
 @Component({
     selector: 'custom-component',
-    templateUrl: './src/app/shared/components/custom/custom.component.html',
+    templateUrl: './src/app/pages/custom/custom.component.html',
 })
 export class CustomComponent {
     customProperty = signal<string | null>(null);
