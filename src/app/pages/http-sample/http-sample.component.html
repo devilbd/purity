@@ -1,17 +1,18 @@
-<div class="http-sample-view">
-    <div class="http-header-block">
-        <h3 class="http-title">🌐 HTTP Client Service Showcase</h3>
-        <p class="http-desc">
-            Demonstrating Purity's <code>HttpClient</code> service. Requests automatically flow through centralized interceptors configured in <code>@interceptors</code> (<code>LoggingInterceptor</code> &amp; <code>AuthInterceptor</code>).
-        </p>
+<div class="window http-sample-root">
+    <div class="sample-header">
+        <h4>🌐 HTTP Client Service (<code>HttpClient</code>)</h4>
+        <span class="badge-pill">Service + Interceptors</span>
     </div>
+    <p class="sample-desc">
+        Demonstrating Purity's <code>HttpClient</code> service with <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>, and <code>404</code> error handling. Requests automatically flow through centralized interceptors (<code>LoggingInterceptor</code> &amp; <code>AuthInterceptor</code>):
+    </p>
 
-    <!-- Request Controls & HTTP Methods -->
-    <div class="http-actions-grid">
+    <!-- Request Controls & HTTP Action Buttons -->
+    <div class="http-controls">
         <button
             type="button"
-            class="button button-primary http-btn get-btn"
-            onclick="window.httpSample ? window.httpSample.sendGetRequest() : this.closest('http-sample')._component.sendGetRequest()"
+            class="button-primary http-btn"
+            onclick="httpSample.sendGetRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag get">GET</span>
@@ -20,64 +21,70 @@
 
         <button
             type="button"
-            class="button button-primary http-btn post-btn"
-            onclick="window.httpSample ? window.httpSample.sendPostRequest() : this.closest('http-sample')._component.sendPostRequest()"
+            class="button-primary http-btn"
+            onclick="httpSample.sendPostRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag post">POST</span>
-            <span>Create New Post</span>
+            <span>Create Post</span>
         </button>
 
         <button
             type="button"
-            class="button button-primary http-btn put-btn"
-            onclick="window.httpSample ? window.httpSample.sendPutRequest() : this.closest('http-sample')._component.sendPutRequest()"
+            class="button-primary http-btn"
+            onclick="httpSample.sendPutRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag put">PUT</span>
-            <span>Update Post #1</span>
+            <span>Update Post</span>
         </button>
 
         <button
             type="button"
-            class="button button-cancel http-btn delete-btn"
-            onclick="window.httpSample ? window.httpSample.sendDeleteRequest() : this.closest('http-sample')._component.sendDeleteRequest()"
+            class="button-cancel http-btn"
+            onclick="httpSample.sendDeleteRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag delete">DELETE</span>
-            <span>Delete Post #1</span>
+            <span>Delete Post</span>
         </button>
 
         <button
             type="button"
-            class="button button-cancel http-btn error-btn"
-            onclick="window.httpSample ? window.httpSample.sendErrorRequest() : this.closest('http-sample')._component.sendErrorRequest()"
+            class="button-cancel http-btn"
+            onclick="httpSample.sendErrorRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag error">404</span>
-            <span>Test Error Catching</span>
+            <span>Test Error</span>
         </button>
     </div>
 
-    <!-- Inline Loader Component in View -->
-    <loader-component id="http-loader"></loader-component>
+    <!-- Centered Inline Loader Indicator -->
+    <div class="loader-wrapper">
+        <loader-component id="http-loader"></loader-component>
+    </div>
 
-    <!-- Response Inspection -->
-    <div class="http-inspect-card window">
-        <div class="card-header">
-            <div class="header-left">
-                <span class="header-tag">HTTP RESPONSE</span>
-                <span class="url-badge">{{requestMethod()}} {{requestUrl()}}</span>
+    <!-- Response Preview Card -->
+    <div class="http-preview-card window">
+        <div class="card-title-area">
+            <span class="card-icon">📡</span>
+            <div class="title-details">
+                <h5>Response Inspection</h5>
+                <div class="meta-row">
+                    <span class="endpoint-badge">{{requestMethod()}} {{requestUrl()}}</span>
+                    <span class="status-badge {{isRequestLoading() ? 'status-loading' : ''}}">Status: {{responseStatus()}}</span>
+                </div>
             </div>
-            <span class="status-badge {{isRequestLoading() ? 'loading' : ''}}">Status: {{responseStatus()}}</span>
         </div>
-        <div class="inspect-content">
-            <div class="field-group">
-                <label class="field-label">Response Body (Data):</label>
+
+        <div class="output-sections">
+            <div class="output-block">
+                <span class="output-label">Response Body (JSON):</span>
                 <pre class="response-pre"><code>{{responseBody()}}</code></pre>
             </div>
-            <div class="field-group">
-                <label class="field-label">Response Headers:</label>
+            <div class="output-block">
+                <span class="output-label">Response Headers:</span>
                 <pre class="response-pre headers-pre"><code>{{responseHeaders()}}</code></pre>
             </div>
         </div>

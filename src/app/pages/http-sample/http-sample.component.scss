@@ -1,48 +1,65 @@
 @use '@styles' as *;
 
-.http-sample-view {
+.http-sample-root {
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
-    padding: 6px 0;
+    margin-top: 12px;
 
-    .http-header-block {
-        .http-title {
-            margin: 0 0 6px 0;
-            font-size: 1.1rem;
+    .sample-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        h4 {
+            margin: 0;
+            font-size: 1.05rem;
             color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
-        .http-desc {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-
-            code {
-                color: var(--accent);
-                background: var(--accent-subtle);
-                padding: 2px 6px;
-                border-radius: 4px;
-                font-family: inherit;
-            }
+        .badge-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
         }
     }
 
-    .http-actions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    .sample-desc {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+
+        code {
+            color: var(--accent);
+            background: var(--accent-subtle);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    }
+
+    .http-controls {
+        display: flex;
         gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
 
         .http-btn {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
-            padding: 9px 12px;
+            padding: 8px 14px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -50,7 +67,7 @@
             .method-tag {
                 padding: 2px 6px;
                 border-radius: 4px;
-                font-size: 10.5px;
+                font-size: 10px;
                 font-weight: 700;
                 letter-spacing: 0.5px;
 
@@ -78,71 +95,92 @@
         }
     }
 
-    .http-inspect-card {
+    .loader-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 0;
+
+        &:has(.visible) {
+            margin: 4px 0;
+        }
+    }
+
+    .http-preview-card {
         padding: 14px 16px;
         display: flex;
         flex-direction: column;
         gap: 12px;
+        background: var(--card-bg-subtle, rgba(255, 255, 255, 0.03));
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
 
-        .card-header {
+        .card-title-area {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
 
-            .header-left {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                flex-wrap: wrap;
-
-                .header-tag {
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: var(--text-secondary);
-                    letter-spacing: 0.5px;
-                }
-
-                .url-badge {
-                    font-size: 12px;
-                    font-family: monospace;
-                    padding: 2px 8px;
-                    background: var(--card-bg-subtle);
-                    border: 1px solid var(--border-color);
-                    border-radius: var(--radius-sm);
-                    color: var(--accent);
-                }
+            .card-icon {
+                font-size: 1.25rem;
             }
 
-            .status-badge {
-                font-size: 12px;
-                font-family: monospace;
-                font-weight: 600;
-                padding: 2px 8px;
-                background: var(--card-bg-subtle);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-sm);
-                color: var(--text-main);
+            .title-details {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                flex: 1;
 
-                &.loading {
-                    color: var(--accent);
-                    animation: pulse 1s infinite alternate;
+                h5 {
+                    margin: 0;
+                    font-size: 0.95rem;
+                    color: var(--text-main);
+                }
+
+                .meta-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    flex-wrap: wrap;
+
+                    .endpoint-badge {
+                        font-size: 11.5px;
+                        font-family: monospace;
+                        padding: 2px 7px;
+                        background: var(--code-bg);
+                        border: 1px solid var(--code-border);
+                        border-radius: var(--radius-sm);
+                        color: var(--accent);
+                    }
+
+                    .status-badge {
+                        font-size: 11.5px;
+                        font-family: monospace;
+                        font-weight: 600;
+                        padding: 2px 7px;
+                        background: var(--code-bg);
+                        border: 1px solid var(--code-border);
+                        border-radius: var(--radius-sm);
+                        color: var(--text-main);
+
+                        &.status-loading {
+                            color: var(--accent);
+                        }
+                    }
                 }
             }
         }
 
-        .inspect-content {
+        .output-sections {
             display: flex;
             flex-direction: column;
             gap: 10px;
 
-            .field-group {
+            .output-block {
                 display: flex;
                 flex-direction: column;
                 gap: 4px;
 
-                .field-label {
+                .output-label {
                     font-size: 12px;
                     font-weight: 600;
                     color: var(--text-secondary);
@@ -163,7 +201,7 @@
                     word-break: break-word;
 
                     &.headers-pre {
-                        max-height: 120px;
+                        max-height: 110px;
                         opacity: 0.85;
                     }
 
@@ -176,14 +214,5 @@
                 }
             }
         }
-    }
-}
-
-@keyframes pulse {
-    from {
-        opacity: 0.6;
-    }
-    to {
-        opacity: 1;
     }
 }
