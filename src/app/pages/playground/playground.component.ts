@@ -465,7 +465,7 @@ export class PlaygroundComponent {
         window.clearTimeout(this.compileDebounceTimer);
         this.compileDebounceTimer = window.setTimeout(() => {
             this.runCompile();
-        }, 150);
+        }, 250);
     }
 
     runCompile() {
@@ -491,6 +491,12 @@ export class PlaygroundComponent {
             const rawTs = this.tsCode();
             const htmlContent = this.htmlCode();
 
+            if (!rawTs.trim()) {
+                this.previewContainer.replaceChildren();
+                this.statusMessage.set('● Empty');
+                return;
+            }
+
             // Use Sucrase to strip TS types, generics, interfaces, etc.
             const transformed = transform(rawTs, {
                 transforms: ['typescript'],
@@ -515,19 +521,21 @@ export class PlaygroundComponent {
             const uniqueSelector = `playground-demo-${++this.compilationCount}`;
             let className = 'PlaygroundDemoComponent';
 
-            const compMatch = cleanJs.match(/@Component\s*\(\s*\{([\s\S]*?)\}\s*\)\s*(?:export\s+)?class\s+([A-Za-z0-9_$]+)/);
+            const compMatch = cleanJs.match(
+                /@Component\s*\(\s*(?:\{[\s\S]*?\}|['"][^'"]+['"])\s*\)\s*(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/,
+            );
             if (compMatch) {
-                className = compMatch[2];
+                className = compMatch[1];
                 cleanJs = cleanJs.replace(compMatch[0], `class ${className}`);
             } else {
-                const classMatch = cleanJs.match(/(?:export\s+)?class\s+([A-Za-z0-9_$]+)/);
+                const classMatch = cleanJs.match(/(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/);
                 if (classMatch) {
                     className = classMatch[1];
                 }
             }
 
             // Remove any remaining export keywords
-            cleanJs = cleanJs.replace(/\bexport\s+/g, '');
+            cleanJs = cleanJs.replace(/\bexport\s+(?:default\s+)?/g, '');
 
             // Wrap in execution function with Purity exports
             const execCode = `
@@ -555,9 +563,10 @@ export class PlaygroundComponent {
             this.statusMessage.set('● Live');
         } catch (err: any) {
             this.isError.set(true);
-            this.errorMessage.set(err?.message || String(err));
+            const msg = err?.message || String(err);
+            this.errorMessage.set(msg);
             this.statusMessage.set('● Error');
-            console.error('[Purity Playground] Compilation error:', err);
+            console.warn('[Purity Playground] Compilation error:', msg);
         }
     }
 
