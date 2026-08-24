@@ -31,6 +31,7 @@ export interface NotificationItem {
     subtitle: string;
     position: NotificationPosition;
     duration: number;
+    remainingSeconds: number;
     width: string;
     height: string;
     dismissible: boolean;
@@ -42,13 +43,41 @@ export interface NotificationItem {
 export class NotifyService {
     public notifications = signal<NotificationItem[]>([]);
     private timers = new Map<string, any>();
+    private tickerInterval: any = null;
+
+    private ensureTicker(): void {
+        if (this.tickerInterval || typeof window === 'undefined') return;
+        this.tickerInterval = setInterval(() => {
+            const current = this.notifications();
+            if (current.length === 0) {
+                clearInterval(this.tickerInterval);
+                this.tickerInterval = null;
+                return;
+            }
+
+            let hasUpdates = false;
+            const updated = current.map((item) => {
+                if (item.duration > 0 && item.remainingSeconds > 0) {
+                    hasUpdates = true;
+                    return { ...item, remainingSeconds: Math.max(0, item.remainingSeconds - 1) };
+                }
+                return item;
+            });
+
+            if (hasUpdates) {
+                this.notifications.set(updated);
+            }
+        }, 1000);
+    }
 
     /**
      * Dispatches a new notification toast.
      */
     public notify(options: NotificationOptions): string {
         const id = options.id || `notify_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-        const duration = options.duration !== undefined ? options.duration : 5000;
+        // Default downtime countdown duration is 10 seconds (10000ms)
+        const duration = options.duration !== undefined ? options.duration : 10000;
+        const remainingSeconds = duration > 0 ? Math.ceil(duration / 1000) : 0;
 
         const item: NotificationItem = {
             id,
@@ -57,6 +86,7 @@ export class NotifyService {
             subtitle: options.subtitle || '',
             position: options.position || 'top-right',
             duration,
+            remainingSeconds,
             width: options.width || '',
             height: options.height || '',
             dismissible: options.dismissible !== false,
@@ -72,6 +102,7 @@ export class NotifyService {
                 this.dismiss(id);
             }, duration);
             this.timers.set(id, timer);
+            this.ensureTicker();
         }
 
         return id;
@@ -145,7 +176,12 @@ export class NotifyService {
             }
         }
 
-        this.notifications.set(current.filter((item) => item.id !== id));
+        const remaining = current.filter((item) => item.id !== id);
+        if (remaining.length === 0 && this.tickerInterval) {
+            clearInterval(this.tickerInterval);
+            this.tickerInterval = null;
+        }
+        this.notifications.set(remaining);
     }
 
     /**
@@ -156,6 +192,10 @@ export class NotifyService {
             clearTimeout(timer);
         }
         this.timers.clear();
+        if (this.tickerInterval) {
+            clearInterval(this.tickerInterval);
+            this.tickerInterval = null;
+        }
         this.notifications.set([]);
     }
 }

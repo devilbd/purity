@@ -18,7 +18,8 @@
                 title="Close notification"
                 onclick="dismiss(item.id)"
             >
-                ✕
+                <span class="toast-countdown">{{item.remainingSeconds ? item.remainingSeconds + 's' : ''}}</span>
+                <span class="toast-close-icon">✕</span>
             </button>
         </div>
     </div>

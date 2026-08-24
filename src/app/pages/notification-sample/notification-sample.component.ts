@@ -12,7 +12,12 @@ export class NotificationSampleComponent {
     public customTitle = signal<string>('Operation Successful');
     public customSubtitle = signal<string>('All reactive state updates and data changes have been applied.');
     public selectedPosition = signal<NotificationPosition>('top-right');
-    public selectedDuration = signal<number>(4000);
+    public selectedDuration = signal<number>(10000);
+
+    public onDurationInput(element: HTMLInputElement): void {
+        const val = parseInt(element.value, 10);
+        this.selectedDuration.set(isNaN(val) ? 0 : val);
+    }
 
     public setPosition(pos: NotificationPosition): void {
         this.selectedPosition.set(pos);

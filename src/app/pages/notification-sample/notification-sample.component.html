@@ -137,6 +137,18 @@
                     placeholder="Toast subtitle..."
                 />
             </div>
+            <div class="input-col">
+                <label class="field-label">Countdown Duration (ms):</label>
+                <input
+                    type="number"
+                    step="1000"
+                    min="0"
+                    class="input-primary"
+                    value="{{selectedDuration()}}"
+                    oninput="onDurationInput(this)"
+                    placeholder="e.g. 10000 (0 for persistent)"
+                />
+            </div>
         </div>
 
         <div class="custom-actions-row">

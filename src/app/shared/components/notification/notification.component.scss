@@ -198,17 +198,47 @@ notification-component, :host {
         border: none;
         color: var(--text-secondary);
         font-size: 13px;
-        padding: 4px 7px;
+        padding: 3px 6px;
         border-radius: var(--radius-control);
         cursor: pointer;
         transition: all var(--transition-fast) ease;
         flex-shrink: 0;
         margin-top: -2px;
         margin-right: -4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+
+        .toast-countdown {
+            font-family: var(--font-mono, monospace);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            line-height: 1;
+            padding: 2px 5px;
+            border-radius: var(--radius-pill, 999px);
+            background: var(--gnome-input, rgba(255, 255, 255, 0.08));
+            border: 1px solid var(--gnome-border-subtle, rgba(255, 255, 255, 0.06));
+            letter-spacing: -0.2px;
+
+            &:empty {
+                display: none;
+            }
+        }
+
+        .toast-close-icon {
+            font-size: 12px;
+            line-height: 1;
+        }
 
         &:hover {
             background: var(--gnome-hover);
             color: var(--text-main);
+
+            .toast-countdown {
+                color: var(--text-main);
+                border-color: var(--gnome-border);
+            }
         }
 
         &:active {
