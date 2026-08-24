@@ -1,6 +1,7 @@
 import { Component, signal, ViewChild } from '@purity/core';
 import type { RadialContextMenuComponent, MenuItem } from '@components/radial-context-menu/radial-context-menu.component';
 import '@components/radial-context-menu/radial-context-menu.component';
+import { logAnalyticsEvent } from '@data/firebase';
 import { emojiMenuItems, svgMenuItems } from './main-menu-data';
 import './radial-context-menu-sample.component.scss';
 
@@ -61,13 +62,17 @@ export class RadialContextMenuSampleComponent {
                 emojiMenu.onSelectItem = (item: MenuItem) => {
                     const icon = item.image ? `${item.image} ` : '';
                     this.emojiLastSelected.set(`${icon}${item.name}`);
+                    logAnalyticsEvent('radial_menu_select', { item: item.name, variant: 'emoji' });
                 };
 
                 emojiMenu.onHover = (item: MenuItem | null) => {
                     this.emojiHovered.set(item ? `${item.image || ''} ${item.name}` : 'None');
                 };
 
-                emojiMenu.onOpen = () => this.emojiMenuState.set('Active (Open)');
+                emojiMenu.onOpen = () => {
+                    this.emojiMenuState.set('Active (Open)');
+                    logAnalyticsEvent('radial_menu_open', { variant: 'emoji' });
+                };
                 emojiMenu.onClose = () => this.emojiMenuState.set('Closed');
             }
 
@@ -80,13 +85,17 @@ export class RadialContextMenuSampleComponent {
 
                 svgMenu.onSelectItem = (item: MenuItem) => {
                     this.svgLastSelected.set(item.name);
+                    logAnalyticsEvent('radial_menu_select', { item: item.name, variant: 'svg' });
                 };
 
                 svgMenu.onHover = (item: MenuItem | null) => {
                     this.svgHovered.set(item ? item.name : 'None');
                 };
 
-                svgMenu.onOpen = () => this.svgMenuState.set('Active (Open)');
+                svgMenu.onOpen = () => {
+                    this.svgMenuState.set('Active (Open)');
+                    logAnalyticsEvent('radial_menu_open', { variant: 'svg' });
+                };
                 svgMenu.onClose = () => this.svgMenuState.set('Closed');
             }
         }, 0);

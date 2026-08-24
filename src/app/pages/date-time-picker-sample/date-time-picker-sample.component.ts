@@ -1,5 +1,6 @@
 import { Component, signal, ViewChild } from '@purity/core';
 import type { DateTimePickerComponent, DateRestriction } from '@components/date-time-picker/date-time-picker.component';
+import { logAnalyticsEvent } from '@data/firebase';
 import './date-time-picker-sample.component.scss';
 
 @Component({
@@ -69,8 +70,10 @@ export class DateTimePickerSampleComponent {
                     if (sig()) picker.setDate(sig());
                     if (restrictions) picker.setRestrictions(restrictions);
                     if (blur) picker.setBlur(blur);
+
                     picker.onDateSelected = (date: Date) => {
                         sig.set(date);
+                        logAnalyticsEvent('date_picker_selected', { picker: selector, date: date.toISOString() });
                     };
                     picker.addEventListener('date-selected', ((e: CustomEvent) => {
                         if (e.detail?.date) {

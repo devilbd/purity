@@ -322,6 +322,27 @@ Purity provides a first-class bootstrapping API that initializes root components
   - `src/environments/environment.prod.ts` for production builds (`production: true`).
   - Swapped automatically at compile/build time via Vite depending on `--mode production` (`npm run build:prod`) or `--mode development` (`npm run build:dev`).
 
+### 9. Firebase & Google Analytics 4 (`src/data/firebase.ts`)
+
+Purity integrates a native, zero-dependency Google Analytics (GA4) / Firebase Analytics service:
+
+* **Automatic Script Injection**: Loads `gtag.js` asynchronously upon app bootstrapping using `VITE_FIREBASE_MEASUREMENT_ID` (`G-XXXXXXXXXX`).
+* **Automatic Page View Tracking**: Logs initial page load and tracks SPA navigation changes (`popstate`, `hashchange`).
+* **Custom Event Logging**:
+  ```typescript
+  import { logAnalyticsEvent } from '@data/firebase';
+
+  logAnalyticsEvent('radial_menu_select', { item: 'home', variant: 'svg' });
+  ```
+* **Injectable Service**:
+  ```typescript
+  import { inject } from '@purity/core';
+  import { FirebaseService } from '@data/firebase';
+
+  const firebase = inject(FirebaseService);
+  firebase.logEvent('action_trigger', { button: 'open-menu' });
+  ```
+
 ---
 
 ## Composable Behaviors (`src/app/shared/behaviors/`)

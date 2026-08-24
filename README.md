@@ -741,6 +741,31 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 
 ---
 
+## 🔥 Firebase & Google Analytics (GA4) Integration
+
+Purity includes a built-in, zero-dependency Google Analytics 4 (GA4) and Firebase Analytics service in [`src/data/firebase.ts`](file:///run/media/devilbd/d/Development/purity/src/data/firebase.ts):
+
+* **Automatic Script Injection**: Injects `https://www.googletagmanager.com/gtag/js` asynchronously at startup when `VITE_FIREBASE_MEASUREMENT_ID` is present.
+* **Automatic Page Views**: Automatically logs page views on application bootstrap and monitors SPA URL changes (`popstate`, `hashchange`).
+* **Typed Custom Event Logging**:
+  ```typescript
+  import { logAnalyticsEvent } from '@data/firebase';
+
+  // Log custom user interactions
+  logAnalyticsEvent('radial_menu_select', { item: 'home', variant: 'svg' });
+  logAnalyticsEvent('date_picker_selected', { picker: '#standard-picker', date: new Date().toISOString() });
+  ```
+* **Dependency Injection**:
+  ```typescript
+  import { inject } from '@purity/core';
+  import { FirebaseService } from '@data/firebase';
+
+  const firebase = inject(FirebaseService);
+  firebase.logEvent('button_clicked', { button_id: 'open-menu' });
+  ```
+
+---
+
 ## 📄 License
 
 MIT License. Feel free to use, modify, and build upon Purity!
