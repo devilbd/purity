@@ -12,7 +12,7 @@
         <button
             type="button"
             class="button-primary notify-btn btn-success"
-            onclick="notificationSample.triggerSuccess()"
+            onclick="triggerSuccess()"
         >
             <span class="type-icon">✓</span>
             <span>Trigger Success</span>
@@ -21,7 +21,7 @@
         <button
             type="button"
             class="button-cancel notify-btn btn-error"
-            onclick="notificationSample.triggerError()"
+            onclick="triggerError()"
         >
             <span class="type-icon">✕</span>
             <span>Trigger Error</span>
@@ -30,7 +30,7 @@
         <button
             type="button"
             class="button-primary notify-btn btn-warn"
-            onclick="notificationSample.triggerWarn()"
+            onclick="triggerWarn()"
         >
             <span class="type-icon">⚠</span>
             <span>Trigger Warning</span>
@@ -39,7 +39,7 @@
         <button
             type="button"
             class="button-primary notify-btn btn-info"
-            onclick="notificationSample.triggerInfo()"
+            onclick="triggerInfo()"
         >
             <span class="type-icon">ℹ</span>
             <span>Trigger Info</span>
@@ -48,7 +48,7 @@
         <button
             type="button"
             class="button-secondary notify-btn btn-clear"
-            onclick="notificationSample.clearAll()"
+            onclick="clearAll()"
         >
             <span>🗑️ Dismiss All</span>
         </button>
@@ -67,49 +67,49 @@
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'top-right' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('top-right')"
+                    onclick="setPosition('top-right')"
                 >
                     Top Right
                 </button>
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'top-left' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('top-left')"
+                    onclick="setPosition('top-left')"
                 >
                     Top Left
                 </button>
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'top-center' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('top-center')"
+                    onclick="setPosition('top-center')"
                 >
                     Top Center
                 </button>
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'bottom-right' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('bottom-right')"
+                    onclick="setPosition('bottom-right')"
                 >
                     Bottom Right
                 </button>
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'bottom-left' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('bottom-left')"
+                    onclick="setPosition('bottom-left')"
                 >
                     Bottom Left
                 </button>
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'bottom-center' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('bottom-center')"
+                    onclick="setPosition('bottom-center')"
                 >
                     Bottom Center
                 </button>
                 <button
                     type="button"
                     class="button-secondary pos-btn {{selectedPosition() === 'center' ? 'active' : ''}}"
-                    onclick="notificationSample.setPosition('center')"
+                    onclick="setPosition('center')"
                 >
                     Center
                 </button>
@@ -123,7 +123,7 @@
                     type="text"
                     class="input-primary"
                     value="{{customTitle()}}"
-                    oninput="notificationSample.customTitle.set(this.value)"
+                    oninput="customTitle.set(this.value)"
                     placeholder="Toast title..."
                 />
             </div>
@@ -133,7 +133,7 @@
                     type="text"
                     class="input-primary"
                     value="{{customSubtitle()}}"
-                    oninput="notificationSample.customSubtitle.set(this.value)"
+                    oninput="customSubtitle.set(this.value)"
                     placeholder="Toast subtitle..."
                 />
             </div>
@@ -143,21 +143,21 @@
             <button
                 type="button"
                 class="button-primary btn-sm btn-success"
-                onclick="notificationSample.triggerCustom('success')"
+                onclick="triggerCustom('success')"
             >
                 Post Custom Success
             </button>
             <button
                 type="button"
                 class="button-cancel btn-sm btn-error"
-                onclick="notificationSample.triggerCustom('error')"
+                onclick="triggerCustom('error')"
             >
                 Post Custom Error
             </button>
             <button
                 type="button"
                 class="button-primary btn-sm btn-info"
-                onclick="notificationSample.triggerCustom('info')"
+                onclick="triggerCustom('info')"
             >
                 Post Custom Info
             </button>

@@ -1,13 +1,10 @@
-import {
-    Component,
-    signal,
-    ViewChild,
-} from '@purity/core';
+import { Component, signal, ViewChild } from '@purity/core';
 import './app.component.scss';
 import '@pages/intro/intro.component';
 import '@pages/header/header.component';
 import '@pages/playground/playground.component';
 import '@pages/demo/demo.component';
+import '@components/notification/notification.component';
 import type { DemoComponent } from '@pages/demo/demo.component';
 import type { PlaygroundComponent } from '@pages/playground/playground.component';
 
@@ -26,10 +23,6 @@ export class AppComponent {
 
     get demoVisibilityClass(): string {
         return this.showDemo() ? 'demo-visible' : 'demo-hidden';
-    }
-
-    protected onInit() {
-        (window as any).app = this;
     }
 
     onTryIt() {

@@ -6,31 +6,31 @@
         <input
             type="text"
             class="input-primary user-input"
-            oninput="demo.onTextInput(this)"
+            oninput="onTextInput(this)"
         />
     </div>
     <div class="flex-horizontal">
         <button
             class="button-primary login-btn"
-            onclick="demo.onLogin(this)"
+            onclick="onLogin()"
         >
             Login
         </button>
         <button
             class="button-cancel logout-btn"
-            onclick="demo.onLogout(this)"
+            onclick="onLogout()"
         >
             Logout
         </button>
         <button
             class="button-primary default-login-btn"
-            onclick="demo.setDefaultLogin(this)"
+            onclick="setDefaultLogin()"
         >
             Set explicitly value on login input
         </button>
         <button
             class="button-primary modal-open-btn"
-            onclick="demo.onOpenModal(this)"
+            onclick="onOpenModal()"
         >
             🪟 Open Modal Dialog
         </button>
@@ -73,5 +73,4 @@
     </modal-view>
 
     <loader-component id="app-loader"></loader-component>
-    <notification-component id="notification-component"></notification-component>
 </div>

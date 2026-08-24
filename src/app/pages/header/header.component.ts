@@ -12,18 +12,6 @@ export class HeaderComponent {
     public currentTheme = signal<AppTheme>('dark');
 
     protected onInit(): void {
-        (window as any).header = this;
-        (window as any).themeService = this.themeService;
-
-        const host = this as unknown as HTMLElement;
-        const btn = host.querySelector<HTMLButtonElement>('.theme-toggle-btn');
-        if (btn) {
-            btn.onclick = (e: MouseEvent) => {
-                e.preventDefault();
-                this.onToggleTheme();
-            };
-        }
-
         this.syncState();
     }
 

@@ -4,7 +4,7 @@
         type="button"
         aria-haspopup="dialog"
         aria-expanded="{{isOpen() ? 'true' : 'false'}}"
-        onclick="this.closest('.picker-overlay, date-time-picker')._picker.togglePicker(event)"
+        onclick="togglePicker(event)"
     >
         <span class="picker-toggle-icon">📅</span>
         <span class="picker-toggle-text">{{displayLabel}}</span>
@@ -21,7 +21,7 @@
                     class="year-toggle-btn"
                     type="button"
                     aria-label="Toggle year picker"
-                    onclick="this.closest('.picker-overlay, date-time-picker')._picker.toggleYearPicker()"
+                    onclick="toggleYearPicker()"
                 >
                     <span class="month-label">{{monthYearLabel}}</span>
                     <svg class="chevron-icon {{viewMode() === 'year' ? 'is-rotated' : ''}}" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -34,7 +34,7 @@
                     type="button"
                     class="nav-btn prev-btn"
                     aria-label="Previous month"
-                    onclick="this.closest('.picker-overlay, date-time-picker')._picker.prevMonth()"
+                    onclick="prevMonth()"
                 >
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
@@ -44,7 +44,7 @@
                     type="button"
                     class="nav-btn next-btn"
                     aria-label="Next month"
-                    onclick="this.closest('.picker-overlay, date-time-picker')._picker.nextMonth()"
+                    onclick="nextMonth()"
                 >
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
@@ -55,7 +55,7 @@
 
         <div class="picker-content-wrapper">
             <div class="calendar-body {{enableBlur() && viewMode() === 'year' ? 'blurred' : ''}}">
-                <div class="calendar-grid" onclick="this.closest('.picker-overlay, date-time-picker')._picker.onCalendarGridClick(event)">
+                <div class="calendar-grid" onclick="onCalendarGridClick(event)">
                     <div class="weekday">Sun</div>
                     <div class="weekday">Mon</div>
                     <div class="weekday">Tue</div>
@@ -69,7 +69,7 @@
                         class="{{day.cellClass}}"
                         type="button"
                         data-time="{{day.time}}"
-                        onclick="this.closest('.picker-overlay, date-time-picker')._picker.selectDayByTime({{day.time}})"
+                        onclick="selectDayByTime(day.time)"
                     >
                         {{day.dateNum}}
                     </button>
@@ -77,13 +77,13 @@
             </div>
 
             <div class="year-selector-overlay {{viewMode() === 'year' ? 'is-visible' : 'is-hidden'}}">
-                <div class="year-grid" onclick="this.closest('.picker-overlay, date-time-picker')._picker.onYearGridClick(event)">
+                <div class="year-grid" onclick="onYearGridClick(event)">
                     <button
                         for="let yr of years"
                         class="year-cell {{yr === viewYear ? 'selected' : ''}}"
                         type="button"
                         data-year="{{yr}}"
-                        onclick="this.closest('.picker-overlay, date-time-picker')._picker.selectYear({{yr}})"
+                        onclick="selectYear(yr)"
                     >
                         {{yr}}
                     </button>
@@ -104,10 +104,10 @@
                         pattern="\d*"
                         maxlength="2"
                         value="{{workingHoursFormatted}}"
-                        oninput="this.closest('.picker-overlay, date-time-picker')._picker.onHoursInput(this)"
-                        onchange="this.closest('.picker-overlay, date-time-picker')._picker.onTimeChange()"
-                        onkeydown="this.closest('.picker-overlay, date-time-picker')._picker.handleTimeKeydown(event, 'hours')"
-                        onwheel="this.closest('.picker-overlay, date-time-picker')._picker.handleWheel(event, 'hours')"
+                        oninput="onHoursInput(this)"
+                        onchange="onTimeChange()"
+                        onkeydown="handleTimeKeydown(event, 'hours')"
+                        onwheel="handleWheel(event, 'hours')"
                         aria-label="Hours"
                         title="Scroll middle mouse or use Up/Down arrows to change hours (00-23)"
                     />
@@ -118,10 +118,10 @@
                         pattern="\d*"
                         maxlength="2"
                         value="{{workingMinutesFormatted}}"
-                        oninput="this.closest('.picker-overlay, date-time-picker')._picker.onMinutesInput(this)"
-                        onchange="this.closest('.picker-overlay, date-time-picker')._picker.onTimeChange()"
-                        onkeydown="this.closest('.picker-overlay, date-time-picker')._picker.handleTimeKeydown(event, 'minutes')"
-                        onwheel="this.closest('.picker-overlay, date-time-picker')._picker.handleWheel(event, 'minutes')"
+                        oninput="onMinutesInput(this)"
+                        onchange="onTimeChange()"
+                        onkeydown="handleTimeKeydown(event, 'minutes')"
+                        onwheel="handleWheel(event, 'minutes')"
                         aria-label="Minutes"
                         title="Scroll middle mouse or use Up/Down arrows to change minutes (00-59)"
                     />
@@ -133,7 +133,7 @@
             <button
                 class="confirm-button"
                 type="button"
-                onclick="this.closest('.picker-overlay, date-time-picker')._picker.confirmSelection()"
+                onclick="confirmSelection()"
             >
                 OK
             </button>

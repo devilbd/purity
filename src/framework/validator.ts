@@ -133,6 +133,8 @@ function findValidationMethod(
     return null;
 }
 
+import { isInsideNestedComponent } from './component';
+
 /**
  * Scans a DOM tree for forms matching registered validators and attaches form and field validation.
  */
@@ -148,7 +150,9 @@ export function bindValidators(
             matchingForms.push(root);
         }
         matchingForms.push(
-            ...Array.from(root.querySelectorAll<HTMLElement>(formSelector)),
+            ...Array.from(root.querySelectorAll<HTMLElement>(formSelector)).filter(
+                (formEl) => !isInsideNestedComponent(formEl, root),
+            ),
         );
 
         for (const formEl of matchingForms) {

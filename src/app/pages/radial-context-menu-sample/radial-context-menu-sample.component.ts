@@ -49,8 +49,6 @@ export class RadialContextMenuSampleComponent {
     }
 
     protected onInit(): void {
-        (window as any).radialSample = this;
-
         setTimeout(() => {
             // 1. Initialize Emoji Menu Instance
             const emojiMenu = this.getEmojiMenu();

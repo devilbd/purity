@@ -1,6 +1,6 @@
 <div
     class="modal-backdrop {{isOpen() ? 'is-open' : 'is-closed'}} {{isMaximized() ? 'is-maximized' : ''}}"
-    onclick="modal.onBackdropClick(event)"
+    onclick="onBackdropClick(event)"
 >
     <div class="modal-dialog window" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -13,7 +13,7 @@
                     type="button"
                     class="modal-control-btn maximize-btn"
                     title="{{isMaximized() ? 'Restore' : 'Maximize'}}"
-                    onclick="modal.maximize()"
+                    onclick="maximize()"
                 >
                     {{isMaximized() ? '🗗' : '🗖'}}
                 </button>
@@ -21,7 +21,7 @@
                     type="button"
                     class="modal-control-btn close-btn"
                     title="Close"
-                    onclick="modal.close()"
+                    onclick="close()"
                 >
                     ✕
                 </button>
@@ -33,8 +33,7 @@
                 <slot>
                     <p>Welcome to the <strong>Purity Modal Dialog Component</strong>.</p>
                     <p>
-                        This modal is managed reactively via Purity signals and automatically prepended to
-                        <code>document.body</code> with <code>z-index: 1000</code> to seamlessly overlay the entire application.
+                        This modal is managed reactively via Purity signals with fixed viewport overlay and <code>z-index: 1000</code>.
                     </p>
                     <div class="modal-info-card">
                         <div><strong>Status:</strong> <span class="status-pill is-active">Active</span></div>
@@ -45,10 +44,10 @@
         </div>
 
         <div class="modal-footer">
-            <button type="button" class="button-cancel" onclick="modal.close()">
+            <button type="button" class="button-cancel" onclick="close()">
                 Cancel
             </button>
-            <button type="button" class="button-primary" onclick="modal.close()">
+            <button type="button" class="button-primary" onclick="close()">
                 Done
             </button>
         </div>

@@ -57,9 +57,9 @@ export class PlaygroundDemoComponent {
         <span class="stat-calc">Doubled: {{doubled}} (x{{multiplier()}})</span>
     </div>
     <div class="button-row">
-        <button type="button" class="button-primary" onclick="pgDemo.onIncrement()">➕ Increment</button>
-        <button type="button" class="button-secondary" onclick="pgDemo.onDecrement()">➖ Decrement</button>
-        <button type="button" class="button-cancel" onclick="pgDemo.onReset()">↺ Reset</button>
+        <button type="button" class="button-primary" onclick="onIncrement()">➕ Increment</button>
+        <button type="button" class="button-secondary" onclick="onDecrement()">➖ Decrement</button>
+        <button type="button" class="button-cancel" onclick="onReset()">↺ Reset</button>
     </div>
 </div>`,
         scss: `.counter-card {
@@ -142,10 +142,10 @@ export class PlaygroundDemoComponent {
         type="text"
         class="input-primary"
         value="{{text()}}"
-        oninput="pgDemo.onTextInput(this)"
+        oninput="onTextInput(this)"
         placeholder="Type text..."
     />
-    <button type="button" class="button-secondary" onclick="pgDemo.toggleCase()">
+    <button type="button" class="button-secondary" onclick="toggleCase()">
         Toggle Signal ({{isUppercase() ? 'UPPERCASE' : 'lowercase'}})
     </button>
     <div class="result-box">
@@ -242,18 +242,18 @@ export class PlaygroundDemoComponent {
             class="input-primary"
             value="{{newTitle()}}"
             placeholder="New task title..."
-            oninput="pgDemo.onTitleInput(this)"
+            oninput="onTitleInput(this)"
         />
-        <button type="button" class="button-primary" onclick="pgDemo.addTask()">➕ Add</button>
+        <button type="button" class="button-primary" onclick="addTask()">➕ Add</button>
     </div>
     <div class="tasks-list">
         <div for="let t, i of tasks" class="task-item">
             <span class="task-num">#{{i + 1}}</span>
-            <span class="task-title {{t.done ? 'task-done' : ''}}" onclick="pgDemo.toggleTask({{t.id}})">
+            <span class="task-title {{t.done ? 'task-done' : ''}}" onclick="toggleTask({{t.id}})">
                 {{t.title}}
             </span>
             <span class="task-tag">{{t.tag}}</span>
-            <button type="button" class="button-cancel delete-btn" onclick="pgDemo.removeTask({{t.id}})">✕</button>
+            <button type="button" class="button-cancel delete-btn" onclick="removeTask({{t.id}})">✕</button>
         </div>
     </div>
 </div>`,
@@ -369,8 +369,6 @@ export class PlaygroundComponent {
     }
 
     protected onInit() {
-        (window as any).playground = this;
-
         // Auto compile & update syntax highlighting whenever code changes
         effect(() => {
             this.activeTab();
@@ -553,7 +551,6 @@ export class PlaygroundComponent {
 
             // 3. Create and mount Custom Element in preview container
             const customEl = document.createElement(uniqueSelector) as any;
-            (window as any).pgDemo = customEl;
             this.previewContainer.replaceChildren(customEl);
             this.statusMessage.set('● Live');
         } catch (err: any) {

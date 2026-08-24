@@ -81,6 +81,8 @@ export abstract class BaseDirective implements DirectiveLifecycle {
     onDestroy?(): void;
 }
 
+import { isInsideNestedComponent } from './component';
+
 /**
  * Scans a DOM tree for attributes matching registered directives and initializes them.
  */
@@ -93,6 +95,7 @@ export function bindDirectives(
 
     for (const el of elements) {
         if (!(el instanceof HTMLElement)) continue;
+        if (el !== root && isInsideNestedComponent(el, root)) continue;
 
         for (const [selector, DirectiveConstructor] of directiveRegistry.entries()) {
             let matchedAttrName: string | null = null;

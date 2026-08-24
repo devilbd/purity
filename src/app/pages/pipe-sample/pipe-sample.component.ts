@@ -11,10 +11,6 @@ export class PipeSampleComponent {
     pipeValue = signal<string>('Purity Framework');
     isPipeUpper = signal<boolean>(true);
 
-    protected onInit() {
-        (window as any).pipeSample = this;
-    }
-
     onPipeInput(element: HTMLInputElement) {
         this.pipeValue.set(element.value);
     }

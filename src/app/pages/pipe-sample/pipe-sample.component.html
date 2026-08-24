@@ -9,12 +9,12 @@
             class="input-primary"
             value="{{pipeValue()}}"
             placeholder="Type something to transform..."
-            oninput="pipeSample.onPipeInput(this)"
+            oninput="onPipeInput(this)"
         />
         <button
             type="button"
             class="button-secondary"
-            onclick="pipeSample.onTogglePipeCase()"
+            onclick="onTogglePipeCase()"
         >
             🔀 Toggle Uppercase (Signal: {{isPipeUpper() ? 'TRUE' : 'FALSE'}})
         </button>

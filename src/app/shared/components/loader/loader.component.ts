@@ -9,9 +9,6 @@ export class LoaderComponent {
     public isLoading = signal<boolean>(false);
     public message = signal<string>('Loading...');
 
-    protected onInit(): void {
-        (this as any)._component = this;
-    }
 
     /**
      * Shows the loader with default 'Loading...' text or custom text.

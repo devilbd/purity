@@ -55,8 +55,8 @@ export class DateTimePickerComponent {
     // Callback hook
     public onDateSelected?: (date: Date) => void;
 
-    private _hostEl?: HTMLElement;
-    private _overlayEl?: HTMLElement;
+    private _hostEl?: HTMLElement | null;
+    private _overlayEl?: HTMLElement | null;
     private _openedAt = 0;
     private _boundDocClick?: (e: MouseEvent) => void;
     private _boundKeydown?: (e: KeyboardEvent) => void;
@@ -75,20 +75,13 @@ export class DateTimePickerComponent {
     protected onInit(): void {
         const host = this as unknown as HTMLElement;
         this._hostEl = host;
-        (host as any)._picker = this;
         this.initWorkingState();
 
-        // Move the dropdown overlay element directly to document.body so it sits
-        // above all other stacking contexts, cards, and windows at z-index: 9999
-        setTimeout(() => {
-            const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
-            if (overlay && overlay.parentElement !== document.body) {
-                document.body.appendChild(overlay);
-                this._overlayEl = overlay;
-                (overlay as any)._picker = this;
-                overlay.classList.toggle('blur-enabled', this.enableBlur());
-            }
-        }, 0);
+        const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
+        if (overlay) {
+            this._overlayEl = overlay;
+            overlay.classList.toggle('blur-enabled', this.enableBlur());
+        }
 
         this._boundDocClick = (event: MouseEvent) => {
             if (!this.isOpen()) return;
@@ -423,12 +416,7 @@ export class DateTimePickerComponent {
     public open(): void {
         const host = this.getHost();
         if (!this._overlayEl && host) {
-            const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
-            if (overlay && overlay.parentElement !== document.body) {
-                document.body.appendChild(overlay);
-                this._overlayEl = overlay;
-                (overlay as any)._picker = this;
-            }
+            this._overlayEl = host.querySelector('.picker-overlay') as HTMLElement | null;
         }
 
         this._openedAt = Date.now();

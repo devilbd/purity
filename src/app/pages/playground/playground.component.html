@@ -13,7 +13,7 @@
             <select
                 id="preset-select"
                 class="preset-select"
-                onchange="playground.onPresetSelect(this.value)"
+                onchange="onPresetSelect(this.value)"
             >
                 <option value="counter" selected>⚡ Reactive Signals & Counter</option>
                 <option value="pipes">🔀 Handlebars Transform Pipes</option>
@@ -31,7 +31,7 @@
                     <button
                         type="button"
                         class="editor-tab {{activeTab() === 'ts' ? 'active' : ''}}"
-                        onclick="playground.setTab('ts')"
+                        onclick="setTab('ts')"
                     >
                         <span class="tab-icon ts-icon">TS</span>
                         app.component.ts
@@ -39,7 +39,7 @@
                     <button
                         type="button"
                         class="editor-tab {{activeTab() === 'html' ? 'active' : ''}}"
-                        onclick="playground.setTab('html')"
+                        onclick="setTab('html')"
                     >
                         <span class="tab-icon html-icon">&lt;&gt;</span>
                         template.html
@@ -47,7 +47,7 @@
                     <button
                         type="button"
                         class="editor-tab {{activeTab() === 'scss' ? 'active' : ''}}"
-                        onclick="playground.setTab('scss')"
+                        onclick="setTab('scss')"
                     >
                         <span class="tab-icon scss-icon">#</span>
                         style.scss
@@ -59,7 +59,7 @@
                         type="button"
                         class="action-btn copy-btn"
                         title="Copy active code"
-                        onclick="playground.copyCode()"
+                        onclick="copyCode()"
                     >
                         📋 Copy
                     </button>
@@ -80,9 +80,9 @@
                         autocomplete="off"
                         autocorrect="off"
                         autocapitalize="off"
-                        onkeydown="playground.onKeyDown(event, this)"
-                        oninput="playground.onCodeChange(this.value)"
-                        onscroll="playground.onScroll(this)"
+                        onkeydown="onKeyDown(event, this)"
+                        oninput="onCodeChange(this.value)"
+                        onscroll="onScroll(this)"
                     ></textarea>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                         type="button"
                         class="action-btn run-btn"
                         title="Recompile & Run"
-                        onclick="playground.runCompile()"
+                        onclick="runCompile()"
                     >
                         ↻ Run
                     </button>

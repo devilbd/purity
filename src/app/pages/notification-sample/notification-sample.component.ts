@@ -14,11 +14,6 @@ export class NotificationSampleComponent {
     public selectedPosition = signal<NotificationPosition>('top-right');
     public selectedDuration = signal<number>(4000);
 
-    protected onInit(): void {
-        (this as any)._component = this;
-        (window as any).notificationSample = this;
-    }
-
     public setPosition(pos: NotificationPosition): void {
         this.selectedPosition.set(pos);
     }

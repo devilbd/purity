@@ -420,8 +420,10 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 3. **CSS Classes over Inline Styles**:
    All visual modifications, state changes, directives, and behaviors must apply CSS classes rather than mutating `element.style` directly.
 
-4. **Overlay & Popover Layering**:
-   Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context traps.
+4. **Declarative Component Rendering & Event Context**:
+   - All components are defined via `@Component` / `defineComponent` and declared directly in templates.
+   - Event handlers (`onclick`, `oninput`, `onchange`, etc.) automatically evaluate within the component/item instance context. Never expose components or services to `window` or mutate `document.body` manually inside lifecycle hooks.
+   - Overlays (e.g. `<modal-view>`, `<notification-component>`, `<date-time-picker>`) use `position: fixed` with proper z-indexes (`1000` / `9999` / `10000`) for viewport-wide display without manual DOM detaching/re-parenting.
 
 5. **Component Lifecycle & Closure Binding**:
    - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()`.

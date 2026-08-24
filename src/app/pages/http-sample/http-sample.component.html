@@ -12,7 +12,7 @@
         <button
             type="button"
             class="button-primary http-btn"
-            onclick="httpSample.sendGetRequest()"
+            onclick="sendGetRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag get">GET</span>
@@ -22,7 +22,7 @@
         <button
             type="button"
             class="button-primary http-btn"
-            onclick="httpSample.sendPostRequest()"
+            onclick="sendPostRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag post">POST</span>
@@ -32,7 +32,7 @@
         <button
             type="button"
             class="button-primary http-btn"
-            onclick="httpSample.sendPutRequest()"
+            onclick="sendPutRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag put">PUT</span>
@@ -42,7 +42,7 @@
         <button
             type="button"
             class="button-cancel http-btn"
-            onclick="httpSample.sendDeleteRequest()"
+            onclick="sendDeleteRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag delete">DELETE</span>
@@ -52,7 +52,7 @@
         <button
             type="button"
             class="button-cancel http-btn"
-            onclick="httpSample.sendErrorRequest()"
+            onclick="sendErrorRequest()"
             disabled="{{isRequestLoading()}}"
         >
             <span class="method-tag error">404</span>

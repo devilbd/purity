@@ -17,11 +17,6 @@ export class ModalViewComponent {
     };
 
     protected onInit() {
-        (window as any).modal = this;
-
-        // Always prepend to document.body so it sits above all other DOM elements
-        document.body.prepend(this as any);
-        
         window.addEventListener('keydown', this.keydownHandler);
     }
 
@@ -34,13 +29,6 @@ export class ModalViewComponent {
             this.title.set(options.title);
         }
         this.isOpen.set(true);
-
-        const host = this as any as HTMLElement;
-        const currentScrollY = window.scrollY || window.pageYOffset || 0;
-        const dialog = host.querySelector?.('.modal-dialog') as HTMLElement | null;
-        if (dialog) {
-            dialog.style.marginTop = `${Math.max(40, currentScrollY + 60)}px`;
-        }
     }
 
     close() {
@@ -49,16 +37,6 @@ export class ModalViewComponent {
 
     maximize() {
         this.isMaximized.update((val) => !val);
-        const host = this as any as HTMLElement;
-        const currentScrollY = window.scrollY || window.pageYOffset || 0;
-        const dialog = host.querySelector?.('.modal-dialog') as HTMLElement | null;
-        if (dialog) {
-            if (this.isMaximized()) {
-                dialog.style.marginTop = `${Math.max(20, currentScrollY + 20)}px`;
-            } else {
-                dialog.style.marginTop = `${Math.max(40, currentScrollY + 60)}px`;
-            }
-        }
     }
 
     onBackdropClick(event: MouseEvent) {

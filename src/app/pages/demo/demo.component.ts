@@ -96,8 +96,6 @@ export class DemoComponent {
     }
 
     protected onInit() {
-        (window as any).demo = this;
-
         this.droppableBehavior();
         this.draggableBehavior();
     }
@@ -157,7 +155,7 @@ export class DemoComponent {
     }
 
     onOpenModal() {
-        const modal = this.modalView || (document.querySelector('modal-view') as any) || (window as any).modal;
+        const modal = this.modalView || (document.querySelector('modal-view') as any);
         modal?.open({ title: 'Purity Modal Dialog Showcase' });
     }
 

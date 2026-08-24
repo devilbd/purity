@@ -16,7 +16,7 @@
                 type="button"
                 class="toast-close-btn"
                 title="Close notification"
-                onclick="window.notificationComponent ? window.notificationComponent.dismiss('{{item.id}}') : this.closest('notification-component')._component.dismiss('{{item.id}}')"
+                onclick="dismiss(item.id)"
             >
                 ✕
             </button>

@@ -184,6 +184,23 @@ function toKebabCase(str: string): string {
 }
 
 /**
+ * Checks if a DOM node is located inside a nested custom element child of rootEl.
+ */
+export function isInsideNestedComponent(node: Node, rootEl: HTMLElement): boolean {
+    let current: HTMLElement | null =
+        node.nodeType === Node.TEXT_NODE
+            ? node.parentElement
+            : (node as HTMLElement).parentElement;
+    while (current && current !== rootEl) {
+        if (current.tagName && current.tagName.includes('-')) {
+            return true;
+        }
+        current = current.parentElement;
+    }
+    return false;
+}
+
+/**
  * Recursively binds structural for loops, text interpolations, attribute bindings,
  * directives, and validators across a DOM subtree with a specific context.
  */
@@ -193,6 +210,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
     // 1. Process structural `for` loops inside rootEl
     const allForElements = Array.from(rootEl.querySelectorAll('[for]'));
     const topLevelForElements = allForElements.filter((el) => {
+        if (isInsideNestedComponent(el, rootEl)) return false;
         let p = el.parentElement;
         while (p && p !== rootEl) {
             if (p.hasAttribute('for')) return false;
@@ -287,6 +305,9 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
             if (parentEl?.closest('[data-no-bind]')) {
                 continue;
             }
+            if (isInsideNestedComponent(node, rootEl)) {
+                continue;
+            }
             textNodes.push(node as Text);
         }
     }
@@ -337,15 +358,35 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         }
     }
 
-    // 4. Bind Element Attributes
+    // 4. Bind Element Attributes & Event Handlers
     const elementsWithAttrs = [rootEl, ...Array.from(rootEl.querySelectorAll('*'))];
     for (const el of elementsWithAttrs) {
         if (!(el instanceof HTMLElement)) continue;
         if (el.closest('[data-no-bind]')) continue;
+        if (el !== rootEl && isInsideNestedComponent(el, rootEl)) continue;
         for (const attr of Array.from(el.attributes)) {
-            if (attr.value.includes('{{')) {
-                const rawValue = attr.value;
-                const attrName = attr.name;
+            const attrName = attr.name;
+            const rawValue = attr.value;
+
+            // Bind event handlers (onclick, oninput, onchange, etc.) to component/item context
+            if (attrName.startsWith('on')) {
+                try {
+                    const handlerFn = new Function(
+                        '$event',
+                        '__context',
+                        '__pipe',
+                        `with (__context) { return (function(event) { ${rawValue} }).call(this, $event); }`,
+                    );
+                    (el as any)[attrName] = function (event: Event) {
+                        return handlerFn.call(this, event, context, executePipe);
+                    };
+                } catch (err) {
+                    console.error(`[Purity] Failed to compile event handler ${attrName}="${rawValue}":`, err);
+                }
+                continue;
+            }
+
+            if (rawValue.includes('{{')) {
                 effect(() => {
                     const replaced = rawValue.replace(
                         /\{\{\s*([\s\S]*?)\s*\}\}/g,
@@ -375,11 +416,6 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                             el.value = replaced;
                         }
                         el.setAttribute(attrName, replaced);
-                        if (attrName.startsWith('on')) {
-                            try {
-                                (el as any)[attrName] = new Function('event', replaced);
-                            } catch {}
-                        }
                     }
                 });
             }

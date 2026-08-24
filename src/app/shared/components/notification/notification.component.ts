@@ -26,14 +26,6 @@ export class NotificationComponent {
     public positionGroups = signal<PositionGroup[]>([]);
 
     protected onInit(): void {
-        (this as any)._component = this;
-        (window as any).notificationComponent = this;
-
-        // Teleport to document.body so notification overlays sit above all DOM stacking contexts
-        if (typeof document !== 'undefined' && document.body) {
-            document.body.prepend(this as any);
-        }
-
         // Dynamically group active notifications by position
         effect(() => {
             const all = this.notifyService.notifications();

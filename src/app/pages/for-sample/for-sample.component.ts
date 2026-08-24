@@ -45,10 +45,6 @@ export class ForSampleComponent {
         return this.members().length;
     }
 
-    protected onInit() {
-        (window as any).forSample = this;
-    }
-
     onNameInput(element: HTMLInputElement) {
         this.newName.set(element.value);
     }
@@ -59,18 +55,20 @@ export class ForSampleComponent {
 
     onAddMember() {
         const name = this.newName().trim();
-        const role = this.newRole().trim() || 'Software Engineer';
+        const role = this.newRole().trim() || 'Frontend Contributor';
+
         if (!name) return;
 
-        const newEntry: TeamMember = {
-            id: Date.now(),
+        const newId = Date.now();
+        const newMember: TeamMember = {
+            id: newId,
             name,
             role,
             status: 'active',
-            tags: ['New Member', 'Purity'],
+            tags: ['Purity', 'Signal'],
         };
 
-        this.members.update((list) => [...list, newEntry]);
+        this.members.update((list) => [...list, newMember]);
         this.newName.set('');
         this.newRole.set('');
     }

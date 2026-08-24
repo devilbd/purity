@@ -14,19 +14,19 @@
             class="input-primary"
             placeholder="Member name (e.g. Dana Scully)..."
             value="{{newName()}}"
-            oninput="forSample.onNameInput(this)"
+            oninput="onNameInput(this)"
         />
         <input
             type="text"
             class="input-primary"
             placeholder="Role (e.g. Systems Analyst)..."
             value="{{newRole()}}"
-            oninput="forSample.onRoleInput(this)"
+            oninput="onRoleInput(this)"
         />
         <button
             type="button"
             class="button-primary add-member-btn"
-            onclick="forSample.onAddMember()"
+            onclick="onAddMember()"
         >
             ➕ Add Member
         </button>
@@ -45,7 +45,7 @@
                     type="button"
                     class="button-cancel delete-btn"
                     title="Remove member"
-                    onclick="forSample.onRemoveMember({{obj.id}})"
+                    onclick="onRemoveMember(obj.id)"
                 >
                     ✕
                 </button>

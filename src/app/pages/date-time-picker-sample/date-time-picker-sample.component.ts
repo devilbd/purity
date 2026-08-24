@@ -34,8 +34,6 @@ export class DateTimePickerSampleComponent {
     public rangePicker?: DateTimePickerComponent | null;
 
     protected onInit(): void {
-        (window as any).dateTimePickerSample = this;
-
         // Configure business picker restrictions
         const businessRestrictions: DateRestriction = {
             futureOnly: true,

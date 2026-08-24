@@ -27,10 +27,6 @@ export class HttpSampleComponent {
     public responseHeaders = signal<string>('// Response headers');
     public isRequestLoading = signal<boolean>(false);
 
-    protected onInit(): void {
-        (this as any)._component = this;
-        (window as any).httpSample = this;
-    }
 
     public async sendGetRequest(): Promise<void> {
         this.requestMethod.set('GET');
