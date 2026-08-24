@@ -1,0 +1,8 @@
+{
+    "html.validate.styles": false,
+    "html.validate.scripts": false,
+    "html.format.templating": true,
+    "css.lint.unknownAtRules": "ignore",
+    "scss.lint.unknownAtRules": "ignore",
+    "less.lint.unknownAtRules": "ignore"
+}
