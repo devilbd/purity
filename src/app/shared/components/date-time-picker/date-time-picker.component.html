@@ -106,10 +106,10 @@
                         value="{{workingHoursFormatted}}"
                         oninput="this.closest('.picker-overlay, date-time-picker')._picker.onHoursInput(this)"
                         onchange="this.closest('.picker-overlay, date-time-picker')._picker.onTimeChange()"
-                        onkeydown="this.closest('.picker-overlay, date-time-picker')._picker.handleTimeKeydown(event)"
+                        onkeydown="this.closest('.picker-overlay, date-time-picker')._picker.handleTimeKeydown(event, 'hours')"
                         onwheel="this.closest('.picker-overlay, date-time-picker')._picker.handleWheel(event, 'hours')"
                         aria-label="Hours"
-                        title="Scroll or type hours (00-23)"
+                        title="Scroll middle mouse or use Up/Down arrows to change hours (00-23)"
                     />
                     <span class="separator">:</span>
                     <input
@@ -120,10 +120,10 @@
                         value="{{workingMinutesFormatted}}"
                         oninput="this.closest('.picker-overlay, date-time-picker')._picker.onMinutesInput(this)"
                         onchange="this.closest('.picker-overlay, date-time-picker')._picker.onTimeChange()"
-                        onkeydown="this.closest('.picker-overlay, date-time-picker')._picker.handleTimeKeydown(event)"
+                        onkeydown="this.closest('.picker-overlay, date-time-picker')._picker.handleTimeKeydown(event, 'minutes')"
                         onwheel="this.closest('.picker-overlay, date-time-picker')._picker.handleWheel(event, 'minutes')"
                         aria-label="Minutes"
-                        title="Scroll or type minutes (00-59)"
+                        title="Scroll middle mouse or use Up/Down arrows to change minutes (00-59)"
                     />
                 </div>
             </div>

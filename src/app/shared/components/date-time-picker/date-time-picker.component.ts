@@ -555,6 +555,82 @@ export class DateTimePickerComponent {
         this.enforceTimeRestrictions();
     }
 
+    public handleTimeKeydown(event: KeyboardEvent, type?: 'hours' | 'minutes'): void {
+        const target = event.target as HTMLInputElement;
+        const key = event.key;
+
+        if (key === 'ArrowUp' || key === 'ArrowDown') {
+            event.preventDefault();
+            event.stopPropagation();
+            const delta = key === 'ArrowUp' ? 1 : -1;
+            const isHours = type === 'hours' || target.getAttribute('aria-label') === 'Hours';
+            if (isHours) {
+                let h = this.workingHours() + delta;
+                if (h > 23) h = 0;
+                if (h < 0) h = 23;
+                this.workingHours.set(h);
+                target.value = this.workingHoursFormatted;
+            } else {
+                let m = this.workingMinutes() + delta;
+                if (m > 59) m = 0;
+                if (m < 0) m = 59;
+                this.workingMinutes.set(m);
+                target.value = this.workingMinutesFormatted;
+            }
+            this.onTimeChange();
+            target.select();
+            return;
+        }
+
+        const isControlKey = [
+            'Backspace', 'Tab', 'Enter', 'Escape', 'Delete', 'ArrowLeft', 'ArrowRight', 'Home', 'End',
+        ].includes(key);
+
+        if (isControlKey || (event.ctrlKey && ['a', 'c', 'v', 'x'].includes(key.toLowerCase()))) {
+            return;
+        }
+
+        if (!/^\d$/.test(key)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+
+        if (target.selectionStart !== target.selectionEnd) {
+            return;
+        }
+
+        if (target.value.length >= 2) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+
+    public handleWheel(event: WheelEvent, type: 'hours' | 'minutes'): void {
+        event.preventDefault();
+        event.stopPropagation();
+        const delta = event.deltaY < 0 ? 1 : -1;
+
+        if (type === 'hours') {
+            let h = this.workingHours() + delta;
+            if (h > 23) h = 0;
+            if (h < 0) h = 23;
+            this.workingHours.set(h);
+        } else {
+            let m = this.workingMinutes() + delta;
+            if (m > 59) m = 0;
+            if (m < 0) m = 59;
+            this.workingMinutes.set(m);
+        }
+        this.onTimeChange();
+
+        const inputEl = event.target as HTMLInputElement | null;
+        if (inputEl) {
+            inputEl.value = type === 'hours' ? this.workingHoursFormatted : this.workingMinutesFormatted;
+            inputEl.select();
+        }
+    }
+
     public confirmSelection(): void {
         let work = this.workingDate();
         if (!work) {
