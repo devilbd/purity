@@ -43,7 +43,6 @@
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
-- 🔥 **Firebase & Google Analytics 4 (GA4)**: Built-in zero-dependency GA4 analytics engine with automatic page view monitoring, typed event logging, and Firebase Console integration.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
 - 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and single-command deployment (`npm run deploy`).
 
@@ -113,10 +112,10 @@ purity/
     │   ├── environment.interface.ts # Environment configuration contract
     │   ├── environment.ts       # Development environment (default)
     │   └── environment.prod.ts  # Production environment (swapped on build)
-    ├── data/                    # Data services, Theme & Firebase configuration
+    ├── data/                    # Data services & Theme configuration
     │   ├── data.service.ts      # Service layer
     │   ├── theme.service.ts     # Reactive ThemeService for Dark/Light mode & localStorage
-    │   └── firebase.ts          # Firebase config & Google Analytics (GA4) service
+    │   └── notify.service.ts    # Reactive NotifyService for toast notifications
     └── app/                     # Sample application & showcases
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styling
@@ -453,17 +452,14 @@ import './style.scss';
 import { bootstrapApplication } from '@purity/core';
 import { AppComponent } from '@app/app.component';
 import { environment } from '@environments/environment';
-import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
 import { ThemeService } from '@data/theme.service';
 import { LoggingInterceptor } from '@interceptors/logging.interceptor';
 import { AuthInterceptor } from '@interceptors/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
     environment,
-    providers: [FirebaseService, ThemeService],
+    providers: [ThemeService],
     interceptors: [LoggingInterceptor, AuthInterceptor],
-}).then(() => {
-    initGoogleAnalytics();
 }).catch((err) => {
     console.error('Failed to bootstrap Purity application:', err);
 });
@@ -753,29 +749,6 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 
 6. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
-
----
-
-## 🔥 Firebase & Google Analytics (GA4) Integration
-
-Purity includes a built-in, zero-dependency Google Analytics 4 (GA4) and Firebase Analytics service in [`src/data/firebase.ts`](file:///run/media/devilbd/d/Development/purity/src/data/firebase.ts):
-
-* **Automatic Script Injection**: Injects `https://www.googletagmanager.com/gtag/js` asynchronously at startup when `VITE_FIREBASE_MEASUREMENT_ID` is present.
-* **Automatic Page Views**: Automatically logs page views on application bootstrap and monitors SPA URL changes (`popstate`, `hashchange`).
-* **Typed Custom Event Logging**:
-  ```typescript
-  import { logAnalyticsEvent } from '@data/firebase';
-
-  logAnalyticsEvent('radial_menu_select', { item: 'home', variant: 'svg' });
-  ```
-* **Dependency Injection**:
-  ```typescript
-  import { inject } from '@purity/core';
-  import { FirebaseService } from '@data/firebase';
-
-  const firebase = inject(FirebaseService);
-  firebase.logEvent('button_clicked', { button_id: 'open-menu' });
-  ```
 
 ---
 
