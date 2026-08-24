@@ -155,7 +155,7 @@ export class DemoComponent {
     }
 
     onOpenModal() {
-        const modal = this.modalView || (document.querySelector('modal-view') as any);
+        const modal = this.modalView || (document.querySelector('#demo-modal') as any) || (document.querySelector('modal-view') as any);
         modal?.open({ title: 'Purity Modal Dialog Showcase' });
     }
 
