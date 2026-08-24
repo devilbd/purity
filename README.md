@@ -36,11 +36,12 @@
 - 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
-- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita Dark aesthetic, featuring smart viewport auto-placement, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
-- 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dynamic polygon pie slices, multi-level nested submenus, center button navigation, and viewport boundary detection.
+- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita Dark aesthetic, featuring smart viewport auto-placement, body teleportation, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, and viewport boundary detection.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
+- 🔥 **Firebase & Google Analytics 4 (GA4)**: Built-in zero-dependency GA4 analytics engine with automatic page view monitoring, typed event logging, and Firebase Console integration.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
 - 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and single-command deployment (`npm run deploy`).
 
@@ -103,12 +104,12 @@ purity/
     │   └── environment.prod.ts  # Production environment (swapped on build)
     ├── data/                    # Data services & Firebase configuration
     │   ├── data.service.ts      # Service layer
-    │   └── firebase.ts          # Firebase config & service
+    │   └── firebase.ts          # Firebase config & Google Analytics (GA4) service
     └── app/                     # Sample application & showcases
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
-        ├── assets/              # Fonts (Adwaita Mono) and static assets
+        ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
         ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
@@ -297,8 +298,8 @@ export class HighlightDirective extends BaseDirective {
 Enhance elements without deep inheritance trees. Behaviors attach modular interactions like pointer drag-and-drop with GPU acceleration (`translate3d`), boundary constraints, and center snapping:
 
 ```typescript
-import { drag } from './shared/behaviors/draggable/draggable';
-import { droppable } from './shared/behaviors/droppable/droppable';
+import { drag } from '@behaviors/draggable/draggable';
+import { droppable } from '@behaviors/droppable/droppable';
 
 // 1. Register droppable drop target
 const dropCleanup = droppable({
@@ -331,14 +332,15 @@ Purity provides a clean `bootstrapApplication()` initialization API that binds e
 
 ```typescript
 import { bootstrapApplication } from '@purity/core';
-import { AppComponent } from './app/app.component';
-import { environment } from './environments/environment';
+import { AppComponent } from '@app/app.component';
+import { environment } from '@environments/environment';
+import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
 
 bootstrapApplication(AppComponent, {
     environment,
-    providers: [
-        // Custom providers or singleton services
-    ],
+    providers: [FirebaseService],
+}).then(() => {
+    initGoogleAnalytics();
 }).catch((err) => {
     console.error('Failed to bootstrap Purity application:', err);
 });
@@ -364,7 +366,7 @@ import './custom.component.scss';
 
 @Component({
     selector: 'custom-component',
-    templateUrl: './src/app/shared/components/custom/custom.component.html',
+    templateUrl: './src/app/pages/custom/custom.component.html',
 })
 export class CustomComponent {
     customProperty = signal<string | null>(null);
@@ -395,8 +397,8 @@ Use the `@ViewChild(selector)` decorator to query child DOM elements and child c
 
 ```typescript
 import { Component, ViewChild, signal } from '@purity/core';
-import type { CustomComponent } from './shared/components/custom/custom.component';
-import type { ModalViewComponent } from './shared/components/modal/modal-view.component';
+import type { CustomComponent } from '@pages/custom/custom.component';
+import type { ModalViewComponent } from '@components/modal/modal-view.component';
 
 @Component({
     selector: 'demo-component',
@@ -565,10 +567,11 @@ export class ModalViewComponent {
 
 ### 14. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
-Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark aesthetics with glassmorphic blur effects and smart viewport-aware auto-placement:
+Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
 - **Reactivity & Signals**: State (`selectedDate`, `isOpen`, `viewDate`, `workingHours`, `workingMinutes`, `restrictions`, `enableBlur`) driven by fine-grained Purity signals.
-- **Smart Viewport Auto-Placement**: Automatically measures available screen headroom and footroom to flip the popup above (`placement-top`) or below (`placement-bottom`) the trigger button, with horizontal auto-alignment.
+- **Direct Body Overlay Teleportation**: Dropdown overlay automatically attaches directly to `document.body` at `z-index: 9999`, rendering cleanly above all other cards, stacking contexts, and radial menus without clipping.
+- **Smart Viewport Auto-Placement**: Automatically measures available screen headroom and footroom to flip the popup above (`placement-top`) or below (`placement-bottom`) the trigger button, with horizontal auto-alignment and window scroll tracking.
 - **Year Navigation Submenu**: Fast multi-year scrollable selector overlay with smooth animated chevron toggle.
 - **24-Hour Time Capsule**: Dual numeric hours & minutes input supporting text entry, key navigation, and mouse-wheel scrolling (`handleWheel`).
 - **Date & Time Restrictions**: Configurable boundaries via `DateRestriction` (`futureOnly`, `pastOnly`, `minDate`, `maxDate`, `daysBack`, `daysForward`, `minTime`, `maxTime`, `disabledDates`).
@@ -585,9 +588,9 @@ Purity includes a full-featured, reactive Date & Time Picker custom element styl
 ```typescript
 // 2. Component Initialization & Custom Restrictions
 import { Component, signal, ViewChild } from '@purity/core';
-import type { DateTimePickerComponent } from './shared/components/date-time-picker/date-time-picker.component';
-import './shared/components/date-time-picker/date-time-picker.component';
-import './shared/pipes/date.pipe';
+import type { DateTimePickerComponent } from '@components/date-time-picker/date-time-picker.component';
+import '@components/date-time-picker/date-time-picker.component';
+import '@pipes/date.pipe';
 
 @Component({ selector: 'booking-view', templateUrl: './booking-view.html' })
 export class BookingViewComponent {
@@ -627,7 +630,8 @@ Purity provides a native circular radial context menu component with glassmorphi
 * **Dynamic Pie Slices**: Automatically computes mathematical polygon clip paths (`innerDist = 26%`, `outerDist = 49.5%`) for any number of menu items.
 * **Multi-Level Navigation**: Push/pop navigation stack for nested `children` submenus with smooth zoom/fade animations.
 * **Viewport Boundaries**: Clamps menu coordinates so radial menus never overflow outside the viewport.
-* **Multiple Icon Representations**: Supports both Unicode Emojis and inlined/imported Lucide SVG vector icons (`home.svg`, `edit.svg`, `search.svg`, `settings.svg`, `share.svg`, `user.svg`) with dynamic theme color inheritance.
+* **Dual Icon Representations**: Supports both Unicode Emojis and inlined Lucide SVG vector icons (`home.svg`, `edit.svg`, `search.svg`, `settings.svg`, `share.svg`, `user.svg` in `src/app/assets/radial-context-menu/`) with theme-adaptive stroke styling.
+* **Direct Body Attachment**: Renders directly on `document.body` at `z-index: 9999`, immune to parent stacking contexts.
 * **Center Navigation**: Displays back arrow `←` during nested navigation, close `×` at root, and shows active hovered segment names in real time.
 
 ```html
@@ -729,8 +733,8 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 3. **CSS Classes over Inline Styles**:
    All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
 
-4. **Modal Dialog Positioning**:
-   Modal dialogs and backdrop overlays must use **`position: absolute`** (never `position: fixed`) relative to `document.body` (`body { position: relative; }`), automatically prepend to `document.body` upon initialization, and sit at `z-index: 1000`.
+4. **Overlay & Popover Layering**:
+   Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context clipping.
 
 5. **Component Lifecycle & Memory Management**:
    - Setup DOM queries and behaviors inside `protected onInit()`.

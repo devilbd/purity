@@ -46,12 +46,12 @@ purity/
     │   └── environment.prod.ts  # Production environment (swapped on build)
     ├── data/                    # Data services and state management
     │   ├── data.service.ts      # Service layer
-    │   └── firebase.ts          # Firebase configuration and service
+    │   └── firebase.ts          # Firebase configuration and Google Analytics (GA4) service
     └── app/                     # Demo / application source
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styles
         ├── app.component.ts     # Root <app-component> implementation
-        ├── assets/              # Fonts (Adwaita Mono) and static assets
+        ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
         ├── pages/               # Application pages, views & feature showcases
         │   ├── custom/          # <custom-component> with two-way signal bindings
         │   ├── date-time-picker-sample/ # <date-time-picker-sample> showcase of date-time-picker configurations
@@ -63,7 +63,7 @@ purity/
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
-        │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> interactive showcase for radial menu
+        │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
         │   └── raw-template/    # <raw-template> dynamic inline template rendering
         └── shared/
             ├── behaviors/       # Composable DOM behaviors
@@ -73,7 +73,7 @@ purity/
             ├── pipes/           # Reusable transform pipes (e.g. date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # Reusable UI Web Components
-                ├── date-time-picker/ # <date-time-picker> reactive date & time picker component
+                ├── date-time-picker/ # <date-time-picker> reactive date & time picker component with body teleportation
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
                 └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
 ```
@@ -157,7 +157,7 @@ Purity features a synchronous reactive primitives engine:
   ```typescript
   @Component({
       selector: 'my-component',
-      templateUrl: './src/app/my-component.html',
+      templateUrl: './src/app/pages/custom/custom.component.html',
   })
   export class MyComponent {
       count = signal(0);
@@ -304,14 +304,15 @@ Purity provides a first-class bootstrapping API that initializes root components
 
   ```typescript
   import { bootstrapApplication } from '@purity/core';
-  import { AppComponent } from './app/app.component';
-  import { environment } from './environments/environment';
+  import { AppComponent } from '@app/app.component';
+  import { environment } from '@environments/environment';
+  import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
 
   bootstrapApplication(AppComponent, {
       environment,
-      providers: [
-          // Custom providers or singleton services
-      ],
+      providers: [FirebaseService],
+  }).then(() => {
+      initGoogleAnalytics();
   }).catch((err) => {
       console.error('Failed to bootstrap Purity application:', err);
   });
@@ -399,8 +400,8 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 3. **CSS Classes over Inline Styles**:
    All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
 
-4. **Modal Dialog Positioning**:
-   Modal dialogs and backdrop overlays must use **`position: absolute`** (never `position: fixed`) relative to `document.body` (`body { position: relative; }`), automatically prepend to `document.body` on initialization, and sit at `z-index: 1000`.
+4. **Overlay & Popover Layering**:
+   Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context traps.
 
 5. **Component Lifecycle & Memory Management**:
    - Setup DOM queries and behaviors inside `protected onInit()`.
