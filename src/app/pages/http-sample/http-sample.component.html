@@ -1,0 +1,82 @@
+<div class="http-sample-view">
+    <div class="http-header-block">
+        <h3 class="http-title">🌐 HTTP Client Service Showcase</h3>
+        <p class="http-desc">
+            Demonstrating Purity's <code>HttpClient</code> service. Requests automatically flow through centralized interceptors configured in <code>@interceptors</code> (<code>LoggingInterceptor</code> &amp; <code>AuthInterceptor</code>).
+        </p>
+    </div>
+
+    <!-- Request Controls & HTTP Methods -->
+    <div class="http-actions-grid">
+        <button
+            type="button"
+            class="button button-primary http-btn get-btn"
+            onclick="window.httpSample ? window.httpSample.sendGetRequest() : this.closest('http-sample')._component.sendGetRequest()"
+            disabled="{{isRequestLoading()}}"
+        >
+            <span class="method-tag get">GET</span>
+            <span>Fetch Post #1</span>
+        </button>
+
+        <button
+            type="button"
+            class="button button-primary http-btn post-btn"
+            onclick="window.httpSample ? window.httpSample.sendPostRequest() : this.closest('http-sample')._component.sendPostRequest()"
+            disabled="{{isRequestLoading()}}"
+        >
+            <span class="method-tag post">POST</span>
+            <span>Create New Post</span>
+        </button>
+
+        <button
+            type="button"
+            class="button button-primary http-btn put-btn"
+            onclick="window.httpSample ? window.httpSample.sendPutRequest() : this.closest('http-sample')._component.sendPutRequest()"
+            disabled="{{isRequestLoading()}}"
+        >
+            <span class="method-tag put">PUT</span>
+            <span>Update Post #1</span>
+        </button>
+
+        <button
+            type="button"
+            class="button button-cancel http-btn delete-btn"
+            onclick="window.httpSample ? window.httpSample.sendDeleteRequest() : this.closest('http-sample')._component.sendDeleteRequest()"
+            disabled="{{isRequestLoading()}}"
+        >
+            <span class="method-tag delete">DELETE</span>
+            <span>Delete Post #1</span>
+        </button>
+
+        <button
+            type="button"
+            class="button button-cancel http-btn error-btn"
+            onclick="window.httpSample ? window.httpSample.sendErrorRequest() : this.closest('http-sample')._component.sendErrorRequest()"
+            disabled="{{isRequestLoading()}}"
+        >
+            <span class="method-tag error">404</span>
+            <span>Test Error Catching</span>
+        </button>
+    </div>
+
+    <!-- Response Inspection -->
+    <div class="http-inspect-card window">
+        <div class="card-header">
+            <div class="header-left">
+                <span class="header-tag">HTTP RESPONSE</span>
+                <span class="url-badge">{{requestMethod()}} {{requestUrl()}}</span>
+            </div>
+            <span class="status-badge {{isRequestLoading() ? 'loading' : ''}}">Status: {{responseStatus()}}</span>
+        </div>
+        <div class="inspect-content">
+            <div class="field-group">
+                <label class="field-label">Response Body (Data):</label>
+                <pre class="response-pre"><code>{{responseBody()}}</code></pre>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Response Headers:</label>
+                <pre class="response-pre headers-pre"><code>{{responseHeaders()}}</code></pre>
+            </div>
+        </div>
+    </div>
+</div>

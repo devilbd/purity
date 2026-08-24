@@ -203,7 +203,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 
     for (const el of topLevelForElements) {
         if (!(el instanceof HTMLElement)) continue;
-        if (el.closest('pre, [data-no-bind]')) continue;
+        if (el.closest('[data-no-bind]')) continue;
 
         const forAttr = el.getAttribute('for');
         if (!forAttr) continue;
@@ -284,7 +284,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
     while ((node = walker.nextNode())) {
         if (node.nodeValue && node.nodeValue.includes('{{')) {
             const parentEl = node.parentElement;
-            if (parentEl?.closest('pre, [data-no-bind]')) {
+            if (parentEl?.closest('[data-no-bind]')) {
                 continue;
             }
             textNodes.push(node as Text);
@@ -341,7 +341,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
     const elementsWithAttrs = [rootEl, ...Array.from(rootEl.querySelectorAll('*'))];
     for (const el of elementsWithAttrs) {
         if (!(el instanceof HTMLElement)) continue;
-        if (el.closest('pre, [data-no-bind]')) continue;
+        if (el.closest('[data-no-bind]')) continue;
         for (const attr of Array.from(el.attributes)) {
             if (attr.value.includes('{{')) {
                 const rawValue = attr.value;
@@ -353,6 +353,23 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     );
                     if (attrName === 'class') {
                         el.className = replaced.trim();
+                    } else if (
+                        ['disabled', 'checked', 'readonly', 'required', 'hidden', 'selected', 'open'].includes(attrName)
+                    ) {
+                        const val = replaced.trim();
+                        const isTruthy =
+                            val !== '' &&
+                            val !== 'false' &&
+                            val !== 'null' &&
+                            val !== 'undefined' &&
+                            val !== '0';
+                        if (isTruthy) {
+                            el.setAttribute(attrName, val || attrName);
+                            (el as any)[attrName] = true;
+                        } else {
+                            el.removeAttribute(attrName);
+                            (el as any)[attrName] = false;
+                        }
                     } else {
                         if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && attrName === 'value') {
                             el.value = replaced;

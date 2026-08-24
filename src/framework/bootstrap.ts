@@ -1,4 +1,5 @@
 import { container, type Token, type Constructor } from './di';
+import { HttpClient, type HttpInterceptor, type HttpInterceptorFn } from './http';
 
 export interface EnvironmentConfig {
     production: boolean;
@@ -16,6 +17,7 @@ export type Provider =
 export interface BootstrapOptions {
     environment?: EnvironmentConfig;
     providers?: Provider[];
+    interceptors?: Array<HttpInterceptor | (new (...args: any[]) => HttpInterceptor) | HttpInterceptorFn>;
     rootSelector?: string;
 }
 
@@ -38,7 +40,8 @@ export function getApplicationRef(): ApplicationRef | null {
 }
 
 /**
- * Bootstraps a Purity application with a root component, environment settings, and service providers.
+ * Bootstraps a Purity application with a root component, environment settings, service providers,
+ * and HTTP interceptors, while automatically managing theme and lifecycle.
  */
 export async function bootstrapApplication(
     rootComponent: any,
@@ -67,7 +70,35 @@ export async function bootstrapApplication(
         }
     }
 
-    // 3. Resolve or find root element in DOM
+    // 3. Register HTTP interceptors if configured directly in bootstrap options
+    if (options.interceptors && Array.isArray(options.interceptors)) {
+        const client = container.resolve<HttpClient>(HttpClient);
+        for (const item of options.interceptors) {
+            if (typeof item === 'function') {
+                if (item.prototype && typeof item.prototype.intercept === 'function') {
+                    client.use(new (item as new () => HttpInterceptor)());
+                } else {
+                    client.use(item as HttpInterceptorFn);
+                }
+            } else if (item && typeof (item as any).intercept === 'function') {
+                client.use(item as HttpInterceptor);
+            }
+        }
+    }
+
+    // 4. Automatically initialize application theme inside bootstrap
+    try {
+        container.resolve('ThemeService');
+    } catch {
+        if (typeof document !== 'undefined') {
+            const savedTheme = typeof localStorage !== 'undefined' ? localStorage.getItem('purity-theme') : null;
+            const theme = savedTheme === 'light' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+            document.body?.setAttribute('data-theme', theme);
+        }
+    }
+
+    // 5. Resolve or find root element in DOM
     const rootSelector =
         options.rootSelector ||
         (rootComponent.selector ? rootComponent.selector : null);
@@ -77,7 +108,7 @@ export async function bootstrapApplication(
         rootElement = document.querySelector(rootSelector);
     }
 
-    // 4. Create ApplicationRef handle
+    // 6. Create ApplicationRef handle
     const appRef: ApplicationRef = {
         rootComponent,
         rootElement,
@@ -101,7 +132,7 @@ export async function bootstrapApplication(
 
     globalAppRef = appRef;
 
-    // 5. Expose debug tools if configured or in development mode
+    // 7. Expose debug tools if configured or in development mode
     if (typeof window !== 'undefined') {
         (window as any).__PURITY_APP__ = appRef;
 

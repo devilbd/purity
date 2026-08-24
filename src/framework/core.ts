@@ -135,3 +135,4 @@ export * from './directive';
 export * from './validator';
 export * from './pipe';
 export * from './bootstrap';
+export * from './http';

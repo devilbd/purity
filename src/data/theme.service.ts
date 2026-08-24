@@ -8,13 +8,13 @@ export class ThemeService {
     public isDark = signal<boolean>(true);
 
     constructor() {
-        this.initTheme();
+        this.applyInitialTheme();
     }
 
     /**
-     * Initializes theme state with Dark as base default.
+     * Initializes theme state with Dark as base default or restored from localStorage.
      */
-    public initTheme(): void {
+    private applyInitialTheme(): void {
         if (typeof window === 'undefined') return;
 
         const savedTheme = localStorage.getItem('purity-theme') as AppTheme | null;
@@ -54,16 +54,4 @@ export class ThemeService {
             document.body?.setAttribute('data-theme', theme);
         }
     }
-}
-
-/**
- * Standalone helper to initialize the theme immediately before/during bootstrap.
- * Dark theme is always the default base.
- */
-export function initTheme(): void {
-    if (typeof window === 'undefined') return;
-    const savedTheme = localStorage.getItem('purity-theme');
-    const activeTheme: AppTheme = savedTheme === 'light' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', activeTheme);
-    document.body?.setAttribute('data-theme', activeTheme);
 }

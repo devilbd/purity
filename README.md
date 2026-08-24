@@ -5,7 +5,7 @@
 <h1 align="center">Purity</h1>
 
 <p align="center">
-  <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, Transform Pipes, and Composable Behaviors.</strong>
+  <strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP Client & Interceptors, Transform Pipes, and Composable Behaviors.</strong>
 </p>
 
 <p align="center">
@@ -20,13 +20,14 @@
 
 ## 📖 Overview
 
-**Purity** is a minimalist, modern frontend framework built from scratch on top of web standards. It avoids the overhead of virtual DOM reconciliation by combining **fine-grained reactive signals** with standard **Custom Elements v1**, a lightweight **Dependency Injection** container, **Transform Pipes**, **Decoupled Form Validation**, and **Composable DOM Behaviors**.
+**Purity** is a minimalist, modern frontend framework built from scratch on top of web standards. It avoids the overhead of virtual DOM reconciliation by combining **fine-grained reactive signals** with standard **Custom Elements v1**, a lightweight **Dependency Injection** container, a native **HTTP Client & Interceptor Engine**, **Transform Pipes**, **Decoupled Form Validation**, and **Composable DOM Behaviors**.
 
 ### Key Highlights
 
 - ⚡ **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 - 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automated dependency tracking.
 - 💉 **First-Class Dependency Injection**: Built-in DI container with `@Injectable` decorator and `inject()` token resolution.
+- 🌐 **Native HTTP Client & Interceptors**: Injectable `HttpClient` service with full HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`), composable onion-model request/response interceptors, typed models (`HttpRequest`, `HttpResponse`, `HttpErrorResponse`), header/query helpers (`HttpHeaders`, `HttpParams`), and reactive signal resource bindings (`createResource`).
 - ⚡ **Transform Pipes**: Reusable formatting classes with `@Pipe` and `BasePipe`, supporting static arguments and dynamic reactive signal parameters in templates (`{{ val | myPipe: isDynamicSignal() }}`).
 - 📋 **Decoupled Form Validation Engine**: Validation rules decoupled with `@Validator` and `BaseValidator`, managing CSS states and submit buttons.
 - 🏷️ **Reactive Custom Directives**: Attribute-level reactivity and DOM mutation monitoring via `@Directive` and `BaseDirective`.
@@ -103,6 +104,7 @@ purity/
     │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── bootstrap.ts         # bootstrapApplication entry, providers, and environment tokens
+    │   ├── http.ts              # HttpClient service, HttpInterceptor pipeline, HttpHeaders, HttpParams, and resources
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
@@ -120,7 +122,7 @@ purity/
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, http-sample, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
@@ -202,7 +204,92 @@ export class UserProfileComponent {
 
 ---
 
-### 3. 🌓 Modular SCSS Theming & ThemeService (`theme.service.ts`)
+### 3. 🌐 HTTP Client Service & Centralized Interceptors (`http.ts`, `@interceptors`)
+
+Purity provides a zero-dependency, type-safe HTTP Client service registered into DI and re-exported via `@purity/core`:
+
+#### 1. Centralized Interceptor Classes (`src/app/shared/interceptors/`)
+
+Interceptors are decoupled from components into centralized classes implementing `HttpInterceptor`:
+
+```typescript
+// src/app/shared/interceptors/auth.interceptor.ts
+import type { HttpInterceptor, HttpRequest, HttpResponse, HttpNextFn } from '@purity/core';
+
+export class AuthInterceptor implements HttpInterceptor {
+    async intercept(req: HttpRequest, next: HttpNextFn): Promise<HttpResponse<any>> {
+        const authReq = req.clone({
+            headers: req.headers.set('Authorization', 'Bearer my_jwt_token'),
+        });
+        return next(authReq);
+    }
+}
+```
+
+```typescript
+// src/app/shared/interceptors/logging.interceptor.ts
+import type { HttpInterceptor, HttpRequest, HttpResponse, HttpNextFn } from '@purity/core';
+
+export class LoggingInterceptor implements HttpInterceptor {
+    async intercept(req: HttpRequest, next: HttpNextFn): Promise<HttpResponse<any>> {
+        const start = performance.now();
+        try {
+            const res = await next(req);
+            console.log(`[HTTP] ${req.method} ${req.url} -> ${res.status} (${Math.round(performance.now() - start)}ms)`);
+            return res;
+        } catch (err: any) {
+            console.error(`[HTTP Error] ${req.method} ${req.url} failed:`, err);
+            throw err;
+        }
+    }
+}
+```
+
+#### 2. Register Interceptors in Bootstrap (`src/main.ts`)
+
+```typescript
+import { bootstrapApplication } from '@purity/core';
+import { AppComponent } from '@app/app.component';
+import { environment } from '@environments/environment';
+import { LoggingInterceptor } from '@interceptors/logging.interceptor';
+import { AuthInterceptor } from '@interceptors/auth.interceptor';
+
+bootstrapApplication(AppComponent, {
+    environment,
+    interceptors: [LoggingInterceptor, AuthInterceptor],
+});
+```
+
+#### 3. Consuming `HttpClient` in Components
+
+Page components simply inject `HttpClient` without any boilerplate. Requests automatically execute through the interceptor chain:
+
+```typescript
+import { Component, signal, inject, HttpClient, HttpParams } from '@purity/core';
+
+interface Post {
+    id: number;
+    title: string;
+    body: string;
+}
+
+@Component({ selector: 'posts-page', templateUrl: './posts-page.html' })
+export class PostsPageComponent {
+    private http = inject(HttpClient);
+    posts = signal<Post[]>([]);
+
+    async loadPosts() {
+        const res = await this.http.get<Post[]>('https://jsonplaceholder.typicode.com/posts', {
+            params: new HttpParams().set('userId', 1),
+        });
+        this.posts.set(res.data);
+    }
+}
+```
+
+---
+
+### 4. 🌓 Modular SCSS Theming & ThemeService (`theme.service.ts`)
 
 Purity provides a first-class theming engine supporting **Dark** (GNOME Adwaita Dark, set as default base foundation) and **Light** (GNOME Adwaita Light) modes. Variables are mapped dynamically to `:root`, `html[data-theme='dark']`, and `html[data-theme='light']`:
 
@@ -223,7 +310,7 @@ themeService.setTheme('light');
 
 ---
 
-### 4. ⚡ Transform Pipes & Dynamic Parameters (`pipe.ts`)
+### 5. ⚡ Transform Pipes & Dynamic Parameters (`pipe.ts`)
 
 Transform Pipes decouple data transformation and formatting logic from UI components and templates. They integrate directly with Handlebars template expressions (`{{ value | pipeName: arg1 : arg2 }}`), supporting static values as well as dynamic reactive signal parameters that automatically re-run transformations when dependencies update:
 
@@ -259,7 +346,7 @@ export class MyTransformPipe extends BasePipe {
 
 ---
 
-### 5. 📋 Decoupled Form Validation Engine (`validator.ts`)
+### 6. 📋 Decoupled Form Validation Engine (`validator.ts`)
 
 Form Validators decouple validation logic from UI templates, automatically tracking field mutations, managing overall form validity, updating submit button `disabled` states, and applying customizable CSS state classes:
 
@@ -289,7 +376,7 @@ export class UserFormValidator extends BaseValidator {
 
 ---
 
-### 6. 🏷️ Reactive Custom Directives (`directive.ts`)
+### 7. 🏷️ Reactive Custom Directives (`directive.ts`)
 
 Directives attach custom behavior, styling, and reactive listeners directly to DOM elements via attributes:
 
@@ -324,7 +411,7 @@ export class HighlightDirective extends BaseDirective {
 
 ---
 
-### 7. 🎯 Composable Interaction Behaviors (`behaviors/`)
+### 8. 🎯 Composable Interaction Behaviors (`behaviors/`)
 
 Enhance elements without deep inheritance trees. Behaviors attach modular interactions like pointer drag-and-drop with GPU acceleration (`translate3d`), boundary constraints, and center snapping:
 
@@ -357,23 +444,24 @@ const dragCleanup = drag({
 
 ---
 
-### 8. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
+### 9. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
 
 Purity provides a clean `bootstrapApplication()` initialization API that binds environment profiles, registers custom service providers, and mounts root Web Components:
 
 ```typescript
+import './style.scss';
 import { bootstrapApplication } from '@purity/core';
 import { AppComponent } from '@app/app.component';
 import { environment } from '@environments/environment';
 import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
-import { ThemeService, initTheme } from '@data/theme.service';
-
-// Initialize theme before mounting
-initTheme();
+import { ThemeService } from '@data/theme.service';
+import { LoggingInterceptor } from '@interceptors/logging.interceptor';
+import { AuthInterceptor } from '@interceptors/auth.interceptor';
 
 bootstrapApplication(AppComponent, {
     environment,
     providers: [FirebaseService, ThemeService],
+    interceptors: [LoggingInterceptor, AuthInterceptor],
 }).then(() => {
     initGoogleAnalytics();
 }).catch((err) => {
@@ -391,7 +479,7 @@ bootstrapApplication(AppComponent, {
 
 ## 🧩 UI Web Components, Templating & Views
 
-### 9. 🧩 Native Web Components (`@Component` Decorator)
+### 10. 🧩 Native Web Components (`@Component` Decorator)
 
 Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
 
@@ -426,7 +514,7 @@ export class CustomComponent {
 
 ---
 
-### 10. 🔍 Child View & Component Queries (`@ViewChild`)
+### 11. 🔍 Child View & Component Queries (`@ViewChild`)
 
 Use the `@ViewChild(selector)` decorator to query child DOM elements and child components with fallback resolution for teleported or body-prepended elements:
 
@@ -457,7 +545,7 @@ export class DemoComponent {
 
 ---
 
-### 11. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
+### 12. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
 Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change. The engine preserves `<pre>` documentation snippets and `[data-no-bind]` blocks while fully binding dynamic expressions inside standalone `<code>` tags:
 
@@ -491,7 +579,7 @@ export class UserCardComponent {
 
 ---
 
-### 12. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+### 13. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
 
 Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
 
@@ -512,30 +600,9 @@ Purity provides native structural loop templates via `for="let item of items"` o
 </div>
 ```
 
-```typescript
-// 2. Component Class: Array Signal with Reactive Mutations
-@Component({ selector: 'team-list', templateUrl: './team-list.html' })
-export class TeamListComponent {
-    members = signal([
-        { id: 1, name: 'Alice Cooper', role: 'Lead Architect', status: 'active', tags: ['TypeScript', 'Signals'] },
-        { id: 2, name: 'Bob Dylan', role: 'Senior Engineer', status: 'busy', tags: ['SCSS', 'Components'] },
-    ]);
-
-    addMember(name: string, role: string) {
-        this.members.update(list => [...list, {
-            id: Date.now(),
-            name,
-            role,
-            status: 'active',
-            tags: ['New Member', 'Purity'],
-        }]);
-    }
-}
-```
-
 ---
 
-### 13. 📦 Generic Components & Content Projection (`<slot>`)
+### 14. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -561,7 +628,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 14. 🪟 Modal Dialogs (`<modal-view>`)
+### 15. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 
@@ -600,7 +667,7 @@ export class ModalViewComponent {
 
 ---
 
-### 15. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
+### 16. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
 Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
@@ -612,53 +679,9 @@ Purity includes a full-featured, reactive Date & Time Picker custom element styl
 - **Date & Time Restrictions**: Configurable boundaries via `DateRestriction` (`futureOnly`, `pastOnly`, `minDate`, `maxDate`, `daysBack`, `daysForward`, `minTime`, `maxTime`, `disabledDates`).
 - **DatePipe Formatting**: Built-in `@Pipe('date')` transform pipe for flexible Handlebars date expressions (`{{ myDate() | date: 'EEEE, MMMM d, yyyy HH:mm' }}`).
 
-```html
-<!-- 1. Consumer Template Usage -->
-<date-time-picker id="my-picker"></date-time-picker>
-
-<!-- Format the selected date with the DatePipe -->
-<p>Selected: {{ selectedDate() | date: 'MMM dd, yyyy HH:mm' }}</p>
-```
-
-```typescript
-// 2. Component Initialization & Custom Restrictions
-import { Component, signal, ViewChild } from '@purity/core';
-import type { DateTimePickerComponent } from '@components/date-time-picker/date-time-picker.component';
-import '@components/date-time-picker/date-time-picker.component';
-import '@pipes/date.pipe';
-
-@Component({ selector: 'booking-view', templateUrl: './booking-view.html' })
-export class BookingViewComponent {
-    selectedDate = signal<Date | null>(new Date());
-
-    @ViewChild('#my-picker')
-    picker?: DateTimePickerComponent | null;
-
-    protected onInit() {
-        setTimeout(() => {
-            if (this.picker) {
-                // Configure restrictions: future dates only, office hours 09:00 - 18:00
-                this.picker.setRestrictions({
-                    futureOnly: true,
-                    daysForward: 60,
-                    minTime: '09:00',
-                    maxTime: '18:00',
-                });
-                this.picker.setBlur(true); // Enable glassmorphism blur mode
-
-                // Subscribe to date selections
-                this.picker.onDateSelected = (date: Date) => {
-                    this.selectedDate.set(date);
-                };
-            }
-        }, 0);
-    }
-}
-```
-
 ---
 
-### 16. 🎯 Radial Context Menu System (`<radial-context-menu>`)
+### 17. 🎯 Radial Context Menu System (`<radial-context-menu>`)
 
 Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, real-time telemetry state signals, and single-source-of-truth right-click delegation via `setSelector()`:
 
@@ -669,56 +692,6 @@ Purity provides a native circular radial context menu component with glassmorphi
 * **Direct Body Attachment**: Renders directly on `document.body` at `z-index: 9999`, immune to parent stacking contexts.
 * **Center Navigation**: Displays back arrow `←` during nested navigation, close `×` at root, and shows active hovered segment names in real time.
 * **Clean Context Menu Delegation**: Set trigger zones with `setSelector('.interactive-zone')`. The component automatically listens for right-clicks matching the selector and opens at cursor coordinates without conflicting duplicate event handlers.
-
-```html
-<!-- Register radial context menu in template -->
-<radial-context-menu id="my-radial-menu"></radial-context-menu>
-
-<!-- Trigger zone -->
-<div class="interactive-zone">Right click here</div>
-```
-
-```typescript
-import { Component, signal, ViewChild } from '@purity/core';
-import type { RadialContextMenuComponent, MenuItem } from '@components/radial-context-menu/radial-context-menu.component';
-import '@components/radial-context-menu/radial-context-menu.component';
-
-const menuItems: MenuItem[] = [
-    {
-        name: 'Home',
-        image: '🏠',
-        children: [
-            { name: 'Dashboard', image: '📊' },
-            { name: 'Analytics', image: '📈' },
-        ],
-    },
-    { name: 'Edit', image: '✏️' },
-    { name: 'Delete', image: '🗑️' },
-];
-
-@Component({
-    selector: 'my-view',
-    templateUrl: './src/app/pages/my-view/my-view.component.html',
-})
-export class MyViewComponent {
-    @ViewChild('#my-radial-menu')
-    radialMenu?: RadialContextMenuComponent | null;
-
-    protected onInit() {
-        setTimeout(() => {
-            if (this.radialMenu) {
-                this.radialMenu.setItems(menuItems);
-                this.radialMenu.setSelector('.interactive-zone');
-                this.radialMenu.setBlur(true);
-
-                this.radialMenu.onSelectItem = (item: MenuItem) => {
-                    console.log('Selected action:', item.name);
-                };
-            }
-        }, 0);
-    }
-}
-```
 
 ---
 
@@ -743,6 +716,7 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
    Components, directives, pipes, and validators register themselves upon module evaluation. Import them cleanly using path aliases (avoid relative `../../` paths):
    ```typescript
    import '@pages/custom/custom.component';
+   import '@pages/http-sample/http-sample.component';
    import '@directives/highlight.directive';
    import '@pipes/transform-sample.pipe';
    import '@validators/forms-validation.validator';
@@ -767,15 +741,15 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
    - SCSS Design System: `@use '@styles' as *;`
 
 3. **CSS Classes over Inline Styles**:
-   All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
+   All visual modifications, state changes, directives, and behaviors apply CSS classes rather than mutating `element.style` directly.
 
 4. **Overlay & Popover Layering**:
    Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context clipping.
 
 5. **Component Lifecycle & Event Listener Binding**:
-   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()` (e.g. `this._boundContextMenu = (e) => this.onDocumentContextMenu(e);`).
+   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()`.
    - Clean up event listeners and behavior instances in `onDestroy()` / `disconnectedCallback()`.
-   - Never initialize event listener closures in class field initializers, as they capture the internal user instance rather than the wrapped Custom Element instance.
+   - Never initialize event listener closures in class field initializers.
 
 6. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
@@ -792,9 +766,7 @@ Purity includes a built-in, zero-dependency Google Analytics 4 (GA4) and Firebas
   ```typescript
   import { logAnalyticsEvent } from '@data/firebase';
 
-  // Log custom user interactions
   logAnalyticsEvent('radial_menu_select', { item: 'home', variant: 'svg' });
-  logAnalyticsEvent('date_picker_selected', { picker: '#standard-picker', date: new Date().toISOString() });
   ```
 * **Dependency Injection**:
   ```typescript

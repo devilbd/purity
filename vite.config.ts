@@ -152,6 +152,7 @@ export default defineConfig(({ mode }) => {
                 '@pipes': path.resolve(import.meta.dirname, 'src/app/shared/pipes'),
                 '@validators': path.resolve(import.meta.dirname, 'src/app/shared/validators'),
                 '@behaviors': path.resolve(import.meta.dirname, 'src/app/shared/behaviors'),
+                '@interceptors': path.resolve(import.meta.dirname, 'src/app/shared/interceptors'),
                 '@app': path.resolve(import.meta.dirname, 'src/app'),
                 '@styles': path.resolve(import.meta.dirname, 'src/styles/index.scss'),
             },

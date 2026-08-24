@@ -14,6 +14,7 @@ import '@pages/pipe-sample/pipe-sample.component';
 import '@pages/for-sample/for-sample.component';
 import '@pages/date-time-picker-sample/date-time-picker-sample.component';
 import '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
+import '@pages/http-sample/http-sample.component';
 import '@components/modal/modal-view.component';
 import '@components/date-time-picker/date-time-picker.component';
 import '@validators/forms-validation.validator';

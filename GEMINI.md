@@ -6,6 +6,7 @@
 - **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`) with automatic dependency tracking and sub-microsecond synchronous updates.
 - **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with synchronous template inlining, expression caching, and lifecycle management.
 - **Dependency Injection**: First-class DI container with `@Injectable` decorator and `inject()` resolution.
+- **HTTP Client & Interceptor Pipeline**: Full-featured HTTP service with all standard methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`), centralized class-based request/response interceptors (`@interceptors/*`), typed models (`HttpRequest`, `HttpResponse`, `HttpErrorResponse`), header/query param helpers (`HttpHeaders`, `HttpParams`), and reactive signal resource helpers (`createResource`).
 - **Custom Directives**: Attribute-level reactivity and DOM augmentation with `@Directive` and `BaseDirective`.
 - **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
 - **Transform Pipes**: Data transformation and formatting engine with `@Pipe` and `BasePipe`, supporting static arguments as well as dynamic reactive signal parameters in templates.
@@ -31,7 +32,7 @@ purity/
 ├── GEMINI.md                    # Project context & architecture guide (this file)
 ├── README.md                    # Public documentation
 └── src/
-    ├── main.ts                  # Application entry point (bootstraps root component & imports global style.scss)
+    ├── main.ts                  # Application entry point (bootstraps root component, providers, interceptors & global style.scss)
     ├── style.scss               # Master global stylesheet importing modular design system
     ├── styles/                  # Modular SCSS architecture & Theme Engine
     │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters)
@@ -46,6 +47,7 @@ purity/
     │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── bootstrap.ts         # bootstrapApplication entry, providers, and environment tokens
+    │   ├── http.ts              # HttpClient service, HttpInterceptor pipeline, HttpHeaders, HttpParams, and resources
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
@@ -71,6 +73,7 @@ purity/
         │   ├── forms-validation/ # <forms-validation> sample form component with submit validation
         │   ├── for-sample/      # <for-sample> demonstrating structural for array repeater
         │   ├── header/          # <header-component> navigation bar with logo and theme toggle
+        │   ├── http-sample/     # <http-sample> clean HTTP client showcase consuming centralized interceptors
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
@@ -81,6 +84,9 @@ purity/
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
             ├── directives/      # Reusable DOM directives (e.g. highlight)
+            ├── interceptors/    # Centralized HTTP interceptor classes (@interceptors/*)
+            │   ├── auth.interceptor.ts    # Centralized Bearer token auth interceptor
+            │   └── logging.interceptor.ts # Centralized latency & status logging interceptor
             ├── pipes/           # Reusable transform pipes (e.g. date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # Reusable UI Web Components
@@ -123,7 +129,7 @@ Purity features a synchronous reactive primitives engine:
   - **`template?: string`**: Inline HTML template string or dynamic getter (`get template()`).
   - **`onInit(): void`**: Lifecycle method invoked after template elements are mounted in the DOM.
   - **`onDestroy(): void`**: Lifecycle method invoked when the component is disconnected from the DOM.
-  - **`bindTemplate(root?: HTMLElement)`**: Parses and binds reactive `{{ expression }}` handlebars interpolations using cached compiled expression functions (`expressionCache`), and initializes active directives and validators. Skips `<pre>` documentation blocks and `[data-no-bind]` elements while fully binding dynamic standalone `<code>` elements.
+  - **`bindTemplate(root?: HTMLElement)`**: Parses and binds reactive `{{ expression }}` handlebars interpolations using cached compiled expression functions (`expressionCache`), and initializes active directives and validators. Supports dynamic standalone `<code>` and `<pre>` elements while skipping blocks marked with `[data-no-bind]`.
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
@@ -165,17 +171,7 @@ Purity features a synchronous reactive primitives engine:
   </div>
   ```
 
-### 3. DOM Utilities (`core.ts`)
-
-Helper functions for declarative DOM updates:
-* `getElement(selector, rootEl?)`: Query selector returning `HTMLElement | null`.
-* `getElements(selectorsRecord, rootEl?)`: Batch query selector returning a `Map<string, HTMLElement>`.
-* `updateTargets(elements, newValue, ifNullValue?)`: Updates `innerHTML` across an array of target elements.
-* `updateValues(elements, newValue, ifNullValue?)`: Updates `.value` on `HTMLInputElement` arrays.
-* `updateStyles(elements, className)`: Sets `className` across target elements.
-* `eventListener(elements, event, handler)`: Attaches event listeners and returns a `{ dispose() }` handle.
-
-### 4. Dependency Injection & State (`di.ts`, `data/`)
+### 3. Dependency Injection & State (`di.ts`, `data/`)
 
 Purity includes a built-in Dependency Injection container with decorator support:
 
@@ -198,13 +194,70 @@ Purity includes a built-in Dependency Injection container with decorator support
   const dataService = inject<DataService>('DataService');
   ```
 
-* **Theme System (`ThemeService`)**:
-  ```typescript
-  import { inject } from '@purity/core';
-  import { ThemeService } from '@data/theme.service';
+### 4. HTTP Client Service & Centralized Interceptors (`http.ts`, `src/app/shared/interceptors/`)
 
-  const themeService = inject(ThemeService);
-  themeService.toggleTheme(); // Toggles between 'dark' and 'light'
+Purity provides a native, zero-dependency, type-safe HTTP Client service registered into DI and re-exported via `@purity/core`:
+
+* **`HttpClient` Service Methods**:
+  - `get<T>(url, options?)`: Executes HTTP GET request.
+  - `post<T>(url, body?, options?)`: Executes HTTP POST request with automatic JSON payload serialization.
+  - `put<T>(url, body?, options?)`: Executes HTTP PUT request.
+  - `patch<T>(url, body?, options?)`: Executes HTTP PATCH request.
+  - `delete<T>(url, options?)`: Executes HTTP DELETE request.
+  - `head(url, options?)`: Executes HTTP HEAD request.
+  - `options<T>(url, options?)`: Executes HTTP OPTIONS request.
+  - `request<T>(method, url, options?)`: Core request dispatcher executing through the interceptors pipeline.
+  - `createResource<T>(fetcher)`: Generates reactive signal bindings (`data`, `loading`, `error`, `status`, `refetch`).
+
+* **Centralized HTTP Interceptors (`src/app/shared/interceptors/`)**:
+  Interceptors are decoupled from UI components into centralized classes implementing `HttpInterceptor`:
+
+  ```typescript
+  // src/app/shared/interceptors/auth.interceptor.ts
+  import type { HttpInterceptor, HttpRequest, HttpResponse, HttpNextFn } from '@purity/core';
+
+  export class AuthInterceptor implements HttpInterceptor {
+      async intercept(req: HttpRequest, next: HttpNextFn): Promise<HttpResponse<any>> {
+          const authReq = req.clone({
+              headers: req.headers.set('Authorization', 'Bearer my_token_123'),
+          });
+          return next(authReq);
+      }
+  }
+  ```
+
+  ```typescript
+  // src/app/shared/interceptors/logging.interceptor.ts
+  import type { HttpInterceptor, HttpRequest, HttpResponse, HttpNextFn } from '@purity/core';
+
+  export class LoggingInterceptor implements HttpInterceptor {
+      async intercept(req: HttpRequest, next: HttpNextFn): Promise<HttpResponse<any>> {
+          const start = performance.now();
+          try {
+              const res = await next(req);
+              console.log(`[HTTP] ${req.method} ${req.url} -> ${res.status} (${Math.round(performance.now() - start)}ms)`);
+              return res;
+          } catch (err) {
+              console.error(`[HTTP Error] ${req.method} ${req.url} failed:`, err);
+              throw err;
+          }
+      }
+  }
+  ```
+
+* **Consuming `HttpClient` in Components**:
+  Page components simply inject `HttpClient` and make calls that automatically flow through all registered interceptors:
+
+  ```typescript
+  @Component({ selector: 'my-page', templateUrl: './my-page.html' })
+  export class MyPageComponent {
+      private http = inject(HttpClient);
+
+      async loadData() {
+          const res = await this.http.get<PostItem>('https://jsonplaceholder.typicode.com/posts/1');
+          console.log('Post data:', res.data);
+      }
+  }
   ```
 
 ### 5. Transform Pipes (`pipe.ts`)
@@ -225,18 +278,6 @@ Transform Pipes decouple data transformation and formatting logic from component
           return prefix ? `${prefix}: ${str}` : str;
       }
   }
-  ```
-
-* **Handlebars Pipe Usage**:
-  ```html
-  <!-- Static arguments -->
-  <div>{{ count() | myTransformPipe: true }}</div>
-
-  <!-- Dynamic reactive signal arguments -->
-  <div>{{ user() | myTransformPipe: isVipSignal() : 'VIP' }}</div>
-
-  <!-- Chained pipes -->
-  <div>{{ total() | currency: '$' : 2 | bold }}</div>
   ```
 
 ### 6. Directives (`directive.ts`)
@@ -275,62 +316,39 @@ Form Validators decouple validation rules and CSS class application from UI comp
   - **`invalidClass?: string`**: CSS class applied when a field/form is invalid (default: `'is-invalid'`).
   - **`validate[FieldName](value, element)`**: Validation method defined on the class for each field.
   - **`validateAll()`**: Method automatically provided to trigger validation across all configured fields.
-  - **Form State & Submit Buttons**: Automatically tracks field mutations, manages form CSS classes (`is-valid` / `is-invalid`), and toggles submit button `disabled` states and `.disabled` class.
-
-  ```typescript
-  @Validator({
-      form: '.forms-validation-form',
-      fields: {
-          input1: '#input1',
-          input2: '#input2',
-      },
-      validClass: 'is-valid',
-      invalidClass: 'is-invalid',
-  })
-  export class FormsValidationValidator extends BaseValidator {
-      validateInput1(value: string): boolean {
-          return value.trim().length >= 3;
-      }
-
-      validateInput2(value: string): boolean {
-          return value.trim().length >= 5;
-      }
-  }
-  ```
 
 ### 8. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
 
-Purity provides a first-class bootstrapping API that initializes root components, binds environment configurations into DI, registers custom providers, and manages application lifecycles:
+Purity provides a first-class bootstrapping API that initializes root components, binds environment configurations into DI, registers custom providers and interceptors, automatically synchronizes themes, and manages application lifecycles:
 
 * **`bootstrapApplication(rootComponent, options?: BootstrapOptions)`**:
   - Registers the active environment configuration under the `'ENVIRONMENT'` token.
+  - Automatically initializes the theme (`ThemeService` / `localStorage` / OS preference).
+  - Automatically wires `interceptors: [...]` directly into the `HttpClient` pipeline.
   - Automatically queries and mounts the root custom element.
   - Exposes debug tools on `(window as any).__PURITY_APP__` in development mode.
   - Returns a Promise resolving to `ApplicationRef` with `.destroy()`, `.rootElement`, and `.environment`.
 
   ```typescript
+  import './style.scss';
   import { bootstrapApplication } from '@purity/core';
   import { AppComponent } from '@app/app.component';
   import { environment } from '@environments/environment';
   import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
-  import { ThemeService, initTheme } from '@data/theme.service';
-
-  initTheme();
+  import { ThemeService } from '@data/theme.service';
+  import { LoggingInterceptor } from '@interceptors/logging.interceptor';
+  import { AuthInterceptor } from '@interceptors/auth.interceptor';
 
   bootstrapApplication(AppComponent, {
       environment,
       providers: [FirebaseService, ThemeService],
+      interceptors: [LoggingInterceptor, AuthInterceptor],
   }).then(() => {
       initGoogleAnalytics();
   }).catch((err) => {
       console.error('Failed to bootstrap Purity application:', err);
   });
   ```
-
-* **Environment Swapping for Different Builds**:
-  - `src/environments/environment.ts` for development (`production: false`, debug logging enabled).
-  - `src/environments/environment.prod.ts` for production builds (`production: true`).
-  - Swapped automatically at compile/build time via Vite depending on `--mode production` (`npm run build:prod`) or `--mode development` (`npm run build:dev`).
 
 ### 9. Firebase & Google Analytics 4 (`src/data/firebase.ts`)
 
@@ -343,14 +361,6 @@ Purity integrates a native, zero-dependency Google Analytics (GA4) / Firebase An
   import { logAnalyticsEvent } from '@data/firebase';
 
   logAnalyticsEvent('radial_menu_select', { item: 'home', variant: 'svg' });
-  ```
-* **Injectable Service**:
-  ```typescript
-  import { inject } from '@purity/core';
-  import { FirebaseService } from '@data/firebase';
-
-  const firebase = inject(FirebaseService);
-  firebase.logEvent('action_trigger', { button: 'open-menu' });
   ```
 
 ---
@@ -366,7 +376,6 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
   - Drop target integration & center snapping (`snapTo`).
   - GPU-accelerated transforms (`translate3d`) with zero transition drag lag.
   - Smooth animation frame scheduling via `requestAnimationFrame`.
-  - CSS state classes (`.draggable-target`, `.is-dragging`, `.snap-hit`).
   - Returns `{ destroy() }` for clean teardown.
 
 * **Droppable (`droppable`)**:
@@ -383,13 +392,10 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    Because components, directives, pipes, and validators register themselves automatically with decorators at module evaluation time, import them as side effects using path aliases (never use relative `../../` paths):
    ```typescript
    import '@pages/custom/custom.component';
+   import '@pages/http-sample/http-sample.component';
    import '@directives/highlight.directive';
    import '@pipes/transform-sample.pipe';
    import '@validators/forms-validation.validator';
-   ```
-   If referencing types for TypeScript typings, use explicit type-only imports:
-   ```typescript
-   import type { CustomComponent } from '@pages/custom/custom.component';
    ```
 
 2. **Clean Path Aliases (No `../` Relative Imports)**:
@@ -400,6 +406,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    - Application Root: `@app/*`
    - Pages & Showcases: `@pages/*`
    - Reusable Components: `@components/*`
+   - Centralized Interceptors: `@interceptors/*`
    - Directives: `@directives/*`
    - Pipes: `@pipes/*`
    - Validators: `@validators/*`
@@ -407,24 +414,18 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    - SCSS Design System: `@use '@styles' as *;`
 
 3. **CSS Classes over Inline Styles**:
-   All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
+   All visual modifications, state changes, directives, and behaviors must apply CSS classes rather than mutating `element.style` directly.
 
 4. **Overlay & Popover Layering**:
    Modal dialogs (`<modal-view>`), radial context menus (`<radial-context-menu>`), and dropdown popovers (`<date-time-picker>`) are attached directly to `document.body` at high z-indexes (`1000` / `9999`) to prevent parent `backdrop-filter` or `transform` stacking context traps.
 
 5. **Component Lifecycle & Closure Binding**:
-   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()` (e.g. `this._boundContextMenu = (e) => this.onDocumentContextMenu(e);`).
+   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()`.
    - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
-   - Never initialize event listener closures in class field initializers, as they capture the internal prototype instance rather than the wrapped Custom Element instance.
+   - Never initialize event listener closures in class field initializers.
 
-6. **Reactivity inside Components & Templates**:
-   - Use declarative `{{ expression }}` template interpolations in HTML templates for fine-grained reactive updates.
-   - Use `effect(() => { ... })` for custom side effects when needed.
-   - Dynamic expressions inside inline `<code>` tags are fully supported and evaluated reactively.
-
-7. **TypeScript Configuration**:
+6. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
-   - Avoid unused variable declarations and make imports type-explicit where appropriate.
 
 ---
 
@@ -441,12 +442,4 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 | `npm run preview` | Previews the production build locally |
 | `npm run deploy` | Builds the app with production profile and deploys to Firebase Hosting |
 | `npm run deploy:hosting` | Builds the app with production profile and deploys only to Firebase Hosting |
-
-### Adding New Features
-
-* **New Framework Features**: Place core abstractions (e.g. state management, routing, template parsers) in `src/framework/`.
-* **New UI Components**: Place custom elements in `src/app/shared/components/<component-name>/` with their corresponding `.ts`, `.html`, and `.scss` files, decorated with `@Component(...)`.
-* **New Directives**: Place custom directives in `src/app/shared/directives/` decorated with `@Directive(...)` extending `BaseDirective`.
-* **New Pipes**: Place custom transform pipes in `src/app/shared/pipes/` decorated with `@Pipe(...)` extending `BasePipe`.
-* **New Validators**: Place form validation rules in `src/app/shared/validators/` decorated with `@Validator(...)` extending `BaseValidator`.
-* **New Behaviors**: Place modular interaction helpers in `src/app/shared/behaviors/<behavior-name>/`.
+| `npm run deploy:hosting` | Builds the app with production profile and deploys only to Firebase Hosting |
