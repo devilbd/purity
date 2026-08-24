@@ -38,11 +38,15 @@ export class RadialContextMenuComponent {
     private itemsContainerEl: HTMLElement | null = null;
     private _openedAt = 0;
 
-    private _boundContextMenu = (e: MouseEvent) => this.onDocumentContextMenu(e);
-    private _boundClick = (e: MouseEvent) => this.onDocumentClick(e);
-    private _boundKeydown = (e: KeyboardEvent) => this.onDocumentKeydown(e);
+    private _boundContextMenu?: (e: MouseEvent) => void;
+    private _boundClick?: (e: MouseEvent) => void;
+    private _boundKeydown?: (e: KeyboardEvent) => void;
 
     protected onInit(): void {
+        this._boundContextMenu = (e: MouseEvent) => this.onDocumentContextMenu(e);
+        this._boundClick = (e: MouseEvent) => this.onDocumentClick(e);
+        this._boundKeydown = (e: KeyboardEvent) => this.onDocumentKeydown(e);
+
         this.createMenuDOM();
         document.addEventListener('contextmenu', this._boundContextMenu);
         document.addEventListener('click', this._boundClick);
@@ -50,9 +54,9 @@ export class RadialContextMenuComponent {
     }
 
     public onDestroy(): void {
-        document.removeEventListener('contextmenu', this._boundContextMenu);
-        document.removeEventListener('click', this._boundClick);
-        window.removeEventListener('keydown', this._boundKeydown);
+        if (this._boundContextMenu) document.removeEventListener('contextmenu', this._boundContextMenu);
+        if (this._boundClick) document.removeEventListener('click', this._boundClick);
+        if (this._boundKeydown) window.removeEventListener('keydown', this._boundKeydown);
 
         if (this.menuEl && this.menuEl.parentNode) {
             this.menuEl.parentNode.removeChild(this.menuEl);
@@ -130,11 +134,11 @@ export class RadialContextMenuComponent {
         return '';
     }
 
-    private getPoint(angle: number, distance = 50): { x: number; y: number } {
-        const rad = (angle * Math.PI) / 180;
+    private getPoint(deg: number, radiusPercent: number): { x: number; y: number } {
+        const rad = (deg * Math.PI) / 180;
         return {
-            x: 50 + distance * Math.cos(rad),
-            y: 50 + distance * Math.sin(rad),
+            x: 50 + radiusPercent * Math.cos(rad),
+            y: 50 + radiusPercent * Math.sin(rad),
         };
     }
 
@@ -212,17 +216,14 @@ export class RadialContextMenuComponent {
         this.isOpen.set(false);
         this.activeHoverItem.set(null);
         this.menuEl.classList.remove('active');
+        this.onClose?.();
+        this.emitEvent('menu-close', {});
 
         setTimeout(() => {
             if (!this.isOpen() && this.menuEl && !this.menuEl.classList.contains('active')) {
                 this.menuEl.style.display = 'none';
-                if (this.onClose) {
-                    this.onClose();
-                }
             }
         }, 300);
-
-        this.emitEvent('menu-close', {});
     }
 
     public navigateTo(item: MenuItem): void {
@@ -412,12 +413,14 @@ export class RadialContextMenuComponent {
         segment.addEventListener('mouseenter', () => {
             this.activeHoverItem.set(item);
             this.onHover?.(item);
+            this.emitEvent('menu-hover', { item });
             this.updateCenterButton();
         });
 
         segment.addEventListener('mouseleave', () => {
             this.activeHoverItem.set(null);
             this.onHover?.(null);
+            this.emitEvent('menu-hover', { item: null });
             this.updateCenterButton();
         });
 
@@ -426,26 +429,22 @@ export class RadialContextMenuComponent {
 
     private onDocumentContextMenu(e: MouseEvent): void {
         const targetSelector = this.selector();
-        if (targetSelector) {
-            const target = (e.target as HTMLElement)?.closest?.(targetSelector);
-            if (!target) return;
-        }
+        if (!targetSelector) return;
+
+        const target = (e.target as HTMLElement)?.closest?.(targetSelector);
+        if (!target) return;
 
         e.preventDefault();
         e.stopPropagation();
 
-        if (this.isOpen()) {
-            this.close();
-        } else {
-            this.open(e.clientX, e.clientY);
-        }
+        this.open(e.clientX, e.clientY);
     }
 
     private onDocumentClick(e: MouseEvent): void {
         if (!this.isOpen()) return;
 
         // Prevent instant close if the click opened the menu in the same interaction
-        if (Date.now() - this._openedAt < 100) return;
+        if (Date.now() - this._openedAt < 150) return;
 
         if (this.menuEl) {
             const path = e.composedPath ? e.composedPath() : [];

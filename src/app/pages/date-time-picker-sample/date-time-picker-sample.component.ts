@@ -13,6 +13,7 @@ export class DateTimePickerSampleComponent {
 
     // 2. Blur Enabled
     public blurDate = signal<Date | null>(new Date());
+    public isBlurEnabled = signal<boolean>(true);
 
     // 3. Business Hours & Future Only
     public businessDate = signal<Date | null>(null);
@@ -101,6 +102,15 @@ export class DateTimePickerSampleComponent {
     public clearStandard(): void {
         this.standardDate.set(null);
         this.standardPicker?.setDate(null);
+    }
+
+    public toggleBlurMode(): void {
+        this.isBlurEnabled.update((v) => !v);
+        const host = this as unknown as HTMLElement;
+        const picker = (host.querySelector?.('#blur-picker') || document.querySelector('#blur-picker')) as
+            | (DateTimePickerComponent & HTMLElement)
+            | null;
+        picker?.setBlur(this.isBlurEnabled());
     }
 
     public setNextWeek(): void {

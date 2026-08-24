@@ -59,21 +59,41 @@ export class RadialContextMenuSampleComponent {
                 emojiMenu.setSelector('.emoji-interactive-zone');
                 emojiMenu.setBlur(this.emojiBlur());
 
-                emojiMenu.onSelectItem = (item: MenuItem) => {
+                const handleEmojiSelect = (item: MenuItem) => {
                     const icon = item.image ? `${item.image} ` : '';
                     this.emojiLastSelected.set(`${icon}${item.name}`);
                     logAnalyticsEvent('radial_menu_select', { item: item.name, variant: 'emoji' });
                 };
 
-                emojiMenu.onHover = (item: MenuItem | null) => {
+                const handleEmojiHover = (item: MenuItem | null) => {
                     this.emojiHovered.set(item ? `${item.image || ''} ${item.name}` : 'None');
                 };
 
-                emojiMenu.onOpen = () => {
+                const handleEmojiOpen = () => {
                     this.emojiMenuState.set('Active (Open)');
                     logAnalyticsEvent('radial_menu_open', { variant: 'emoji' });
                 };
-                emojiMenu.onClose = () => this.emojiMenuState.set('Closed');
+
+                const handleEmojiClose = () => {
+                    this.emojiMenuState.set('Closed');
+                    this.emojiHovered.set('None');
+                };
+
+                // Direct component callbacks
+                emojiMenu.onSelectItem = handleEmojiSelect;
+                emojiMenu.onHover = handleEmojiHover;
+                emojiMenu.onOpen = handleEmojiOpen;
+                emojiMenu.onClose = handleEmojiClose;
+
+                // DOM Custom Events
+                emojiMenu.addEventListener('item-selected', ((e: CustomEvent) => {
+                    if (e.detail?.item) handleEmojiSelect(e.detail.item);
+                }) as EventListener);
+                emojiMenu.addEventListener('menu-hover', ((e: CustomEvent) => {
+                    handleEmojiHover(e.detail?.item ?? null);
+                }) as EventListener);
+                emojiMenu.addEventListener('menu-open', handleEmojiOpen);
+                emojiMenu.addEventListener('menu-close', handleEmojiClose);
             }
 
             // 2. Initialize SVG Vector Menu Instance
@@ -83,20 +103,40 @@ export class RadialContextMenuSampleComponent {
                 svgMenu.setSelector('.svg-interactive-zone');
                 svgMenu.setBlur(this.svgBlur());
 
-                svgMenu.onSelectItem = (item: MenuItem) => {
+                const handleSvgSelect = (item: MenuItem) => {
                     this.svgLastSelected.set(item.name);
                     logAnalyticsEvent('radial_menu_select', { item: item.name, variant: 'svg' });
                 };
 
-                svgMenu.onHover = (item: MenuItem | null) => {
+                const handleSvgHover = (item: MenuItem | null) => {
                     this.svgHovered.set(item ? item.name : 'None');
                 };
 
-                svgMenu.onOpen = () => {
+                const handleSvgOpen = () => {
                     this.svgMenuState.set('Active (Open)');
                     logAnalyticsEvent('radial_menu_open', { variant: 'svg' });
                 };
-                svgMenu.onClose = () => this.svgMenuState.set('Closed');
+
+                const handleSvgClose = () => {
+                    this.svgMenuState.set('Closed');
+                    this.svgHovered.set('None');
+                };
+
+                // Direct component callbacks
+                svgMenu.onSelectItem = handleSvgSelect;
+                svgMenu.onHover = handleSvgHover;
+                svgMenu.onOpen = handleSvgOpen;
+                svgMenu.onClose = handleSvgClose;
+
+                // DOM Custom Events
+                svgMenu.addEventListener('item-selected', ((e: CustomEvent) => {
+                    if (e.detail?.item) handleSvgSelect(e.detail.item);
+                }) as EventListener);
+                svgMenu.addEventListener('menu-hover', ((e: CustomEvent) => {
+                    handleSvgHover(e.detail?.item ?? null);
+                }) as EventListener);
+                svgMenu.addEventListener('menu-open', handleSvgOpen);
+                svgMenu.addEventListener('menu-close', handleSvgClose);
             }
         }, 0);
     }

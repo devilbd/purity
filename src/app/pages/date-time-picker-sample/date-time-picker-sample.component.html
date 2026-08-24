@@ -58,8 +58,17 @@
                 <span class="output-label">Selected:</span>
                 <code class="output-value">{{blurDate() ? (blurDate() | date: 'medium') : 'None (click to pick)'}}</code>
             </div>
+            <div class="controls-row">
+                <button
+                    type="button"
+                    class="button-secondary btn-sm"
+                    onclick="dateTimePickerSample.toggleBlurMode()"
+                >
+                    Toggle Blur: {{isBlurEnabled() ? 'ON' : 'OFF'}}
+                </button>
+            </div>
             <div class="tag-row">
-                <span class="status-tag tag-info">enableBlur = true</span>
+                <span class="status-tag tag-info">enableBlur = {{isBlurEnabled()}}</span>
                 <span class="status-tag tag-primary">Pipe: medium</span>
             </div>
         </div>
@@ -69,8 +78,8 @@
             <div class="card-title-area">
                 <span class="card-icon">🏢</span>
                 <div>
-                    <h5>Business Hours & Future Dates</h5>
-                    <p class="card-subtitle">Restricted to next 60 days, working hours 09:00 - 18:00</p>
+                    <h5>Office Hours (09:00 - 18:00)</h5>
+                    <p class="card-subtitle">Restricted to future dates within 60 days & business hours</p>
                 </div>
             </div>
             <div class="picker-wrapper">
@@ -78,7 +87,7 @@
             </div>
             <div class="output-preview">
                 <span class="output-label">Selected:</span>
-                <code class="output-value">{{businessDate() ? (businessDate() | date: 'MMM dd, yyyy HH:mm') : 'None (click to pick)'}}</code>
+                <code class="output-value">{{businessDate() ? (businessDate() | date: 'yyyy-MM-dd HH:mm') : 'None (click to pick)'}}</code>
             </div>
             <div class="controls-row">
                 <button
@@ -89,15 +98,19 @@
                     Set Next Week 14:30
                 </button>
             </div>
+            <div class="tag-row">
+                <span class="status-tag tag-warn">futureOnly: true</span>
+                <span class="status-tag tag-warn">09:00 - 18:00</span>
+            </div>
         </div>
 
-        <!-- 4. Date Range & Disabled Days -->
+        <!-- 4. Custom Window & Disabled Dates -->
         <div class="picker-card window">
             <div class="card-title-area">
-                <span class="card-icon">🚫</span>
+                <span class="card-icon">🛡️</span>
                 <div>
-                    <h5>Range Limits & Disabled Days</h5>
-                    <p class="card-subtitle">Past 7 days to +14 days with specific disabled dates</p>
+                    <h5>Custom Window & Blockouts</h5>
+                    <p class="card-subtitle">Bound between -7 and +14 days with disabled target days</p>
                 </div>
             </div>
             <div class="picker-wrapper">
@@ -105,12 +118,11 @@
             </div>
             <div class="output-preview">
                 <span class="output-label">Selected:</span>
-                <code class="output-value">{{rangeDate() ? (rangeDate() | date: 'yyyy-MM-dd HH:mm') : 'None (click to pick)'}}</code>
+                <code class="output-value">{{rangeDate() ? (rangeDate() | date: 'EEEE, MMMM d, yyyy') : 'None (click to pick)'}}</code>
             </div>
             <div class="tag-row">
-                <span class="status-tag tag-warn">daysBack: 7</span>
-                <span class="status-tag tag-warn">daysForward: 14</span>
-                <span class="status-tag tag-danger">2 disabled dates</span>
+                <span class="status-tag tag-danger">-7 to +14 days</span>
+                <span class="status-tag tag-danger">Blockout Days</span>
             </div>
         </div>
     </div>

@@ -86,6 +86,7 @@ export class DateTimePickerComponent {
                 document.body.appendChild(overlay);
                 this._overlayEl = overlay;
                 (overlay as any)._picker = this;
+                overlay.classList.toggle('blur-enabled', this.enableBlur());
             }
         }, 0);
 
@@ -101,19 +102,11 @@ export class DateTimePickerComponent {
                 return;
             }
 
-            const target = event.target as Node | null;
-            if (host && target && typeof host.contains === 'function' && host.contains(target)) {
-                return;
-            }
-            if (this._overlayEl && target && typeof this._overlayEl.contains === 'function' && this._overlayEl.contains(target)) {
-                return;
-            }
-
             this.close();
         };
 
         this._boundKeydown = (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && this.isOpen()) {
+            if (this.isOpen() && event.key === 'Escape') {
                 this.close();
             }
         };
@@ -209,19 +202,26 @@ export class DateTimePickerComponent {
         return validBounds.length > 0 ? new Date(Math.min(...validBounds)) : null;
     }
 
-    public get years(): number[] {
-        const currentYear = this.viewDate().getFullYear();
-        const startYear = currentYear - 10;
-        return Array.from({ length: 21 }, (_, i) => startYear + i);
+    public get displayLabel(): string {
+        const date = this.selectedDate();
+        if (!date) {
+            return 'Select Date & Time';
+        }
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        return `${y}-${m}-${d} ${hh}:${mm}`;
+    }
+
+    public get monthYearLabel(): string {
+        const v = this.viewDate();
+        return v.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
     }
 
     public get viewYear(): number {
         return this.viewDate().getFullYear();
-    }
-
-    public get monthYearLabel(): string {
-        const date = this.viewDate();
-        return date.toLocaleDateString('default', { month: 'long', year: 'numeric' });
     }
 
     public get workingHoursFormatted(): string {
@@ -232,96 +232,80 @@ export class DateTimePickerComponent {
         return String(this.workingMinutes()).padStart(2, '0');
     }
 
-    public get displayLabel(): string {
-        const d = this.selectedDate();
-        if (!d) return '+ choose date';
-        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const month = months[d.getMonth()];
-        const day = String(d.getDate()).padStart(2, '0');
-        const year = d.getFullYear();
-        const hours = String(d.getHours()).padStart(2, '0');
-        const mins = String(d.getMinutes()).padStart(2, '0');
-        return `${month} ${day}, ${year} ${hours}:${mins}`;
-    }
-
     public get calendarDays(): CalendarDay[] {
-        const date = this.viewDate();
-        const year = date.getFullYear();
-        const month = date.getMonth();
+        const currentView = this.viewDate();
+        const year = currentView.getFullYear();
+        const month = currentView.getMonth();
 
-        // First day of current month
-        const firstDay = new Date(year, month, 1);
-        const lastDayPreviousMonth = new Date(year, month, 0);
-        const lastDayCurrentMonth = new Date(year, month + 1, 0);
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+
+        const startDayIndex = firstDayOfMonth.getDay();
+        const totalDaysInMonth = lastDayOfMonth.getDate();
 
         const days: CalendarDay[] = [];
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
         const working = this.workingDate();
-        const selectedCompare = working
-            ? new Date(working.getFullYear(), working.getMonth(), working.getDate()).getTime()
-            : null;
 
-        // Days from previous month to fill the first row
-        const startDayOfWeek = firstDay.getDay(); // 0 is Sunday
-        for (let i = startDayOfWeek - 1; i >= 0; i--) {
-            const d = new Date(year, month - 1, lastDayPreviousMonth.getDate() - i);
-            days.push(this.createCalendarDay(d, false, today, selectedCompare));
+        // 1. Previous month trailing days
+        const prevMonthLastDate = new Date(year, month, 0).getDate();
+        for (let i = startDayIndex - 1; i >= 0; i--) {
+            const date = new Date(year, month - 1, prevMonthLastDate - i);
+            days.push(this.createCalendarDay(date, false, today, working));
         }
 
-        // Days of current month
-        for (let i = 1; i <= lastDayCurrentMonth.getDate(); i++) {
-            const d = new Date(year, month, i);
-            days.push(this.createCalendarDay(d, true, today, selectedCompare));
+        // 2. Current month days
+        for (let dayNum = 1; dayNum <= totalDaysInMonth; dayNum++) {
+            const date = new Date(year, month, dayNum);
+            days.push(this.createCalendarDay(date, true, today, working));
         }
 
-        // Days from next month to fill the last row
-        const endDayOfWeek = lastDayCurrentMonth.getDay();
-        const remainingDays = 6 - endDayOfWeek;
-        for (let i = 1; i <= remainingDays; i++) {
-            const d = new Date(year, month + 1, i);
-            days.push(this.createCalendarDay(d, false, today, selectedCompare));
+        // 3. Next month leading days to fill 42 cells grid (6 rows of 7)
+        const remainingCells = 42 - days.length;
+        for (let nextDay = 1; nextDay <= remainingCells; nextDay++) {
+            const date = new Date(year, month + 1, nextDay);
+            days.push(this.createCalendarDay(date, false, today, working));
         }
 
         return days;
+    }
+
+    public get years(): number[] {
+        const currentYear = this.viewYear;
+        const yearsList: number[] = [];
+        const start = currentYear - 12;
+        const end = currentYear + 15;
+
+        for (let yr = start; yr <= end; yr++) {
+            yearsList.push(yr);
+        }
+        return yearsList;
     }
 
     private createCalendarDay(
         date: Date,
         isCurrentMonth: boolean,
         today: Date,
-        selectedTime: number | null,
+        working: Date | null,
     ): CalendarDay {
-        const dayStart = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0).getTime();
-        const dayEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999).getTime();
+        const isToday =
+            date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
 
-        const min = this.effectiveMinDate;
-        const max = this.effectiveMaxDate;
-        const rest = this.restrictions();
+        const isSelected =
+            working !== null &&
+            date.getDate() === working.getDate() &&
+            date.getMonth() === working.getMonth() &&
+            date.getFullYear() === working.getFullYear();
 
-        let isDisabled = false;
-        if (min && dayEnd < min.getTime()) isDisabled = true;
-        if (max && dayStart > max.getTime()) isDisabled = true;
+        const isDisabled = this.isDateDisabled(date);
 
-        if (rest?.disabledDates) {
-            const isDisabledSpecific = rest.disabledDates.some(
-                (d: Date) =>
-                    d.getFullYear() === date.getFullYear() &&
-                    d.getMonth() === date.getMonth() &&
-                    d.getDate() === date.getDate(),
-            );
-            if (isDisabledSpecific) isDisabled = true;
-        }
-
-        const isToday = dayStart === today.getTime();
-        const isSelected = dayStart === selectedTime;
-
-        const cellClasses: string[] = ['day-cell'];
-        if (!isCurrentMonth) cellClasses.push('off-month');
-        if (isToday) cellClasses.push('today');
-        if (isSelected) cellClasses.push('selected');
-        if (isDisabled) cellClasses.push('disabled');
+        const classes = ['day-cell'];
+        if (!isCurrentMonth) classes.push('off-month');
+        if (isToday) classes.push('today');
+        if (isSelected) classes.push('selected');
+        if (isDisabled) classes.push('disabled');
 
         return {
             date,
@@ -331,58 +315,100 @@ export class DateTimePickerComponent {
             isToday,
             isSelected,
             isDisabled,
-            cellClass: cellClasses.join(' '),
+            cellClass: classes.join(' '),
         };
     }
 
-    public initWorkingState(): void {
-        const baseDate = this.selectedDate() || new Date();
-        this.workingDate.set(this.selectedDate());
-        this.viewDate.set(new Date(baseDate.getFullYear(), baseDate.getMonth(), 1));
+    private isDateDisabled(date: Date): boolean {
+        const min = this.effectiveMinDate;
+        const max = this.effectiveMaxDate;
 
-        this.workingHours.set(baseDate.getHours());
-        this.workingMinutes.set(baseDate.getMinutes());
+        const checkTime = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 
+        if (min) {
+            const minTime = new Date(min.getFullYear(), min.getMonth(), min.getDate()).getTime();
+            if (checkTime < minTime) return true;
+        }
+
+        if (max) {
+            const maxTime = new Date(max.getFullYear(), max.getMonth(), max.getDate()).getTime();
+            if (checkTime > maxTime) return true;
+        }
+
+        const rest = this.restrictions();
+        if (rest?.disabledDates && rest.disabledDates.length > 0) {
+            for (const disabled of rest.disabledDates) {
+                if (
+                    date.getDate() === disabled.getDate() &&
+                    date.getMonth() === disabled.getMonth() &&
+                    date.getFullYear() === disabled.getFullYear()
+                ) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private initWorkingState(): void {
+        const sel = this.selectedDate();
+        if (sel) {
+            this.workingDate.set(new Date(sel));
+            this.workingHours.set(sel.getHours());
+            this.workingMinutes.set(sel.getMinutes());
+            this.viewDate.set(new Date(sel.getFullYear(), sel.getMonth(), 1));
+        } else {
+            const now = new Date();
+            this.workingDate.set(null);
+            this.workingHours.set(12);
+            this.workingMinutes.set(0);
+            this.viewDate.set(new Date(now.getFullYear(), now.getMonth(), 1));
+        }
         this.enforceTimeRestrictions();
     }
 
-    public updateOverlayPosition(): void {
+    private updateOverlayPosition(): void {
         const host = this.getHost();
-        const overlay = this._overlayEl || (host?.querySelector?.('.picker-overlay') as HTMLElement | null);
-        const toggleBtn = host?.querySelector?.('.picker-toggle') as HTMLElement | null;
-        if (!overlay || !toggleBtn) return;
+        const overlay = this._overlayEl || (host?.querySelector('.picker-overlay') as HTMLElement | null);
+        if (!host || !overlay) return;
 
-        const btnRect = toggleBtn.getBoundingClientRect();
-        const overlayHeight = overlay.offsetHeight > 0 ? overlay.offsetHeight : 390;
-        const overlayWidth = overlay.offsetWidth > 0 ? overlay.offsetWidth : 290;
+        const trigger = host.querySelector('.picker-toggle') as HTMLElement | null;
+        if (!trigger) return;
 
-        const spaceBelow = window.innerHeight - btnRect.bottom;
-        const spaceAbove = btnRect.top;
+        const triggerRect = trigger.getBoundingClientRect();
+        const overlayHeight = 380;
+        const overlayWidth = 290;
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
 
-        // Vertical placement (flip to top if cramped below)
-        let top: number;
-        if (spaceBelow < overlayHeight + 12 && spaceAbove > spaceBelow) {
-            top = Math.max(12, btnRect.top - overlayHeight - 6);
-            this.placement.set('placement-top');
-        } else {
-            top = Math.min(window.innerHeight - overlayHeight - 12, btnRect.bottom + 6);
-            this.placement.set('placement-bottom');
+        const spaceBelow = viewportHeight - triggerRect.bottom;
+        const spaceAbove = triggerRect.top;
+
+        let placeTop = false;
+        if (spaceBelow < overlayHeight && spaceAbove >= overlayHeight) {
+            placeTop = true;
         }
 
-        // Horizontal placement (flip to right if cramped on right)
-        let left: number;
-        if (btnRect.left + overlayWidth > window.innerWidth - 12) {
-            left = Math.max(12, btnRect.right - overlayWidth);
+        this.placement.set(placeTop ? 'placement-top' : 'placement-bottom');
+
+        let top = placeTop ? triggerRect.top - overlayHeight - 6 : triggerRect.bottom + 6;
+        let left = triggerRect.left;
+
+        if (left + overlayWidth > viewportWidth - 10) {
+            left = Math.max(10, viewportWidth - overlayWidth - 10);
             this.alignPlacement.set('align-right');
         } else {
-            left = Math.max(12, btnRect.left);
             this.alignPlacement.set('align-left');
         }
 
-        overlay.style.position = 'fixed';
-        overlay.style.top = `${Math.round(top)}px`;
-        overlay.style.left = `${Math.round(left)}px`;
-        overlay.style.zIndex = '9999';
+        if (top < 10) top = 10;
+        if (top + overlayHeight > viewportHeight - 10) {
+            top = Math.max(10, viewportHeight - overlayHeight - 10);
+        }
+
+        overlay.style.top = `${top}px`;
+        overlay.style.left = `${left}px`;
     }
 
     public togglePicker(event?: MouseEvent): void {
@@ -410,6 +436,12 @@ export class DateTimePickerComponent {
         this.viewMode.set('calendar');
         this.isOpen.set(true);
 
+        if (this._overlayEl) {
+            this._overlayEl.classList.add('is-open');
+            this._overlayEl.classList.remove('is-closed');
+            this._overlayEl.classList.toggle('blur-enabled', this.enableBlur());
+        }
+
         requestAnimationFrame(() => {
             this.updateOverlayPosition();
         });
@@ -418,6 +450,10 @@ export class DateTimePickerComponent {
 
     public close(): void {
         this.isOpen.set(false);
+        if (this._overlayEl) {
+            this._overlayEl.classList.remove('is-open');
+            this._overlayEl.classList.add('is-closed');
+        }
     }
 
     public onCalendarGridClick(event: MouseEvent): void {
@@ -457,96 +493,106 @@ export class DateTimePickerComponent {
     }
 
     public toggleYearPicker(): void {
-        this.viewMode.update((v: string) => (v === 'calendar' ? 'year' : 'calendar'));
+        const nextMode = this.viewMode() === 'calendar' ? 'year' : 'calendar';
+        this.viewMode.set(nextMode);
+        if (this._overlayEl) {
+            const calBody = this._overlayEl.querySelector('.calendar-body');
+            const yearOverlay = this._overlayEl.querySelector('.year-selector-overlay');
+            if (calBody) {
+                calBody.classList.toggle('blurred', this.enableBlur() && nextMode === 'year');
+            }
+            if (yearOverlay) {
+                yearOverlay.classList.toggle('is-visible', nextMode === 'year');
+                yearOverlay.classList.toggle('is-hidden', nextMode !== 'year');
+            }
+        }
     }
 
     public selectYear(year: number): void {
-        const current = this.viewDate();
-        this.viewDate.set(new Date(year, current.getMonth(), 1));
-
-        const working = this.workingDate();
-        if (working) {
-            const updated = new Date(working);
-            updated.setFullYear(year);
-            this.workingDate.set(updated);
-        }
-
+        const cur = this.viewDate();
+        this.viewDate.set(new Date(year, cur.getMonth(), 1));
         this.viewMode.set('calendar');
-    }
-
-    public confirmSelection(): void {
-        const working = this.workingDate() || new Date();
-        const confirmed = new Date(working);
-        this.updateDateWithTime(confirmed);
-        this.selectedDate.set(confirmed);
-        this.emitSelection();
-        this.isOpen.set(false);
+        if (this._overlayEl) {
+            const calBody = this._overlayEl.querySelector('.calendar-body');
+            const yearOverlay = this._overlayEl.querySelector('.year-selector-overlay');
+            if (calBody) calBody.classList.remove('blurred');
+            if (yearOverlay) {
+                yearOverlay.classList.remove('is-visible');
+                yearOverlay.classList.add('is-hidden');
+            }
+        }
     }
 
     public prevMonth(): void {
-        const current = this.viewDate();
-        this.viewDate.set(new Date(current.getFullYear(), current.getMonth() - 1, 1));
+        const cur = this.viewDate();
+        this.viewDate.set(new Date(cur.getFullYear(), cur.getMonth() - 1, 1));
     }
 
     public nextMonth(): void {
-        const current = this.viewDate();
-        this.viewDate.set(new Date(current.getFullYear(), current.getMonth() + 1, 1));
+        const cur = this.viewDate();
+        this.viewDate.set(new Date(cur.getFullYear(), cur.getMonth() + 1, 1));
     }
 
-    public onHoursInput(target: HTMLInputElement): void {
-        let val = parseInt(target.value, 10);
-        if (isNaN(val)) val = 0;
-        this.workingHours.set(val);
-        this.onTimeChange();
+    public onHoursInput(inputEl: HTMLInputElement): void {
+        const val = inputEl.value.replace(/\D/g, '');
+        let num = parseInt(val, 10);
+        if (isNaN(num)) num = 0;
+        if (num > 23) num = 23;
+        if (num < 0) num = 0;
+        this.workingHours.set(num);
     }
 
-    public onMinutesInput(target: HTMLInputElement): void {
-        let val = parseInt(target.value, 10);
-        if (isNaN(val)) val = 0;
-        this.workingMinutes.set(val);
-        this.onTimeChange();
+    public onMinutesInput(inputEl: HTMLInputElement): void {
+        const val = inputEl.value.replace(/\D/g, '');
+        let num = parseInt(val, 10);
+        if (isNaN(num)) num = 0;
+        if (num > 59) num = 59;
+        if (num < 0) num = 0;
+        this.workingMinutes.set(num);
     }
 
     public onTimeChange(): void {
-        let h = this.workingHours();
-        if (isNaN(h) || h < 0) h = 0;
-        if (h > 23) h = 23;
-        this.workingHours.set(h);
-
-        let m = this.workingMinutes();
-        if (isNaN(m) || m < 0) m = 0;
-        if (m > 59) m = 59;
-        this.workingMinutes.set(m);
-
         this.enforceTimeRestrictions();
     }
 
+    public confirmSelection(): void {
+        let work = this.workingDate();
+        if (!work) {
+            work = new Date();
+            if (this.isDateDisabled(work)) {
+                return;
+            }
+        }
+
+        const result = new Date(
+            work.getFullYear(),
+            work.getMonth(),
+            work.getDate(),
+            this.workingHours(),
+            this.workingMinutes(),
+            0,
+            0,
+        );
+
+        this.selectedDate.set(result);
+        this.emitSelection();
+        this.close();
+    }
+
     private enforceTimeRestrictions(): void {
+        const work = this.workingDate();
         const rest = this.restrictions();
         if (!rest) return;
 
-        const working = this.workingDate();
-        if (!working) return;
+        const isTodayOrMin =
+            work &&
+            rest.minDate &&
+            work.getDate() === rest.minDate.getDate() &&
+            work.getMonth() === rest.minDate.getMonth() &&
+            work.getFullYear() === rest.minDate.getFullYear();
 
-        const current = new Date(working);
-        this.updateDateWithTime(current);
-
-        const min = this.effectiveMinDate;
-        const max = this.effectiveMaxDate;
-
-        if (min && current.getTime() < min.getTime()) {
-            this.applyDateToWorking(min);
-            this.updateDateWithTime(current);
-        }
-
-        if (max && current.getTime() > max.getTime()) {
-            this.applyDateToWorking(max);
-            this.updateDateWithTime(current);
-        }
-
-        if (rest.minTime || rest.maxTime) {
+        if (isTodayOrMin || !work) {
             const timeVal = this.workingHours() * 60 + this.workingMinutes();
-
             if (rest.minTime) {
                 const [minH, minM] = rest.minTime.split(':').map(Number);
                 const minVal = minH * 60 + minM;
@@ -570,56 +616,6 @@ export class DateTimePickerComponent {
         this.workingMinutes.set(m);
     }
 
-    private applyDateToWorking(date: Date): void {
-        this.setWorkingTime(date.getHours(), date.getMinutes());
-    }
-
-    public handleTimeKeydown(event: KeyboardEvent): void {
-        const target = event.target as HTMLInputElement;
-        const key = event.key;
-
-        const isControlKey = [
-            'Backspace', 'Tab', 'Enter', 'Escape', 'Delete', 'ArrowLeft', 'ArrowRight', 'Home', 'End',
-        ].includes(key);
-
-        if (isControlKey || (event.ctrlKey && ['a', 'c', 'v', 'x'].includes(key.toLowerCase()))) {
-            return;
-        }
-
-        if (!/^\d$/.test(key)) {
-            event.preventDefault();
-            event.stopPropagation();
-            return;
-        }
-
-        if (target.selectionStart !== target.selectionEnd) {
-            return;
-        }
-
-        if (target.value.length >= 2) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-    }
-
-    public handleWheel(event: WheelEvent, type: 'hours' | 'minutes'): void {
-        event.preventDefault();
-        const delta = event.deltaY < 0 ? 1 : -1;
-
-        if (type === 'hours') {
-            let h = this.workingHours() + delta;
-            if (h > 23) h = 0;
-            if (h < 0) h = 23;
-            this.workingHours.set(h);
-        } else {
-            let m = this.workingMinutes() + delta;
-            if (m > 59) m = 0;
-            if (m < 0) m = 59;
-            this.workingMinutes.set(m);
-        }
-        this.onTimeChange();
-    }
-
     public setDate(date: Date | null): void {
         this.selectedDate.set(date);
         this.initWorkingState();
@@ -632,10 +628,9 @@ export class DateTimePickerComponent {
 
     public setBlur(enable: boolean): void {
         this.enableBlur.set(enable);
-    }
-
-    private updateDateWithTime(date: Date): void {
-        date.setHours(this.workingHours(), this.workingMinutes(), 0, 0);
+        if (this._overlayEl) {
+            this._overlayEl.classList.toggle('blur-enabled', enable);
+        }
     }
 
     private emitSelection(): void {

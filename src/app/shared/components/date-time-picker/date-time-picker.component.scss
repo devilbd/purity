@@ -97,9 +97,9 @@ date-time-picker, :host {
     }
 
     &.blur-enabled {
-        background: var(--dp-surface-blur-bg);
-        backdrop-filter: var(--blur-heavy);
-        -webkit-backdrop-filter: var(--blur-heavy);
+        background: var(--dp-surface-blur-bg) !important;
+        backdrop-filter: var(--blur-heavy) !important;
+        -webkit-backdrop-filter: var(--blur-heavy) !important;
     }
 }
 
@@ -153,19 +153,21 @@ date-time-picker, :host {
             transition: all var(--transition-fast) ease;
             outline: none;
 
+            .chevron-icon {
+                transition: transform var(--transition-fast) var(--ease-spring);
+
+                &.is-rotated {
+                    transform: rotate(180deg);
+                }
+            }
+
             &:hover {
                 background: var(--gnome-hover);
                 border-color: var(--gnome-border-subtle);
             }
 
-            .chevron-icon {
-                color: var(--dp-text-secondary, var(--text-secondary));
-                transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-
-                &.is-rotated {
-                    transform: rotate(180deg);
-                    color: var(--accent);
-                }
+            &:active {
+                background: var(--gnome-active);
             }
         }
     }
@@ -176,7 +178,7 @@ date-time-picker, :host {
         gap: 4px;
 
         .nav-btn {
-            background: var(--gnome-card);
+            background: var(--gnome-input);
             border: 1px solid var(--gnome-border-subtle);
             color: var(--dp-text-main, var(--text-main));
             width: 28px;
@@ -196,7 +198,6 @@ date-time-picker, :host {
             }
 
             &:active {
-                background: var(--gnome-active);
                 transform: scale(0.96);
             }
         }
@@ -214,8 +215,8 @@ date-time-picker, :host {
     transition: filter var(--transition-fast) ease, opacity var(--transition-fast) ease;
 
     &.blurred {
-        filter: blur(4px);
-        opacity: 0.35;
+        filter: blur(6px) !important;
+        opacity: 0.25 !important;
         pointer-events: none;
     }
 
@@ -302,6 +303,12 @@ date-time-picker, :host {
     overflow-y: auto;
     z-index: 10;
     transition: opacity var(--transition-fast) ease, transform var(--transition-fast) ease;
+
+    .blur-enabled & {
+        background: var(--dp-surface-blur-bg) !important;
+        backdrop-filter: var(--blur-heavy) !important;
+        -webkit-backdrop-filter: var(--blur-heavy) !important;
+    }
 
     &.is-hidden {
         opacity: 0;
