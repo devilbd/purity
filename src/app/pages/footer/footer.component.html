@@ -1,0 +1,20 @@
+<footer class="footer-component-root window">
+    <div class="footer-content">
+        <div class="footer-left">
+            <span class="framework-brand">
+                <img class="footer-logo-img" src="/purity_logo.png" alt="Purity Logo" width="22" height="22" />
+                <span class="framework-name">Purity</span>
+            </span>
+            <span class="version-badge" title="Framework Version">v{{version()}}</span>
+            <span class="build-badge {{isProduction() ? 'build-prod' : 'build-dev'}}" title="Build Version">build: {{buildVersion()}}</span>
+            <span class="footer-copy">© {{currentYear()}}</span>
+        </div>
+
+        <div class="footer-right">
+            <span class="creator-badge">
+                <span class="creator-label">Creator:</span>
+                <span class="creator-name">V. Parchev</span>
+            </span>
+        </div>
+    </div>
+</footer>

@@ -22,7 +22,8 @@ html {
 body {
     position: relative;
     margin: 0;
-    padding: 0;
+    padding: 7px;
+    box-sizing: border-box;
     min-height: 100vh;
     background: var(--wallpaper);
     background-attachment: fixed;
