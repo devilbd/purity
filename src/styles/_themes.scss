@@ -1,0 +1,34 @@
+/* ==========================================================================
+   Purity Design System - Theme Engine
+   Dark theme is the base foundation.
+   ========================================================================== */
+
+@use './theme-dark' as dark;
+@use './theme-light' as light;
+
+/* 1. Base / Default is Dark theme on :root, html, and body */
+:root {
+    @include dark.theme-dark-variables;
+}
+
+html,
+body {
+    @include dark.theme-dark-variables;
+    color-scheme: dark;
+}
+
+/* 2. Explicit Dark theme */
+html[data-theme='dark'],
+body[data-theme='dark'],
+[data-theme='dark'] {
+    @include dark.theme-dark-variables;
+    color-scheme: dark;
+}
+
+/* 3. Explicit Light theme */
+html[data-theme='light'],
+body[data-theme='light'],
+[data-theme='light'] {
+    @include light.theme-light-variables;
+    color-scheme: light;
+}

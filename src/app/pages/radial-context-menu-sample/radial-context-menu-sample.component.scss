@@ -28,10 +28,10 @@
             font-size: 11px;
             font-weight: 700;
             padding: 3px 9px;
-            border-radius: 999px;
-            background: rgba(53, 132, 228, 0.2);
-            color: #79c0ff;
-            border: 1px solid rgba(53, 132, 228, 0.35);
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
         }
     }
 
@@ -41,8 +41,8 @@
         color: var(--text-secondary);
 
         code {
-            color: #79c0ff;
-            background: rgba(53, 132, 228, 0.15);
+            color: var(--accent);
+            background: var(--accent-subtle);
             padding: 2px 5px;
             border-radius: 4px;
         }
@@ -64,8 +64,8 @@
         display: flex;
         flex-direction: column;
         gap: 14px;
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
         border-radius: var(--radius-window, 12px);
 
         .variant-header {
@@ -98,8 +98,8 @@
                     color: var(--text-secondary);
 
                     code {
-                        color: #79c0ff;
-                        background: rgba(53, 132, 228, 0.12);
+                        color: var(--accent);
+                        background: var(--accent-subtle);
                         padding: 1px 4px;
                         border-radius: 3px;
                     }
@@ -110,18 +110,18 @@
                 font-size: 10.5px;
                 font-weight: 700;
                 padding: 3px 8px;
-                border-radius: 999px;
+                border-radius: var(--radius-pill);
 
                 &.emoji-pill {
-                    background: rgba(227, 179, 65, 0.2);
-                    color: #f1e05a;
-                    border: 1px solid rgba(227, 179, 65, 0.35);
+                    background: var(--gnome-warn-bg);
+                    color: var(--gnome-warn);
+                    border: 1px solid var(--gnome-warn);
                 }
 
                 &.svg-pill {
-                    background: rgba(46, 194, 126, 0.2);
-                    color: #57e389;
-                    border: 1px solid rgba(46, 194, 126, 0.35);
+                    background: var(--gnome-success-bg);
+                    color: var(--gnome-success);
+                    border: 1px solid var(--gnome-success);
                 }
             }
         }
@@ -133,26 +133,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: radial-gradient(circle at center, rgba(53, 132, 228, 0.08) 0%, rgba(255, 255, 255, 0.02) 70%);
-        border: 2px dashed rgba(53, 132, 228, 0.35);
+        background: radial-gradient(circle at center, var(--accent-subtle) 0%, var(--gnome-card) 70%);
+        border: 2px dashed var(--accent-shadow);
         border-radius: var(--radius-control, 8px);
         cursor: context-menu;
         user-select: none;
-        transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+        transition: border-color var(--transition-fast) ease, background-color var(--transition-fast) ease, transform var(--transition-fast) ease;
 
         &:hover {
-            border-color: rgba(53, 132, 228, 0.7);
-            background-color: rgba(53, 132, 228, 0.12);
+            border-color: var(--accent);
+            background-color: var(--accent-subtle);
             transform: translateY(-1px);
         }
 
         &.svg-interactive-zone {
-            background: radial-gradient(circle at center, rgba(46, 194, 126, 0.08) 0%, rgba(255, 255, 255, 0.02) 70%);
-            border-color: rgba(46, 194, 126, 0.35);
+            background: radial-gradient(circle at center, var(--gnome-success-bg) 0%, var(--gnome-card) 70%);
+            border-color: var(--gnome-success);
 
             &:hover {
-                border-color: rgba(46, 194, 126, 0.7);
-                background-color: rgba(46, 194, 126, 0.12);
+                border-color: var(--gnome-success);
+                background-color: var(--gnome-success-bg);
             }
         }
 
@@ -182,7 +182,7 @@
                 max-width: 260px;
 
                 strong {
-                    color: #79c0ff;
+                    color: var(--accent);
                 }
             }
 
@@ -206,8 +206,8 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background: rgba(0, 0, 0, 0.22);
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
         border-radius: var(--radius-control, 8px);
 
         .telemetry-grid {
@@ -220,8 +220,8 @@
                 flex-direction: column;
                 gap: 2px;
                 padding: 6px 8px;
-                background: rgba(0, 0, 0, 0.25);
-                border: 1px solid rgba(255, 255, 255, 0.05);
+                background: var(--gnome-input);
+                border: 1px solid var(--gnome-border-subtle);
                 border-radius: 5px;
 
                 &.full-width {
@@ -230,7 +230,7 @@
 
                 .telemetry-label {
                     font-size: 10px;
-                    color: #8b949e;
+                    color: var(--text-secondary);
                     font-weight: 600;
                     text-transform: uppercase;
                     letter-spacing: 0.5px;
@@ -239,21 +239,21 @@
                 .telemetry-value {
                     font-family: var(--font-mono, monospace);
                     font-size: 11.5px;
-                    color: #d1d5db;
+                    color: var(--text-main);
                     word-break: break-all;
 
                     &.status-val {
-                        color: #79c0ff;
+                        color: var(--accent);
                         font-weight: 700;
                     }
 
                     &.hover-val {
-                        color: #e3b341;
+                        color: var(--gnome-warn);
                         font-weight: 600;
                     }
 
                     &.action-val {
-                        color: #7ee787;
+                        color: var(--gnome-success);
                         font-weight: 700;
                     }
                 }
@@ -265,7 +265,7 @@
             flex-direction: column;
             gap: 5px;
             padding-top: 2px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid var(--gnome-border-subtle);
 
             .summary-label {
                 font-size: 10.5px;
@@ -282,8 +282,8 @@
                     font-size: 10.5px;
                     padding: 2px 6px;
                     border-radius: 4px;
-                    background: rgba(255, 255, 255, 0.05);
-                    border: 1px solid rgba(255, 255, 255, 0.07);
+                    background: var(--gnome-hover);
+                    border: 1px solid var(--gnome-border-subtle);
                     color: var(--text-main);
                 }
             }

@@ -19,7 +19,7 @@ modal-view {
     width: 100%;
     min-height: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: flex-start;
@@ -52,7 +52,7 @@ modal-view {
     flex-direction: column;
     padding: 0;
     overflow: hidden;
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.15);
+    box-shadow: var(--shadow-deep);
     transform: scale(0.94) translateY(12px);
     transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, height 0.3s ease, max-width 0.3s ease, max-height 0.3s ease;
 
@@ -66,7 +66,7 @@ modal-view {
     height: 96vh;
     max-width: 98vw;
     max-height: 96vh;
-    border-radius: 8px;
+    border-radius: var(--radius-control);
 }
 
 .modal-header {
@@ -74,8 +74,8 @@ modal-view {
     justify-content: space-between;
     align-items: center;
     padding: 14px 20px;
-    background: rgba(255, 255, 255, 0.04);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--gnome-card);
+    border-bottom: 1px solid var(--gnome-border);
 }
 
 .modal-title-area {
@@ -102,26 +102,26 @@ modal-view {
 }
 
 .modal-control-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--gnome-input);
+    border: 1px solid var(--gnome-border);
     color: var(--text-main);
     width: 32px;
     height: 32px;
-    border-radius: 6px;
+    border-radius: var(--radius-control);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast) ease;
 
     &:hover {
-        background: rgba(255, 255, 255, 0.18);
-        border-color: rgba(255, 255, 255, 0.25);
+        background: var(--gnome-hover);
+        border-color: var(--gnome-border-focus);
     }
 
     &.close-btn:hover {
-        background: rgba(237, 51, 59, 0.8);
+        background: var(--gnome-error);
         border-color: #ed333b;
         color: #ffffff;
     }
@@ -141,19 +141,19 @@ modal-view {
 
     code {
         font-family: var(--font-mono, monospace);
-        background: rgba(53, 132, 228, 0.15);
-        border: 1px solid rgba(53, 132, 228, 0.3);
+        background: var(--accent-subtle, rgba(53, 132, 228, 0.15));
+        border: 1px solid var(--accent-shadow);
         border-radius: 4px;
         padding: 2px 6px;
         font-size: 12px;
-        color: #79c0ff;
+        color: var(--accent);
     }
 }
 
 .modal-info-card {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
+    background: var(--gnome-card);
+    border: 1px solid var(--gnome-border-subtle);
+    border-radius: var(--radius-control);
     padding: 12px 14px;
     margin-top: 14px;
     display: flex;
@@ -163,12 +163,12 @@ modal-view {
     .status-pill {
         display: inline-block;
         padding: 2px 8px;
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
         font-size: 11px;
         font-weight: 700;
-        background: rgba(46, 194, 126, 0.2);
-        color: #2ec27e;
-        border: 1px solid rgba(46, 194, 126, 0.35);
+        background: var(--gnome-success-bg, rgba(46, 194, 126, 0.2));
+        color: var(--gnome-success);
+        border: 1px solid var(--gnome-success);
     }
 }
 
@@ -178,6 +178,6 @@ modal-view {
     align-items: center;
     gap: 10px;
     padding: 14px 20px;
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: var(--gnome-subtle);
+    border-top: 1px solid var(--gnome-border);
 }

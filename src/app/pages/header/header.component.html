@@ -1,6 +1,22 @@
 <div class="header-component-root window">
     <div class="header-content">
-        <img class="header-logo-img" src="/purity_logo.png" alt="Purity Logo" width="190" height="190" />
-        <h1 class="main-logo">Purity</h1>
+        <div class="header-brand">
+            <img class="header-logo-img" src="/purity_logo.png" alt="Purity Logo" width="190" height="190" />
+            <h1 class="main-logo">Purity</h1>
+        </div>
+
+        <div class="header-actions">
+            <button
+                class="theme-toggle-btn"
+                type="button"
+                aria-label="Toggle Dark / Light Theme"
+                title="Switch theme (current: {{currentTheme()}})"
+                onclick="header.onToggleTheme()"
+            >
+                <span class="theme-icon theme-icon-moon {{isDark() ? 'active' : ''}}">🌙</span>
+                <span class="theme-label">{{isDark() ? 'Dark' : 'Light'}}</span>
+                <span class="theme-icon theme-icon-sun {{!isDark() ? 'active' : ''}}">☀️</span>
+            </button>
+        </div>
     </div>
 </div>

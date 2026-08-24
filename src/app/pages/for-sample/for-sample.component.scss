@@ -25,10 +25,10 @@
             font-size: 11px;
             font-weight: 700;
             padding: 3px 9px;
-            border-radius: 999px;
-            background: rgba(53, 132, 228, 0.2);
-            color: #79c0ff;
-            border: 1px solid rgba(53, 132, 228, 0.35);
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
         }
     }
 
@@ -38,8 +38,8 @@
         color: var(--text-secondary);
 
         code {
-            color: #79c0ff;
-            background: rgba(53, 132, 228, 0.15);
+            color: var(--accent);
+            background: var(--accent-subtle);
             padding: 2px 5px;
             border-radius: 4px;
         }
@@ -73,13 +73,13 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
         border-radius: var(--radius-control, 6px);
-        transition: transform 0.2s ease, border-color 0.2s ease;
+        transition: transform var(--transition-fast) ease, border-color var(--transition-fast) ease;
 
         &:hover {
-            border-color: rgba(53, 132, 228, 0.4);
+            border-color: var(--accent);
             transform: translateY(-1px);
         }
 
@@ -99,7 +99,7 @@
             .member-index {
                 font-family: var(--font-mono, monospace);
                 font-size: 11px;
-                color: #8b949e;
+                color: var(--text-secondary);
             }
 
             .member-name {
@@ -115,19 +115,19 @@
                 text-transform: uppercase;
 
                 &.status-active {
-                    background: rgba(46, 160, 67, 0.2);
-                    color: #7ee787;
-                    border: 1px solid rgba(46, 160, 67, 0.35);
+                    background: var(--gnome-success-bg);
+                    color: var(--gnome-success);
+                    border: 1px solid var(--gnome-success);
                 }
                 &.status-busy {
-                    background: rgba(210, 153, 34, 0.2);
-                    color: #e3b341;
-                    border: 1px solid rgba(210, 153, 34, 0.35);
+                    background: var(--gnome-warn-bg);
+                    color: var(--gnome-warn);
+                    border: 1px solid var(--gnome-warn);
                 }
                 &.status-offline {
-                    background: rgba(255, 255, 255, 0.1);
-                    color: #8b949e;
-                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    background: var(--gnome-input);
+                    color: var(--text-secondary);
+                    border: 1px solid var(--gnome-border-subtle);
                 }
             }
 
@@ -153,9 +153,9 @@
                 font-size: 10.5px;
                 padding: 2px 7px;
                 border-radius: 4px;
-                background: rgba(53, 132, 228, 0.12);
-                color: #79c0ff;
-                border: 1px solid rgba(53, 132, 228, 0.25);
+                background: var(--accent-subtle);
+                color: var(--accent);
+                border: 1px solid var(--accent-shadow);
             }
         }
     }

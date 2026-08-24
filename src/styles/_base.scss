@@ -1,0 +1,347 @@
+/* ==========================================================================
+   Purity Design System - Base Styles & UI Elements
+   ========================================================================== */
+
+/* 1. Tell the browser where the font file is */
+@font-face {
+    font-family: 'Adwaita Mono';
+    src: url('../app/assets/mono/AdwaitaMono-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background-color: var(--wallpaper-bg-color, #1e1e1e);
+    transition: background-color var(--transition-normal) ease;
+}
+
+body {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background: var(--wallpaper);
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: var(--wallpaper-bg-color, #1e1e1e);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    transition: background-color var(--transition-normal) ease, color var(--transition-normal) ease;
+}
+
+/* Base Label Styling */
+.label-base {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 12px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.2) 0%,
+        rgba(255, 255, 255, 0.05) 50%,
+        transparent 100%
+    );
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+/* Status Labels */
+.success {
+    @extend .label-base;
+    background-color: var(--gnome-success);
+    color: #ffffff;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 2px 6px rgba(46, 194, 126, 0.3);
+}
+
+.error {
+    @extend .label-base;
+    color: #ffffff;
+    background-color: var(--gnome-error);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 2px 6px rgba(237, 51, 59, 0.3);
+}
+
+.info {
+    @extend .label-base;
+    color: #ffffff;
+    background-color: var(--gnome-info);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 2px 6px rgba(53, 132, 228, 0.3);
+}
+
+.warn {
+    @extend .label-base;
+    color: rgba(0, 0, 0, 0.85);
+    background-color: var(--gnome-warn);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 2px 6px rgba(248, 228, 92, 0.3);
+}
+
+.window-base {
+    margin: var(--spacing-lg);
+}
+
+/* Glassmorphic Window Container */
+.window {
+    @extend .window-base;
+
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window);
+    box-shadow: var(--shadow-deep);
+
+    overflow: hidden;
+    color: var(--text-main);
+    font-family: var(--font-main);
+
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    transition: background-color var(--transition-normal) ease, border-color var(--transition-normal) ease, box-shadow var(--transition-normal) ease;
+}
+
+.button-base {
+    margin: var(--spacing-sm);
+}
+
+/* Primary Elevated Button */
+.button-primary {
+    @extend .button-base;
+    background-color: var(--accent);
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    color: #ffffff;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    padding: 10px 20px;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-control);
+    cursor: pointer;
+    transition: all var(--transition-fast) var(--ease-gnome);
+    outline: none;
+
+    &:hover:not(:disabled):not(.disabled) {
+        background-color: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px var(--accent-shadow), inset 0 1px rgba(255, 255, 255, 0.25);
+    }
+
+    &:active:not(:disabled):not(.disabled) {
+        background-color: var(--accent-active);
+        transform: translateY(0);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px var(--accent-shadow);
+        border-color: var(--accent);
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed !important;
+        pointer-events: none;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Secondary Translucent Button */
+.button-secondary {
+    @extend .button-base;
+    background-color: var(--gnome-card);
+    backdrop-filter: var(--blur-subtle);
+    -webkit-backdrop-filter: var(--blur-subtle);
+    border: 1px solid var(--gnome-border);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    padding: 10px 20px;
+    border-radius: var(--radius-control);
+    cursor: pointer;
+    transition: all var(--transition-fast) var(--ease-gnome);
+    outline: none;
+
+    &:hover:not(:disabled):not(.disabled) {
+        background-color: var(--gnome-hover);
+        border-color: var(--gnome-border-focus);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled):not(.disabled) {
+        background-color: var(--gnome-active);
+        transform: translateY(0);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px var(--accent-shadow);
+        border-color: var(--accent);
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed !important;
+        pointer-events: none;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Error / Cancel / Destructive Button */
+.button-error,
+.button-danger,
+.button-cancel {
+    @extend .button-base;
+    background-color: var(--gnome-error);
+    background-image: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.15),
+        transparent
+    );
+    color: #ffffff;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    padding: 10px 20px;
+    border-radius: var(--radius-control);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.3), 0 2px 6px rgba(237, 51, 59, 0.35);
+    cursor: pointer;
+    transition: all var(--transition-fast) var(--ease-gnome);
+    outline: none;
+
+    &:hover:not(:disabled):not(.disabled) {
+        background-color: #e01b24;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 14px rgba(237, 51, 59, 0.4), inset 0 1px rgba(255, 255, 255, 0.4);
+    }
+
+    &:active:not(:disabled):not(.disabled) {
+        background-color: #c01c28;
+        transform: translateY(0);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px rgba(237, 51, 59, 0.4);
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+        cursor: not-allowed !important;
+        pointer-events: none;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}
+
+.button-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.base-input {
+    margin: var(--spacing-sm);
+}
+
+/* Translucent Glass Input */
+.input-primary {
+    @extend .base-input;
+
+    background-color: var(--gnome-input);
+    backdrop-filter: var(--blur-subtle);
+    -webkit-backdrop-filter: var(--blur-subtle);
+
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-control);
+    color: var(--text-main);
+    padding: 10px 16px;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-fast) ease;
+    outline: none;
+
+    &::placeholder {
+        color: var(--text-secondary);
+        opacity: 0.65;
+    }
+
+    &:hover {
+        background-color: var(--gnome-input-hover);
+        border-color: var(--gnome-border);
+    }
+
+    &:focus {
+        background-color: var(--gnome-input-focus);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-shadow);
+    }
+}
+
+.input-primary.error,
+.input-primary.is-invalid,
+.is-invalid {
+    border-color: var(--gnome-error) !important;
+    box-shadow: 0 0 0 3px var(--gnome-error-bg) !important;
+}
+
+.input-primary.is-valid,
+.is-valid {
+    border-color: var(--gnome-success) !important;
+    box-shadow: 0 0 0 3px var(--gnome-success-bg) !important;
+}
+
+/* Typography & Layout Helpers */
+.mono-text {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--accent);
+}
+
+.flex-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-vertical > * {
+    margin: var(--spacing-sm);
+}
+
+.flex-horizontal {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-horizontal > * {
+    margin: var(--spacing-sm);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: var(--spacing-md) var(--spacing-xl);
+    color: var(--text-main);
+}

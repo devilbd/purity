@@ -22,8 +22,8 @@
         color: var(--text-secondary);
 
         code {
-            color: #79c0ff;
-            background: rgba(53, 132, 228, 0.15);
+            color: var(--accent);
+            background: var(--accent-subtle);
             padding: 2px 5px;
             border-radius: 4px;
         }
@@ -46,8 +46,8 @@
     }
 
     .pipe-results {
-        background: rgba(10, 15, 25, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: var(--gnome-input);
+        border: 1px solid var(--gnome-border-subtle);
         border-radius: 6px;
         padding: 10px 14px;
         display: flex;
@@ -62,26 +62,26 @@
             align-items: center;
             gap: 12px;
             padding: 2px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid var(--gnome-border-subtle);
 
             &:last-child {
                 border-bottom: none;
             }
 
             .pipe-label {
-                color: #8b949e;
+                color: var(--text-secondary);
             }
 
             .pipe-val {
-                color: #d1d5db;
+                color: var(--text-main);
                 font-weight: 600;
 
                 &.highlight {
-                    color: #7ee787;
-                    background: rgba(46, 160, 67, 0.15);
+                    color: var(--gnome-success);
+                    background: var(--gnome-success-bg);
                     padding: 2px 8px;
                     border-radius: 4px;
-                    border: 1px solid rgba(46, 160, 67, 0.3);
+                    border: 1px solid var(--gnome-success);
                 }
             }
         }

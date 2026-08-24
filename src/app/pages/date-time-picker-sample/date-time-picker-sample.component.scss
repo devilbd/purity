@@ -29,10 +29,10 @@
             font-size: 11px;
             font-weight: 700;
             padding: 3px 9px;
-            border-radius: 999px;
-            background: rgba(53, 132, 228, 0.2);
-            color: #79c0ff;
-            border: 1px solid rgba(53, 132, 228, 0.35);
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
         }
     }
 
@@ -42,8 +42,8 @@
         color: var(--text-secondary);
 
         code {
-            color: #79c0ff;
-            background: rgba(53, 132, 228, 0.15);
+            color: var(--accent);
+            background: var(--accent-subtle);
             padding: 2px 5px;
             border-radius: 4px;
         }
@@ -62,10 +62,10 @@
         display: flex;
         flex-direction: column;
         gap: 12px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
         border-radius: var(--radius-control, 6px);
-        transition: border-color 0.2s ease, transform 0.2s ease;
+        transition: border-color var(--transition-fast) ease, transform var(--transition-fast) ease;
         overflow: visible !important;
         position: relative;
 
@@ -74,7 +74,7 @@
         }
 
         &:hover {
-            border-color: rgba(53, 132, 228, 0.4);
+            border-color: var(--accent);
             transform: translateY(-1px);
         }
 
@@ -113,13 +113,13 @@
             flex-direction: column;
             gap: 4px;
             padding: 8px 10px;
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: var(--gnome-input);
+            border: 1px solid var(--gnome-border-subtle);
             border-radius: 6px;
 
             .output-label {
                 font-size: 11px;
-                color: #8b949e;
+                color: var(--text-secondary);
                 font-weight: 600;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
@@ -128,7 +128,8 @@
             .output-value {
                 font-family: var(--font-mono, monospace);
                 font-size: 12px;
-                color: #7ee787;
+                color: var(--gnome-success);
+                font-weight: 600;
                 word-break: break-all;
             }
         }
@@ -156,27 +157,27 @@
                 border-radius: 4px;
 
                 &.tag-info {
-                    background: rgba(88, 166, 255, 0.15);
-                    color: #79c0ff;
-                    border: 1px solid rgba(88, 166, 255, 0.3);
+                    background: var(--gnome-info-bg);
+                    color: var(--gnome-info);
+                    border: 1px solid var(--gnome-info);
                 }
 
                 &.tag-primary {
-                    background: rgba(53, 132, 228, 0.15);
-                    color: #a5d6ff;
-                    border: 1px solid rgba(53, 132, 228, 0.3);
+                    background: var(--accent-subtle);
+                    color: var(--accent);
+                    border: 1px solid var(--accent-shadow);
                 }
 
                 &.tag-warn {
-                    background: rgba(210, 153, 34, 0.15);
-                    color: #e3b341;
-                    border: 1px solid rgba(210, 153, 34, 0.3);
+                    background: var(--gnome-warn-bg);
+                    color: var(--gnome-warn);
+                    border: 1px solid var(--gnome-warn);
                 }
 
                 &.tag-danger {
-                    background: rgba(248, 81, 73, 0.15);
-                    color: #ff7b72;
-                    border: 1px solid rgba(248, 81, 73, 0.3);
+                    background: var(--gnome-error-bg);
+                    color: var(--gnome-error);
+                    border: 1px solid var(--gnome-error);
                 }
             }
         }

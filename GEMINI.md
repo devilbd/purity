@@ -9,6 +9,7 @@
 - **Custom Directives**: Attribute-level reactivity and DOM augmentation with `@Directive` and `BaseDirective`.
 - **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
 - **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with GPU acceleration, boundary constraints, and snap support) that attach seamlessly without inheritance.
+- **Modular SCSS Theming & Theme Engine**: Clean SCSS token architecture with Dark and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
 ---
@@ -29,8 +30,16 @@ purity/
 ├── GEMINI.md                    # Project context & architecture guide (this file)
 ├── README.md                    # Public documentation
 └── src/
-    ├── main.ts                  # Application entry point (registers root components)
-    ├── style.scss               # Global styles & GNOME Adwaita-inspired design system
+    ├── main.ts                  # Application entry point (registers root components & services)
+    ├── style.scss               # Master global stylesheet importing modular design system
+    ├── styles/                  # Modular SCSS architecture & Theme Engine
+    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions)
+    │   ├── _mixins.scss         # SCSS mixins (glassmorphism, flex, button lifts, scrollbars)
+    │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens
+    │   ├── _theme-light.scss    # GNOME Adwaita Light theme tokens
+    │   ├── _themes.scss         # Theme loader (binds [data-theme='dark'|'light'] & prefers-color-scheme)
+    │   ├── _base.scss           # Base typography, body, window, buttons, and inputs
+    │   └── index.scss           # Barrel export for @use '@styles' as *;
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM helpers, and module re-exports
     │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader, slot & pipe engine
@@ -46,6 +55,7 @@ purity/
     │   └── environment.prod.ts  # Production environment (swapped on build)
     ├── data/                    # Data services and state management
     │   ├── data.service.ts      # Service layer
+    │   ├── theme.service.ts     # Reactive ThemeService for Dark/Light mode & localStorage
     │   └── firebase.ts          # Firebase configuration and Google Analytics (GA4) service
     └── app/                     # Demo / application source
         ├── app.component.html   # Root template
@@ -59,7 +69,7 @@ purity/
         │   ├── directive-sample/ # <directive-sample> demonstrating directive usage
         │   ├── forms-validation/ # <forms-validation> sample form component with submit validation
         │   ├── for-sample/      # <for-sample> demonstrating structural for array repeater
-        │   ├── header/          # <header-component> navigation bar with logo
+        │   ├── header/          # <header-component> navigation bar with logo and theme toggle
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
@@ -178,7 +188,7 @@ Helper functions for declarative DOM updates:
 * `updateStyles(elements, className)`: Sets `className` across target elements.
 * `eventListener(elements, event, handler)`: Attaches event listeners and returns a `{ dispose() }` handle.
 
-### 4. Dependency Injection (`di.ts`)
+### 4. Dependency Injection & State (`di.ts`, `data/`)
 
 Purity includes a built-in Dependency Injection container with decorator support:
 
@@ -199,6 +209,15 @@ Purity includes a built-in Dependency Injection container with decorator support
 
   // Or resolve by string token name:
   const dataService = inject<DataService>('DataService');
+  ```
+
+* **Theme System (`ThemeService`)**:
+  ```typescript
+  import { inject } from '@purity/core';
+  import { ThemeService } from '@data/theme.service';
+
+  const themeService = inject(ThemeService);
+  themeService.toggleTheme(); // Toggles between 'dark' and 'light'
   ```
 
 ### 5. Transform Pipes (`pipe.ts`)
@@ -307,10 +326,13 @@ Purity provides a first-class bootstrapping API that initializes root components
   import { AppComponent } from '@app/app.component';
   import { environment } from '@environments/environment';
   import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
+  import { ThemeService, initTheme } from '@data/theme.service';
+
+  initTheme();
 
   bootstrapApplication(AppComponent, {
       environment,
-      providers: [FirebaseService],
+      providers: [FirebaseService, ThemeService],
   }).then(() => {
       initGoogleAnalytics();
   }).catch((err) => {

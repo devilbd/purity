@@ -1,5 +1,8 @@
+@use '@styles' as *;
+
 .header-component-root {
-    padding: 16px 20px;
+    position: relative;
+    padding: 18px 24px;
 }
 
 .header-content {
@@ -7,16 +10,30 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-sm, 8px);
+    position: relative;
+    width: 100%;
+}
+
+.header-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs, 4px);
 }
 
 .header-logo-img {
-    width: 190px;
-    height: 190px;
+    width: 170px;
+    height: 170px;
     object-fit: contain;
     display: block;
     user-select: none;
     -webkit-user-drag: none;
+    transition: transform var(--transition-normal) var(--ease-spring);
+
+    &:hover {
+        transform: scale(1.03) rotate(-1deg);
+    }
 }
 
 .main-logo {
@@ -31,17 +48,89 @@
     /* GNOME 50 "Shiny" effect: Subtle gradient and accent glow */
     background: linear-gradient(
         to bottom,
-        #ffffff 0%,
-        #e0e0e0 50%,
-        var(--text-main) 100%
+        var(--text-main) 0%,
+        var(--accent-hover) 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 
     text-shadow:
-        0 0 5px rgba(53, 132, 228, 0.5),
-        0 2px 4px rgba(0, 0, 0, 0.4);
+        0 0 5px var(--accent-shadow),
+        0 2px 4px rgba(0, 0, 0, 0.2);
 
     transform: none;
     display: inline-block;
+}
+
+.header-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+
+    @media (max-width: 600px) {
+        position: static;
+        margin-top: 14px;
+    }
+}
+
+/* GNOME 50 Theme Switcher Pill Button */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: var(--radius-pill, 999px);
+    background: var(--gnome-input, rgba(255, 255, 255, 0.08));
+    backdrop-filter: var(--blur-subtle);
+    -webkit-backdrop-filter: var(--blur-subtle);
+    border: 1px solid var(--gnome-border);
+    color: var(--text-main);
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: var(--font-size-xs, 12px);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    box-shadow: var(--shadow-control);
+    transition: all var(--transition-fast) var(--ease-gnome);
+    outline: none;
+    user-select: none;
+
+    .theme-icon {
+        font-size: 14px;
+        line-height: 1;
+        opacity: 0.45;
+        transition: opacity var(--transition-fast) ease, transform var(--transition-fast) var(--ease-spring);
+
+        &.active {
+            opacity: 1;
+            transform: scale(1.18);
+        }
+    }
+
+    .theme-label {
+        text-transform: uppercase;
+        font-weight: 800;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        color: var(--text-main);
+    }
+
+    &:hover {
+        background: var(--gnome-hover);
+        border-color: var(--gnome-border-focus);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px var(--accent-shadow);
+    }
+
+    &:active {
+        transform: translateY(0);
+        background: var(--gnome-active);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px var(--accent-shadow);
+        border-color: var(--accent);
+    }
 }

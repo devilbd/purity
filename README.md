@@ -36,7 +36,8 @@
 - 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
-- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita Dark aesthetic, featuring smart viewport auto-placement, body teleportation, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss`, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, and header switch toggle.
+- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, and viewport boundary detection.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
@@ -87,8 +88,16 @@ purity/
 ├── README.md                    # Project documentation (this file)
 ├── GEMINI.md                    # Agent context & architecture reference
 └── src/
-    ├── main.ts                  # Application entry point (bootstraps root component)
-    ├── style.scss               # Global styles (GNOME Adwaita design system)
+    ├── main.ts                  # Application entry point (bootstraps root component & services)
+    ├── style.scss               # Master global stylesheet importing modular design system
+    ├── styles/                  # Modular SCSS architecture & Theme Engine
+    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions)
+    │   ├── _mixins.scss         # SCSS mixins (glassmorphism, flex, button lifts, scrollbars)
+    │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens
+    │   ├── _theme-light.scss    # GNOME Adwaita Light theme tokens
+    │   ├── _themes.scss         # Theme loader (binds [data-theme='dark'|'light'] & prefers-color-scheme)
+    │   ├── _base.scss           # Base typography, body, window, buttons, and inputs
+    │   └── index.scss           # Barrel export for @use '@styles' as *;
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
     │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot & pipe engine
@@ -102,8 +111,9 @@ purity/
     │   ├── environment.interface.ts # Environment configuration contract
     │   ├── environment.ts       # Development environment (default)
     │   └── environment.prod.ts  # Production environment (swapped on build)
-    ├── data/                    # Data services & Firebase configuration
+    ├── data/                    # Data services, Theme & Firebase configuration
     │   ├── data.service.ts      # Service layer
+    │   ├── theme.service.ts     # Reactive ThemeService for Dark/Light mode & localStorage
     │   └── firebase.ts          # Firebase config & Google Analytics (GA4) service
     └── app/                     # Sample application & showcases
         ├── app.component.html   # Root template
@@ -192,7 +202,28 @@ export class UserProfileComponent {
 
 ---
 
-### 3. ⚡ Transform Pipes & Dynamic Parameters (`pipe.ts`)
+### 3. 🌓 Modular SCSS Theming & ThemeService (`theme.service.ts`)
+
+Purity provides a first-class theming engine supporting **Dark** (GNOME Adwaita Dark) and **Light** (GNOME Adwaita Light) modes. Variables are mapped dynamically to `:root`, `html[data-theme='dark']`, and `html[data-theme='light']`:
+
+```typescript
+import { inject } from '@purity/core';
+import { ThemeService } from '@data/theme.service';
+
+const themeService = inject(ThemeService);
+
+// 1. Read active theme reactively
+console.log(themeService.currentTheme()); // 'dark' | 'light'
+console.log(themeService.isDark());       // true | false
+
+// 2. Toggle or set theme programmatically
+themeService.toggleTheme();
+themeService.setTheme('light');
+```
+
+---
+
+### 4. ⚡ Transform Pipes & Dynamic Parameters (`pipe.ts`)
 
 Transform Pipes decouple data transformation and formatting logic from UI components and templates. They integrate directly with Handlebars template expressions (`{{ value | pipeName: arg1 : arg2 }}`), supporting static values as well as dynamic reactive signal parameters that automatically re-run transformations when dependencies update:
 
@@ -228,7 +259,7 @@ export class MyTransformPipe extends BasePipe {
 
 ---
 
-### 4. 📋 Decoupled Form Validation Engine (`validator.ts`)
+### 5. 📋 Decoupled Form Validation Engine (`validator.ts`)
 
 Form Validators decouple validation logic from UI templates, automatically tracking field mutations, managing overall form validity, updating submit button `disabled` states, and applying customizable CSS state classes:
 
@@ -258,7 +289,7 @@ export class UserFormValidator extends BaseValidator {
 
 ---
 
-### 5. 🏷️ Reactive Custom Directives (`directive.ts`)
+### 6. 🏷️ Reactive Custom Directives (`directive.ts`)
 
 Directives attach custom behavior, styling, and reactive listeners directly to DOM elements via attributes:
 
@@ -293,7 +324,7 @@ export class HighlightDirective extends BaseDirective {
 
 ---
 
-### 6. 🎯 Composable Interaction Behaviors (`behaviors/`)
+### 7. 🎯 Composable Interaction Behaviors (`behaviors/`)
 
 Enhance elements without deep inheritance trees. Behaviors attach modular interactions like pointer drag-and-drop with GPU acceleration (`translate3d`), boundary constraints, and center snapping:
 
@@ -326,7 +357,7 @@ const dragCleanup = drag({
 
 ---
 
-### 7. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
+### 8. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
 
 Purity provides a clean `bootstrapApplication()` initialization API that binds environment profiles, registers custom service providers, and mounts root Web Components:
 
@@ -335,10 +366,14 @@ import { bootstrapApplication } from '@purity/core';
 import { AppComponent } from '@app/app.component';
 import { environment } from '@environments/environment';
 import { FirebaseService, initGoogleAnalytics } from '@data/firebase';
+import { ThemeService, initTheme } from '@data/theme.service';
+
+// Initialize theme before mounting
+initTheme();
 
 bootstrapApplication(AppComponent, {
     environment,
-    providers: [FirebaseService],
+    providers: [FirebaseService, ThemeService],
 }).then(() => {
     initGoogleAnalytics();
 }).catch((err) => {
@@ -356,7 +391,7 @@ bootstrapApplication(AppComponent, {
 
 ## 🧩 UI Web Components, Templating & Views
 
-### 8. 🧩 Native Web Components (`@Component` Decorator)
+### 9. 🧩 Native Web Components (`@Component` Decorator)
 
 Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
 
@@ -391,7 +426,7 @@ export class CustomComponent {
 
 ---
 
-### 9. 🔍 Child View & Component Queries (`@ViewChild`)
+### 10. 🔍 Child View & Component Queries (`@ViewChild`)
 
 Use the `@ViewChild(selector)` decorator to query child DOM elements and child components with fallback resolution for teleported or body-prepended elements:
 
@@ -422,7 +457,7 @@ export class DemoComponent {
 
 ---
 
-### 10. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
+### 11. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
 Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change:
 
@@ -456,7 +491,7 @@ export class UserCardComponent {
 
 ---
 
-### 11. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+### 12. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
 
 Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
 
@@ -500,7 +535,7 @@ export class TeamListComponent {
 
 ---
 
-### 12. 📦 Generic Components & Content Projection (`<slot>`)
+### 13. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -526,7 +561,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 13. 🪟 Modal Dialogs (`<modal-view>`)
+### 14. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 
@@ -565,9 +600,9 @@ export class ModalViewComponent {
 
 ---
 
-### 14. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
+### 15. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
-Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
+Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
 - **Reactivity & Signals**: State (`selectedDate`, `isOpen`, `viewDate`, `workingHours`, `workingMinutes`, `restrictions`, `enableBlur`) driven by fine-grained Purity signals.
 - **Direct Body Overlay Teleportation**: Dropdown overlay automatically attaches directly to `document.body` at `z-index: 9999`, rendering cleanly above all other cards, stacking contexts, and radial menus without clipping.
@@ -623,9 +658,9 @@ export class BookingViewComponent {
 
 ---
 
-### 15. 🎯 Radial Context Menu System (`<radial-context-menu>`)
+### 16. 🎯 Radial Context Menu System (`<radial-context-menu>`)
 
-Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita Dark styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, and configurable DOM selector triggers:
+Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, and configurable DOM selector triggers:
 
 * **Dynamic Pie Slices**: Automatically computes mathematical polygon clip paths (`innerDist = 26%`, `outerDist = 49.5%`) for any number of menu items.
 * **Multi-Level Navigation**: Push/pop navigation stack for nested `children` submenus with smooth zoom/fade animations.

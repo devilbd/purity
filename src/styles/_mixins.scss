@@ -1,0 +1,57 @@
+/* ==========================================================================
+   Purity Design System - Reusable Mixins
+   ========================================================================== */
+
+@mixin glass-surface($bg: var(--gnome-surface), $blur: var(--blur-effect), $border: var(--gnome-border)) {
+    background: $bg;
+    backdrop-filter: $blur;
+    -webkit-backdrop-filter: $blur;
+    border: 1px solid $border;
+}
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin focus-ring($color: var(--accent), $spread: 3px) {
+    outline: none;
+    &:focus-visible {
+        box-shadow: 0 0 0 $spread rgba(53, 132, 228, 0.45);
+        border-color: $color;
+    }
+}
+
+@mixin button-hover-lift {
+    transition: all var(--transition-fast) var(--ease-gnome);
+    &:hover:not(:disabled):not(.disabled) {
+        transform: translateY(-1px);
+    }
+    &:active:not(:disabled):not(.disabled) {
+        transform: translateY(0);
+    }
+}
+
+@mixin custom-scrollbar($width: 6px) {
+    &::-webkit-scrollbar {
+        width: $width;
+        height: $width;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--gnome-border);
+        border-radius: 999px;
+        &:hover {
+            background: var(--text-secondary);
+        }
+    }
+}

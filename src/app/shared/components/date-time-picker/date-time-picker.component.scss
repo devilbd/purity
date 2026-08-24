@@ -1,42 +1,5 @@
 @use '@styles' as *;
 
-:root, date-time-picker, .picker-overlay {
-    // GNOME 50 Design Tokens for DatePicker
-    --dp-accent: var(--accent, #3584e4);
-    --dp-accent-hover: var(--accent-hover, #4791eb);
-    --dp-accent-active: var(--accent-active, #1c71d8);
-    --dp-accent-shadow: rgba(53, 132, 228, 0.35);
-
-    // Surfaces & Glassmorphism
-    --dp-surface-bg: rgba(36, 36, 36, 0.96);
-    --dp-surface-blur-bg: rgba(32, 32, 32, 0.78);
-    --dp-card-bg: rgba(255, 255, 255, 0.05);
-    --dp-hover-bg: rgba(255, 255, 255, 0.12);
-    --dp-active-bg: rgba(255, 255, 255, 0.18);
-    --dp-subtle-bg: rgba(255, 255, 255, 0.03);
-
-    // Text
-    --dp-text-main: var(--text-main, #ffffff);
-    --dp-text-secondary: var(--text-secondary, #9a9996);
-    --dp-text-muted: #777777;
-    --dp-text-off: rgba(255, 255, 255, 0.25);
-
-    // Borders & Shadows
-    --dp-border: rgba(255, 255, 255, 0.12);
-    --dp-border-subtle: rgba(255, 255, 255, 0.07);
-    --dp-border-focus: rgba(53, 132, 228, 0.5);
-    --dp-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), inset 0 1px rgba(255, 255, 255, 0.1);
-
-    // Radii
-    --dp-radius-window: var(--radius-window, 14px);
-    --dp-radius-control: var(--radius-control, 8px);
-    --dp-radius-pill: 999px;
-
-    // Blur
-    --dp-blur: blur(35px) saturate(160%);
-    --dp-blur-heavy: blur(50px) saturate(180%);
-}
-
 date-time-picker, :host {
     display: inline-block;
     position: relative;
@@ -51,23 +14,23 @@ date-time-picker, :host {
 
 /* 1. The Trigger Button (GNOME Input/Pill Button Style) */
 .picker-toggle {
-    background: var(--gnome-input, rgba(255, 255, 255, 0.08));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--gnome-border, rgba(255, 255, 255, 0.12));
-    color: var(--dp-text-main);
+    background: var(--gnome-input);
+    backdrop-filter: var(--blur-subtle);
+    -webkit-backdrop-filter: var(--blur-subtle);
+    border: 1px solid var(--gnome-border);
+    color: var(--dp-text-main, var(--text-main));
     padding: 8px 16px;
-    border-radius: var(--dp-radius-control);
+    border-radius: var(--radius-control);
     cursor: pointer;
-    font-family: var(--font-main, 'Inter', sans-serif);
-    font-size: var(--font-size-sm, 13.5px);
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--transition-fast) var(--ease-gnome);
     white-space: nowrap;
-    box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
+    box-shadow: var(--shadow-control);
     outline: none;
 
     .picker-toggle-icon {
@@ -76,38 +39,40 @@ date-time-picker, :host {
     }
 
     &:hover {
-        background: rgba(255, 255, 255, 0.14);
-        border-color: rgba(255, 255, 255, 0.22);
+        background: var(--gnome-input-hover);
+        border-color: var(--gnome-border-focus);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 12px var(--accent-shadow);
     }
 
     &:active {
         transform: translateY(0);
-        background: rgba(255, 255, 255, 0.08);
+        background: var(--gnome-input);
     }
 
     &:focus-visible {
-        box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.4);
-        border-color: var(--dp-accent);
+        box-shadow: 0 0 0 3px var(--accent-shadow);
+        border-color: var(--accent);
     }
 }
 
-/* 2. The Popover Overlay Container (Attached to document.body) */
+/* 2. The Popover Overlay Container (Attached directly to document.body) */
 .picker-overlay {
     display: none;
     position: fixed;
     z-index: 9999;
     width: 290px;
     background: var(--dp-surface-bg);
-    backdrop-filter: var(--dp-blur);
-    -webkit-backdrop-filter: var(--dp-blur);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
     border: 1px solid var(--dp-border);
-    border-radius: var(--dp-radius-window);
+    border-radius: var(--radius-window);
     padding: 16px;
     box-shadow: var(--dp-shadow);
     box-sizing: border-box;
-    font-family: var(--font-main, 'Inter', sans-serif);
+    font-family: var(--font-main);
+    color: var(--dp-text-main, var(--text-main));
+    transition: background-color var(--transition-normal) ease, border-color var(--transition-normal) ease;
 
     &.placement-bottom {
         &.is-open {
@@ -133,8 +98,8 @@ date-time-picker, :host {
 
     &.blur-enabled {
         background: var(--dp-surface-blur-bg);
-        backdrop-filter: var(--dp-blur-heavy);
-        -webkit-backdrop-filter: var(--dp-blur-heavy);
+        backdrop-filter: var(--blur-heavy);
+        -webkit-backdrop-filter: var(--blur-heavy);
     }
 }
 
@@ -175,9 +140,9 @@ date-time-picker, :host {
         .year-toggle-btn {
             background: transparent;
             border: 1px solid transparent;
-            color: var(--dp-text-main);
+            color: var(--dp-text-main, var(--text-main));
             padding: 4px 8px;
-            border-radius: var(--dp-radius-control);
+            border-radius: var(--radius-control);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -185,21 +150,21 @@ date-time-picker, :host {
             font-size: 14.5px;
             font-weight: 700;
             font-family: var(--font-main);
-            transition: all 0.2s ease;
+            transition: all var(--transition-fast) ease;
             outline: none;
 
             &:hover {
-                background: var(--dp-hover-bg);
-                border-color: var(--dp-border-subtle);
+                background: var(--gnome-hover);
+                border-color: var(--gnome-border-subtle);
             }
 
             .chevron-icon {
-                color: var(--dp-text-secondary);
+                color: var(--dp-text-secondary, var(--text-secondary));
                 transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
                 &.is-rotated {
                     transform: rotate(180deg);
-                    color: var(--dp-accent);
+                    color: var(--accent);
                 }
             }
         }
@@ -211,27 +176,27 @@ date-time-picker, :host {
         gap: 4px;
 
         .nav-btn {
-            background: var(--dp-card-bg);
-            border: 1px solid var(--dp-border-subtle);
-            color: var(--dp-text-main);
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            color: var(--dp-text-main, var(--text-main));
             width: 28px;
             height: 28px;
-            border-radius: var(--dp-radius-control);
+            border-radius: var(--radius-control);
             display: grid;
             place-items: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all var(--transition-fast) ease;
             outline: none;
             padding: 0;
 
             &:hover {
-                background: var(--dp-hover-bg);
-                border-color: var(--dp-border);
+                background: var(--gnome-hover);
+                border-color: var(--gnome-border);
                 transform: scale(1.05);
             }
 
             &:active {
-                background: var(--dp-active-bg);
+                background: var(--gnome-active);
                 transform: scale(0.96);
             }
         }
@@ -246,7 +211,7 @@ date-time-picker, :host {
 
 /* 5. Calendar Grid */
 .calendar-body {
-    transition: filter 0.25s ease, opacity 0.25s ease;
+    transition: filter var(--transition-fast) ease, opacity var(--transition-fast) ease;
 
     &.blurred {
         filter: blur(4px);
@@ -263,7 +228,7 @@ date-time-picker, :host {
             text-align: center;
             font-size: 11px;
             font-weight: 700;
-            color: var(--dp-text-secondary);
+            color: var(--dp-text-secondary, var(--text-secondary));
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 4px 0;
@@ -275,7 +240,7 @@ date-time-picker, :host {
             background: transparent;
             border: 1px solid transparent;
             border-radius: 50%;
-            color: var(--dp-text-main);
+            color: var(--dp-text-main, var(--text-main));
             font-size: 12.5px;
             font-weight: 500;
             font-family: var(--font-main);
@@ -288,26 +253,26 @@ date-time-picker, :host {
             user-select: none;
 
             &:hover:not(.disabled):not(.selected) {
-                background: var(--dp-hover-bg);
-                border-color: var(--dp-border-subtle);
+                background: var(--gnome-hover);
+                border-color: var(--gnome-border-subtle);
                 transform: scale(1.08);
             }
 
             &.off-month {
-                color: var(--dp-text-off);
+                color: var(--text-off);
             }
 
             &.today {
-                border-color: var(--dp-accent);
-                color: var(--dp-accent-hover);
+                border-color: var(--accent);
+                color: var(--accent);
                 font-weight: 700;
             }
 
             &.selected {
-                background: var(--dp-accent) !important;
+                background: var(--accent) !important;
                 color: #ffffff !important;
                 font-weight: 700;
-                box-shadow: 0 2px 8px var(--dp-accent-shadow);
+                box-shadow: 0 2px 8px var(--accent-shadow);
                 transform: scale(1.04);
             }
 
@@ -328,15 +293,15 @@ date-time-picker, :host {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(30, 30, 30, 0.94);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: var(--dp-radius-control);
+    background: var(--dp-surface-bg);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border-radius: var(--radius-control);
     padding: 8px 4px;
     box-sizing: border-box;
     overflow-y: auto;
     z-index: 10;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity var(--transition-fast) ease, transform var(--transition-fast) ease;
 
     &.is-hidden {
         opacity: 0;
@@ -357,29 +322,29 @@ date-time-picker, :host {
 
         .year-cell {
             padding: 8px 0;
-            background: var(--dp-card-bg);
-            border: 1px solid var(--dp-border-subtle);
-            border-radius: var(--dp-radius-control);
-            color: var(--dp-text-main);
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-control);
+            color: var(--dp-text-main, var(--text-main));
             font-size: 13px;
             font-weight: 600;
             font-family: var(--font-main);
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all var(--transition-fast) ease;
             outline: none;
             text-align: center;
 
             &:hover:not(.selected) {
-                background: var(--dp-hover-bg);
-                border-color: var(--dp-border);
+                background: var(--gnome-hover);
+                border-color: var(--gnome-border);
                 transform: translateY(-1px);
             }
 
             &.selected {
-                background: var(--dp-accent);
+                background: var(--accent);
                 color: #ffffff;
-                border-color: var(--dp-accent-hover);
-                box-shadow: 0 2px 8px var(--dp-accent-shadow);
+                border-color: var(--accent-hover);
+                box-shadow: 0 2px 8px var(--accent-shadow);
             }
         }
     }
@@ -391,9 +356,9 @@ date-time-picker, :host {
     align-items: center;
     justify-content: space-between;
     padding: 8px 10px;
-    background: var(--dp-subtle-bg);
-    border: 1px solid var(--dp-border-subtle);
-    border-radius: var(--dp-radius-control);
+    background: var(--gnome-subtle);
+    border: 1px solid var(--gnome-border-subtle);
+    border-radius: var(--radius-control);
 
     .time-label {
         display: flex;
@@ -401,7 +366,7 @@ date-time-picker, :host {
         gap: 6px;
         font-size: 12px;
         font-weight: 600;
-        color: var(--dp-text-secondary);
+        color: var(--dp-text-secondary, var(--text-secondary));
 
         .time-icon {
             font-size: 13px;
@@ -412,8 +377,8 @@ date-time-picker, :host {
         .time-input-group {
             display: inline-flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--dp-border-subtle);
+            background: var(--gnome-input);
+            border: 1px solid var(--gnome-border-subtle);
             border-radius: 6px;
             padding: 2px 6px;
 
@@ -421,7 +386,7 @@ date-time-picker, :host {
                 width: 24px;
                 background: transparent;
                 border: none;
-                color: var(--dp-text-main);
+                color: var(--dp-text-main, var(--text-main));
                 font-family: var(--font-mono, monospace);
                 font-size: 13px;
                 font-weight: 700;
@@ -430,12 +395,12 @@ date-time-picker, :host {
                 padding: 2px 0;
 
                 &:focus {
-                    color: var(--dp-accent-hover);
+                    color: var(--accent-hover);
                 }
             }
 
             .separator {
-                color: var(--dp-text-secondary);
+                color: var(--dp-text-secondary, var(--text-secondary));
                 font-weight: 700;
                 padding: 0 1px;
                 user-select: none;
@@ -451,26 +416,26 @@ date-time-picker, :host {
     padding-top: 4px;
 
     .confirm-button {
-        background: var(--dp-accent);
+        background: var(--accent);
         color: #ffffff;
         border: 1px solid rgba(255, 255, 255, 0.15);
         padding: 6px 18px;
-        border-radius: var(--dp-radius-control);
+        border-radius: var(--radius-control);
         font-size: 12.5px;
         font-weight: 700;
         cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 2px 6px var(--dp-accent-shadow);
+        transition: all var(--transition-fast) ease;
+        box-shadow: 0 2px 6px var(--accent-shadow);
         outline: none;
 
         &:hover {
-            background: var(--dp-accent-hover);
+            background: var(--accent-hover);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px var(--dp-accent-shadow);
+            box-shadow: 0 4px 12px var(--accent-shadow);
         }
 
         &:active {
-            background: var(--dp-accent-active);
+            background: var(--accent-active);
             transform: translateY(0);
         }
     }

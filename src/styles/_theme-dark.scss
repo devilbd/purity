@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Purity Design System - Dark Theme (GNOME Adwaita Dark)
+   ========================================================================== */
+
+@mixin theme-dark-variables {
+    /* Surfaces & Glassmorphism */
+    --gnome-bg: #1e1e1e;
+    --gnome-surface: rgba(45, 45, 45, 0.45);
+    --gnome-surface-solid: #242424;
+    --gnome-header: rgba(36, 36, 36, 0.85);
+    --gnome-card: rgba(255, 255, 255, 0.05);
+    --gnome-hover: rgba(255, 255, 255, 0.12);
+    --gnome-active: rgba(255, 255, 255, 0.18);
+    --gnome-subtle: rgba(255, 255, 255, 0.03);
+
+    /* Form Inputs & Controls */
+    --gnome-input: rgba(255, 255, 255, 0.08);
+    --gnome-input-hover: rgba(255, 255, 255, 0.14);
+    --gnome-input-focus: rgba(255, 255, 255, 0.16);
+
+    /* Borders & Lines */
+    --gnome-border: rgba(255, 255, 255, 0.12);
+    --gnome-border-subtle: rgba(255, 255, 255, 0.07);
+    --gnome-border-focus: rgba(53, 132, 228, 0.6);
+
+    /* Typography & Text */
+    --text-main: #ffffff;
+    --text-secondary: #9a9996;
+    --text-muted: #777777;
+    --text-off: rgba(255, 255, 255, 0.25);
+    --text-inverse: #1e1e1e;
+
+    /* Primary Accent - Adwaita Blue */
+    --accent: #3584e4;
+    --accent-hover: #4791eb;
+    --accent-active: #1c71d8;
+    --accent-shadow: rgba(53, 132, 228, 0.35);
+    --accent-subtle: rgba(53, 132, 228, 0.15);
+
+    /* Semantic Status Colors */
+    --gnome-success: #2ec27e;
+    --gnome-error: #ed333b;
+    --gnome-info: #3584e4;
+    --gnome-warn: #f8e45c;
+    --gnome-success-bg: rgba(46, 194, 126, 0.18);
+    --gnome-error-bg: rgba(237, 51, 59, 0.18);
+    --gnome-info-bg: rgba(53, 132, 228, 0.18);
+    --gnome-warn-bg: rgba(248, 228, 92, 0.18);
+
+    /* Shadows */
+    --shadow-deep: 0 20px 50px rgba(0, 0, 0, 0.55);
+    --shadow-popup: 0 16px 40px rgba(0, 0, 0, 0.65), inset 0 1px rgba(255, 255, 255, 0.1);
+    --shadow-control: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.08);
+
+    /* Global Dynamic Wallpaper */
+    --wallpaper: radial-gradient(circle at top left, rgba(53, 132, 228, 0.45), transparent 45%),
+                 radial-gradient(circle at bottom right, rgba(145, 65, 172, 0.45), transparent 45%),
+                 #1e1e1e;
+    --wallpaper-bg-color: #1e1e1e;
+
+    /* DatePicker Specific Tokens */
+    --dp-surface-bg: rgba(36, 36, 36, 0.96);
+    --dp-surface-blur-bg: rgba(32, 32, 32, 0.78);
+    --dp-text-main: var(--text-main);
+    --dp-text-secondary: var(--text-secondary);
+    --dp-border: var(--gnome-border);
+    --dp-shadow: var(--shadow-popup);
+
+    /* Radial Context Menu Specific Tokens */
+    --radial-bg: rgba(30, 30, 30, 0.92);
+    --radial-blur-bg: rgba(30, 30, 30, 0.75);
+    --radial-segment-bg: rgba(45, 45, 45, 0.7);
+    --radial-text: #ffffff;
+    --radial-border: rgba(255, 255, 255, 0.12);
+}

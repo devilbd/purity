@@ -153,7 +153,7 @@ export default defineConfig(({ mode }) => {
                 '@validators': path.resolve(import.meta.dirname, 'src/app/shared/validators'),
                 '@behaviors': path.resolve(import.meta.dirname, 'src/app/shared/behaviors'),
                 '@app': path.resolve(import.meta.dirname, 'src/app'),
-                '@styles': path.resolve(import.meta.dirname, 'src/style.scss'),
+                '@styles': path.resolve(import.meta.dirname, 'src/styles/index.scss'),
             },
         },
     };
