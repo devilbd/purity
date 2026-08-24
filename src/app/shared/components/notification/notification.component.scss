@@ -102,9 +102,7 @@ notification-component, :host {
     min-height: 52px;
     max-height: 200px;
     padding: 12px 14px;
-    background: var(--gnome-surface);
-    backdrop-filter: var(--blur-effect);
-    -webkit-backdrop-filter: var(--blur-effect);
+    background: var(--gnome-header);
     border: 1px solid var(--gnome-border);
     border-radius: 14px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
