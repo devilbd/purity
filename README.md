@@ -108,13 +108,13 @@ purity/
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets
-        ├── pages/               # Application pages, views & feature showcases (intro, playground, demo, date-time-picker-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, date-time-picker-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # Reusable UI Web Components (header, modal, date-time-picker)
+            └── components/      # Reusable UI Web Components (modal, date-time-picker)
 ```
 
 ---

@@ -5,7 +5,7 @@ import {
 } from '@purity/core';
 import './app.component.scss';
 import './pages/intro/intro.component';
-import './shared/components/header/header.component';
+import './pages/header/header.component';
 import './pages/playground/playground.component';
 import './pages/demo/demo.component';
 import type { DemoComponent } from './pages/demo/demo.component';

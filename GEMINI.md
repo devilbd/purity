@@ -59,6 +59,7 @@ purity/
         │   ├── directive-sample/ # <directive-sample> demonstrating directive usage
         │   ├── forms-validation/ # <forms-validation> sample form component with submit validation
         │   ├── for-sample/      # <for-sample> demonstrating structural for array repeater
+        │   ├── header/          # <header-component> navigation bar with logo
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
@@ -72,7 +73,6 @@ purity/
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # Reusable UI Web Components
                 ├── date-time-picker/ # <date-time-picker> reactive date & time picker component
-                ├── header/      # <header-component> navigation bar with logo
                 └── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
 ```
 
