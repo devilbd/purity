@@ -1,7 +1,13 @@
 @use '@styles' as *;
 
-notification-component {
-    display: contents;
+notification-component, :host {
+    display: contents !important;
+    background: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .notification-container {
@@ -13,6 +19,11 @@ notification-component {
     pointer-events: none;
     z-index: 10000;
     overflow: hidden;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .toast-stack {
@@ -26,6 +37,9 @@ notification-component {
     overflow-y: auto;
     pointer-events: none;
     z-index: 10000;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
     @include custom-scrollbar(4px);
 
     &.pos-top-right {
@@ -92,15 +106,16 @@ notification-component {
     backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
     border: 1px solid var(--gnome-border);
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-deep);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     transition: transform var(--transition-fast) var(--ease-gnome), opacity var(--transition-fast) ease;
     animation: toastSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
     overflow: hidden;
 
     &.toast-success {
-        border-left: 4px solid var(--gnome-success);
+        border-color: rgba(46, 194, 126, 0.35);
+        box-shadow: inset 4px 0 0 0 var(--gnome-success), 0 8px 24px rgba(0, 0, 0, 0.35);
         .toast-icon::before {
             content: '✓';
             color: var(--gnome-success);
@@ -109,7 +124,8 @@ notification-component {
     }
 
     &.toast-error {
-        border-left: 4px solid var(--gnome-error);
+        border-color: rgba(237, 51, 59, 0.35);
+        box-shadow: inset 4px 0 0 0 var(--gnome-error), 0 8px 24px rgba(0, 0, 0, 0.35);
         .toast-icon::before {
             content: '✕';
             color: var(--gnome-error);
@@ -118,7 +134,8 @@ notification-component {
     }
 
     &.toast-warn {
-        border-left: 4px solid var(--gnome-warn);
+        border-color: rgba(248, 228, 92, 0.35);
+        box-shadow: inset 4px 0 0 0 var(--gnome-warn), 0 8px 24px rgba(0, 0, 0, 0.35);
         .toast-icon::before {
             content: '⚠';
             color: var(--gnome-warn);
@@ -127,7 +144,8 @@ notification-component {
     }
 
     &.toast-info {
-        border-left: 4px solid var(--gnome-info);
+        border-color: rgba(53, 132, 228, 0.35);
+        box-shadow: inset 4px 0 0 0 var(--gnome-info), 0 8px 24px rgba(0, 0, 0, 0.35);
         .toast-icon::before {
             content: 'ℹ';
             color: var(--gnome-info);
