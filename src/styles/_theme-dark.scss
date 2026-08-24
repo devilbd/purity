@@ -72,4 +72,19 @@
     --radial-segment-bg: rgba(45, 45, 45, 0.7);
     --radial-text: #ffffff;
     --radial-border: rgba(255, 255, 255, 0.12);
+
+    /* Code & Syntax Highlighting Tokens */
+    --code-bg: rgba(14, 18, 26, 0.85);
+    --code-border: rgba(255, 255, 255, 0.1);
+    --code-text: #e6edf3;
+    --code-kw: #ff7b72;
+    --code-dec: #d2a8ff;
+    --code-fn: #79c0ff;
+    --code-typ: #ffa657;
+    --code-str: #a5d6ff;
+    --code-num: #79c0ff;
+    --code-cmt: #8b949e;
+    --code-tag: #7ee787;
+    --code-attr: #79c0ff;
+    --code-expr: #ffa657;
 }

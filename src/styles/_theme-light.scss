@@ -72,4 +72,19 @@
     --radial-segment-bg: rgba(240, 240, 240, 0.85);
     --radial-text: #1c1c1c;
     --radial-border: rgba(0, 0, 0, 0.12);
+
+    /* Code & Syntax Highlighting Tokens */
+    --code-bg: #f6f8fa;
+    --code-border: rgba(0, 0, 0, 0.12);
+    --code-text: #24292f;
+    --code-kw: #cf222e;
+    --code-dec: #8250df;
+    --code-fn: #0550ae;
+    --code-typ: #953800;
+    --code-str: #0a3069;
+    --code-num: #0550ae;
+    --code-cmt: #6e7781;
+    --code-tag: #116329;
+    --code-attr: #0550ae;
+    --code-expr: #953800;
 }

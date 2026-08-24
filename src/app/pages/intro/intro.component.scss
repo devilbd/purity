@@ -165,70 +165,76 @@
         font-weight: 600;
     }
 
-    /* Syntax-highlighted code block */
+    /* Syntax-highlighted code block with crisp theme-adaptive colors */
     pre {
         margin: 0;
-        background: var(--gnome-surface-solid, rgba(10, 15, 25, 0.8));
-        border: 1px solid var(--gnome-border);
-        border-radius: 6px;
+        background: var(--code-bg, rgba(14, 18, 26, 0.85));
+        border: 1px solid var(--code-border, var(--gnome-border));
+        border-radius: var(--radius-control, 6px);
         padding: 14px 16px;
         overflow-x: auto;
-        font-size: 12px;
+        font-size: 12.5px;
         line-height: 1.55;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: background-color var(--transition-normal) ease, border-color var(--transition-normal) ease;
 
         code {
             background: transparent;
             border: none;
             padding: 0;
-            color: var(--text-main);
+            color: var(--code-text, var(--text-main));
             font-size: inherit;
             font-weight: 400;
+            font-family: var(--font-mono, monospace);
             display: block;
         }
 
-        /* Token colors */
+        /* Token colors driven by theme variables */
         .kw {
-            color: #ff7b72;
+            color: var(--code-kw, #ff7b72);
             font-weight: 600;
         }
 
         .dec {
-            color: #d2a8ff;
+            color: var(--code-dec, #d2a8ff);
             font-weight: 600;
         }
 
         .fn {
-            color: #79c0ff;
+            color: var(--code-fn, #79c0ff);
+            font-weight: 600;
         }
 
         .typ {
-            color: #ffa657;
+            color: var(--code-typ, #ffa657);
+            font-weight: 600;
         }
 
         .str {
-            color: #a5d6ff;
+            color: var(--code-str, #a5d6ff);
         }
 
         .num {
-            color: #79c0ff;
+            color: var(--code-num, #79c0ff);
+            font-weight: 600;
         }
 
         .cmt {
-            color: var(--text-secondary);
+            color: var(--code-cmt, var(--text-secondary));
             font-style: italic;
         }
 
         .tag {
-            color: #7ee787;
+            color: var(--code-tag, #7ee787);
+            font-weight: 600;
         }
 
         .attr {
-            color: #79c0ff;
+            color: var(--code-attr, #79c0ff);
         }
 
         .expr {
-            color: #ffa657;
+            color: var(--code-expr, #ffa657);
             font-weight: 600;
         }
     }
