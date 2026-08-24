@@ -3,7 +3,7 @@
         <div class="intro-title-area">
             <h2 class="intro-title">About Purity Framework</h2>
             <p class="intro-tagline">
-                A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, and Composable Behaviors.
+                A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptor pipelines, and GNOME Adwaita theming.
             </p>
         </div>
         <div class="intro-actions">
@@ -106,10 +106,97 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 3. Transform Pipes -->
+        <!-- 3. HTTP Client & Centralized Interceptors Pipeline -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>3. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
+                <h4>3. 🌐 HTTP Client Service &amp; Centralized Interceptor Pipeline (<code>http.ts</code>, <code>@interceptors/*</code>)</h4>
+                <p>Full-featured HTTP client with <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>, and decoupled centralized interceptor classes:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span>, <span class="typ">HttpClient</span>, <span class="kw">type</span> <span class="typ">HttpInterceptor</span>, <span class="kw">type</span> <span class="typ">HttpRequest</span>, <span class="kw">type</span> <span class="typ">HttpResponse</span>, <span class="kw">type</span> <span class="typ">HttpNextFn</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+
+<span class="cmt">// 1. Declare centralized interceptor class in src/app/shared/interceptors/</span>
+<span class="kw">export class</span> <span class="typ">AuthInterceptor</span> <span class="kw">implements</span> <span class="typ">HttpInterceptor</span> {
+    <span class="kw">async</span> <span class="fn">intercept</span>(req: <span class="typ">HttpRequest</span>, next: <span class="typ">HttpNextFn</span>): <span class="typ">Promise</span>&lt;<span class="typ">HttpResponse</span>&lt;<span class="typ">any</span>&gt;&gt; {
+        <span class="kw">const</span> authReq = req.<span class="fn">clone</span>({
+            headers: req.headers.<span class="fn">set</span>(<span class="str">'Authorization'</span>, <span class="str">'Bearer jwt_token_123'</span>),
+        });
+        <span class="kw">return</span> <span class="fn">next</span>(authReq);
+    }
+}
+
+<span class="cmt">// 2. Consume HttpClient cleanly inside any page or component</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'post-view'</span> })
+<span class="kw">export class</span> <span class="typ">PostViewComponent</span> {
+    <span class="kw">private</span> http = <span class="fn">inject</span>(<span class="typ">HttpClient</span>);
+
+    <span class="kw">async</span> <span class="fn">loadPost</span>() {
+        <span class="cmt">// Automatically flows through all registered interceptors</span>
+        <span class="kw">const</span> res = <span class="kw">await</span> <span class="kw">this</span>.http.<span class="fn">get</span>&lt;<span class="typ">Post</span>&gt;(<span class="str">'https://api.example.com/posts/1'</span>);
+        console.<span class="fn">log</span>(<span class="str">'Post data:'</span>, res.data);
+    }
+}</code></pre>
+        </div>
+
+        <!-- 4. Application Bootstrapping & Theme Engine -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>4. 🚀 Application Bootstrapping &amp; Theme Engine (<code>bootstrap.ts</code>, <code>ThemeService</code>)</h4>
+                <p>Initialize application root, wire DI providers &amp; interceptors, and automatically synchronize GNOME Adwaita Dark/Light themes:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> { <span class="typ">AppComponent</span> } <span class="kw">from</span> <span class="str">'@app/app.component'</span>;
+<span class="kw">import</span> { <span class="typ">ThemeService</span> } <span class="kw">from</span> <span class="str">'@data/theme.service'</span>;
+<span class="kw">import</span> { <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'@data/notify.service'</span>;
+<span class="kw">import</span> { <span class="typ">LoggingInterceptor</span> } <span class="kw">from</span> <span class="str">'@interceptors/logging.interceptor'</span>;
+<span class="kw">import</span> { <span class="typ">AuthInterceptor</span> } <span class="kw">from</span> <span class="str">'@interceptors/auth.interceptor'</span>;
+<span class="kw">import</span> { environment } <span class="kw">from</span> <span class="str">'@environments/environment'</span>;
+
+<span class="fn">bootstrapApplication</span>(<span class="typ">AppComponent</span>, {
+    environment,
+    providers: [<span class="typ">ThemeService</span>, <span class="typ">NotifyService</span>],
+    interceptors: [<span class="typ">LoggingInterceptor</span>, <span class="typ">AuthInterceptor</span>],
+}).<span class="fn">then</span>(() =&gt; {
+    console.<span class="fn">log</span>(<span class="str">'Purity application mounted with theme &amp; interceptors configured!'</span>);
+});</code></pre>
+        </div>
+
+        <!-- 5. Reactive NotifyService -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>5. 🔔 Reactive Toast Notification Service (<code>NotifyService</code>)</h4>
+                <p>Injectable service exposing multi-variant notification dispatchers (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>) with positioning and auto-dismiss timeouts:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> { <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'@data/notify.service'</span>;
+
+<span class="dec">@Component</span>({ selector: <span class="str">'checkout-page'</span> })
+<span class="kw">export class</span> <span class="typ">CheckoutPageComponent</span> {
+    <span class="kw">private</span> notify = <span class="fn">inject</span>(<span class="typ">NotifyService</span>);
+
+    <span class="fn">onOrderComplete</span>() {
+        <span class="cmt">// Trigger success toast positioned top-right</span>
+        <span class="kw">this</span>.notify.<span class="fn">success</span>(
+            <span class="str">'Order Confirmed'</span>,
+            <span class="str">'Invoice #84920 has been emailed to you.'</span>,
+            { position: <span class="str">'top-right'</span>, duration: <span class="num">5000</span> }
+        );
+    }
+
+    <span class="fn">onPaymentError</span>() {
+        <span class="cmt">// Trigger error toast positioned bottom-left</span>
+        <span class="kw">this</span>.notify.<span class="fn">error</span>(
+            <span class="str">'Payment Failed'</span>,
+            <span class="str">'Insufficient funds or card expired.'</span>,
+            { position: <span class="str">'bottom-left'</span> }
+        );
+    }
+}</code></pre>
+        </div>
+
+        <!-- 6. Transform Pipes -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>6. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
                 <p>Classes decorated with <code>@Pipe</code> transform template values and accept reactive signals as dynamic parameters:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Pipe</span>, <span class="typ">BasePipe</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -130,10 +217,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;div&gt;</span><span class="expr">{{ count() | myTransformPipe: true }}</span><span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 4. Form Validation -->
+        <!-- 7. Form Validation -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>4. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
+                <h4>7. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
                 <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -159,10 +246,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 5. Custom Directives -->
+        <!-- 8. Custom Directives -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>5. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
+                <h4>8. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
                 <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -186,10 +273,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 6. Composable Behaviors -->
+        <!-- 9. Composable Behaviors -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>6. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
+                <h4>9. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
                 <p>Pointer-based drag interactions with GPU acceleration (<code>translate3d</code>), boundary constraints, and center snapping:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">drag</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/draggable/draggable'</span>;
@@ -223,10 +310,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
             <span class="section-badge">Components &amp; Views</span>
         </div>
 
-        <!-- 7. Web Components -->
+        <!-- 10. Web Components -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>7. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
+                <h4>10. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
                 <p>Plain classes transformed into Custom Elements with automatic template inlining, signal bindings, and lifecycle hooks:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -257,10 +344,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 8. ViewChild Queries -->
+        <!-- 11. ViewChild Queries -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>8. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
+                <h4>11. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
                 <p>Property decorator that queries child elements or custom components by CSS selector with fallback resolution for teleported/body-prepended elements:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
@@ -287,10 +374,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 9. Handlebars Interpolation & Pipes -->
+        <!-- 12. Handlebars Interpolation & Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>9. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
+                <h4>12. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
                 <p>Embed reactive signals and transform pipes directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
             </div>
             <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering &amp; Pipe Transformation --&gt;</span>
@@ -318,10 +405,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 10. Structural Array Repeater -->
+        <!-- 13. Structural Array Repeater -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>10. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
+                <h4>13. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
                 <p>Repeat elements and components dynamically with object property access, index variables, and nested loops:</p>
             </div>
             <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Array Repeater &amp; Nested Loops --&gt;</span>
@@ -349,10 +436,10 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 11. Slot Content Projection -->
+        <!-- 14. Slot Content Projection -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>11. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                <h4>14. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
                 <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
             </div>
             <pre><code><span class="cmt">&lt;!-- 1. Consumer Template: Passing arbitrary HTML &amp; components into &lt;modal-view&gt; --&gt;</span>
@@ -374,10 +461,116 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 12. Modal Dialogs -->
+        <!-- 15. Toast Notification Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>12. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                <h4>15. 🔔 Multi-Position Toast Notification Component (<code>&lt;notification-component&gt;</code>)</h4>
+                <p>Global reactive toast overlay anchoring semantic notifications (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>) across 7 viewport positions with zero layout overlap:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. Mount once in root template or index.html --&gt;</span>
+<span class="tag">&lt;notification-component&gt;&lt;/notification-component&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Dispatch notifications from any service or component --&gt;</span>
+<span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> { <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'@data/notify.service'</span>;
+
+<span class="dec">@Component</span>({ selector: <span class="str">'app-header'</span> })
+<span class="kw">export class</span> <span class="typ">AppHeaderComponent</span> {
+    <span class="kw">private</span> notify = <span class="fn">inject</span>(<span class="typ">NotifyService</span>);
+
+    <span class="fn">showSuccess</span>() {
+        <span class="kw">this</span>.notify.<span class="fn">success</span>(<span class="str">'Settings Saved'</span>, <span class="str">'Your preferences have synced.'</span>, {
+            position: <span class="str">'top-right'</span>,
+            duration: <span class="num">4000</span>,
+        });
+    }
+}</code></pre>
+        </div>
+
+        <!-- 16. HTTP Loader Component -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>16. ⏳ HTTP Request Loader Component (<code>&lt;loader-component&gt;</code>)</h4>
+                <p>Compact animated SVG spinner with centered loading text and programmatic <code>show()</code>, <code>hide()</code>, and <code>toggle()</code> methods:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. Place in template where loading indicator is needed --&gt;</span>
+<span class="tag">&lt;loader-component</span> <span class="attr">id</span>=<span class="str">"http-loader"</span><span class="tag">&gt;&lt;/loader-component&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Query with @ViewChild and control during async tasks --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'user-list'</span> })
+<span class="kw">export class</span> <span class="typ">UserListComponent</span> {
+    <span class="dec">@ViewChild</span>(<span class="str">'#http-loader'</span>)
+    loader?: <span class="typ">LoaderComponent</span> | <span class="kw">null</span>;
+
+    <span class="kw">async</span> <span class="fn">fetchData</span>() {
+        <span class="kw">this</span>.loader?.<span class="fn">show</span>(<span class="str">'Loading data...'</span>);
+        <span class="kw">try</span> {
+            <span class="kw">await</span> <span class="fn">performHttpRequest</span>();
+        } <span class="kw">finally</span> {
+            <span class="kw">this</span>.loader?.<span class="fn">hide</span>();
+        }
+    }
+}</code></pre>
+        </div>
+
+        <!-- 17. Date & Time Picker Component -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>17. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
+                <p>Full calendar view, year navigation, 24-hour time wheel scrolling, smart viewport auto-placement, date ranges, and custom pipe formatting:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. Template usage with pipe formatting --&gt;</span>
+<span class="tag">&lt;date-time-picker</span> <span class="attr">id</span>=<span class="str">"booking-picker"</span><span class="tag">&gt;&lt;/date-time-picker&gt;</span>
+<span class="tag">&lt;p&gt;</span>Selected: <span class="expr">{{selectedDate() | date: 'EEEE, MMMM d, yyyy HH:mm'}}</span><span class="tag">&lt;/p&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component usage with @ViewChild --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'booking-view'</span> })
+<span class="kw">export class</span> <span class="typ">BookingViewComponent</span> {
+    <span class="dec">@ViewChild</span>(<span class="str">'#booking-picker'</span>)
+    picker?: <span class="typ">DateTimePickerComponent</span> | <span class="kw">null</span>;
+
+    selectedDate = <span class="fn">signal</span>(<span class="str">''</span>);
+
+    <span class="kw">protected</span> <span class="fn">onInit</span>() {
+        <span class="kw">this</span>.picker?.<span class="fn">onDateChange</span>((isoDate) =&gt; {
+            <span class="kw">this</span>.selectedDate.<span class="fn">set</span>(isoDate);
+        });
+    }
+}</code></pre>
+        </div>
+
+        <!-- 18. Circular Radial Context Menu -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>18. 🎯 Circular Radial Context Menu (<code>&lt;radial-context-menu&gt;</code>)</h4>
+                <p>Circular context menu with pie segments, SVG icons, submenus, dynamic placement, and keyboard/outside-click dismissal:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. Component template --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"canvas-area"</span> <span class="attr">oncontextmenu</span>=<span class="str">"myComponent.openMenu(event)"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;radial-context-menu</span> <span class="attr">id</span>=<span class="str">"canvas-menu"</span><span class="tag">&gt;&lt;/radial-context-menu&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component controller --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'canvas-view'</span> })
+<span class="kw">export class</span> <span class="typ">CanvasViewComponent</span> {
+    <span class="dec">@ViewChild</span>(<span class="str">'#canvas-menu'</span>)
+    menu?: <span class="typ">RadialContextMenuComponent</span> | <span class="kw">null</span>;
+
+    <span class="fn">openMenu</span>(event: <span class="typ">MouseEvent</span>) {
+        event.<span class="fn">preventDefault</span>();
+        <span class="kw">this</span>.menu?.<span class="fn">openAt</span>(event.clientX, event.clientY, [
+            { id: <span class="str">'copy'</span>, label: <span class="str">'Copy'</span>, icon: <span class="str">'📋'</span>, action: () =&gt; console.<span class="fn">log</span>(<span class="str">'Copy'</span>) },
+            { id: <span class="str">'cut'</span>, label: <span class="str">'Cut'</span>, icon: <span class="str">'✂️'</span>, action: () =&gt; console.<span class="fn">log</span>(<span class="str">'Cut'</span>) },
+            { id: <span class="str">'delete'</span>, label: <span class="str">'Delete'</span>, icon: <span class="str">'🗑️'</span>, action: () =&gt; console.<span class="fn">log</span>(<span class="str">'Delete'</span>) },
+        ]);
+    }
+}</code></pre>
+        </div>
+
+        <!-- 19. Modal Dialogs -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>19. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
                 <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, automatic <code>document.body</code> prepending, and <code>z-index: 1000</code>:</p>
             </div>
             <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
