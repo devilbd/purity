@@ -20,6 +20,50 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs, 4px);
+    cursor: pointer;
+    position: relative;
+    padding: 8px 18px;
+    border-radius: var(--radius-window, 16px);
+    transition: all var(--transition-normal) var(--ease-gnome);
+
+    /* Background glow aura */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 45%;
+        left: 50%;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, var(--accent-shadow) 0%, rgba(53, 132, 228, 0.0) 70%);
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.45s ease, transform 0.45s var(--ease-spring);
+        z-index: 0;
+    }
+
+    &:hover {
+        &::before {
+            opacity: 0.9;
+            transform: translate(-50%, -50%) scale(1.5);
+        }
+
+        .header-logo-img {
+            transform: scale(1.07) translateY(-6px) rotate(-1.5deg);
+            filter: drop-shadow(0 16px 30px var(--accent-shadow))
+                    drop-shadow(0 0 24px rgba(71, 145, 235, 0.6))
+                    brightness(1.08);
+        }
+
+        .main-logo {
+            transform: translateY(-2px) scale(1.02);
+            text-shadow:
+                0 0 16px var(--accent-shadow),
+                0 0 32px rgba(53, 132, 228, 0.45),
+                0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+    }
 }
 
 .header-logo-img {
@@ -29,11 +73,9 @@
     display: block;
     user-select: none;
     -webkit-user-drag: none;
-    transition: transform var(--transition-normal) var(--ease-spring);
-
-    &:hover {
-        transform: scale(1.03) rotate(-1deg);
-    }
+    position: relative;
+    z-index: 1;
+    transition: transform var(--transition-normal) var(--ease-spring), filter var(--transition-normal) ease;
 }
 
 .main-logo {
@@ -44,6 +86,8 @@
     letter-spacing: -1.5px;
     color: var(--text-main);
     margin: 0;
+    position: relative;
+    z-index: 1;
 
     /* GNOME 50 "Shiny" effect: Subtle gradient and accent glow */
     background: linear-gradient(
@@ -60,6 +104,7 @@
 
     transform: none;
     display: inline-block;
+    transition: transform var(--transition-normal) var(--ease-spring), text-shadow var(--transition-normal) ease;
 }
 
 .header-actions {
