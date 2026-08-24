@@ -80,18 +80,22 @@ export class DateTimePickerComponent {
         const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
         if (overlay) {
             this._overlayEl = overlay;
+            if (overlay.parentElement !== document.body) {
+                document.body.appendChild(overlay);
+            }
             overlay.classList.toggle('blur-enabled', this.enableBlur());
         }
 
         this._boundDocClick = (event: MouseEvent) => {
             if (!this.isOpen()) return;
-            if (Date.now() - this._openedAt < 150) return;
+            if (Date.now() - this._openedAt < 200) return;
 
             const path = event.composedPath ? event.composedPath() : [];
-            if (host && path.includes(host)) {
+            const target = event.target as Node | null;
+            if (host && (path.includes(host) || (target && host.contains(target)))) {
                 return;
             }
-            if (this._overlayEl && path.includes(this._overlayEl)) {
+            if (this._overlayEl && (path.includes(this._overlayEl) || (target && this._overlayEl.contains(target)))) {
                 return;
             }
 
@@ -406,34 +410,39 @@ export class DateTimePickerComponent {
 
     public togglePicker(event?: MouseEvent): void {
         event?.stopPropagation();
-        if (!this.isOpen()) {
-            this.open();
-        } else {
+        if (this.isOpen()) {
             this.close();
+        } else {
+            this.open();
         }
     }
 
     public open(): void {
         const host = this.getHost();
         if (!this._overlayEl && host) {
-            this._overlayEl = host.querySelector('.picker-overlay') as HTMLElement | null;
+            const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
+            if (overlay) {
+                this._overlayEl = overlay;
+                if (overlay.parentElement !== document.body) {
+                    document.body.appendChild(overlay);
+                }
+            }
         }
+
+        if (!this._overlayEl) return;
 
         this._openedAt = Date.now();
         this.initWorkingState();
         this.viewMode.set('calendar');
+
+        // Position overlay synchronously BEFORE showing it
+        this.updateOverlayPosition();
+
         this.isOpen.set(true);
 
-        if (this._overlayEl) {
-            this._overlayEl.classList.add('is-open');
-            this._overlayEl.classList.remove('is-closed');
-            this._overlayEl.classList.toggle('blur-enabled', this.enableBlur());
-        }
-
-        requestAnimationFrame(() => {
-            this.updateOverlayPosition();
-        });
-        setTimeout(() => this.updateOverlayPosition(), 50);
+        this._overlayEl.classList.add('is-open');
+        this._overlayEl.classList.remove('is-closed');
+        this._overlayEl.classList.toggle('blur-enabled', this.enableBlur());
     }
 
     public close(): void {

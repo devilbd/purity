@@ -69,7 +69,6 @@
                         class="{{day.cellClass}}"
                         type="button"
                         data-time="{{day.time}}"
-                        onclick="selectDayByTime(day.time)"
                     >
                         {{day.dateNum}}
                     </button>
@@ -83,7 +82,6 @@
                         class="year-cell {{yr === viewYear ? 'selected' : ''}}"
                         type="button"
                         data-year="{{yr}}"
-                        onclick="selectYear(yr)"
                     >
                         {{yr}}
                     </button>

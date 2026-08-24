@@ -76,13 +76,13 @@ date-time-picker, :host {
 
     &.placement-bottom {
         &.is-open {
-            animation: gnomeSlideDown 0.22s cubic-bezier(0, 0, 0.2, 1);
+            animation: gnomeSlideDown 0.14s cubic-bezier(0, 0, 0.2, 1);
         }
     }
 
     &.placement-top {
         &.is-open {
-            animation: gnomeSlideUp 0.22s cubic-bezier(0, 0, 0.2, 1);
+            animation: gnomeSlideUp 0.14s cubic-bezier(0, 0, 0.2, 1);
         }
     }
 

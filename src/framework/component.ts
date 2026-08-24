@@ -371,15 +371,20 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
             // Bind event handlers (onclick, oninput, onchange, etc.) to component/item context
             if (attrName.startsWith('on')) {
                 try {
+                    const eventType = attrName.slice(2).toLowerCase();
+                    const cleanedExpr = rawValue.replace(/\{\{\s*([\s\S]*?)\s*\}\}/g, '$1');
                     const handlerFn = new Function(
                         '$event',
                         '__context',
                         '__pipe',
-                        `with (__context) { return (function(event) { ${rawValue} }).call(this, $event); }`,
+                        `with (__context) { return (function(event) { ${cleanedExpr} }).call(this, $event); }`,
                     );
-                    (el as any)[attrName] = function (event: Event) {
+                    const listener = function (this: any, event: Event) {
                         return handlerFn.call(this, event, context, executePipe);
                     };
+                    (el as any)[attrName] = listener;
+                    el.addEventListener(eventType, listener);
+                    el.removeAttribute(attrName);
                 } catch (err) {
                     console.error(`[Purity] Failed to compile event handler ${attrName}="${rawValue}":`, err);
                 }
@@ -496,8 +501,8 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             }
         }
 
-        this.onInit?.();
         this.bindTemplate?.();
+        this.onInit?.();
     };
 
     proto.disconnectedCallback = function (this: any) {
