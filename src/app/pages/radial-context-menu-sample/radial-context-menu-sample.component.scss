@@ -136,7 +136,7 @@
         background: radial-gradient(circle at center, var(--accent-subtle) 0%, var(--gnome-card) 70%);
         border: 2px dashed var(--accent-shadow);
         border-radius: var(--radius-control, 8px);
-        cursor: context-menu;
+        cursor: var(--cursor-context-menu, context-menu);
         user-select: none;
         transition: border-color var(--transition-fast) ease, background-color var(--transition-fast) ease, transform var(--transition-fast) ease;
 

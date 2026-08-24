@@ -1,10 +1,10 @@
 /* Draggable Styles and Animations */
 .draggable-target {
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
     touch-action: none;
 
     .drag-handle {
-        cursor: grab;
+        cursor: var(--cursor-grab, grab);
     }
 }
 
@@ -12,12 +12,12 @@
     z-index: 1000 !important;
     user-select: none !important;
     filter: brightness(1.05);
-    cursor: grabbing !important;
+    cursor: var(--cursor-grabbing, grabbing) !important;
     transition: none !important; /* CRITICAL: Smooth instantaneous dragging without transform delay */
     will-change: transform;
 
     .drag-handle {
-        cursor: grabbing !important;
+        cursor: var(--cursor-grabbing, grabbing) !important;
     }
 }
 

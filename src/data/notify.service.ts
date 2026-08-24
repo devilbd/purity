@@ -18,6 +18,7 @@ export interface NotificationOptions {
     subtitle?: string;
     position?: NotificationPosition;
     duration?: number; // Duration in ms. 0 means persistent until closed manually.
+    blink?: boolean; // When true, flashes/blinks for attention. Default: false (off).
     width?: string;
     height?: string;
     dismissible?: boolean;
@@ -32,6 +33,7 @@ export interface NotificationItem {
     position: NotificationPosition;
     duration: number;
     remainingSeconds: number;
+    blink: boolean;
     width: string;
     height: string;
     dismissible: boolean;
@@ -87,6 +89,7 @@ export class NotifyService {
             position: options.position || 'top-right',
             duration,
             remainingSeconds,
+            blink: options.blink === true, // Off by default
             width: options.width || '',
             height: options.height || '',
             dismissible: options.dismissible !== false,

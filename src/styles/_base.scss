@@ -11,12 +11,20 @@
     font-display: swap;
 }
 
+/* Global Cursor Hierarchy (Breeze Cursors) */
+*,
+*::before,
+*::after {
+    cursor: inherit;
+}
+
 html {
     margin: 0;
     padding: 0;
     min-height: 100%;
     background-color: var(--wallpaper-bg-color, #1e1e1e);
     transition: background-color var(--transition-normal) ease;
+    cursor: var(--cursor-default);
 }
 
 body {
@@ -33,6 +41,67 @@ body {
     color: var(--text-main);
     font-family: var(--font-main);
     transition: background-color var(--transition-normal) ease, color var(--transition-normal) ease;
+    cursor: var(--cursor-default);
+}
+
+/* Global Interactive Element Breeze Cursors */
+a,
+button,
+[role='button'],
+input[type='button'],
+input[type='submit'],
+input[type='reset'],
+select,
+summary,
+label[for],
+.clickable,
+.button-base,
+.button-primary,
+.button-secondary,
+.button-error,
+.button-danger,
+.button-cancel,
+.editor-tab,
+.action-btn,
+.theme-toggle-btn,
+.toast-close-btn,
+.delete-btn {
+    cursor: var(--cursor-pointer);
+}
+
+input[type='text'],
+input[type='number'],
+input[type='password'],
+input[type='email'],
+input[type='search'],
+input[type='url'],
+input[type='tel'],
+textarea,
+.input-primary,
+[contenteditable='true'],
+code,
+pre {
+    cursor: var(--cursor-text);
+}
+
+:disabled,
+[disabled],
+.disabled,
+[aria-disabled='true'] {
+    cursor: var(--cursor-not-allowed) !important;
+}
+
+[draggable='true'],
+.draggable,
+.draggable-target,
+.drag-handle {
+    cursor: var(--cursor-grab);
+}
+
+.is-dragging,
+.dragging,
+.p-dragging {
+    cursor: var(--cursor-grabbing) !important;
 }
 
 /* Base Label Styling */

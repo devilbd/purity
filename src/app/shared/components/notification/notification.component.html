@@ -2,7 +2,7 @@
     <div for="let group of positionGroups" class="toast-stack pos-{{group.position}}">
         <div
             for="let item of group.items"
-            class="toast-card toast-{{item.type}}"
+            class="toast-card toast-{{item.type}} {{item.blink ? 'toast-blink' : ''}}"
             style="{{item.width ? 'width: ' + item.width + ';' : ''}} {{item.height ? 'height: ' + item.height + ';' : ''}}"
         >
             <div class="toast-icon-wrapper">

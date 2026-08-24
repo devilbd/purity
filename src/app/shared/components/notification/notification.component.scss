@@ -107,9 +107,12 @@ notification-component, :host {
     border-radius: 14px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     transition: transform var(--transition-fast) var(--ease-gnome), opacity var(--transition-fast) ease;
-    animation: toastSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
     overflow: hidden;
+
+    &.toast-blink {
+        animation: toastBlink 1.2s infinite alternate ease-in-out;
+    }
 
     &.toast-success {
         border-color: rgba(46, 194, 126, 0.35);
@@ -255,5 +258,16 @@ notification-component, :host {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toastBlink {
+    0% {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        filter: brightness(1);
+    }
+    100% {
+        box-shadow: 0 0 24px var(--accent-shadow), 0 8px 28px rgba(0, 0, 0, 0.5);
+        filter: brightness(1.2);
     }
 }

@@ -40,4 +40,26 @@
     --blur-subtle: blur(12px) saturate(140%);
     --blur-effect: blur(40px) saturate(160%);
     --blur-heavy: blur(50px) saturate(180%);
+
+    /* Breeze Cursor Theme Tokens */
+    --cursor-default: url('/cursors/default.svg') 4 4, default;
+    --cursor-pointer: url('/cursors/pointer.svg') 16 4, pointer;
+    --cursor-text: url('/cursors/text.svg') 16 15, text;
+    --cursor-grab: url('/cursors/openhand.svg') 16 16, grab;
+    --cursor-grabbing: url('/cursors/dnd-move.svg') 16 16, grabbing;
+    --cursor-not-allowed: url('/cursors/not-allowed.svg') 16 15, not-allowed;
+    --cursor-crosshair: url('/cursors/crosshair.svg') 17 17, crosshair;
+    --cursor-help: url('/cursors/help.svg') 4 4, help;
+    --cursor-move: url('/cursors/all-scroll.svg') 15 15, move;
+    --cursor-col-resize: url('/cursors/col-resize.svg') 16 15, col-resize;
+    --cursor-row-resize: url('/cursors/row-resize.svg') 16 15, row-resize;
+    --cursor-ew-resize: url('/cursors/size_hor.svg') 16 15, ew-resize;
+    --cursor-ns-resize: url('/cursors/size_ver.svg') 16 15, ns-resize;
+    --cursor-nwse-resize: url('/cursors/size_bdiag.svg') 16 15, nwse-resize;
+    --cursor-nesw-resize: url('/cursors/size_fdiag.svg') 16 15, nesw-resize;
+    --cursor-zoom-in: url('/cursors/zoom-in.svg') 15 15, zoom-in;
+    --cursor-zoom-out: url('/cursors/zoom-out.svg') 15 15, zoom-out;
+    --cursor-context-menu: url('/cursors/context-menu.svg') 4 4, context-menu;
+    --cursor-progress: url('/cursors/progress-01.svg') 4 4, progress;
+    --cursor-wait: url('/cursors/wait-01.svg') 16 15, wait;
 }

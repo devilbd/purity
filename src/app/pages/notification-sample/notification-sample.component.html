@@ -154,6 +154,14 @@
         <div class="custom-actions-row">
             <button
                 type="button"
+                class="button-secondary btn-sm {{enableBlink() ? 'active-blink' : ''}}"
+                onclick="toggleBlink()"
+                title="Toggle notification attention blinking (default: off)"
+            >
+                ⚡ Blinking: {{enableBlink() ? 'ON' : 'OFF (Default)'}}
+            </button>
+            <button
+                type="button"
                 class="button-primary btn-sm btn-success"
                 onclick="triggerCustom('success')"
             >

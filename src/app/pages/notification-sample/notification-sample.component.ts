@@ -13,10 +13,15 @@ export class NotificationSampleComponent {
     public customSubtitle = signal<string>('All reactive state updates and data changes have been applied.');
     public selectedPosition = signal<NotificationPosition>('top-right');
     public selectedDuration = signal<number>(10000);
+    public enableBlink = signal<boolean>(false); // Off by default
 
     public onDurationInput(element: HTMLInputElement): void {
         const val = parseInt(element.value, 10);
         this.selectedDuration.set(isNaN(val) ? 0 : val);
+    }
+
+    public toggleBlink(): void {
+        this.enableBlink.update((v) => !v);
     }
 
     public setPosition(pos: NotificationPosition): void {
@@ -30,6 +35,7 @@ export class NotificationSampleComponent {
             {
                 position: this.selectedPosition(),
                 duration: this.selectedDuration(),
+                blink: this.enableBlink(),
             },
         );
     }
@@ -41,6 +47,7 @@ export class NotificationSampleComponent {
             {
                 position: this.selectedPosition(),
                 duration: this.selectedDuration(),
+                blink: this.enableBlink(),
             },
         );
     }
@@ -52,6 +59,7 @@ export class NotificationSampleComponent {
             {
                 position: this.selectedPosition(),
                 duration: this.selectedDuration(),
+                blink: this.enableBlink(),
             },
         );
     }
@@ -63,6 +71,7 @@ export class NotificationSampleComponent {
             {
                 position: this.selectedPosition(),
                 duration: this.selectedDuration(),
+                blink: this.enableBlink(),
             },
         );
     }
@@ -74,6 +83,7 @@ export class NotificationSampleComponent {
             subtitle: this.customSubtitle() || '',
             position: this.selectedPosition(),
             duration: this.selectedDuration(),
+            blink: this.enableBlink(),
         });
     }
 
