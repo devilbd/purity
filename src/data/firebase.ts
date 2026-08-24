@@ -23,31 +23,23 @@ export const firebaseConfig: FirebaseConfig = {
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || environment.firebase?.authDomain || 'purity-d470d.firebaseapp.com',
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || environment.firebase?.projectId || 'purity-d470d',
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || environment.firebase?.storageBucket || 'purity-d470d.firebasestorage.app',
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || environment.firebase?.messagingSenderId || '',
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || environment.firebase?.appId || '',
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || import.meta.env.VITE_GA_MEASUREMENT_ID || environment.firebase?.measurementId || '',
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || environment.firebase?.messagingSenderId || '196144189978',
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || environment.firebase?.appId || '1:196144189978:web:f64f7ff6a0cf3e01de77a3',
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || import.meta.env.VITE_GA_MEASUREMENT_ID || environment.firebase?.measurementId || 'G-VK790J8H7J',
 };
 
 let isAnalyticsInitialized = false;
 
 /**
- * Initializes Google Analytics 4 (GA4) / Firebase Analytics by dynamically injecting
- * the gtag.js script and configuring initial page tracking.
+ * Initializes Google Analytics 4 (GA4) / Firebase Analytics and configures page tracking.
  */
 export function initGoogleAnalytics(measurementId?: string): boolean {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
         return false;
     }
 
-    if (isAnalyticsInitialized) {
-        return true;
-    }
-
-    const mId = (measurementId || firebaseConfig.measurementId || '').trim();
+    const mId = (measurementId || firebaseConfig.measurementId || 'G-VK790J8H7J').trim();
     if (!mId) {
-        console.warn(
-            '[Firebase/Analytics] No Measurement ID found. Set VITE_FIREBASE_MEASUREMENT_ID in .env or environment config.',
-        );
         return false;
     }
 
@@ -59,9 +51,9 @@ export function initGoogleAnalytics(measurementId?: string): boolean {
         };
     }
 
-    // 2. Inject Google Tag Manager gtag.js script
+    // 2. Inject Google Tag Manager gtag.js script if not already in DOM
     const scriptId = 'google-analytics-gtag';
-    if (!document.getElementById(scriptId)) {
+    if (!document.getElementById(scriptId) && !document.querySelector(`script[src*="${mId}"]`)) {
         const script = document.createElement('script');
         script.id = scriptId;
         script.async = true;
@@ -69,25 +61,29 @@ export function initGoogleAnalytics(measurementId?: string): boolean {
         document.head.appendChild(script);
     }
 
-    // 3. Configure Google Analytics
-    window.gtag('js', new Date());
-    window.gtag('config', mId, {
-        send_page_view: true,
-        page_title: document.title,
-        page_location: window.location.href,
-        page_path: window.location.pathname,
-    });
+    if (!isAnalyticsInitialized) {
+        // 3. Configure Google Analytics & Firebase App association
+        window.gtag('js', new Date());
+        window.gtag('config', mId, {
+            app_id: firebaseConfig.appId,
+            debug_mode: true,
+            send_page_view: true,
+            page_title: document.title,
+            page_location: window.location.href,
+            page_path: window.location.pathname,
+        });
 
-    isAnalyticsInitialized = true;
-    console.info(`[Firebase/Analytics] Google Analytics (GA4) initialized with ID: ${mId}`);
+        isAnalyticsInitialized = true;
+        console.info(`[Firebase/Analytics] Google Analytics (GA4) active (Measurement ID: ${mId}, App ID: ${firebaseConfig.appId})`);
 
-    // 4. Auto-track SPA navigation events (hashchange & popstate)
-    window.addEventListener('popstate', () => {
-        trackPageView(document.title, window.location.pathname);
-    });
-    window.addEventListener('hashchange', () => {
-        trackPageView(document.title, window.location.pathname + window.location.hash);
-    });
+        // 4. Auto-track SPA navigation events
+        window.addEventListener('popstate', () => {
+            trackPageView(document.title, window.location.pathname);
+        });
+        window.addEventListener('hashchange', () => {
+            trackPageView(document.title, window.location.pathname + window.location.hash);
+        });
+    }
 
     return true;
 }
@@ -97,7 +93,10 @@ export function initGoogleAnalytics(measurementId?: string): boolean {
  */
 export function logAnalyticsEvent(eventName: string, params?: Record<string, any>): void {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-        window.gtag('event', eventName, params || {});
+        window.gtag('event', eventName, {
+            ...params,
+            debug_mode: true,
+        });
         if (!environment.production) {
             console.debug(`[Firebase/Analytics] Event: ${eventName}`, params);
         }
@@ -109,16 +108,16 @@ export function logAnalyticsEvent(eventName: string, params?: Record<string, any
  */
 export function trackPageView(pageTitle?: string, pagePath?: string): void {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-        const mId = firebaseConfig.measurementId;
-        if (mId) {
-            window.gtag('config', mId, {
-                page_title: pageTitle || document.title,
-                page_path: pagePath || window.location.pathname,
-                page_location: window.location.href,
-            });
-            if (!environment.production) {
-                console.debug(`[Firebase/Analytics] PageView: ${pageTitle || document.title} (${pagePath || window.location.pathname})`);
-            }
+        const mId = firebaseConfig.measurementId || 'G-VK790J8H7J';
+        window.gtag('config', mId, {
+            app_id: firebaseConfig.appId,
+            debug_mode: true,
+            page_title: pageTitle || document.title,
+            page_path: pagePath || window.location.pathname,
+            page_location: window.location.href,
+        });
+        if (!environment.production) {
+            console.debug(`[Firebase/Analytics] PageView: ${pageTitle || document.title} (${pagePath || window.location.pathname})`);
         }
     }
 }
