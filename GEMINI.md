@@ -59,6 +59,7 @@ purity/
     ├── data/                    # Data services and state management
     │   ├── data.service.ts      # Service layer
     │   ├── theme.service.ts     # Reactive ThemeService for Dark/Light mode & localStorage
+    │   ├── notify.service.ts    # Reactive NotifyService for toast notifications (success, error, warn, info)
     │   └── firebase.ts          # Firebase configuration and Google Analytics (GA4) service
     └── app/                     # Demo / application source
         ├── app.component.html   # Root template
@@ -75,6 +76,7 @@ purity/
         │   ├── header/          # <header-component> navigation bar with logo and theme toggle
         │   ├── http-sample/     # <http-sample> clean HTTP client showcase consuming centralized interceptors
         │   ├── intro/           # <intro-component> framework overview & code samples
+        │   ├── notification-sample/ # <notification-sample> interactive showcase for toast notifications & positions
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
@@ -93,6 +95,7 @@ purity/
                 ├── date-time-picker/ # <date-time-picker> reactive date & time picker component with body teleportation
                 ├── loader/      # <loader-component> reactive HTTP request loader with glassmorphism & show/hide methods
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
+                ├── notification/ # <notification-component> multi-position reactive toast notifications
                 └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
 ```
 

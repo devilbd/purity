@@ -122,13 +122,13 @@ purity/
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, http-sample, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, http-sample, notification-sample, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # Reusable UI Web Components (modal, loader, date-time-picker, radial-context-menu)
+            └── components/      # Reusable UI Web Components (modal, loader, notification, date-time-picker, radial-context-menu)
 ```
 
 ---

@@ -1,0 +1,166 @@
+<div class="window notification-sample-root">
+    <div class="sample-header">
+        <h4>🔔 Toast Notification System (<code>NotifyService</code> + <code>&lt;notification-component&gt;</code>)</h4>
+        <span class="badge-pill">Component + Service</span>
+    </div>
+    <p class="sample-desc">
+        Reactive, multi-position toast notification system with semantic variants (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>), custom titles and subtitles, position anchors, dimension constraints, manual close buttons, and auto-dismiss timers:
+    </p>
+
+    <!-- Quick Trigger Actions -->
+    <div class="notify-quick-grid">
+        <button
+            type="button"
+            class="button-primary notify-btn btn-success"
+            onclick="notificationSample.triggerSuccess()"
+        >
+            <span class="type-icon">✓</span>
+            <span>Trigger Success</span>
+        </button>
+
+        <button
+            type="button"
+            class="button-cancel notify-btn btn-error"
+            onclick="notificationSample.triggerError()"
+        >
+            <span class="type-icon">✕</span>
+            <span>Trigger Error</span>
+        </button>
+
+        <button
+            type="button"
+            class="button-primary notify-btn btn-warn"
+            onclick="notificationSample.triggerWarn()"
+        >
+            <span class="type-icon">⚠</span>
+            <span>Trigger Warning</span>
+        </button>
+
+        <button
+            type="button"
+            class="button-primary notify-btn btn-info"
+            onclick="notificationSample.triggerInfo()"
+        >
+            <span class="type-icon">ℹ</span>
+            <span>Trigger Info</span>
+        </button>
+
+        <button
+            type="button"
+            class="button-secondary notify-btn btn-clear"
+            onclick="notificationSample.clearAll()"
+        >
+            <span>🗑️ Dismiss All</span>
+        </button>
+    </div>
+
+    <!-- Position & Configuration Card -->
+    <div class="config-card">
+        <div class="config-title">
+            <span class="card-icon">📍</span>
+            <h5>Position &amp; Custom Toast Builder</h5>
+        </div>
+
+        <div class="position-selector-row">
+            <span class="config-label">Active Position:</span>
+            <div class="position-buttons">
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'top-right' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('top-right')"
+                >
+                    Top Right
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'top-left' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('top-left')"
+                >
+                    Top Left
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'top-center' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('top-center')"
+                >
+                    Top Center
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'bottom-right' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('bottom-right')"
+                >
+                    Bottom Right
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'bottom-left' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('bottom-left')"
+                >
+                    Bottom Left
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'bottom-center' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('bottom-center')"
+                >
+                    Bottom Center
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary pos-btn {{selectedPosition() === 'center' ? 'active' : ''}}"
+                    onclick="notificationSample.setPosition('center')"
+                >
+                    Center
+                </button>
+            </div>
+        </div>
+
+        <div class="custom-builder-inputs">
+            <div class="input-col">
+                <label class="field-label">Custom Title:</label>
+                <input
+                    type="text"
+                    class="input-primary"
+                    value="{{customTitle()}}"
+                    oninput="notificationSample.customTitle.set(this.value)"
+                    placeholder="Toast title..."
+                />
+            </div>
+            <div class="input-col">
+                <label class="field-label">Custom Subtitle:</label>
+                <input
+                    type="text"
+                    class="input-primary"
+                    value="{{customSubtitle()}}"
+                    oninput="notificationSample.customSubtitle.set(this.value)"
+                    placeholder="Toast subtitle..."
+                />
+            </div>
+        </div>
+
+        <div class="custom-actions-row">
+            <button
+                type="button"
+                class="button-primary btn-sm btn-success"
+                onclick="notificationSample.triggerCustom('success')"
+            >
+                Post Custom Success
+            </button>
+            <button
+                type="button"
+                class="button-cancel btn-sm btn-error"
+                onclick="notificationSample.triggerCustom('error')"
+            >
+                Post Custom Error
+            </button>
+            <button
+                type="button"
+                class="button-primary btn-sm btn-info"
+                onclick="notificationSample.triggerCustom('info')"
+            >
+                Post Custom Info
+            </button>
+        </div>
+    </div>
+</div>

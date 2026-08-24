@@ -1,0 +1,223 @@
+@use '@styles' as *;
+
+.notification-sample-root {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 12px;
+
+    .sample-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        h4 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
+        }
+    }
+
+    .sample-desc {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+        line-height: 1.5;
+
+        code {
+            color: var(--accent);
+            background: var(--accent-subtle);
+            padding: 2px 5px;
+            border-radius: var(--radius-control);
+            font-family: inherit;
+        }
+    }
+
+    .notify-quick-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 10px;
+
+        .notify-btn {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-control);
+            cursor: pointer;
+            @include button-hover-lift;
+
+            .type-icon {
+                font-weight: 800;
+                font-size: 12px;
+            }
+
+            &.btn-success {
+                background-color: var(--gnome-success);
+                color: #ffffff;
+            }
+
+            &.btn-error {
+                background-color: var(--gnome-error);
+                color: #ffffff;
+            }
+
+            &.btn-warn {
+                background-color: var(--gnome-warn);
+                color: rgba(0, 0, 0, 0.85);
+            }
+
+            &.btn-info {
+                background-color: var(--accent);
+                color: #ffffff;
+            }
+
+            &.btn-clear {
+                background-color: var(--gnome-card);
+                color: var(--text-main);
+            }
+        }
+    }
+
+    .config-card {
+        padding: 16px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card);
+
+        .config-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            .card-icon {
+                font-size: 1.1rem;
+            }
+
+            h5 {
+                margin: 0;
+                font-size: 14px;
+                color: var(--text-main);
+                font-weight: 600;
+            }
+        }
+
+        .position-selector-row {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .config-label {
+                font-size: 11.5px;
+                color: var(--text-secondary);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .position-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+
+                .pos-btn {
+                    margin: 0;
+                    padding: 6px 12px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    border-radius: var(--radius-control);
+                    background: var(--gnome-input);
+                    border: 1px solid var(--gnome-border-subtle);
+                    color: var(--text-secondary);
+                    cursor: pointer;
+                    @include button-hover-lift;
+
+                    &.active {
+                        background: var(--accent);
+                        color: #ffffff;
+                        border-color: var(--accent);
+                        box-shadow: 0 2px 8px var(--accent-shadow);
+                    }
+                }
+            }
+        }
+
+        .custom-builder-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+
+            .input-col {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .field-label {
+                    font-size: 11.5px;
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                }
+
+                input {
+                    margin: 0;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+            }
+        }
+
+        .custom-actions-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+
+            .btn-sm {
+                margin: 0;
+                padding: 6px 14px;
+                font-size: 12px;
+                font-weight: 600;
+                border-radius: var(--radius-control);
+                cursor: pointer;
+                @include button-hover-lift;
+
+                &.btn-success {
+                    background-color: var(--gnome-success);
+                    color: #ffffff;
+                }
+
+                &.btn-error {
+                    background-color: var(--gnome-error);
+                    color: #ffffff;
+                }
+
+                &.btn-info {
+                    background-color: var(--accent);
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+}

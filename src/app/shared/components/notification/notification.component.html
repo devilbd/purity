@@ -1,0 +1,25 @@
+<div class="notification-container" aria-live="polite">
+    <div for="let group of positionGroups" class="toast-stack pos-{{group.position}}">
+        <div
+            for="let item of group.items"
+            class="toast-card window toast-{{item.type}}"
+            style="{{item.width ? 'width: ' + item.width + ';' : ''}} {{item.height ? 'height: ' + item.height + ';' : ''}}"
+        >
+            <div class="toast-icon-wrapper">
+                <span class="toast-icon icon-{{item.type}}"></span>
+            </div>
+            <div class="toast-body">
+                <div class="toast-title">{{item.title}}</div>
+                <div class="toast-subtitle">{{item.subtitle}}</div>
+            </div>
+            <button
+                type="button"
+                class="toast-close-btn"
+                title="Close notification"
+                onclick="window.notificationComponent ? window.notificationComponent.dismiss('{{item.id}}') : this.closest('notification-component')._component.dismiss('{{item.id}}')"
+            >
+                ✕
+            </button>
+        </div>
+    </div>
+</div>
