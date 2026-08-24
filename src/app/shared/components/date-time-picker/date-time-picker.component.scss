@@ -1,0 +1,574 @@
+@use '../../../../style.scss' as *;
+
+date-time-picker, :host {
+    display: inline-block;
+    position: relative;
+    font-family: var(--font-main, 'Inter', sans-serif);
+
+    // GNOME 50 Design Tokens for DatePicker
+    --dp-accent: var(--accent, #3584e4);
+    --dp-accent-hover: var(--accent-hover, #4791eb);
+    --dp-accent-active: var(--accent-active, #1c71d8);
+    --dp-accent-shadow: rgba(53, 132, 228, 0.35);
+
+    // Surfaces & Glassmorphism
+    --dp-surface-bg: rgba(36, 36, 36, 0.96);
+    --dp-surface-blur-bg: rgba(32, 32, 32, 0.78);
+    --dp-card-bg: rgba(255, 255, 255, 0.05);
+    --dp-hover-bg: rgba(255, 255, 255, 0.12);
+    --dp-active-bg: rgba(255, 255, 255, 0.18);
+    --dp-subtle-bg: rgba(255, 255, 255, 0.03);
+
+    // Text
+    --dp-text-main: var(--text-main, #ffffff);
+    --dp-text-secondary: var(--text-secondary, #9a9996);
+    --dp-text-muted: #777777;
+    --dp-text-off: rgba(255, 255, 255, 0.25);
+
+    // Borders & Shadows
+    --dp-border: rgba(255, 255, 255, 0.12);
+    --dp-border-subtle: rgba(255, 255, 255, 0.07);
+    --dp-border-focus: rgba(53, 132, 228, 0.5);
+    --dp-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px rgba(255, 255, 255, 0.1);
+
+    // Radii
+    --dp-radius-window: var(--radius-window, 14px);
+    --dp-radius-control: var(--radius-control, 8px);
+    --dp-radius-pill: 999px;
+
+    // Blur
+    --dp-blur: blur(35px) saturate(160%);
+    --dp-blur-heavy: blur(50px) saturate(180%);
+}
+
+.date-time-picker-container,
+.date-picker-container {
+    position: relative;
+    display: inline-block;
+}
+
+/* 1. The Trigger Button (GNOME Input/Pill Button Style) */
+.picker-toggle {
+    background: var(--gnome-input, rgba(255, 255, 255, 0.08));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--gnome-border, rgba(255, 255, 255, 0.12));
+    color: var(--dp-text-main);
+    padding: 8px 16px;
+    border-radius: var(--dp-radius-control);
+    cursor: pointer;
+    font-family: var(--font-main, 'Inter', sans-serif);
+    font-size: var(--font-size-sm, 13.5px);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.06);
+    outline: none;
+
+    .picker-toggle-icon {
+        font-size: 14px;
+        line-height: 1;
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.14);
+        border-color: rgba(255, 255, 255, 0.22);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px rgba(255, 255, 255, 0.1);
+    }
+
+    &:active {
+        transform: translateY(0);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    &:focus-visible {
+        box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.4);
+        border-color: var(--dp-accent);
+    }
+}
+
+/* 2. The Popover Overlay Container */
+.picker-overlay {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    width: 290px;
+    background: var(--dp-surface-bg);
+    backdrop-filter: var(--dp-blur);
+    -webkit-backdrop-filter: var(--dp-blur);
+    border: 1px solid var(--dp-border);
+    border-radius: var(--dp-radius-window);
+    padding: 16px;
+    box-shadow: var(--dp-shadow);
+    box-sizing: border-box;
+
+    // Default placement (bottom)
+    top: calc(100% + 8px);
+    bottom: auto;
+    left: 0;
+    right: auto;
+
+    &.placement-bottom {
+        top: calc(100% + 8px);
+        bottom: auto;
+
+        &.is-open {
+            animation: gnomeSlideDown 0.25s cubic-bezier(0, 0, 0.2, 1);
+        }
+    }
+
+    &.placement-top {
+        top: auto;
+        bottom: calc(100% + 8px);
+
+        &.is-open {
+            animation: gnomeSlideUp 0.25s cubic-bezier(0, 0, 0.2, 1);
+        }
+    }
+
+    &.align-left {
+        left: 0;
+        right: auto;
+    }
+
+    &.align-right {
+        left: auto;
+        right: 0;
+    }
+
+    &.is-open {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &.is-closed {
+        display: none;
+    }
+
+    &.blur-enabled {
+        background: var(--dp-surface-blur-bg);
+        backdrop-filter: var(--dp-blur-heavy);
+        -webkit-backdrop-filter: var(--dp-blur-heavy);
+    }
+}
+
+@keyframes gnomeSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes gnomeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 3. Header Section (Month, Year Selector, Navigation) */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2px;
+
+    .label-group {
+        display: flex;
+        align-items: center;
+
+        .year-toggle-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--dp-radius-control);
+            padding: 5px 10px;
+            color: var(--dp-text-main);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-main);
+            font-weight: 700;
+            font-size: 14px;
+            transition: all 0.15s ease;
+            outline: none;
+
+            .month-label {
+                letter-spacing: -0.01em;
+            }
+
+            .chevron-icon {
+                color: var(--dp-accent);
+                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+                &.is-rotated {
+                    transform: rotate(180deg);
+                }
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.14);
+                border-color: rgba(255, 255, 255, 0.18);
+            }
+
+            &:focus-visible {
+                box-shadow: 0 0 0 2px var(--dp-accent);
+            }
+        }
+    }
+
+    .header-nav {
+        display: flex;
+        gap: 6px;
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--dp-text-main);
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            outline: none;
+
+            svg {
+                stroke: var(--dp-text-main);
+            }
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.15);
+                border-color: rgba(255, 255, 255, 0.2);
+                transform: scale(1.05);
+
+                svg {
+                    stroke: var(--dp-accent);
+                }
+            }
+
+            &:active {
+                transform: scale(0.95);
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            &:focus-visible {
+                box-shadow: 0 0 0 2px var(--dp-accent);
+            }
+        }
+    }
+}
+
+/* 4. Content Area (Calendar & Year Overlay) */
+.picker-content-wrapper {
+    position: relative;
+    min-height: 210px;
+}
+
+.calendar-body {
+    transition: filter 0.25s ease, opacity 0.25s ease;
+
+    &.blurred {
+        filter: blur(6px);
+        opacity: 0.35;
+        pointer-events: none;
+    }
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+
+    .weekday {
+        text-align: center;
+        font-size: 11px;
+        color: var(--dp-text-secondary);
+        font-weight: 700;
+        padding-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .day-cell {
+        aspect-ratio: 1;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--dp-text-main);
+        font-family: var(--font-main);
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        outline: none;
+
+        &:hover:not(.disabled):not(.selected) {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            transform: scale(1.06);
+        }
+
+        &.off-month {
+            color: var(--dp-text-off);
+            font-weight: 400;
+        }
+
+        &.today {
+            color: var(--dp-accent);
+            font-weight: 800;
+            border-color: rgba(53, 132, 228, 0.5);
+            background: rgba(53, 132, 228, 0.08);
+        }
+
+        &.selected {
+            background: var(--dp-accent) !important;
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent) !important;
+            color: #ffffff !important;
+            font-weight: 800;
+            border-color: rgba(0, 0, 0, 0.2) !important;
+            box-shadow: 0 2px 8px var(--dp-accent-shadow), inset 0 1px rgba(255, 255, 255, 0.25) !important;
+            transform: scale(1.04);
+        }
+
+        &.disabled {
+            opacity: 0.22;
+            cursor: not-allowed;
+            background: transparent !important;
+            color: var(--dp-text-muted) !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 2px var(--dp-accent);
+        }
+    }
+}
+
+/* 5. Year Selector Submenu Overlay */
+.year-selector-overlay {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    align-items: center;
+    justify-content: center;
+    background: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(15px);
+    border-radius: var(--dp-radius-control);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    &.is-visible {
+        display: flex;
+        animation: gnomeFadeIn 0.2s ease;
+    }
+
+    &.is-hidden {
+        display: none;
+    }
+}
+
+@keyframes gnomeFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.year-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    height: 190px;
+    width: 100%;
+    overflow-y: auto;
+    padding: 8px;
+    box-sizing: border-box;
+
+    /* Custom GNOME Scrollbar */
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.35);
+    }
+
+    .year-cell {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--dp-text-main);
+        padding: 8px 4px;
+        border-radius: var(--dp-radius-control);
+        cursor: pointer;
+        font-family: var(--font-main);
+        font-size: 13.5px;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.15s ease;
+        outline: none;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        &.selected {
+            background: var(--dp-accent);
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
+            color: #ffffff;
+            font-weight: 800;
+            border-color: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px var(--dp-accent-shadow);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 2px var(--dp-accent);
+        }
+    }
+}
+
+/* 6. Time Picker Section */
+.time-picker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 12px;
+    margin-top: 2px;
+
+    .time-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--dp-text-secondary);
+
+        .time-icon {
+            font-size: 13px;
+        }
+    }
+
+    .time-inner-container {
+        display: inline-flex;
+        align-items: center;
+        background: var(--gnome-input, rgba(255, 255, 255, 0.08));
+        border: 1px solid var(--gnome-border, rgba(255, 255, 255, 0.12));
+        border-radius: var(--dp-radius-control);
+        padding: 3px 8px;
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+
+        &:focus-within {
+            border-color: var(--dp-accent);
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 0 0 2px rgba(53, 132, 228, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .time-input-group {
+        display: flex;
+        align-items: center;
+
+        input {
+            width: 28px;
+            background: transparent;
+            border: none;
+            color: var(--dp-text-main);
+            font-family: var(--font-mono, 'Adwaita Mono', monospace);
+            text-align: center;
+            padding: 2px 0;
+            font-size: 14px;
+            font-weight: 700;
+            outline: none;
+
+            &::-webkit-inner-spin-button {
+                display: none;
+            }
+        }
+
+        .separator {
+            color: var(--dp-text-secondary);
+            font-family: var(--font-mono, monospace);
+            font-weight: 800;
+            font-size: 14px;
+            margin: 0 1px;
+            user-select: none;
+        }
+    }
+}
+
+/* 7. Footer & Confirm OK Button */
+.picker-footer {
+    display: flex;
+    justify-content: center;
+
+    .confirm-button {
+        width: 100%;
+        background-color: var(--dp-accent);
+        background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
+        color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        padding: 9px 18px;
+        border-radius: var(--dp-radius-control);
+        font-family: var(--font-main, 'Inter', sans-serif);
+        font-size: 13.5px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: 0 2px 8px var(--dp-accent-shadow), inset 0 1px rgba(255, 255, 255, 0.2);
+        outline: none;
+
+        &:hover {
+            background-color: var(--dp-accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(53, 132, 228, 0.45), inset 0 1px rgba(255, 255, 255, 0.3);
+        }
+
+        &:active {
+            transform: translateY(0);
+            background-color: var(--dp-accent-active);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 3px rgba(53, 132, 228, 0.5);
+        }
+    }
+}

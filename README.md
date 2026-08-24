@@ -36,6 +36,7 @@
 - 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`).
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
+- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita Dark aesthetic, featuring smart viewport auto-placement, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
@@ -110,9 +111,9 @@ purity/
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
-            ├── pipes/           # Reusable transform pipes (transform-sample, uppercase)
+            ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
-            └── components/      # UI Web Components (intro, header, playground, demo, custom, modal, pipe-sample, for-sample, raw-template, forms-validation, directive-sample)
+            └── components/      # UI Web Components (intro, header, playground, demo, custom, modal, date-time-picker, date-time-picker-sample, pipe-sample, for-sample, raw-template, forms-validation, directive-sample)
 ```
 
 ---
@@ -554,6 +555,63 @@ export class ModalViewComponent {
 
     maximize() {
         this.isMaximized.update(v => !v);
+    }
+}
+```
+
+---
+
+### 14. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
+
+Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark aesthetics with glassmorphic blur effects and smart viewport-aware auto-placement:
+
+- **Reactivity & Signals**: State (`selectedDate`, `isOpen`, `viewDate`, `workingHours`, `workingMinutes`, `restrictions`, `enableBlur`) driven by fine-grained Purity signals.
+- **Smart Viewport Auto-Placement**: Automatically measures available screen headroom and footroom to flip the popup above (`placement-top`) or below (`placement-bottom`) the trigger button, with horizontal auto-alignment.
+- **Year Navigation Submenu**: Fast multi-year scrollable selector overlay with smooth animated chevron toggle.
+- **24-Hour Time Capsule**: Dual numeric hours & minutes input supporting text entry, key navigation, and mouse-wheel scrolling (`handleWheel`).
+- **Date & Time Restrictions**: Configurable boundaries via `DateRestriction` (`futureOnly`, `pastOnly`, `minDate`, `maxDate`, `daysBack`, `daysForward`, `minTime`, `maxTime`, `disabledDates`).
+- **DatePipe Formatting**: Built-in `@Pipe('date')` transform pipe for flexible Handlebars date expressions (`{{ myDate() | date: 'EEEE, MMMM d, yyyy HH:mm' }}`).
+
+```html
+<!-- 1. Consumer Template Usage -->
+<date-time-picker id="my-picker"></date-time-picker>
+
+<!-- Format the selected date with the DatePipe -->
+<p>Selected: {{ selectedDate() | date: 'MMM dd, yyyy HH:mm' }}</p>
+```
+
+```typescript
+// 2. Component Initialization & Custom Restrictions
+import { Component, signal, ViewChild } from '@purity/core';
+import type { DateTimePickerComponent } from './shared/components/date-time-picker/date-time-picker.component';
+import './shared/components/date-time-picker/date-time-picker.component';
+import './shared/pipes/date.pipe';
+
+@Component({ selector: 'booking-view', templateUrl: './booking-view.html' })
+export class BookingViewComponent {
+    selectedDate = signal<Date | null>(new Date());
+
+    @ViewChild('#my-picker')
+    picker?: DateTimePickerComponent | null;
+
+    protected onInit() {
+        setTimeout(() => {
+            if (this.picker) {
+                // Configure restrictions: future dates only, office hours 09:00 - 18:00
+                this.picker.setRestrictions({
+                    futureOnly: true,
+                    daysForward: 60,
+                    minTime: '09:00',
+                    maxTime: '18:00',
+                });
+                this.picker.setBlur(true); // Enable glassmorphism blur mode
+
+                // Subscribe to date selections
+                this.picker.onDateSelected = (date: Date) => {
+                    this.selectedDate.set(date);
+                };
+            }
+        }, 0);
     }
 }
 ```

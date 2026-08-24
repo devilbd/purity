@@ -1,0 +1,117 @@
+<div class="window date-time-picker-sample-root">
+    <div class="sample-header">
+        <h4>📅 Date & Time Picker Component (<code>&lt;date-time-picker&gt;</code>)</h4>
+        <span class="badge-pill">Web Component + Signals</span>
+    </div>
+    <p class="sample-desc">
+        Modern, reactive date and time picker featuring calendar views, year navigation, 24-hour time inputs with mouse-wheel scrolling, GNOME Adwaita glassmorphism overlays, smart viewport auto-placement, date range restrictions, and custom pipe transformations:
+    </p>
+
+    <div class="pickers-grid">
+        <!-- 1. Standard Picker -->
+        <div class="picker-card window">
+            <div class="card-title-area">
+                <span class="card-icon">⚡</span>
+                <div>
+                    <h5>Standard Date & Time</h5>
+                    <p class="card-subtitle">Full date & 24h time picker with inline OK confirmation</p>
+                </div>
+            </div>
+            <div class="picker-wrapper">
+                <date-time-picker id="standard-picker"></date-time-picker>
+            </div>
+            <div class="output-preview">
+                <span class="output-label">Selected:</span>
+                <code class="output-value">{{standardDate() ? (standardDate() | date: 'EEEE, MMMM d, yyyy HH:mm') : 'None (click to pick)'}}</code>
+            </div>
+            <div class="controls-row">
+                <button
+                    type="button"
+                    class="button-primary btn-sm"
+                    onclick="dateTimePickerSample.setTomorrow()"
+                >
+                    Set Tomorrow 10:00
+                </button>
+                <button
+                    type="button"
+                    class="button-cancel btn-sm"
+                    onclick="dateTimePickerSample.clearStandard()"
+                >
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. Glassmorphism Blur Effect -->
+        <div class="picker-card window">
+            <div class="card-title-area">
+                <span class="card-icon">✨</span>
+                <div>
+                    <h5>Glassmorphism Blur Overlay</h5>
+                    <p class="card-subtitle">Backdrop-filter blur enabled with saturation boost</p>
+                </div>
+            </div>
+            <div class="picker-wrapper">
+                <date-time-picker id="blur-picker"></date-time-picker>
+            </div>
+            <div class="output-preview">
+                <span class="output-label">Selected:</span>
+                <code class="output-value">{{blurDate() ? (blurDate() | date: 'medium') : 'None (click to pick)'}}</code>
+            </div>
+            <div class="tag-row">
+                <span class="status-tag tag-info">enableBlur = true</span>
+                <span class="status-tag tag-primary">Pipe: medium</span>
+            </div>
+        </div>
+
+        <!-- 3. Future Only & Business Hours -->
+        <div class="picker-card window">
+            <div class="card-title-area">
+                <span class="card-icon">🏢</span>
+                <div>
+                    <h5>Business Hours & Future Dates</h5>
+                    <p class="card-subtitle">Restricted to next 60 days, working hours 09:00 - 18:00</p>
+                </div>
+            </div>
+            <div class="picker-wrapper">
+                <date-time-picker id="business-picker"></date-time-picker>
+            </div>
+            <div class="output-preview">
+                <span class="output-label">Selected:</span>
+                <code class="output-value">{{businessDate() ? (businessDate() | date: 'MMM dd, yyyy HH:mm') : 'None (click to pick)'}}</code>
+            </div>
+            <div class="controls-row">
+                <button
+                    type="button"
+                    class="button-primary btn-sm"
+                    onclick="dateTimePickerSample.setNextWeek()"
+                >
+                    Set Next Week 14:30
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. Date Range & Disabled Days -->
+        <div class="picker-card window">
+            <div class="card-title-area">
+                <span class="card-icon">🚫</span>
+                <div>
+                    <h5>Range Limits & Disabled Days</h5>
+                    <p class="card-subtitle">Past 7 days to +14 days with specific disabled dates</p>
+                </div>
+            </div>
+            <div class="picker-wrapper">
+                <date-time-picker id="range-picker"></date-time-picker>
+            </div>
+            <div class="output-preview">
+                <span class="output-label">Selected:</span>
+                <code class="output-value">{{rangeDate() ? (rangeDate() | date: 'yyyy-MM-dd HH:mm') : 'None (click to pick)'}}</code>
+            </div>
+            <div class="tag-row">
+                <span class="status-tag tag-warn">daysBack: 7</span>
+                <span class="status-tag tag-warn">daysForward: 14</span>
+                <span class="status-tag tag-danger">2 disabled dates</span>
+            </div>
+        </div>
+    </div>
+</div>

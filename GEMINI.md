@@ -57,10 +57,12 @@ purity/
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
             ├── directives/      # Reusable DOM directives (e.g. highlight)
-            ├── pipes/           # Reusable transform pipes (e.g. transform-sample, uppercase)
+            ├── pipes/           # Reusable transform pipes (e.g. date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
             └── components/      # UI Web Components
                 ├── custom/      # <custom-component> with two-way signal bindings
+                ├── date-time-picker/ # <date-time-picker> reactive date & time picker component
+                ├── date-time-picker-sample/ # <date-time-picker-sample> showcase of date-time-picker configurations
                 ├── demo/        # <demo-component> live framework interactive showcase
                 ├── directive-sample/ # <directive-sample> demonstrating directive usage
                 ├── forms-validation/ # <forms-validation> sample form component with submit validation

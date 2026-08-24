@@ -358,6 +358,11 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                             el.value = replaced;
                         }
                         el.setAttribute(attrName, replaced);
+                        if (attrName.startsWith('on')) {
+                            try {
+                                (el as any)[attrName] = new Function('event', replaced);
+                            } catch {}
+                        }
                     }
                 });
             }

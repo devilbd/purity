@@ -13,15 +13,19 @@ import '../directive-sample/directive-sample.component';
 import '../pipe-sample/pipe-sample.component';
 import '../for-sample/for-sample.component';
 import '../modal/modal-view.component';
+import '../date-time-picker/date-time-picker.component';
+import '../date-time-picker-sample/date-time-picker-sample.component';
 import '../../validators/forms-validation.validator';
 import '../../pipes/transform-sample.pipe';
 import '../../pipes/uppercase.pipe';
+import '../../pipes/date.pipe';
 import type { CustomComponent } from '../custom/custom.component';
 import type { RawTemplateComponent } from '../raw-template/raw-template.component';
 import type { FormsValidationComponent } from '../forms-validation/forms-validation.component';
 import type { PipeSampleComponent } from '../pipe-sample/pipe-sample.component';
 import type { ForSampleComponent } from '../for-sample/for-sample.component';
 import type { ModalViewComponent } from '../modal/modal-view.component';
+import type { DateTimePickerSampleComponent } from '../date-time-picker-sample/date-time-picker-sample.component';
 import { drag } from '../../behaviors/draggable/draggable';
 import { droppable } from '../../behaviors/droppable/droppable';
 
@@ -50,6 +54,9 @@ export class DemoComponent {
 
     @ViewChild('#for-sample')
     forSample?: ForSampleComponent | null;
+
+    @ViewChild('#date-time-picker-sample')
+    dateTimePickerSample?: DateTimePickerSampleComponent | null;
 
     @ViewChild('#demo-modal')
     modalView?: ModalViewComponent | null;
