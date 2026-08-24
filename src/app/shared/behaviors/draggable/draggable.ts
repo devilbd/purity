@@ -1,6 +1,6 @@
 import { getElement } from '@purity/core';
 import './draggable.scss';
-import { findDropTarget, type DroppableOptions } from '../droppable/droppable';
+import { findDropTarget, type DroppableOptions } from '@behaviors/droppable/droppable';
 
 export interface DraggableOptions {
     selector: string;

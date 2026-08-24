@@ -44,9 +44,17 @@ function decoratorsPlugin(): Plugin {
                     if (urlMatch) {
                         const url = urlMatch[1];
                         const fileDir = path.dirname(id);
-                        const absTarget = url.startsWith('./src/')
+                        let absTarget = url.startsWith('./src/')
                             ? path.resolve(process.cwd(), url)
                             : path.resolve(fileDir, url);
+
+                        if (!fs.existsSync(absTarget) && url.startsWith('@')) {
+                            const resolvedPath = url
+                                .replace(/^@pages\//, 'src/app/pages/')
+                                .replace(/^@components\//, 'src/app/shared/components/')
+                                .replace(/^@app\//, 'src/app/');
+                            absTarget = path.resolve(process.cwd(), resolvedPath);
+                        }
 
                         if (fs.existsSync(absTarget)) {
                             let rel = path.relative(fileDir, absTarget);
@@ -106,13 +114,15 @@ function environmentPlugin(isProd: boolean): Plugin {
     return {
         name: 'purity-environment-plugin',
         enforce: 'pre',
-        resolveId(source, importer) {
+        resolveId(source) {
             if (
                 isProd &&
                 (source.endsWith('environments/environment') ||
                     source.endsWith('environments/environment.ts') ||
                     source === './environments/environment' ||
-                    source === '../environments/environment')
+                    source === '../environments/environment' ||
+                    source === '@environments/environment' ||
+                    source === '@environments')
             ) {
                 return path.resolve(
                     import.meta.dirname,
@@ -134,6 +144,16 @@ export default defineConfig(({ mode }) => {
                 '@purity/core': path.resolve(import.meta.dirname, 'src/framework/core.ts'),
                 '@purity': path.resolve(import.meta.dirname, 'src/framework'),
                 '@environments': path.resolve(import.meta.dirname, 'src/environments'),
+                '@data': path.resolve(import.meta.dirname, 'src/data'),
+                '@pages': path.resolve(import.meta.dirname, 'src/app/pages'),
+                '@shared': path.resolve(import.meta.dirname, 'src/app/shared'),
+                '@components': path.resolve(import.meta.dirname, 'src/app/shared/components'),
+                '@directives': path.resolve(import.meta.dirname, 'src/app/shared/directives'),
+                '@pipes': path.resolve(import.meta.dirname, 'src/app/shared/pipes'),
+                '@validators': path.resolve(import.meta.dirname, 'src/app/shared/validators'),
+                '@behaviors': path.resolve(import.meta.dirname, 'src/app/shared/behaviors'),
+                '@app': path.resolve(import.meta.dirname, 'src/app'),
+                '@styles': path.resolve(import.meta.dirname, 'src/style.scss'),
             },
         },
     };

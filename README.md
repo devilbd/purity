@@ -636,24 +636,32 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
 
 ## 📐 Best Practices & Conventions
 
-1. **Side-Effect Imports for Custom Elements, Directives, Pipes, and Validators**:
-   Components, directives, pipes, and validators register themselves upon module evaluation. Import them using side-effect imports:
+1. **Side-Effect Imports with Path Aliases**:
+   Components, directives, pipes, and validators register themselves upon module evaluation. Import them cleanly using path aliases (avoid relative `../../` paths):
    ```typescript
-   import './shared/components/custom/custom.component';
-   import './shared/directives/highlight.directive';
-   import './shared/pipes/transform-sample.pipe';
-   import './shared/validators/forms-validation.validator';
+   import '@pages/custom/custom.component';
+   import '@directives/highlight.directive';
+   import '@pipes/transform-sample.pipe';
+   import '@validators/forms-validation.validator';
    ```
    For TypeScript type references, use explicit type-only imports:
    ```typescript
-   import type { CustomComponent } from './shared/components/custom/custom.component';
+   import type { CustomComponent } from '@pages/custom/custom.component';
    ```
 
-2. **Use `@purity/core` Path Alias**:
-   Import framework primitives cleanly via the `@purity/core` alias without relative `../../` paths:
-   ```typescript
-   import { Component, signal, effect, ViewChild, inject, Pipe, BasePipe } from '@purity/core';
-   ```
+2. **Clean Path Aliases (Zero `../` Relative Imports)**:
+   Use path aliases across TypeScript and SCSS:
+   - Framework Primitives: `@purity/core`, `@purity/*`
+   - Environments: `@environments`, `@environments/*`
+   - Data Layer: `@data/*`
+   - Application Root: `@app/*`
+   - Pages & Showcases: `@pages/*`
+   - Reusable Components: `@components/*`
+   - Directives: `@directives/*`
+   - Pipes: `@pipes/*`
+   - Validators: `@validators/*`
+   - Behaviors: `@behaviors/*`
+   - SCSS Design System: `@use '@styles' as *;`
 
 3. **CSS Classes over Inline Styles**:
    All visual modifications, state changes, directives, and behaviors apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.

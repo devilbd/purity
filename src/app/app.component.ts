@@ -4,12 +4,12 @@ import {
     ViewChild,
 } from '@purity/core';
 import './app.component.scss';
-import './pages/intro/intro.component';
-import './pages/header/header.component';
-import './pages/playground/playground.component';
-import './pages/demo/demo.component';
-import type { DemoComponent } from './pages/demo/demo.component';
-import type { PlaygroundComponent } from './pages/playground/playground.component';
+import '@pages/intro/intro.component';
+import '@pages/header/header.component';
+import '@pages/playground/playground.component';
+import '@pages/demo/demo.component';
+import type { DemoComponent } from '@pages/demo/demo.component';
+import type { PlaygroundComponent } from '@pages/playground/playground.component';
 
 @Component({
     selector: 'app-component',

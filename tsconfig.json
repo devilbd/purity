@@ -15,7 +15,20 @@
     "noEmit": true,
     "paths": {
       "@purity/core": ["./src/framework/core.ts"],
-      "@purity/*": ["./src/framework/*"]
+      "@purity/*": ["./src/framework/*"],
+      "@environments": ["./src/environments/environment.ts"],
+      "@environments/*": ["./src/environments/*"],
+      "@data/*": ["./src/data/*"],
+      "@app/*": ["./src/app/*"],
+      "@pages/*": ["./src/app/pages/*"],
+      "@shared/*": ["./src/app/shared/*"],
+      "@components/*": ["./src/app/shared/components/*"],
+      "@directives/*": ["./src/app/shared/directives/*"],
+      "@pipes/*": ["./src/app/shared/pipes/*"],
+      "@validators/*": ["./src/app/shared/validators/*"],
+      "@behaviors/*": ["./src/app/shared/behaviors/*"],
+      "@styles": ["./src/style.scss"],
+      "@styles/*": ["./src/*"]
     },
 
     /* Linting */

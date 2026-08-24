@@ -1,5 +1,5 @@
 import { Component, signal, ViewChild } from '@purity/core';
-import type { DateTimePickerComponent, DateRestriction } from '../../shared/components/date-time-picker/date-time-picker.component';
+import type { DateTimePickerComponent, DateRestriction } from '@components/date-time-picker/date-time-picker.component';
 import './date-time-picker-sample.component.scss';
 
 @Component({

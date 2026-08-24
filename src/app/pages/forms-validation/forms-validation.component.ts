@@ -1,6 +1,6 @@
 import { Component } from '@purity/core';
 import './forms-validation.component.scss';
-import '../../shared/validators/forms-validation.validator';
+import '@validators/forms-validation.validator';
 
 @Component({
     selector: 'forms-validation',

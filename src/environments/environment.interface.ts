@@ -1,4 +1,4 @@
-import type { FirebaseConfig } from '../data/firebase';
+import type { FirebaseConfig } from '@data/firebase';
 
 export interface Environment {
     production: boolean;

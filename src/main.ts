@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '@purity/core';
-import { AppComponent } from './app/app.component';
-import { environment } from './environments/environment';
-import './data/firebase';
+import { AppComponent } from '@app/app.component';
+import { environment } from '@environments/environment';
+import '@data/firebase';
 
 bootstrapApplication(AppComponent, {
     environment,

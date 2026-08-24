@@ -4,30 +4,30 @@ import {
     signal,
     ViewChild,
 } from '@purity/core';
-import { DataService } from '../../../data/data.service';
+import { DataService } from '@data/data.service';
 import './demo.component.scss';
-import '../custom/custom.component';
-import '../raw-template/raw-template.component';
-import '../forms-validation/forms-validation.component';
-import '../directive-sample/directive-sample.component';
-import '../pipe-sample/pipe-sample.component';
-import '../for-sample/for-sample.component';
-import '../date-time-picker-sample/date-time-picker-sample.component';
-import '../../shared/components/modal/modal-view.component';
-import '../../shared/components/date-time-picker/date-time-picker.component';
-import '../../shared/validators/forms-validation.validator';
-import '../../shared/pipes/transform-sample.pipe';
-import '../../shared/pipes/uppercase.pipe';
-import '../../shared/pipes/date.pipe';
-import type { CustomComponent } from '../custom/custom.component';
-import type { RawTemplateComponent } from '../raw-template/raw-template.component';
-import type { FormsValidationComponent } from '../forms-validation/forms-validation.component';
-import type { PipeSampleComponent } from '../pipe-sample/pipe-sample.component';
-import type { ForSampleComponent } from '../for-sample/for-sample.component';
-import type { ModalViewComponent } from '../../shared/components/modal/modal-view.component';
-import type { DateTimePickerSampleComponent } from '../date-time-picker-sample/date-time-picker-sample.component';
-import { drag } from '../../shared/behaviors/draggable/draggable';
-import { droppable } from '../../shared/behaviors/droppable/droppable';
+import '@pages/custom/custom.component';
+import '@pages/raw-template/raw-template.component';
+import '@pages/forms-validation/forms-validation.component';
+import '@pages/directive-sample/directive-sample.component';
+import '@pages/pipe-sample/pipe-sample.component';
+import '@pages/for-sample/for-sample.component';
+import '@pages/date-time-picker-sample/date-time-picker-sample.component';
+import '@components/modal/modal-view.component';
+import '@components/date-time-picker/date-time-picker.component';
+import '@validators/forms-validation.validator';
+import '@pipes/transform-sample.pipe';
+import '@pipes/uppercase.pipe';
+import '@pipes/date.pipe';
+import type { CustomComponent } from '@pages/custom/custom.component';
+import type { RawTemplateComponent } from '@pages/raw-template/raw-template.component';
+import type { FormsValidationComponent } from '@pages/forms-validation/forms-validation.component';
+import type { PipeSampleComponent } from '@pages/pipe-sample/pipe-sample.component';
+import type { ForSampleComponent } from '@pages/for-sample/for-sample.component';
+import type { ModalViewComponent } from '@components/modal/modal-view.component';
+import type { DateTimePickerSampleComponent } from '@pages/date-time-picker-sample/date-time-picker-sample.component';
+import { drag } from '@behaviors/draggable/draggable';
+import { droppable } from '@behaviors/droppable/droppable';
 
 @Component({
     selector: 'demo-component',

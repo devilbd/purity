@@ -1,5 +1,5 @@
 import { Injectable } from '@purity/core';
-import { environment } from '../environments/environment';
+import { environment } from '@environments/environment';
 
 export interface FirebaseConfig {
     apiKey: string;

@@ -346,24 +346,32 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 
 ## Key Conventions & Best Practices
 
-1. **Side-Effect Imports for Custom Elements, Directives, Pipes, and Validators**:
-   Because components, directives, pipes, and validators register themselves automatically with decorators at module evaluation time, import them as side effects:
+1. **Side-Effect Imports with Path Aliases**:
+   Because components, directives, pipes, and validators register themselves automatically with decorators at module evaluation time, import them as side effects using path aliases (never use relative `../../` paths):
    ```typescript
-   import './shared/components/custom/custom.component';
-   import './shared/directives/highlight.directive';
-   import './shared/pipes/transform-sample.pipe';
-   import './shared/validators/forms-validation.validator';
+   import '@pages/custom/custom.component';
+   import '@directives/highlight.directive';
+   import '@pipes/transform-sample.pipe';
+   import '@validators/forms-validation.validator';
    ```
    If referencing types for TypeScript typings, use explicit type-only imports:
    ```typescript
-   import type { CustomComponent } from './shared/components/custom/custom.component';
+   import type { CustomComponent } from '@pages/custom/custom.component';
    ```
 
-2. **Use `@purity/core` Path Alias**:
-   All framework imports should use the `@purity/core` alias rather than relative `../../` paths:
-   ```typescript
-   import { Component, signal, effect, ViewChild, inject, Pipe, BasePipe } from '@purity/core';
-   ```
+2. **Clean Path Aliases (No `../` Relative Imports)**:
+   All imports across TypeScript and SCSS must use path aliases rather than relative parent `../` paths:
+   - Framework Primitives: `@purity/core`, `@purity/*`
+   - Environments: `@environments`, `@environments/*`
+   - Data Layer: `@data/*`
+   - Application Root: `@app/*`
+   - Pages & Showcases: `@pages/*`
+   - Reusable Components: `@components/*`
+   - Directives: `@directives/*`
+   - Pipes: `@pipes/*`
+   - Validators: `@validators/*`
+   - Behaviors: `@behaviors/*`
+   - SCSS Design System: `@use '@styles' as *;`
 
 3. **CSS Classes over Inline Styles**:
    All visual modifications, state changes, directives, and behaviors must apply CSS classes (e.g. `.p-highlight`, `.is-valid`, `.is-dragging`, `.button-primary`, `.button-secondary`, `.button-cancel`) rather than mutating `element.style` directly.
