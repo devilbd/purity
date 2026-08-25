@@ -271,6 +271,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     $index: index,
                     $first: index === 0,
                     $last: index === list.length - 1,
+                    __host: componentInstance || (context instanceof Element ? context : (context as any)?.__host),
                 });
 
                 anchor.parentNode?.insertBefore(clone, anchor);
@@ -429,6 +430,34 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 }
 
 /**
+ * Safely resolves a child element matching selector from a host or root document
+ * without throwing illegal invocation when host is a prototype/context wrapper.
+ */
+function safeQuerySelector(host: any, selector: string): any {
+    if (typeof document === 'undefined') return null;
+
+    if (host && host.__host) {
+        try {
+            const el = host.__host.querySelector?.(selector);
+            if (el) return el;
+        } catch (_) {}
+    }
+
+    if (host) {
+        try {
+            const el = host.querySelector?.(selector);
+            if (el) return el;
+        } catch (_) {}
+    }
+
+    try {
+        return document.querySelector?.(selector) ?? null;
+    } catch (_) {
+        return null;
+    }
+}
+
+/**
  * Attaches standard Purity component lifecycle methods, template loader, and bindings to a prototype.
  */
 function attachComponentLifecycle(proto: any, options: ComponentOptions) {
@@ -493,7 +522,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             for (const { propertyKey, selector } of this.__childViews) {
                 Object.defineProperty(this, propertyKey, {
                     get() {
-                        return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
+                        return safeQuerySelector(this, selector);
                     },
                     enumerable: true,
                     configurable: true,
@@ -665,7 +694,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
                 propertyKeyOrContext.addInitializer(function (this: any) {
                     Object.defineProperty(this, propertyName, {
                         get() {
-                            return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
+                            return safeQuerySelector(this, selector);
                         },
                         enumerable: true,
                         configurable: true,
@@ -675,7 +704,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
             return function (this: any, initialValue: any) {
                 Object.defineProperty(this, propertyName, {
                     get() {
-                        return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
+                        return safeQuerySelector(this, selector);
                     },
                     enumerable: true,
                     configurable: true,
@@ -693,7 +722,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
 
         Object.defineProperty(target, propertyKey, {
             get(this: any) {
-                return this.querySelector?.(selector) ?? document.querySelector?.(selector) ?? null;
+                return safeQuerySelector(this, selector);
             },
             set(_value: any) {
                 // allow property override

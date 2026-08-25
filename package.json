@@ -13,13 +13,12 @@
     "deploy:hosting": "npm run build:prod && firebase deploy --only hosting"
   },
   "devDependencies": {
+    "@types/prismjs": "^1.26.6",
     "sass": "^1.103.1",
     "typescript": "^7.0.2",
     "vite": "^8.2.2"
   },
   "dependencies": {
-    "@codesandbox/sandpack-client": "^2.19.8",
-    "@types/prismjs": "^1.26.6",
     "prismjs": "^1.30.0",
     "sucrase": "^3.35.1"
   }

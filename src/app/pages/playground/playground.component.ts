@@ -16,6 +16,34 @@ import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-scss';
 import 'prismjs/components/prism-markup';
 
+// Shared UI Web Components
+import '@components/loader/loader.component';
+import { LoaderComponent } from '@components/loader/loader.component';
+import '@components/modal/modal-view.component';
+import { ModalViewComponent } from '@components/modal/modal-view.component';
+import '@components/notification/notification.component';
+import { NotificationComponent } from '@components/notification/notification.component';
+import '@components/date-time-picker/date-time-picker.component';
+import { DateTimePickerComponent } from '@components/date-time-picker/date-time-picker.component';
+import '@components/radial-context-menu/radial-context-menu.component';
+import { RadialContextMenuComponent } from '@components/radial-context-menu/radial-context-menu.component';
+
+// Standalone Widgets
+import '@widgets/analogue-clock/analogue-clock.component';
+import { AnalogueClockComponent } from '@widgets/analogue-clock/analogue-clock.component';
+
+// Directives, Pipes & Validators
+import '@directives/highlight.directive';
+import { HighlightDirective } from '@directives/highlight.directive';
+import '@pipes/uppercase.pipe';
+import { UppercasePipe } from '@pipes/uppercase.pipe';
+import '@pipes/date.pipe';
+import { DatePipe } from '@pipes/date.pipe';
+import '@pipes/transform-sample.pipe';
+import { MyTransformPipe } from '@pipes/transform-sample.pipe';
+import '@validators/forms-validation.validator';
+import { FormsValidationValidator } from '@validators/forms-validation.validator';
+
 export interface CodePreset {
     id: string;
     name: string;
@@ -26,6 +54,95 @@ export interface CodePreset {
 }
 
 export const PLAYGROUND_PRESETS: CodePreset[] = [
+    {
+        id: 'loader-async',
+        name: '⏳ Async Loader & ViewChild',
+        description: 'Using <loader-component> with @ViewChild and async actions.',
+        ts: `import { Component, signal, effect, ViewChild } from '@purity/core';
+import type { LoaderComponent } from '@components/loader/loader.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#loader')
+    private loader?: LoaderComponent | null;
+
+    selectedUser = signal('');
+    users = signal([
+        'Alice Smith',
+        'Bob Johnson',
+        'Charlie Brown'
+    ]);
+
+    onSelectUser(event: Event, user: string) {
+        this.loader?.show(\`Loading profile for \${user}...\`);
+        setTimeout(() => {
+            this.loader?.hide();
+            this.selectedUser.set(user);
+        }, 1200);
+    }
+}`,
+        html: `<div class="user-select-card window">
+    <h3>👤 Select User Profile</h3>
+    
+    <!-- Purity UI Loader Component -->
+    <loader-component id="loader"></loader-component>
+
+    <div class="user-list">
+        <div for="let user of users" class="user-item">
+            <button
+                type="button"
+                class="button-secondary user-btn"
+                onclick="onSelectUser(event, user)"
+            >
+                Select {{user}}
+            </button>
+        </div>
+    </div>
+
+    <div class="selected-result">
+        <span>Active User: <strong>{{selectedUser() || 'None selected'}}</strong></span>
+    </div>
+</div>`,
+        scss: `.user-select-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #232635;
+    border: 1px solid rgba(130, 170, 255, 0.2);
+    border-radius: 12px;
+    color: #eeffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+    h3 {
+        margin: 0;
+        color: #82aaff;
+    }
+
+    .user-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .user-btn {
+        width: 100%;
+        text-align: left;
+        padding: 10px 16px;
+    }
+
+    .selected-result {
+        padding: 12px 16px;
+        background: #1b1e2b;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        color: #c3e88d;
+    }
+}`,
+    },
     {
         id: 'counter',
         name: '⚡ Reactive Signals & Counter',
@@ -255,11 +372,11 @@ export class PlaygroundDemoComponent {
     <div class="tasks-list">
         <div for="let t, i of tasks" class="task-item">
             <span class="task-num">#{{i + 1}}</span>
-            <span class="task-title {{t.done ? 'task-done' : ''}}" onclick="toggleTask({{t.id}})">
+            <span class="task-title {{t.done ? 'task-done' : ''}}" onclick="toggleTask(t.id)">
                 {{t.title}}
             </span>
             <span class="task-tag">{{t.tag}}</span>
-            <button type="button" class="button-cancel delete-btn" onclick="removeTask({{t.id}})">✕</button>
+            <button type="button" class="button-cancel delete-btn" onclick="removeTask(t.id)">✕</button>
         </div>
     </div>
 </div>`,
@@ -398,10 +515,10 @@ function transformAllClasses(cleanJs: string): { code: string; postStatements: s
 
         if (className) {
             const transformedBody = classBody.replace(
-                /@(?:ViewChild|ChildView)\s*\(\s*([\s\S]*?)\s*\)\s*(?:public\s+|private\s+|protected\s+)?([a-zA-Z0-9_$]+)/g,
+                /@(?:ViewChild|ChildView)\s*\(\s*([\s\S]*?)\s*\)\s*(?:public\s+|private\s+|protected\s+)?([a-zA-Z0-9_$]+)(?:\s*=\s*[^;\n]+)?(?:\s*;)?/g,
                 (_, args, prop) => {
                     postStatements.push(`__purity.ViewChild(${args.trim()})(${className}.prototype, '${prop}');`);
-                    return prop;
+                    return '';
                 },
             );
             result += header + '{' + transformedBody + '}';
@@ -670,7 +787,7 @@ export class PlaygroundComponent {
             cleanJs = cleanJs.replace(/export\s+default\s+([A-Za-z0-9_$]+);?/g, '');
             cleanJs = cleanJs.replace(/export\s*\{[^}]*\};?/g, '');
 
-            // Scope object with framework primitives, data services, analytics, widgets & behaviors
+            // Scope object with framework primitives, data services, analytics, components, widgets & behaviors
             const purityScope = {
                 ...purityCore,
                 DataService,
@@ -681,6 +798,17 @@ export class PlaygroundComponent {
                 logAnalyticsEvent,
                 drag,
                 droppable,
+                LoaderComponent,
+                ModalViewComponent,
+                NotificationComponent,
+                DateTimePickerComponent,
+                RadialContextMenuComponent,
+                AnalogueClockComponent,
+                HighlightDirective,
+                UppercasePipe,
+                DatePipe,
+                MyTransformPipe,
+                FormsValidationValidator,
             };
 
             // Dynamic destructuring to avoid collision with any class names declared in cleanJs
