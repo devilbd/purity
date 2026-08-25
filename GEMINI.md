@@ -79,7 +79,7 @@ purity/
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── notification-sample/ # <notification-sample> interactive showcase for toast notifications & positions
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
-        │   ├── playground/      # <playground-view> Sandpack-inspired live editor & preview (GNOME 50 / Palenight)
+        │   ├── playground/      # <playground-view> in-browser live editor, compiler & localStorage history (GNOME 50 / Palenight)
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
         │   └── raw-template/    # <raw-template> dynamic inline template rendering
         └── shared/

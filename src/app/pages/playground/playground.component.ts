@@ -1,4 +1,4 @@
-import { Component, signal, effect } from '@purity/core';
+import { Component, signal, effect, inject } from '@purity/core';
 import './playground.component.scss';
 import * as purityCore from '@purity/core';
 import { DataService } from '@data/data.service';
@@ -51,6 +51,35 @@ export interface CodePreset {
     ts: string;
     html: string;
     scss: string;
+    isCustom?: boolean;
+    createdAt?: number;
+}
+
+const PLAYGROUND_HISTORY_STORAGE_KEY = 'PURITY_PLAYGROUND_HISTORY';
+
+function loadPlaygroundHistory(): CodePreset[] {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+        const raw = localStorage.getItem(PLAYGROUND_HISTORY_STORAGE_KEY);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        }
+    } catch (e) {
+        console.error('[Playground] Failed to load history from localStorage:', e);
+    }
+    return [];
+}
+
+function savePlaygroundHistory(history: CodePreset[]): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+        localStorage.setItem(PLAYGROUND_HISTORY_STORAGE_KEY, JSON.stringify(history));
+    } catch (e) {
+        console.error('[Playground] Failed to save history to localStorage:', e);
+    }
 }
 
 export const PLAYGROUND_PRESETS: CodePreset[] = [
@@ -562,11 +591,15 @@ function transformAllClasses(cleanJs: string): { code: string; postStatements: s
     templateUrl: './src/app/pages/playground/playground.component.html',
 })
 export class PlaygroundComponent {
+    private notify = inject(NotifyService);
+
     activeTab = signal<'ts' | 'html' | 'scss'>('ts');
-    selectedPresetId = signal<string>('counter');
+    selectedPresetId = signal<string>(PLAYGROUND_PRESETS[0].id);
     statusMessage = signal<string>('● Ready');
     isError = signal<boolean>(false);
     errorMessage = signal<string>('');
+
+    savedPresets = signal<CodePreset[]>(loadPlaygroundHistory());
 
     tsCode = signal<string>(PLAYGROUND_PRESETS[0].ts);
     htmlCode = signal<string>(PLAYGROUND_PRESETS[0].html);
@@ -592,8 +625,12 @@ export class PlaygroundComponent {
         return Array.from({ length: Math.max(lines, 1) }, (_, i) => i + 1);
     }
 
-    get presets() {
-        return PLAYGROUND_PRESETS;
+    get allPresets(): CodePreset[] {
+        return [...PLAYGROUND_PRESETS, ...this.savedPresets()];
+    }
+
+    get isCustomSelected(): boolean {
+        return this.savedPresets().some(p => p.id === this.selectedPresetId());
     }
 
     protected onInit() {
@@ -635,7 +672,7 @@ export class PlaygroundComponent {
     }
 
     onPresetSelect(presetId: string) {
-        const preset = PLAYGROUND_PRESETS.find(p => p.id === presetId);
+        const preset = this.allPresets.find(p => p.id === presetId);
         if (!preset) return;
 
         this.selectedPresetId.set(presetId);
@@ -644,6 +681,60 @@ export class PlaygroundComponent {
         this.scssCode.set(preset.scss);
         this.updateHighlight();
         this.runCompile();
+    }
+
+    onSaveSnippet() {
+        const defaultTitle = `Snippet #${this.savedPresets().length + 1} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+        const title = window.prompt('Enter a title for your saved playground snippet:', defaultTitle);
+        if (title === null) return; // User cancelled
+        const cleanTitle = title.trim() || defaultTitle;
+
+        const newId = `custom-${Date.now()}`;
+        const newPreset: CodePreset = {
+            id: newId,
+            name: `💾 ${cleanTitle}`,
+            description: 'Custom snippet saved into local storage history.',
+            ts: this.tsCode(),
+            html: this.htmlCode(),
+            scss: this.scssCode(),
+            isCustom: true,
+            createdAt: Date.now(),
+        };
+
+        const updated = [newPreset, ...this.savedPresets()];
+        this.savedPresets.set(updated);
+        savePlaygroundHistory(updated);
+
+        this.selectedPresetId.set(newId);
+
+        // Synchronize native select value
+        const select = document.querySelector('#preset-select') as HTMLSelectElement | null;
+        if (select) {
+            select.value = newId;
+        }
+
+        this.notify.success('Saved to History', `Snippet "${cleanTitle}" saved to localStorage.`);
+    }
+
+    onDeleteSnippet() {
+        const currentId = this.selectedPresetId();
+        const custom = this.savedPresets().find(p => p.id === currentId);
+        if (!custom) {
+            this.notify.warn('Cannot Delete Built-in', 'Built-in framework presets cannot be removed.');
+            return;
+        }
+
+        const updated = this.savedPresets().filter(p => p.id !== currentId);
+        this.savedPresets.set(updated);
+        savePlaygroundHistory(updated);
+
+        this.notify.info('Snippet Deleted', `Removed "${custom.name}" from local history.`);
+        this.onPresetSelect(PLAYGROUND_PRESETS[0].id);
+
+        const select = document.querySelector('#preset-select') as HTMLSelectElement | null;
+        if (select) {
+            select.value = PLAYGROUND_PRESETS[0].id;
+        }
     }
 
     updateHighlight() {

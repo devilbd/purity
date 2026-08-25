@@ -9,17 +9,32 @@
         </div>
 
         <div class="preset-selector-group">
-            <label for="preset-select">Preset:</label>
+            <label for="preset-select">Preset / History:</label>
             <select
                 id="preset-select"
                 class="preset-select"
                 onchange="onPresetSelect(this.value)"
             >
-                <option value="loader-async">⏳ Async Loader & ViewChild</option>
-                <option value="counter" selected>⚡ Reactive Signals & Counter</option>
-                <option value="pipes">🔀 Handlebars Transform Pipes</option>
-                <option value="array-loop">🔁 Structural Array Repeater</option>
+                <option for="let p of allPresets" value="{{p.id}}">{{p.name}}</option>
             </select>
+
+            <button
+                type="button"
+                class="action-btn save-snippet-btn"
+                title="Save current code to browser localStorage history"
+                onclick="onSaveSnippet()"
+            >
+                💾 Save written...
+            </button>
+
+            <button
+                type="button"
+                class="action-btn delete-snippet-btn {{isCustomSelected ? 'visible' : 'hidden'}}"
+                title="Delete this custom snippet from localStorage"
+                onclick="onDeleteSnippet()"
+            >
+                🗑️ Delete
+            </button>
         </div>
     </div>
 

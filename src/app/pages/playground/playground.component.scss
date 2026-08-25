@@ -544,5 +544,37 @@
                 border-color: var(--pn-blue);
             }
         }
+
+        &.save-snippet-btn {
+            background: rgba(195, 232, 141, 0.12);
+            color: var(--pn-green);
+            border-color: rgba(195, 232, 141, 0.3);
+
+            &:hover {
+                background: rgba(195, 232, 141, 0.22);
+                border-color: var(--pn-green);
+                color: #ffffff;
+            }
+        }
+
+        &.delete-snippet-btn {
+            background: rgba(255, 83, 112, 0.12);
+            color: var(--pn-red);
+            border-color: rgba(255, 83, 112, 0.3);
+
+            &:hover {
+                background: rgba(255, 83, 112, 0.22);
+                border-color: var(--pn-red);
+                color: #ffffff;
+            }
+
+            &.hidden {
+                display: none !important;
+            }
+
+            &.visible {
+                display: inline-flex !important;
+            }
+        }
     }
 }
