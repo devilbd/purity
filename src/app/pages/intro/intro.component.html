@@ -629,6 +629,178 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
     }
 }</code></pre>
         </div>
+
+        <!-- ========================================== -->
+        <!-- GROUP 3: LIFECYCLES & EXECUTION PHASES     -->
+        <!-- ========================================== -->
+        <div class="intro-section-divider">
+            <span class="section-icon">🔄</span>
+            <h3 class="section-title">Framework Lifecycles &amp; Execution Phases</h3>
+            <span class="section-badge">Lifecycles &amp; Phases</span>
+        </div>
+
+        <!-- 21. Component Mounting & Teardown Lifecycle -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>21. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
+                <p>Native Custom Elements v1 lifecycle flow from template projection and reactive binding to teardown:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span>, <span class="fn">ViewChild</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+
+<span class="dec">@Component</span>({
+    selector: <span class="str">'lifecycle-demo'</span>,
+    templateUrl: <span class="str">'./lifecycle-demo.component.html'</span>,
+})
+<span class="kw">export class</span> <span class="typ">LifecycleDemoComponent</span> {
+    <span class="kw">private</span> timerId?: <span class="typ">number</span>;
+    count = <span class="fn">signal</span>(<span class="num">0</span>);
+
+    <span class="cmt">/**
+     * PHASE 1: Constructor - Instantiates state &amp; signals.
+     */</span>
+    <span class="kw">constructor</span>() {
+        console.<span class="fn">log</span>(<span class="str">'[1. Constructor] Class instance initialized'</span>);
+    }
+
+    <span class="cmt">/**
+     * PHASE 2: onInit() - Invoked after connectedCallback():
+     * - &lt;slot&gt; content projection resolved
+     * - Strict input values sanitized (zero parser warnings)
+     * - Template mounted to innerHTML
+     * - @ViewChild getters and reactive {{ expressions }} compiled
+     * - Directives (@Directive) and Validators (@Validator) attached
+     */</span>
+    <span class="kw">protected</span> <span class="fn">onInit</span>(): <span class="typ">void</span> {
+        console.<span class="fn">log</span>(<span class="str">'[2. onInit] DOM mounted and all bindings active'</span>);
+        <span class="kw">this</span>.timerId = window.<span class="fn">setInterval</span>(() =&gt; <span class="kw">this</span>.count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>), <span class="num">1000</span>);
+    }
+
+    <span class="cmt">/**
+     * PHASE 3: onDestroy() - Invoked during disconnectedCallback():
+     * - Automatically tears down active Directives (disconnects MutationObservers)
+     * - Automatically unbinds active Form Validators
+     * - Use for clearing intervals, listeners, and behavior cleanup
+     */</span>
+    <span class="kw">protected</span> <span class="fn">onDestroy</span>(): <span class="typ">void</span> {
+        console.<span class="fn">log</span>(<span class="str">'[3. onDestroy] Element removed from DOM, cleaning up'</span>);
+        <span class="kw">if</span> (<span class="kw">this</span>.timerId) window.<span class="fn">clearInterval</span>(<span class="kw">this</span>.timerId);
+    }
+}</code></pre>
+        </div>
+
+        <!-- 22. Custom Directive Lifecycle -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>22. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
+                <p>Execution phases for attribute-level reactivity, signal tracking, and host DOM mutation observation:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+
+<span class="dec">@Directive</span>(<span class="str">'tooltip'</span>)
+<span class="kw">export class</span> <span class="typ">TooltipDirective</span> <span class="kw">extends</span> <span class="typ">BaseDirective</span> {
+    <span class="cmt">/**
+     * PHASE 1: onInit() - Attached to host DOM element:
+     * - Access this.element, this.value, this.options
+     * - Setup initial classes, attributes, or wrapper spans
+     */</span>
+    <span class="fn">onInit</span>(): <span class="typ">void</span> {
+        <span class="kw">this</span>.element.classList.<span class="fn">add</span>(<span class="str">'has-tooltip'</span>);
+        <span class="kw">this</span>.<span class="fn">onChanges</span>(<span class="kw">this</span>.value);
+    }
+
+    <span class="cmt">/**
+     * PHASE 2: onChanges(newValue, oldValue) - Reactive signal tracking:
+     * - Automatically executed inside an effect() whenever dynamic [tooltip]="textSignal()" changes
+     */</span>
+    <span class="fn">onChanges</span>(newValue: <span class="typ">any</span>, oldValue?: <span class="typ">any</span>): <span class="typ">void</span> {
+        <span class="kw">this</span>.element.<span class="fn">setAttribute</span>(<span class="str">'data-tooltip'</span>, String(newValue ?? <span class="str">''</span>));
+    }
+
+    <span class="cmt">/**
+     * PHASE 3: onDOMChange(recordOrEvent) - Mutation &amp; Input Observer:
+     * - Fires on host element attribute/child mutations or input/change events
+     */</span>
+    <span class="fn">onDOMChange</span>(record: <span class="typ">MutationRecord</span> | <span class="typ">Event</span>): <span class="typ">void</span> {
+        <span class="cmt">// Handle dynamic attribute changes or element resize</span>
+    }
+
+    <span class="cmt">/**
+     * PHASE 4: destroy() / onDestroy() - Teardown:
+     * - Automatically disconnects MutationObserver and unbinds event listeners
+     */</span>
+    <span class="kw">override</span> <span class="fn">onDestroy</span>(): <span class="typ">void</span> {
+        <span class="kw">this</span>.element.classList.<span class="fn">remove</span>(<span class="str">'has-tooltip'</span>);
+    }
+}</code></pre>
+        </div>
+
+        <!-- 23. Form Validation Lifecycle -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>23. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
+                <p>Decoupled validation pipeline with field binding, live evaluation, CSS state reflection, and submit lock:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+
+<span class="dec">@Validator</span>({
+    form: <span class="str">'#order-form'</span>,
+    fields: { email: <span class="str">'#email-input'</span>, quantity: <span class="str">'#qty-input'</span> },
+    validClass: <span class="str">'is-valid'</span>,
+    invalidClass: <span class="str">'is-invalid'</span>,
+})
+<span class="kw">export class</span> <span class="typ">OrderValidator</span> <span class="kw">extends</span> <span class="typ">BaseValidator</span> {
+    <span class="cmt">/**
+     * 1. FIELD BINDING: Binds 'input', 'blur', and 'change' listeners to fields
+     * 2. EVALUATION PHASE: Custom validation methods executed per field
+     */</span>
+    <span class="fn">validateEmail</span>(value: <span class="typ">string</span>): <span class="typ">boolean</span> {
+        <span class="kw">return</span> <span class="str">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>.<span class="fn">test</span>(value);
+    }
+
+    <span class="fn">validateQuantity</span>(value: <span class="typ">string</span>): <span class="typ">boolean</span> {
+        <span class="kw">const</span> n = parseInt(value, <span class="num">10</span>);
+        <span class="kw">return</span> !isNaN(n) &amp;&amp; n &gt; <span class="num">0</span>;
+    }
+
+    <span class="cmt">/**
+     * 3. DOM STATE REFLECTION:
+     * - Applies .is-valid / .is-invalid / .is-touched CSS state classes
+     * - Automatically enables / disables form submit button
+     * 4. TEARDOWN: destroy() automatically unbinds field listeners on unmount
+     */</span>
+}</code></pre>
+        </div>
+
+        <!-- 24. Application Bootstrapping Lifecycle -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>24. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
+                <p>End-to-end initialization sequence from environment tokens to root component mounting:</p>
+            </div>
+            <pre><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> { <span class="typ">AppComponent</span> } <span class="kw">from</span> <span class="str">'@app/app.component'</span>;
+<span class="kw">import</span> { <span class="typ">ThemeService</span> } <span class="kw">from</span> <span class="str">'@data/theme.service'</span>;
+<span class="kw">import</span> { <span class="typ">LoggingInterceptor</span> } <span class="kw">from</span> <span class="str">'@interceptors/logging.interceptor'</span>;
+<span class="kw">import</span> { environment } <span class="kw">from</span> <span class="str">'@environments/environment'</span>;
+
+<span class="cmt">/**
+ * BOOTSTRAPPING PHASES:
+ * 1. Environment Registration: Binds active environment under 'ENVIRONMENT' DI token
+ * 2. Provider Instantiation: Registers and initializes singleton services into DI
+ * 3. Theme Synchronization: Reads ThemeService, localStorage &amp; OS prefers-color-scheme
+ * 4. HTTP Pipeline Assembly: Configures interceptors: [...] inside HttpClient
+ * 5. Root Element Mounting: Resolves &lt;app-component&gt; and triggers component lifecycle
+ * 6. Debug Tools: Exposes window.__PURITY_APP__ in development mode
+ */</span>
+<span class="fn">bootstrapApplication</span>(<span class="typ">AppComponent</span>, {
+    environment,
+    providers: [<span class="typ">ThemeService</span>],
+    interceptors: [<span class="typ">LoggingInterceptor</span>],
+}).<span class="fn">then</span>((appRef) =&gt; {
+    console.<span class="fn">log</span>(<span class="str">'Application Ref:'</span>, appRef.rootElement);
+    <span class="cmt">// appRef.destroy() available for complete application teardown</span>
+});</code></pre>
+        </div>
     </div>
 
     <!-- Bottom CTA Button -->

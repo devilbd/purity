@@ -373,6 +373,125 @@ Purity provides a first-class bootstrapping API that initializes root components
 
 ---
 
+## Framework Lifecycles & Execution Phases
+
+Purity components, directives, validators, and bootstrapping routines follow well-defined, synchronous lifecycle phases built directly on modern Web standards:
+
+### 1. Web Component Lifecycle (`@Component`)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         COMPONENT MOUNTING PHASES                           │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 1. CONNECTED (connectedCallback)                                            │
+│    ├── Captures initial nested HTML for <slot> content projection           │
+│    ├── Inlines template synchronously via Vite ?raw / templateUrl / string  │
+│    ├── Resolves <slot> projections (replaces with projected DOM or fallback)│
+│    ├── Sanitizes strict input types (prevents browser parser warnings)      │
+│    └── Mounts sanitized template into Custom Element innerHTML              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 2. QUERY & BINDING (bindTemplate)                                           │
+│    ├── Binds @ViewChild property descriptors to getters                     │
+│    ├── Structural Repeater: Parses for="let item of list" & creates scopes  │
+│    ├── Text Interpolation: Splits {{ expr }} into reactive effect() nodes   │
+│    ├── Directives: Instantiates matching @Directive classes (calls onInit)  │
+│    ├── Validators: Attaches @Validator rules and event listeners            │
+│    ├── Event Handlers: Compiles onclick/oninput to scoped functions         │
+│    └── Attribute Reactivity: Tracks class and boolean attribute changes     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 3. USER INIT HOOK                                                           │
+│    └── onInit() is executed (DOM is fully populated and reactive)           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                       │
+                              (Active Component State)
+                                       │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        COMPONENT UNMOUNTING PHASES                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ 4. DISCONNECTED (disconnectedCallback)                                      │
+│    ├── Directives Teardown: Calls destroy() on all active directives        │
+│    ├── Validators Teardown: Calls destroy() on active form validators       │
+│    └── USER TEARDOWN HOOK: onDestroy() is executed                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Component Lifecycle Methods
+
+| Hook / Method | Invocation Timing | Typical Usage |
+|---|---|---|
+| `constructor()` | Instantiation of the class instance | Initializing signal states and injecting DI dependencies. |
+| `onInit()` | Invoked after DOM template is mounted, `<slot>` is resolved, and all bindings are active | Attaching behaviors (`drag`, `droppable`), starting intervals, making HTTP requests. |
+| `onDestroy()` | Invoked when the custom element is disconnected from the DOM | Unsubscribing listeners, stopping timers, tearing down behaviors. |
+| `render(html?: string)` | Programmatically replaces `innerHTML` and triggers `bindTemplate()` | Dynamic inline template re-rendering. |
+| `disconnectedCallback()` | Native Custom Element unmount callback (automatically invokes `onDestroy()`) | Internal framework teardown. |
+
+---
+
+### 2. Custom Directive Lifecycle (`@Directive` & `BaseDirective`)
+
+```
+[Element Matched by Selector]
+              │
+              ▼
+   1. Constructor(element, value, options)
+              │
+              ▼
+   2. onInit() ──> Initial DOM class & attribute setup
+              │
+   ┌──────────┴──────────────────────────────────────┐
+   │                                                 │
+   ▼                                                 ▼
+3. onChanges(newValue, oldValue)         4. onDOMChange(record | event)
+   Triggered via effect() whenever          Triggered via MutationObserver on DOM
+   dynamic [directive]="signalVal()"         mutations, or host input/change events.
+   changes.                                  │
+   │                                         │
+   └──────────┬──────────────────────────────┘
+              │
+              ▼
+   5. destroy() / onDestroy()
+      Disconnects MutationObserver, removes event listeners, and cleans up references.
+```
+
+---
+
+### 3. Form Validator Lifecycle (`@Validator` & `BaseValidator`)
+
+```
+[Form or Input Element Matched]
+              │
+              ▼
+   1. Field Binding: Attaches 'input', 'blur', and 'change' listeners
+              │
+              ▼
+   2. Evaluation Phase: Runs custom validate[FieldName]() and validateAll() rules
+              │
+              ▼
+   3. DOM State Reflection:
+      ├── Toggles CSS state classes (.is-valid, .is-invalid, .is-touched, .is-dirty)
+      └── Enables or disables the submit button reactively
+              │
+              ▼
+   4. destroy(): Unbinds all field event listeners upon component unmount
+```
+
+---
+
+### 4. Application Bootstrapping Lifecycle (`bootstrapApplication`)
+
+```
+bootstrapApplication(RootComponent, options)
+  │
+  ├── 1. Environment Registration: Binds environment profile under 'ENVIRONMENT' DI token
+  ├── 2. Provider Instantiation: Registers and instantiates singleton providers in DI
+  ├── 3. Theme Synchronization: Initializes ThemeService from localStorage & OS preferences
+  ├── 4. HTTP Pipeline Assembly: Configures interceptors: [...] inside HttpClient
+  ├── 5. Root Element Mounting: Resolves <app-component> and triggers component lifecycle
+  └── 6. Returns Promise<ApplicationRef> ({ destroy(), rootElement, environment })
+```
+
+---
+
 ## Composable Behaviors (`src/app/shared/behaviors/`)
 
 Behaviors enhance DOM elements without requiring complex inheritance trees:
