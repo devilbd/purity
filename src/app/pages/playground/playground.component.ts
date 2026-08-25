@@ -8,13 +8,7 @@ import { FirebaseService, initGoogleAnalytics, logAnalyticsEvent } from '@data/f
 import { drag } from '@behaviors/draggable/draggable';
 import { droppable } from '@behaviors/droppable/droppable';
 import { transform } from 'sucrase';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-scss';
-import 'prismjs/components/prism-markup';
+import Prism from './prism-loader';
 
 // Shared UI Web Components
 import '@components/loader/loader.component';
