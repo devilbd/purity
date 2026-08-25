@@ -28,7 +28,7 @@
     </div>
 
     <!-- Vertical Stack of Framework Architecture Code Samples -->
-    <div class="intro-samples-stack" data-no-bind>
+    <div class="intro-samples-stack">
 
         <!-- ========================================== -->
         <!-- GROUP 1: CORE FRAMEWORK CODE & PRIMITIVES  -->
@@ -42,10 +42,20 @@
         <!-- 1. Reactivity -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>1. 🔄 Fine-Grained Reactive Signals &amp; Effects (<code>core.ts</code>)</h4>
-                <p>Synchronous reactivity primitives with automated dependency tracking and sub-microsecond updates:</p>
+                <div class="sample-title-box">
+                    <h4>1. 🔄 Fine-Grained Reactive Signals &amp; Effects (<code>core.ts</code>)</h4>
+                    <p>Synchronous reactivity primitives with automated dependency tracking and sub-microsecond updates:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('reactivity')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="cmt">// 1. Create typed reactive signals</span>
 <span class="kw">const</span> count = <span class="fn">signal</span>&lt;<span class="typ">number</span>&gt;(<span class="num">0</span>);
@@ -68,10 +78,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 2. Dependency Injection -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>2. 💉 First-Class Dependency Injection (<code>di.ts</code>)</h4>
-                <p>Singleton service registration with <code>@Injectable</code> and instant token resolution via <code>inject()</code>:</p>
+                <div class="sample-title-box">
+                    <h4>2. 💉 First-Class Dependency Injection (<code>di.ts</code>)</h4>
+                    <p>Singleton service registration with <code>@Injectable</code> and instant token resolution via <code>inject()</code>:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('di')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Injectable</span>, <span class="fn">signal</span>, <span class="fn">inject</span>, <span class="fn">Component</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Injectable</span>, <span class="fn">signal</span>, <span class="fn">inject</span>, <span class="fn">Component</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="kw">export interface</span> <span class="typ">User</span> {
     id: <span class="typ">number</span>;
@@ -109,10 +129,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 3. HTTP Client & Centralized Interceptors Pipeline -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>3. 🌐 HTTP Client Service &amp; Centralized Interceptor Pipeline (<code>http.ts</code>, <code>@interceptors/*</code>)</h4>
-                <p>Full-featured HTTP client with <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>, and decoupled centralized interceptor classes:</p>
+                <div class="sample-title-box">
+                    <h4>3. 🌐 HTTP Client Service &amp; Centralized Interceptor Pipeline (<code>http.ts</code>, <code>@interceptors/*</code>)</h4>
+                    <p>Full-featured HTTP client with <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>, and decoupled centralized interceptor classes:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('http')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span>, <span class="typ">HttpClient</span>, <span class="kw">type</span> <span class="typ">HttpInterceptor</span>, <span class="kw">type</span> <span class="typ">HttpRequest</span>, <span class="kw">type</span> <span class="typ">HttpResponse</span>, <span class="kw">type</span> <span class="typ">HttpNextFn</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span>, <span class="typ">HttpClient</span>, <span class="kw">type</span> <span class="typ">HttpInterceptor</span>, <span class="kw">type</span> <span class="typ">HttpRequest</span>, <span class="kw">type</span> <span class="typ">HttpResponse</span>, <span class="kw">type</span> <span class="typ">HttpNextFn</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="cmt">// 1. Declare centralized interceptor class in src/app/shared/interceptors/</span>
 <span class="kw">export class</span> <span class="typ">AuthInterceptor</span> <span class="kw">implements</span> <span class="typ">HttpInterceptor</span> {
@@ -140,10 +170,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 4. Application Bootstrapping & Theme Engine -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>4. 🚀 Application Bootstrapping &amp; Theme Engine (<code>bootstrap.ts</code>, <code>ThemeService</code>)</h4>
-                <p>Initialize application root, wire DI providers &amp; interceptors, and automatically synchronize GNOME Adwaita Dark/Light themes:</p>
+                <div class="sample-title-box">
+                    <h4>4. 🚀 Application Bootstrapping &amp; Theme Engine (<code>bootstrap.ts</code>, <code>ThemeService</code>)</h4>
+                    <p>Initialize application root, wire DI providers &amp; interceptors, and automatically synchronize GNOME Adwaita Dark/Light themes:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('bootstrap')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import</span> { <span class="typ">AppComponent</span> } <span class="kw">from</span> <span class="str">'@app/app.component'</span>;
 <span class="kw">import</span> { <span class="typ">ThemeService</span> } <span class="kw">from</span> <span class="str">'@data/theme.service'</span>;
 <span class="kw">import</span> { <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'@data/notify.service'</span>;
@@ -163,10 +203,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 5. Reactive NotifyService -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>5. 🔔 Reactive Toast Notification Service (<code>NotifyService</code>)</h4>
-                <p>Injectable service exposing multi-variant notification dispatchers (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>) with positioning and auto-dismiss timeouts:</p>
+                <div class="sample-title-box">
+                    <h4>5. 🔔 Reactive Toast Notification Service (<code>NotifyService</code>)</h4>
+                    <p>Injectable service exposing multi-variant notification dispatchers (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>) with positioning and auto-dismiss timeouts:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('notify')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import</span> { <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'@data/notify.service'</span>;
 
 <span class="dec">@Component</span>({ selector: <span class="str">'checkout-page'</span> })
@@ -196,10 +246,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 6. Transform Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>6. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
-                <p>Classes decorated with <code>@Pipe</code> transform template values and accept reactive signals as dynamic parameters:</p>
+                <div class="sample-title-box">
+                    <h4>6. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
+                    <p>Classes decorated with <code>@Pipe</code> transform template values and accept reactive signals as dynamic parameters:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('pipes')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Pipe</span>, <span class="typ">BasePipe</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Pipe</span>, <span class="typ">BasePipe</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="cmt">// 1. Declare transform pipe with typed arguments</span>
 <span class="dec">@Pipe</span>(<span class="str">'myTransformPipe'</span>)
@@ -220,10 +280,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 7. Form Validation -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>7. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
-                <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
+                <div class="sample-title-box">
+                    <h4>7. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
+                    <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('validator')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="cmt">// Decorator binds validation rules directly to matching form elements</span>
 <span class="dec">@Validator</span>({
@@ -249,10 +319,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 8. Custom Directives -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>8. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
-                <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
+                <div class="sample-title-box">
+                    <h4>8. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
+                    <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('directives')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Directive</span>(<span class="str">'highlight'</span>)
 <span class="kw">export class</span> <span class="typ">HighlightDirective</span> <span class="kw">extends</span> <span class="typ">BaseDirective</span> {
@@ -276,10 +356,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 9. Composable Behaviors -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>9. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
-                <p>Pointer-based drag interactions with GPU acceleration (<code>translate3d</code>), boundary constraints, and center snapping:</p>
+                <div class="sample-title-box">
+                    <h4>9. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
+                    <p>Pointer-based drag interactions with GPU acceleration (<code>translate3d</code>), boundary constraints, and center snapping:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('behaviors')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">drag</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/draggable/draggable'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">drag</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/draggable/draggable'</span>;
 <span class="kw">import</span> { <span class="fn">droppable</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/droppable/droppable'</span>;
 
 <span class="cmt">// 1. Register droppable drop target</span>
@@ -313,10 +403,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 10. Web Components -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>10. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
-                <p>Plain classes transformed into Custom Elements with automatic template inlining, signal bindings, and lifecycle hooks:</p>
+                <div class="sample-title-box">
+                    <h4>10. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
+                    <p>Plain classes transformed into Custom Elements with automatic template inlining, signal bindings, and lifecycle hooks:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('components')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import</span> <span class="str">'./custom.component.scss'</span>;
 
 <span class="dec">@Component</span>({
@@ -347,10 +447,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 11. ViewChild Queries -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>11. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
-                <p>Property decorator that queries child elements or custom components implicitly by property name, with optional explicit selectors for disambiguation:</p>
+                <div class="sample-title-box">
+                    <h4>11. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
+                    <p>Property decorator that queries child elements or custom components implicitly by property name, with optional explicit selectors for disambiguation:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('viewchild')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import type</span> { <span class="typ">LoaderComponent</span> } <span class="kw">from</span> <span class="str">'@components/loader/loader.component'</span>;
 <span class="kw">import type</span> { <span class="typ">CustomComponent</span> } <span class="kw">from</span> <span class="str">'@pages/custom/custom.component'</span>;
 
@@ -381,10 +491,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 12. Handlebars Interpolation & Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>12. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
-                <p>Embed reactive signals and transform pipes directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
+                <div class="sample-title-box">
+                    <h4>12. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
+                    <p>Embed reactive signals and transform pipes directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('handlebars')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering &amp; Pipe Transformation --&gt;</span>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative Signal Rendering &amp; Pipe Transformation --&gt;</span>
 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"window {{loginStatus}}"</span><span class="tag">&gt;</span>
     <span class="cmt">&lt;!-- Reactive text content and transform pipe --&gt;</span>
     <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{currentUser() | uppercase}}</span>!<span class="tag">&lt;/h3&gt;</span>
@@ -412,10 +532,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 13. Structural Array Repeater -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>13. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
-                <p>Repeat elements and components dynamically with object property access, index variables, and nested loops:</p>
+                <div class="sample-title-box">
+                    <h4>13. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
+                    <p>Repeat elements and components dynamically with object property access, index variables, and nested loops:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('for-loop')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. HTML Template: Array Repeater &amp; Nested Loops --&gt;</span>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. HTML Template: Array Repeater &amp; Nested Loops --&gt;</span>
 <span class="tag">&lt;div</span> <span class="attr">for</span>=<span class="str">"let obj, index of members"</span> <span class="attr">class</span>=<span class="str">"member-card"</span><span class="tag">&gt;</span>
     <span class="tag">&lt;span&gt;</span>#<span class="expr">{{index + 1}}</span>: <span class="tag">&lt;strong&gt;</span><span class="expr">{{obj.name | uppercase}}</span><span class="tag">&lt;/strong&gt;&lt;/span&gt;</span>
     <span class="tag">&lt;p&gt;</span>Role: <span class="expr">{{obj.role}}</span><span class="tag">&lt;/p&gt;</span>
@@ -443,10 +573,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 14. Slot Content Projection -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>14. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
-                <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
+                <div class="sample-title-box">
+                    <h4>14. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                    <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('slot')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. Consumer Template: Passing arbitrary HTML &amp; components into &lt;modal-view&gt; --&gt;</span>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. Consumer Template: Passing arbitrary HTML &amp; components into &lt;modal-view&gt; --&gt;</span>
 <span class="tag">&lt;modal-view</span> <span class="attr">id</span>=<span class="str">"demo-modal"</span><span class="tag">&gt;</span>
     <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"custom-projected-body"</span><span class="tag">&gt;</span>
         <span class="tag">&lt;h4&gt;</span>📦 Projected Modal Content<span class="tag">&lt;/h4&gt;</span>
@@ -465,65 +605,56 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 15. Toast Notification Component -->
+        <!-- 15. Theming & Modular SCSS -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>15. 🔔 Multi-Position Toast Notification Component (<code>&lt;notification-component&gt;</code>)</h4>
-                <p>Global reactive toast overlay anchoring semantic notifications (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>) across 7 viewport positions with zero layout overlap:</p>
+                <div class="sample-title-box">
+                    <h4>15. 🎨 GNOME Adwaita Theming &amp; Modular SCSS Design System</h4>
+                    <p>Translucent glassmorphism, refined corner radii, subtle specular borders, and GNOME cubic bezier animations with Dark and Light themes:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('theming')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. Mount once in root template or index.html --&gt;</span>
-<span class="tag">&lt;notification-component&gt;&lt;/notification-component&gt;</span>
+            <pre data-no-bind><code><span class="kw">@use</span> <span class="str">'@styles'</span> <span class="kw">as</span> *;
 
-<span class="cmt">&lt;!-- 2. Dispatch notifications from any service or component --&gt;</span>
-<span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
-<span class="kw">import</span> { <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'@data/notify.service'</span>;
+<span class="cmt">// Consume modular GNOME 50 design tokens directly in any component SCSS:</span>
+<span class="tag">.custom-card</span> {
+    <span class="kw">@include</span> <span class="fn">glassmorphic-card</span>;
+    <span class="attr">border-radius</span>: <span class="expr">var(--radius-card, 12px)</span>;
+    <span class="attr">padding</span>: <span class="num">18px 20px</span>;
+    <span class="attr">box-shadow</span>: <span class="expr">var(--shadow-card)</span>;
+    <span class="attr">transition</span>: <span class="str">all var(--transition-normal) var(--gnome-bezier)</span>;
 
-<span class="dec">@Component</span>({ selector: <span class="str">'app-header'</span> })
-<span class="kw">export class</span> <span class="typ">AppHeaderComponent</span> {
-    <span class="kw">private</span> notify = <span class="fn">inject</span>(<span class="typ">NotifyService</span>);
-
-    <span class="fn">showSuccess</span>() {
-        <span class="kw">this</span>.notify.<span class="fn">success</span>(<span class="str">'Settings Saved'</span>, <span class="str">'Your preferences have synced.'</span>, {
-            position: <span class="str">'top-right'</span>,
-            duration: <span class="num">4000</span>,
-        });
+    <span class="tag">&amp;:hover</span> {
+        <span class="attr">border-color</span>: <span class="expr">var(--gnome-border-bright)</span>;
+        <span class="attr">transform</span>: <span class="str">translateY(-2px)</span>;
     }
 }</code></pre>
         </div>
 
-        <!-- 16. HTTP Loader Component -->
+        <!-- 16. Date & Time Picker Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>16. ⏳ HTTP Request Loader Component (<code>&lt;loader-component&gt;</code>)</h4>
-                <p>Compact animated SVG spinner with centered loading text and programmatic <code>show()</code>, <code>hide()</code>, and <code>toggle()</code> methods:</p>
+                <div class="sample-title-box">
+                    <h4>16. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
+                    <p>Full calendar view, year navigation, 24-hour time wheel scrolling, smart viewport auto-placement, date ranges, and custom pipe formatting:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('date-time-picker')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. Place in template where loading indicator is needed --&gt;</span>
-<span class="tag">&lt;loader-component</span> <span class="attr">id</span>=<span class="str">"http-loader"</span><span class="tag">&gt;&lt;/loader-component&gt;</span>
-
-<span class="cmt">&lt;!-- 2. Query with @ViewChild and control during async tasks --&gt;</span>
-<span class="dec">@Component</span>({ selector: <span class="str">'user-list'</span> })
-<span class="kw">export class</span> <span class="typ">UserListComponent</span> {
-    <span class="dec">@ViewChild</span>(<span class="str">'#http-loader'</span>)
-    loader?: <span class="typ">LoaderComponent</span> | <span class="kw">null</span>;
-
-    <span class="kw">async</span> <span class="fn">fetchData</span>() {
-        <span class="kw">this</span>.loader?.<span class="fn">show</span>(<span class="str">'Loading data...'</span>);
-        <span class="kw">try</span> {
-            <span class="kw">await</span> <span class="fn">performHttpRequest</span>();
-        } <span class="kw">finally</span> {
-            <span class="kw">this</span>.loader?.<span class="fn">hide</span>();
-        }
-    }
-}</code></pre>
-        </div>
-
-        <!-- 17. Date & Time Picker Component -->
-        <div class="intro-sample-card">
-            <div class="sample-header">
-                <h4>17. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
-                <p>Full calendar view, year navigation, 24-hour time wheel scrolling, smart viewport auto-placement, date ranges, and custom pipe formatting:</p>
-            </div>
-            <pre><code><span class="cmt">&lt;!-- 1. Template usage with pipe formatting --&gt;</span>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. Template usage with pipe formatting --&gt;</span>
 <span class="tag">&lt;date-time-picker</span> <span class="attr">id</span>=<span class="str">"booking-picker"</span><span class="tag">&gt;&lt;/date-time-picker&gt;</span>
 <span class="tag">&lt;p&gt;</span>Selected: <span class="expr">{{selectedDate() | date: 'EEEE, MMMM d, yyyy HH:mm'}}</span><span class="tag">&lt;/p&gt;</span>
 
@@ -543,13 +674,23 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 18. Circular Radial Context Menu -->
+        <!-- 17. Circular Radial Context Menu -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>18. 🎯 Circular Radial Context Menu (<code>&lt;radial-context-menu&gt;</code>)</h4>
-                <p>Circular context menu with pie segments, SVG icons, submenus, dynamic placement, and keyboard/outside-click dismissal:</p>
+                <div class="sample-title-box">
+                    <h4>17. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
+                    <p>Circular context menu with pie segments, SVG icons, submenus, dynamic placement, and keyboard/outside-click dismissal:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('radial-menu')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. Component template --&gt;</span>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. Component template --&gt;</span>
 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"canvas-area"</span> <span class="attr">oncontextmenu</span>=<span class="str">"myComponent.openMenu(event)"</span><span class="tag">&gt;</span>
     <span class="tag">&lt;radial-context-menu</span> <span class="attr">id</span>=<span class="str">"canvas-menu"</span><span class="tag">&gt;&lt;/radial-context-menu&gt;</span>
 <span class="tag">&lt;/div&gt;</span>
@@ -571,13 +712,51 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
+        <!-- 18. Right-Click Context Menu Delegation -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>18. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
+                    <p>Single-source-of-truth right-click delegation binding radial menu activation across any matching DOM selector:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('context-menu-delegation')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="dec">@Component</span>({ selector: <span class="str">'file-explorer'</span> })
+<span class="kw">export class</span> <span class="typ">FileExplorerComponent</span> {
+    <span class="dec">@ViewChild</span>(<span class="str">'#radial-menu'</span>)
+    menu?: <span class="typ">RadialContextMenuComponent</span> | <span class="kw">null</span>;
+
+    <span class="kw">protected</span> <span class="fn">onInit</span>() {
+        <span class="cmt">// Delegate right-click context menu to all matching items</span>
+        <span class="kw">this</span>.menu?.<span class="fn">setSelector</span>(<span class="str">'.file-item'</span>);
+    }
+}</code></pre>
+        </div>
+
         <!-- 19. Modal Dialogs -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>19. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
-                <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, fixed viewport overlays, and <code>z-index: 1000</code>:</p>
+                <div class="sample-title-box">
+                    <h4>19. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                    <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, fixed viewport overlays, and <code>z-index: 1000</code>:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('modal')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import</span> <span class="str">'./modal-view.component.scss'</span>;
 
 <span class="dec">@Component</span>({
@@ -607,10 +786,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 20. Analogue Clock Widget -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>20. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
-                <p>Native 2D Canvas clock with subpixel Retina scaling, frosted glass dial, 3D beveled hands, date window, smooth sweep vs quartz ticking, and multi-timezone support:</p>
+                <div class="sample-title-box">
+                    <h4>20. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
+                    <p>Native 2D Canvas clock with subpixel Retina scaling, frosted glass dial, 3D beveled hands, date window, smooth sweep vs quartz ticking, and multi-timezone support:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('clock')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="cmt">&lt;!-- 1. Component template usage --&gt;</span>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. Component template usage --&gt;</span>
 <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"clock-container"</span><span class="tag">&gt;</span>
     <span class="tag">&lt;analogue-clock</span> <span class="attr">id</span>=<span class="str">"london-clock"</span><span class="tag">&gt;&lt;/analogue-clock&gt;</span>
 <span class="tag">&lt;/div&gt;</span>
@@ -646,10 +835,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 21. Component Mounting & Teardown Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>21. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
-                <p>Native Custom Elements v1 lifecycle flow from template projection and reactive binding to teardown:</p>
+                <div class="sample-title-box">
+                    <h4>21. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
+                    <p>Native Custom Elements v1 lifecycle flow from template projection and reactive binding to teardown:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('component-lifecycle')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span>, <span class="fn">ViewChild</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span>, <span class="fn">ViewChild</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Component</span>({
     selector: <span class="str">'lifecycle-demo'</span>,
@@ -695,10 +894,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 22. Custom Directive Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>22. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
-                <p>Execution phases for attribute-level reactivity, signal tracking, and host DOM mutation observation:</p>
+                <div class="sample-title-box">
+                    <h4>22. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
+                    <p>Execution phases for attribute-level reactivity, signal tracking, and host DOM mutation observation:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('directive-lifecycle')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Directive</span>, <span class="typ">BaseDirective</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Directive</span>(<span class="str">'tooltip'</span>)
 <span class="kw">export class</span> <span class="typ">TooltipDirective</span> <span class="kw">extends</span> <span class="typ">BaseDirective</span> {
@@ -741,10 +950,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 23. Form Validation Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>23. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
-                <p>Decoupled validation pipeline with field binding, live evaluation, CSS state reflection, and submit lock:</p>
+                <div class="sample-title-box">
+                    <h4>23. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
+                    <p>Decoupled validation pipeline with field binding, live evaluation, CSS state reflection, and submit lock:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('validator-lifecycle')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">Validator</span>, <span class="typ">BaseValidator</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="dec">@Validator</span>({
     form: <span class="str">'#order-form'</span>,
@@ -778,10 +997,20 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
         <!-- 24. Application Bootstrapping Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
-                <h4>24. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
-                <p>End-to-end initialization sequence from environment tokens to root component mounting:</p>
+                <div class="sample-title-box">
+                    <h4>24. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
+                    <p>End-to-end initialization sequence from environment tokens to root component mounting:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('bootstrap-lifecycle')"
+                >
+                    🎮 Edit in Playground
+                </button>
             </div>
-            <pre><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 <span class="kw">import</span> { <span class="typ">AppComponent</span> } <span class="kw">from</span> <span class="str">'@app/app.component'</span>;
 <span class="kw">import</span> { <span class="typ">ThemeService</span> } <span class="kw">from</span> <span class="str">'@data/theme.service'</span>;
 <span class="kw">import</span> { <span class="typ">LoggingInterceptor</span> } <span class="kw">from</span> <span class="str">'@interceptors/logging.interceptor'</span>;

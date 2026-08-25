@@ -649,6 +649,23 @@ export class PlaygroundComponent {
         this.updateHighlight();
         requestAnimationFrame(() => this.updateHighlight());
         setTimeout(() => this.updateHighlight(), 50);
+
+        if (typeof window !== 'undefined') {
+            window.addEventListener('purity:load-playground-snippet', (e: any) => {
+                if (e?.detail) {
+                    this.loadSnippet(e.detail);
+                }
+            });
+        }
+    }
+
+    loadSnippet(snippet: { id?: string; title?: string; ts?: string; html?: string; scss?: string }) {
+        if (snippet.ts !== undefined) this.tsCode.set(snippet.ts);
+        if (snippet.html !== undefined) this.htmlCode.set(snippet.html);
+        if (snippet.scss !== undefined) this.scssCode.set(snippet.scss);
+        if (snippet.id) this.selectedPresetId.set(snippet.id);
+        this.updateHighlight();
+        this.runCompile();
     }
 
     setTab(tab: 'ts' | 'html' | 'scss') {

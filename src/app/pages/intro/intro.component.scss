@@ -138,21 +138,56 @@
     }
 
     .sample-header {
-        h4 {
-            margin: 0 0 4px 0;
-            font-size: 1.05rem;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 700;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+
+        .sample-title-box {
+            flex: 1;
+            min-width: 240px;
+
+            h4 {
+                margin: 0 0 4px 0;
+                font-size: 1.05rem;
+                color: var(--text-main);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 700;
+            }
+
+            p {
+                margin: 0;
+                font-size: 13px;
+                color: var(--text-secondary);
+                line-height: 1.4;
+            }
         }
 
-        p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.4;
+        .sample-edit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: var(--radius-control, 8px);
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border);
+            color: var(--text-main);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all var(--transition-fast) ease;
+
+            &:hover {
+                background: var(--accent);
+                color: #ffffff;
+                border-color: var(--accent);
+                box-shadow: 0 2px 8px var(--accent-shadow);
+                transform: translateY(-1px);
+            }
         }
     }
 
