@@ -11,7 +11,7 @@
 - **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
 - **Transform Pipes**: Data transformation and formatting engine with `@Pipe` and `BasePipe`, supporting static arguments as well as dynamic reactive signal parameters in templates.
 - **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with GPU acceleration, boundary constraints, and snap support) that attach seamlessly without inheritance.
-- **Modular SCSS Theming & Theme Engine**: Clean SCSS token architecture with GNOME Adwaita Dark (baseline) and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
+- **GNOME 50 Design System & Modular SCSS Theming**: All Purity UI design, components, widgets, buttons, inputs, dropdowns, and layouts strictly adhere to **GNOME 50 Adwaita** design standards (translucent glassmorphism, refined corner radii, subtle specular borders, GNOME cubic bezier animations, and Breeze cursor hierarchy) with Dark (baseline default) and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
 ---
@@ -451,7 +451,22 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
      - Pills & Badges: `border-radius: var(--radius-pill, 999px); padding: 2px 7px;` (or `3px 10px;`).
      - Control Groups / Toolbars: `display: flex; gap: 8px` to `12px; align-items: center;`.
 
-7. **TypeScript Configuration**:
+7. **GNOME 50 Adwaita Design Language Mandate**:
+   Every visual element, page, view, component, widget, and interactive control in Purity MUST strictly adhere to the **GNOME 50 Adwaita** design language:
+   - **Glassmorphic Surfaces**: Translucent window backgrounds using `var(--gnome-surface)`, frosted blur filters (`var(--blur-effect)`, `var(--blur-subtle)`), and hairline specular borders (`var(--gnome-border)`, `var(--gnome-border-subtle)`).
+   - **Rounded Geometry Hierarchy**:
+     - Top-level windows and modals: `border-radius: var(--radius-window, 16px);`.
+     - Inner cards, dialog panels, and sample containers: `border-radius: var(--radius-card, 12px);`.
+     - Controls (buttons, inputs, selects, segmented toggles): `border-radius: var(--radius-control, 8px);`.
+     - Badges, pills, tags, chips: `border-radius: var(--radius-pill, 999px);`.
+   - **Buttons & Interactive Elements**:
+     - Primary action buttons (`.button-primary`): Elevated gradient `var(--accent)`, subtle top inset highlight (`inset 0 1px rgba(255, 255, 255, 0.15)`), active press feedback (`inset 0 2px 4px rgba(0, 0, 0, 0.25)`), and hover lift (`translateY(-1px)`).
+     - Secondary/surface buttons (`.button-secondary`): `background: var(--gnome-card)`, `border: 1px solid var(--gnome-border)`, GNOME hover lift.
+     - Inputs & Selects (`.input-primary`): Inset depth shadow (`inset 0 1px 2px rgba(0, 0, 0, 0.1)`), custom SVG arrow indicators, and standard 3px accent focus ring (`0 0 0 3px var(--accent-shadow)`).
+   - **Motion & Physics**: Transitions must use GNOME cubic-bezier easing (`var(--ease-gnome) = cubic-bezier(0.25, 0.8, 0.25, 1)`) and spring curves (`var(--ease-spring) = cubic-bezier(0.34, 1.56, 0.64, 1)`).
+   - **Dual Theme Fidelity**: Full parity across Dark (baseline GNOME Adwaita obsidian) and Light (frosted alabaster) themes.
+
+8. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
 
 ---
