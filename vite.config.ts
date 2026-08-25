@@ -159,5 +159,17 @@ export default defineConfig(({ mode }) => {
                 '@styles': path.resolve(import.meta.dirname, 'src/styles/index.scss'),
             },
         },
+        build: {
+            chunkSizeWarningLimit: 800,
+            rollupOptions: {
+                output: {
+                    manualChunks(id: string) {
+                        if (id.includes('node_modules/sucrase') || id.includes('node_modules/prismjs')) {
+                            return 'vendor-compiler';
+                        }
+                    },
+                },
+            },
+        },
     };
 });
