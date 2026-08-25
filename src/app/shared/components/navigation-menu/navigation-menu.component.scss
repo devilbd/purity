@@ -1,0 +1,239 @@
+@use '@styles' as *;
+
+/* ==========================================================================
+   Purity Design System - Floating Radial Navigation Menu (GNOME 50)
+   ========================================================================== */
+
+navigation-menu {
+    display: block;
+    position: relative;
+    z-index: 9990;
+}
+
+/* Floating Draggable Container */
+.nav-ball-container {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 9990;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    transform: translate3d(0, 0, 0);
+    transition: filter var(--transition-fast) var(--ease-gnome);
+
+    &.is-dragging {
+        filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.6));
+        z-index: 9995;
+
+        .nav-drag-handle {
+            opacity: 1 !important;
+            transform: translateY(0) scale(1.05) !important;
+            cursor: grabbing !important;
+            background: var(--accent) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .nav-ball-orb {
+            cursor: grabbing !important;
+            transform: scale(1.04);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 24px var(--accent) !important;
+        }
+    }
+}
+
+/* Hover Drag Handle */
+.nav-drag-handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-subtle);
+    -webkit-backdrop-filter: var(--blur-subtle);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-pill, 999px);
+    box-shadow: var(--shadow-popup);
+    cursor: grab;
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: auto;
+    transition: opacity var(--transition-fast) var(--ease-gnome),
+                transform var(--transition-fast) var(--ease-gnome),
+                background var(--transition-fast),
+                color var(--transition-fast);
+
+    .drag-grip-icon {
+        opacity: 0.8;
+    }
+
+    &:hover {
+        background: var(--gnome-hover);
+        color: var(--text-main);
+        border-color: var(--accent);
+    }
+}
+
+/* Reveal drag handle when hovering the container */
+.nav-ball-container:hover .nav-drag-handle {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Glassmorphic Navigation Ball Sphere */
+.nav-ball-orb {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 35% 25%, rgba(53, 132, 228, 0.42), rgba(36, 36, 36, 0.95) 75%);
+    backdrop-filter: var(--blur-window);
+    -webkit-backdrop-filter: var(--blur-window);
+    border: 1.5px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 0 16px var(--accent-shadow);
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    transition: transform var(--transition-fast) var(--ease-spring),
+                box-shadow var(--transition-fast) var(--ease-gnome),
+                border-color var(--transition-fast);
+
+    /* Specular Top Shine */
+    .orb-shine {
+        position: absolute;
+        top: 2px;
+        left: 15%;
+        width: 70%;
+        height: 38%;
+        border-radius: 50%;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.05) 80%, transparent);
+        pointer-events: none;
+    }
+
+    /* Ambient Core Glow */
+    .orb-glow {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 50%, var(--accent-subtle), transparent 70%);
+        pointer-events: none;
+        opacity: 0.8;
+        transition: opacity var(--transition-fast);
+    }
+
+    .orb-icon {
+        font-size: 1.35rem;
+        line-height: 1;
+        filter: drop-shadow(0 2px 6px var(--accent-shadow));
+        transition: transform var(--transition-fast) var(--ease-gnome);
+        z-index: 1;
+    }
+
+    .orb-label {
+        font-size: 8.5px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        margin-top: 1px;
+        z-index: 1;
+    }
+
+    &:hover {
+        transform: scale(1.08) translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6), inset 0 2px 6px rgba(255, 255, 255, 0.4), 0 0 24px var(--accent);
+
+        .orb-icon {
+            transform: rotate(20deg) scale(1.1);
+        }
+
+        .orb-glow {
+            opacity: 1;
+        }
+    }
+
+    &:active {
+        transform: scale(0.95);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ==========================================================================
+   Target Section Flash Animation
+   ========================================================================== */
+@keyframes pNavHighlightPulse {
+    0% {
+        outline: 3px solid var(--accent);
+        outline-offset: 4px;
+        box-shadow: 0 0 0 6px var(--accent-shadow), var(--shadow-deep);
+    }
+    50% {
+        outline: 3px solid var(--accent-hover);
+        outline-offset: 6px;
+        box-shadow: 0 0 0 12px var(--accent-shadow), var(--shadow-deep);
+    }
+    100% {
+        outline: 3px solid transparent;
+        outline-offset: 8px;
+        box-shadow: none;
+    }
+}
+
+.p-nav-highlight {
+    animation: pNavHighlightPulse 1.8s var(--ease-gnome) forwards;
+    border-radius: var(--radius-window, 16px);
+}
+
+/* ==========================================================================
+   Light Theme Adjustments
+   ========================================================================== */
+[data-theme='light'] {
+    .nav-drag-handle {
+        background: rgba(255, 255, 255, 0.9);
+        border-color: var(--gnome-border);
+        color: var(--text-main);
+        box-shadow: var(--shadow-popup);
+
+        &:hover {
+            background: #ffffff;
+            border-color: var(--accent);
+        }
+    }
+
+    .nav-ball-orb {
+        background: radial-gradient(circle at 35% 25%, rgba(28, 113, 216, 0.35), rgba(246, 246, 246, 0.95) 75%);
+        border-color: rgba(28, 113, 216, 0.35);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15), inset 0 2px 4px rgba(255, 255, 255, 0.9), 0 0 12px var(--accent-shadow);
+
+        .orb-shine {
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 80%, transparent);
+        }
+
+        .orb-label {
+            color: #1c1c1c;
+            text-shadow: none;
+        }
+
+        &:hover {
+            border-color: var(--accent);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.2), inset 0 2px 6px #ffffff, 0 0 20px var(--accent);
+        }
+    }
+}

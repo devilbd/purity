@@ -6,6 +6,7 @@ import '@pages/playground/playground.component';
 import '@pages/demo/demo.component';
 import '@pages/footer/footer.component';
 import '@components/notification/notification.component';
+import '@components/navigation-menu/navigation-menu.component';
 import type { DemoComponent } from '@pages/demo/demo.component';
 import type { PlaygroundComponent } from '@pages/playground/playground.component';
 

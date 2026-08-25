@@ -1,0 +1,33 @@
+<div id="nav-ball" class="nav-ball-container" aria-label="Floating Navigation Menu">
+    <!-- Hover Drag Handle -->
+    <div class="nav-drag-handle" title="Drag to reposition navigation ball">
+        <svg class="drag-grip-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+            <circle cx="9" cy="6" r="1.5"></circle>
+            <circle cx="15" cy="6" r="1.5"></circle>
+            <circle cx="9" cy="12" r="1.5"></circle>
+            <circle cx="15" cy="12" r="1.5"></circle>
+            <circle cx="9" cy="18" r="1.5"></circle>
+            <circle cx="15" cy="18" r="1.5"></circle>
+        </svg>
+        <span class="handle-text">DRAG</span>
+    </div>
+
+    <!-- Interactive Navigation Ball -->
+    <button
+        type="button"
+        class="nav-ball-orb"
+        id="nav-ball-trigger"
+        title="Open Navigation Menu"
+        onclick="onOrbClick(event)"
+        aria-haspopup="menu"
+        aria-expanded="{{isOpen()}}"
+    >
+        <span class="orb-shine"></span>
+        <span class="orb-glow"></span>
+        <span class="orb-icon">🧭</span>
+        <span class="orb-label">NAV</span>
+    </button>
+</div>
+
+<!-- Integrated Radial Context Menu -->
+<radial-context-menu id="nav-radial-menu"></radial-context-menu>
