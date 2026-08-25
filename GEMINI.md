@@ -98,6 +98,7 @@ purity/
                 ├── date-time-picker/ # <date-time-picker> reactive date & time picker component with body teleportation
                 ├── loader/      # <loader-component> reactive HTTP request loader with glassmorphism & show/hide methods
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
+                ├── navigation-menu/ # <navigation-menu> draggable floating radial navigation menu
                 ├── notification/ # <notification-component> multi-position reactive toast notifications
                 └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
 ```
@@ -483,5 +484,4 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 | `npm run build:prod` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
 | `npm run preview` | Previews the production build locally |
 | `npm run deploy` | Builds the app with production profile and deploys to Firebase Hosting |
-| `npm run deploy:hosting` | Builds the app with production profile and deploys only to Firebase Hosting |
 | `npm run deploy:hosting` | Builds the app with production profile and deploys only to Firebase Hosting |
