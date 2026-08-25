@@ -1,0 +1,82 @@
+<div class="analogue-clock-widget">
+    <!-- Header Bar -->
+    <div class="clock-header">
+        <div class="clock-title-group">
+            <span class="clock-icon">⏱️</span>
+            <span class="clock-title">{{title()}}</span>
+            <span class="clock-badge">{{smoothSeconds() ? 'Smooth' : 'Quartz'}}</span>
+        </div>
+        <div class="clock-tz-badge">
+            <span>{{timezoneLabel()}}</span>
+        </div>
+    </div>
+
+    <!-- Clock Canvas Stage -->
+    <div class="clock-stage">
+        <canvas
+            id="clock-canvas-el"
+            class="clock-canvas"
+            title="Click to toggle Smooth / Quartz ticking"
+            onclick="toggleSweep()"
+        ></canvas>
+    </div>
+
+    <!-- Digital Readout Display -->
+    <div class="clock-digital-readout">
+        <span class="digital-time">{{digitalTime()}}</span>
+        <span class="digital-date">{{dateString()}}</span>
+    </div>
+
+    <!-- Interactive Controls Bar -->
+    <div class="clock-controls">
+        <button
+            type="button"
+            class="control-btn {{smoothSeconds() ? 'active' : ''}}"
+            onclick="toggleSweep()"
+            title="Toggle between continuous smooth sweep and precision quartz step"
+        >
+            <span>{{smoothSeconds() ? '⚡ Smooth Sweep' : '⏱ Precision Tick'}}</span>
+        </button>
+
+        <button
+            type="button"
+            class="control-btn {{showSeconds() ? 'active' : ''}}"
+            onclick="toggleSeconds()"
+            title="Toggle second hand visibility"
+        >
+            <span>{{showSeconds() ? '🔴 Seconds Hand' : '⚪ Hide Seconds'}}</span>
+        </button>
+
+        <button
+            type="button"
+            class="control-btn {{showNumbers() ? 'active' : ''}}"
+            onclick="toggleNumbers()"
+            title="Toggle dial numerals"
+        >
+            <span>{{showNumbers() ? '🔢 12/3/6/9 Numerals' : '➖ Minimal Indices'}}</span>
+        </button>
+
+        <button
+            type="button"
+            class="control-btn {{showDateBadge() ? 'active' : ''}}"
+            onclick="toggleDateBadge()"
+            title="Toggle dial date aperture window"
+        >
+            <span>{{showDateBadge() ? '📅 Date Aperture' : '🔲 Clean Dial'}}</span>
+        </button>
+
+        <select
+            class="tz-select"
+            onchange="onTimezoneChange(this.value)"
+            title="Select Clock Timezone"
+        >
+            <option value="local" selected>📍 Local Time</option>
+            <option value="UTC">🌐 UTC / GMT</option>
+            <option value="America/New_York">🗽 New York (EST/EDT)</option>
+            <option value="Europe/London">🇬🇧 London (GMT/BST)</option>
+            <option value="Europe/Paris">🇫🇷 Paris (CET/CEST)</option>
+            <option value="Asia/Tokyo">🇯🇵 Tokyo (JST)</option>
+            <option value="Australia/Sydney">🇦🇺 Sydney (AEST/AEDT)</option>
+        </select>
+    </div>
+</div>

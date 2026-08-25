@@ -40,6 +40,7 @@
 - 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
 - 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
+- ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
 - 🪟 **Modal Dialog System (`<modal-view>`)**: Reusable dialogs with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`.
 - 🎮 **Interactive Sandpack Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation and execution.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
@@ -121,12 +122,13 @@ purity/
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, http-sample, notification-sample, date-time-picker-sample, radial-context-menu-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
+            ├── widgets/         # Rich standalone widgets (analogue-clock)
             └── components/      # Reusable UI Web Components (modal, loader, notification, date-time-picker, radial-context-menu)
 ```
 
@@ -691,6 +693,49 @@ Purity provides a native circular radial context menu component with glassmorphi
 
 ---
 
+### 18. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
+
+Purity includes a high-precision 2D Canvas analogue clock widget in `src/app/shared/widgets/analogue-clock/`, designed in GNOME Adwaita Dark and Light aesthetics:
+
+* **Retina / HiDPI Scaling**: Automatically measures and scales the backing canvas using `window.devicePixelRatio` for razor-sharp rendering on High-DPI and Retina displays.
+* **Multi-Layered Bezel & Frosted Dial**: Brushed metallic rim with specular highlights, frosted glass dial face with concentric precision tracks, and convex watch crystal gloss reflections.
+* **3D Beveled Sword Hands**: Chamfered dual-tone hour and minute hands with realistic directional light reflections and soft drop shadows.
+* **Continuous Sweep & Precision Quartz Modes**: Reactive signal toggle between smooth 60/120fps continuous sweep and discrete 1-second quartz steps.
+* **Date Aperture & Multi-Timezone Support**: Integrated day/date window (`WED 25`) and support for standard IANA timezones (`Local`, `UTC`, `Europe/London`, `America/New_York`, `Europe/Paris`, `Asia/Tokyo`, `Australia/Sydney`).
+* **Theme-Adaptive**: Reacts dynamically to `ThemeService.isDark()` with deep obsidian dial & luminous diamond indices in dark mode, and opalescent frosted crystal & polished platinum in light mode.
+
+#### Basic Usage Example:
+
+```html
+<!-- 1. HTML Template -->
+<div class="dashboard-widget">
+    <analogue-clock id="master-clock"></analogue-clock>
+</div>
+```
+
+```typescript
+// 2. Component Class: Configuration via Signals & @ViewChild
+import { Component, ViewChild } from '@purity/core';
+import '@widgets/analogue-clock/analogue-clock.component';
+import type { AnalogueClockComponent } from '@widgets/analogue-clock/analogue-clock.component';
+
+@Component({ selector: 'dashboard-view', templateUrl: './dashboard.html' })
+export class DashboardViewComponent {
+    @ViewChild('#master-clock')
+    clock?: AnalogueClockComponent | null;
+
+    protected onInit() {
+        // Customize clock properties dynamically
+        this.clock?.timezone.set('Europe/London');
+        this.clock?.smoothSeconds.set(true);
+        this.clock?.showNumbers.set(true);
+        this.clock?.showDateBadge.set(true);
+    }
+}
+```
+
+---
+
 ## 🛠️ DOM Utilities
 
 Purity includes lightweight helpers for efficient DOM querying and synchronization:
@@ -713,6 +758,7 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
    ```typescript
    import '@pages/custom/custom.component';
    import '@pages/http-sample/http-sample.component';
+   import '@widgets/analogue-clock/analogue-clock.component';
    import '@directives/highlight.directive';
    import '@pipes/transform-sample.pipe';
    import '@validators/forms-validation.validator';
@@ -720,6 +766,7 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
    For TypeScript type references, use explicit type-only imports:
    ```typescript
    import type { CustomComponent } from '@pages/custom/custom.component';
+   import type { AnalogueClockComponent } from '@widgets/analogue-clock/analogue-clock.component';
    ```
 
 2. **Clean Path Aliases (Zero `../` Relative Imports)**:
@@ -730,6 +777,7 @@ Purity includes lightweight helpers for efficient DOM querying and synchronizati
    - Application Root: `@app/*`
    - Pages & Showcases: `@pages/*`
    - Reusable Components: `@components/*`
+   - Standalone Widgets: `@widgets/*`
    - Directives: `@directives/*`
    - Pipes: `@pipes/*`
    - Validators: `@validators/*`

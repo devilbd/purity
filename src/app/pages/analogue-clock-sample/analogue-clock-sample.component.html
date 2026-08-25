@@ -1,0 +1,69 @@
+<div class="window analogue-clock-sample-root">
+    <div class="sample-header">
+        <h4>⏱️ Analogue Clock Component (<code>&lt;analogue-clock&gt;</code>)</h4>
+        <span class="badge-pill">Web Component + Native Canvas</span>
+    </div>
+    <p class="sample-desc">
+        Interactive 2D Canvas analogue clock featuring Retina/HiDPI subpixel clarity, frosted glassmorphism dial, 3D beveled sword hands, day/date aperture window, continuous smooth sweep vs precision quartz ticking, multiple world timezones, and full GNOME Adwaita Dark and Light theme adaptation:
+    </p>
+
+    <div class="clock-sample-grid">
+        <!-- 1. Primary Interactive Clock Card -->
+        <div class="clock-card window primary-clock-card">
+            <div class="card-title-area">
+                <span class="card-icon">⚡</span>
+                <div>
+                    <h5>Interactive Master Clock</h5>
+                    <p class="card-subtitle">Full-featured studio clock with live toggle controls & timezone selector</p>
+                </div>
+            </div>
+
+            <div class="clock-display-wrapper">
+                <analogue-clock id="sample-main-clock"></analogue-clock>
+            </div>
+        </div>
+
+        <!-- 2. Multi-Timezone World Clocks Card -->
+        <div class="clock-card window world-clocks-card">
+            <div class="card-title-area">
+                <span class="card-icon">🌍</span>
+                <div>
+                    <h5>World Timezones & Multi-Instance</h5>
+                    <p class="card-subtitle">Synchronous independent timezones & precision modes</p>
+                </div>
+            </div>
+
+            <div class="world-clocks-row">
+                <!-- London Clock -->
+                <div class="world-clock-box">
+                    <div class="world-badge">
+                        <span class="world-flag">🇬🇧</span>
+                        <span class="world-label">London (UTC / GMT)</span>
+                    </div>
+                    <div class="mini-clock-holder">
+                        <analogue-clock id="sample-london-clock"></analogue-clock>
+                    </div>
+                </div>
+
+                <!-- Tokyo Clock -->
+                <div class="world-clock-box">
+                    <div class="world-badge">
+                        <span class="world-flag">🇯🇵</span>
+                        <span class="world-label">Tokyo (JST +9)</span>
+                    </div>
+                    <div class="mini-clock-holder">
+                        <analogue-clock id="sample-tokyo-clock"></analogue-clock>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tag-row">
+                <span class="status-tag tag-primary">Retina HiDPI</span>
+                <span class="status-tag tag-info">Frosted Glass</span>
+                <span class="status-tag tag-success">3D Sword Hands</span>
+                <span class="status-tag tag-warn">Day/Date Aperture</span>
+                <span class="status-tag tag-accent">Theme Adaptive</span>
+            </div>
+        </div>
+    </div>
+</div>

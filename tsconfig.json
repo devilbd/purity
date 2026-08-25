@@ -28,6 +28,7 @@
       "@validators/*": ["./src/app/shared/validators/*"],
       "@behaviors/*": ["./src/app/shared/behaviors/*"],
       "@interceptors/*": ["./src/app/shared/interceptors/*"],
+      "@widgets/*": ["./src/app/shared/widgets/*"],
       "@styles": ["./src/style.scss"],
       "@styles/*": ["./src/*"]
     },

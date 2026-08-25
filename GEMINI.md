@@ -68,6 +68,7 @@ purity/
         ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
         ├── pages/               # Application pages, views & feature showcases
         │   ├── custom/          # <custom-component> with two-way signal bindings
+        │   ├── analogue-clock-sample/ # <analogue-clock-sample> showcase of analogue clock configurations
         │   ├── date-time-picker-sample/ # <date-time-picker-sample> showcase of date-time-picker configurations
         │   ├── demo/            # <demo-component> live framework interactive showcase
         │   ├── directive-sample/ # <directive-sample> demonstrating directive usage
@@ -91,6 +92,8 @@ purity/
             │   └── logging.interceptor.ts # Centralized latency & status logging interceptor
             ├── pipes/           # Reusable transform pipes (e.g. date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (e.g. forms-validation)
+            ├── widgets/         # Rich standalone widgets
+            │   └── analogue-clock/ # <analogue-clock> 2D Canvas analogue clock widget
             └── components/      # Reusable UI Web Components
                 ├── date-time-picker/ # <date-time-picker> reactive date & time picker component with body teleportation
                 ├── loader/      # <loader-component> reactive HTTP request loader with glassmorphism & show/hide methods

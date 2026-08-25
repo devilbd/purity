@@ -13,6 +13,7 @@ import '@pages/directive-sample/directive-sample.component';
 import '@pages/pipe-sample/pipe-sample.component';
 import '@pages/for-sample/for-sample.component';
 import '@pages/date-time-picker-sample/date-time-picker-sample.component';
+import '@pages/analogue-clock-sample/analogue-clock-sample.component';
 import '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import '@pages/http-sample/http-sample.component';
 import '@pages/notification-sample/notification-sample.component';
@@ -33,6 +34,7 @@ import type { ModalViewComponent } from '@components/modal/modal-view.component'
 import type { LoaderComponent } from '@components/loader/loader.component';
 import type { NotificationComponent } from '@components/notification/notification.component';
 import type { DateTimePickerSampleComponent } from '@pages/date-time-picker-sample/date-time-picker-sample.component';
+import type { AnalogueClockSampleComponent } from '@pages/analogue-clock-sample/analogue-clock-sample.component';
 import type { RadialContextMenuSampleComponent } from '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import type { NotificationSampleComponent } from '@pages/notification-sample/notification-sample.component';
 import { drag } from '@behaviors/draggable/draggable';
@@ -81,6 +83,9 @@ export class DemoComponent {
 
     @ViewChild('#notification-component')
     notificationComponent?: NotificationComponent | null;
+
+    @ViewChild('#analogue-clock-sample')
+    analogueClockSample?: AnalogueClockSampleComponent | null;
 
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };

@@ -1,6 +1,12 @@
 import { Component, signal, effect } from '@purity/core';
 import './playground.component.scss';
 import * as purityCore from '@purity/core';
+import { DataService } from '@data/data.service';
+import { ThemeService } from '@data/theme.service';
+import { NotifyService } from '@data/notify.service';
+import { FirebaseService, initGoogleAnalytics, logAnalyticsEvent } from '@data/firebase';
+import { drag } from '@behaviors/draggable/draggable';
+import { droppable } from '@behaviors/droppable/droppable';
 import { transform } from 'sucrase';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-clike';
@@ -329,6 +335,86 @@ export class PlaygroundDemoComponent {
     },
 ];
 
+/**
+ * Parses class bodies and transforms property-level decorators like @ViewChild and @ChildView
+ * into valid ES class properties with prototype decorator bindings.
+ */
+function transformAllClasses(cleanJs: string): { code: string; postStatements: string[] } {
+    const postStatements: string[] = [];
+    let result = '';
+    let i = 0;
+
+    while (i < cleanJs.length) {
+        const classIndex = cleanJs.indexOf('class ', i);
+        if (classIndex === -1) {
+            result += cleanJs.slice(i);
+            break;
+        }
+
+        result += cleanJs.slice(i, classIndex);
+
+        const classOpenBraceIndex = cleanJs.indexOf('{', classIndex);
+        if (classOpenBraceIndex === -1) {
+            result += cleanJs.slice(classIndex);
+            break;
+        }
+
+        const header = cleanJs.slice(classIndex, classOpenBraceIndex);
+        const nameMatch = header.match(/class\s+([A-Za-z0-9_$]+)/);
+        const className = nameMatch ? nameMatch[1] : null;
+
+        let depth = 1;
+        let inString: string | null = null;
+        let inComment = false;
+        let j = classOpenBraceIndex + 1;
+
+        while (j < cleanJs.length && depth > 0) {
+            const ch = cleanJs[j];
+            const prev = cleanJs[j - 1];
+
+            if (inString) {
+                if (ch === inString && prev !== '\\') inString = null;
+            } else if (inComment) {
+                if (ch === '/' && prev === '*') inComment = false;
+            } else {
+                if (ch === '"' || ch === "'" || ch === '`') {
+                    inString = ch;
+                } else if (ch === '/' && cleanJs[j + 1] === '*') {
+                    inComment = true;
+                    j++;
+                } else if (ch === '/' && cleanJs[j + 1] === '/') {
+                    const nextNl = cleanJs.indexOf('\n', j);
+                    if (nextNl !== -1) j = nextNl;
+                } else if (ch === '{') {
+                    depth++;
+                } else if (ch === '}') {
+                    depth--;
+                }
+            }
+            j++;
+        }
+
+        const classBody = cleanJs.slice(classOpenBraceIndex + 1, j - 1);
+
+        if (className) {
+            const transformedBody = classBody.replace(
+                /@(?:ViewChild|ChildView)\s*\(\s*([\s\S]*?)\s*\)\s*(?:public\s+|private\s+|protected\s+)?([a-zA-Z0-9_$]+)/g,
+                (_, args, prop) => {
+                    postStatements.push(`__purity.ViewChild(${args.trim()})(${className}.prototype, '${prop}');`);
+                    return prop;
+                },
+            );
+            result += header + '{' + transformedBody + '}';
+        } else {
+            result += cleanJs.slice(classIndex, j);
+        }
+
+        i = j;
+    }
+
+    return { code: result, postStatements };
+}
+
 @Component({
     selector: 'playground-view',
     templateUrl: './src/app/pages/playground/playground.component.html',
@@ -504,16 +590,51 @@ export class PlaygroundComponent {
             });
             let cleanJs = transformed.code;
 
-            // Strip import statements
-            cleanJs = cleanJs.replace(/import\s+[\s\S]*?from\s+['"][^'"]+['"];?/g, '');
+            // Strip all import statements (named, default, namespace, side-effects, type-only)
+            cleanJs = cleanJs
+                .replace(/import\s+(?:type\s+)?[\s\S]*?from\s*['"][^'"]+['"];?/g, '')
+                .replace(/import\s+['"][^'"]+['"];?/g, '')
+                .replace(/import\s+type\s+[^;]+;?/g, '');
 
-            // Handle @Pipe decorator if any
-            const pipeStatements: string[] = [];
+            const postStatements: string[] = [];
+
+            // Transform @Pipe(...) class ClassName
             cleanJs = cleanJs.replace(
-                /@Pipe\s*\(\s*['"]([^'"]+)['"]\s*\)\s*(?:export\s+)?class\s+([A-Za-z0-9_$]+)/g,
-                (_, pipeName, pipeClass) => {
-                    pipeStatements.push(`__purity.Pipe('${pipeName}')(${pipeClass});`);
-                    return `class ${pipeClass}`;
+                /@Pipe\s*\(\s*([\s\S]*?)\s*\)\s*(?:export\s+)?class\s+([A-Za-z0-9_$]+)/g,
+                (_, args, cls) => {
+                    postStatements.push(`__purity.Pipe(${args})(${cls});`);
+                    return `class ${cls}`;
+                },
+            );
+
+            // Transform @Directive(...) class ClassName
+            cleanJs = cleanJs.replace(
+                /@Directive\s*\(\s*([\s\S]*?)\s*\)\s*(?:export\s+)?class\s+([A-Za-z0-9_$]+)/g,
+                (_, args, cls) => {
+                    postStatements.push(`__purity.Directive(${args})(${cls});`);
+                    return `class ${cls}`;
+                },
+            );
+
+            // Transform @Validator(...) class ClassName
+            cleanJs = cleanJs.replace(
+                /@Validator\s*\(\s*([\s\S]*?)\s*\)\s*(?:export\s+)?class\s+([A-Za-z0-9_$]+)/g,
+                (_, args, cls) => {
+                    postStatements.push(`__purity.Validator(${args})(${cls});`);
+                    return `class ${cls}`;
+                },
+            );
+
+            // Transform @Injectable(...) or @Service(...) class ClassName
+            cleanJs = cleanJs.replace(
+                /@(?:Injectable|Service)\s*(?:\(\s*([\s\S]*?)\s*\))?\s*(?:export\s+)?class\s+([A-Za-z0-9_$]+)/g,
+                (_, args, cls) => {
+                    if (args && args.trim()) {
+                        postStatements.push(`__purity.Injectable(${args})(${cls});`);
+                    } else {
+                        postStatements.push(`__purity.Injectable()(${cls});`);
+                    }
+                    return `class ${cls}`;
                 },
             );
 
@@ -522,27 +643,59 @@ export class PlaygroundComponent {
             let className = 'PlaygroundDemoComponent';
 
             const compMatch = cleanJs.match(
-                /@Component\s*\(\s*(?:\{[\s\S]*?\}|['"][^'"]+['"])\s*\)\s*(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/,
+                /@Component(?:\s*\(\s*(?:\{[\s\S]*?\}|['"][^'"]+['"]|\(\s*\))?\s*\))?\s*(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/,
             );
             if (compMatch) {
                 className = compMatch[1];
                 cleanJs = cleanJs.replace(compMatch[0], `class ${className}`);
             } else {
-                const classMatch = cleanJs.match(/(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/);
-                if (classMatch) {
-                    className = classMatch[1];
+                const classMatches = Array.from(cleanJs.matchAll(/(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/g));
+                if (classMatches.length > 0) {
+                    className = classMatches[classMatches.length - 1][1];
                 }
             }
 
+            // Transform @ViewChild / @ChildView inside classes
+            const classTransform = transformAllClasses(cleanJs);
+            cleanJs = classTransform.code;
+            postStatements.push(...classTransform.postStatements);
+
+            // Strip any remaining arbitrary decorators (e.g. @CustomDec, @Something(...))
+            cleanJs = cleanJs.replace(/@[A-Za-z0-9_$]+(?:\([^)]*\))?\s*/g, '');
+
             // Remove any remaining export keywords
-            cleanJs = cleanJs.replace(/\bexport\s+(?:default\s+)?/g, '');
+            cleanJs = cleanJs.replace(/export\s+(?:default\s+)?(?:const|let|var|function|class)\s+/g, (match) => {
+                return match.replace(/export\s+(?:default\s+)?/, '');
+            });
+            cleanJs = cleanJs.replace(/export\s+default\s+([A-Za-z0-9_$]+);?/g, '');
+            cleanJs = cleanJs.replace(/export\s*\{[^}]*\};?/g, '');
+
+            // Scope object with framework primitives, data services, analytics, widgets & behaviors
+            const purityScope = {
+                ...purityCore,
+                DataService,
+                ThemeService,
+                NotifyService,
+                FirebaseService,
+                initGoogleAnalytics,
+                logAnalyticsEvent,
+                drag,
+                droppable,
+            };
+
+            // Dynamic destructuring to avoid collision with any class names declared in cleanJs
+            const declaredClassNames = new Set(
+                Array.from(cleanJs.matchAll(/class\s+([A-Za-z0-9_$]+)/g)).map(m => m[1])
+            );
+            const scopeKeys = Object.keys(purityScope).filter(k => !declaredClassNames.has(k));
 
             // Wrap in execution function with Purity exports
             const execCode = `
-                const { Component, signal, effect, inject, Pipe, BasePipe, Directive, BaseDirective, Validator, BaseValidator } = __purity;
+                const { ${scopeKeys.join(', ')} } = __purity;
+
                 ${cleanJs}
                 
-                ${pipeStatements.join('\n')}
+                ${postStatements.join('\n')}
 
                 // Attach template and register component with unique selector
                 const compDecorator = Component({
@@ -555,7 +708,7 @@ export class PlaygroundComponent {
             `;
 
             const execFn = new Function('__purity', execCode);
-            execFn(purityCore);
+            execFn(purityScope);
 
             // 3. Create and mount Custom Element in preview container
             const customEl = document.createElement(uniqueSelector) as any;

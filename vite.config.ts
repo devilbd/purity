@@ -19,11 +19,11 @@ function decoratorsPlugin(): Plugin {
             const rawImports: string[] = [];
             let tplCounter = 0;
 
-            // 1. Mask string literals (template literals, single/double quoted strings)
-            // to prevent matching decorators inside code sample strings or regexes
+            // 1. Mask comments and string literals (template literals, single/double quoted strings)
+            // to prevent matching decorators inside comments, code sample strings, or regexes
             const stringLiterals: string[] = [];
             const placeholderCode = code.replace(
-                /(`(?:\\`|[\s\S])*?`|"(?:\\"|[^"\n\r])*"|'(?:\\'|[^'\n\r])*')/g,
+                /(\/\*[\s\S]*?\*\/|\/\/[^\n\r]*|`(?:\\`|[\s\S])*?`|"(?:\\"|[^"\n\r])*"|'(?:\\'|[^'\n\r])*')/g,
                 (match) => {
                     const placeholder = `__PURITY_MASKED_STR_${stringLiterals.length}__`;
                     stringLiterals.push(match);
@@ -52,6 +52,7 @@ function decoratorsPlugin(): Plugin {
                             const resolvedPath = url
                                 .replace(/^@pages\//, 'src/app/pages/')
                                 .replace(/^@components\//, 'src/app/shared/components/')
+                                .replace(/^@widgets\//, 'src/app/shared/widgets/')
                                 .replace(/^@app\//, 'src/app/');
                             absTarget = path.resolve(process.cwd(), resolvedPath);
                         }
@@ -148,6 +149,7 @@ export default defineConfig(({ mode }) => {
                 '@pages': path.resolve(import.meta.dirname, 'src/app/pages'),
                 '@shared': path.resolve(import.meta.dirname, 'src/app/shared'),
                 '@components': path.resolve(import.meta.dirname, 'src/app/shared/components'),
+                '@widgets': path.resolve(import.meta.dirname, 'src/app/shared/widgets'),
                 '@directives': path.resolve(import.meta.dirname, 'src/app/shared/directives'),
                 '@pipes': path.resolve(import.meta.dirname, 'src/app/shared/pipes'),
                 '@validators': path.resolve(import.meta.dirname, 'src/app/shared/validators'),

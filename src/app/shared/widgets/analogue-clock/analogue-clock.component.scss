@@ -1,0 +1,286 @@
+@use '@styles' as *;
+
+/* ==========================================================================
+   Purity Design System - Analogue Clock Widget
+   ========================================================================== */
+
+analogue-clock {
+    display: block;
+    width: 100%;
+}
+
+.analogue-clock-widget {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    border-radius: var(--radius-card);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-window);
+    -webkit-backdrop-filter: var(--blur-window);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    transition: all var(--transition-normal) var(--ease-gnome);
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(circle at 50% 0%, var(--accent-subtle), transparent 70%);
+        pointer-events: none;
+        opacity: 0.6;
+        transition: opacity var(--transition-normal);
+    }
+
+    &:hover::before {
+        opacity: 0.9;
+    }
+}
+
+/* Header & Title */
+.clock-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--gnome-border-subtle);
+
+    .clock-title-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .clock-icon {
+            font-size: 1.25rem;
+            filter: drop-shadow(0 2px 6px var(--accent-shadow));
+        }
+
+        .clock-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .clock-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+    }
+
+    .clock-tz-badge {
+        font-family: 'Adwaita Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        background: var(--gnome-card);
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--gnome-border-subtle);
+    }
+}
+
+/* Clock Dial Stage & Canvas Container */
+.clock-stage {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 30%, var(--gnome-subtle), transparent 70%);
+
+    .clock-canvas {
+        display: block;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+        border-radius: 50%;
+        filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.35));
+        transition: transform var(--transition-fast) var(--ease-gnome), filter var(--transition-fast);
+
+        &:hover {
+            transform: scale(1.015);
+            filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.45));
+        }
+
+        &:active {
+            transform: scale(0.99);
+        }
+    }
+}
+
+/* Digital Readout Bar */
+.clock-digital-readout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 18px;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    background: var(--gnome-card);
+    border: 1px solid var(--gnome-border-subtle);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15);
+
+    .digital-time {
+        font-family: 'Adwaita Mono', monospace;
+        font-size: 1.45rem;
+        font-weight: 700;
+        color: var(--text-main);
+        letter-spacing: 0.05em;
+        text-shadow: 0 2px 8px var(--accent-shadow);
+    }
+
+    .digital-date {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        letter-spacing: 0.02em;
+    }
+}
+
+/* Interactive Control Pills */
+.clock-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    width: 100%;
+
+    .control-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gnome-border);
+        background: var(--gnome-card);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all var(--transition-fast) var(--ease-gnome);
+
+        &:hover {
+            background: var(--gnome-hover);
+            color: var(--text-main);
+            border-color: var(--gnome-border-focus);
+            transform: translateY(-1px);
+        }
+
+        &:active {
+            transform: translateY(0);
+            background: var(--gnome-active);
+        }
+
+        &.active {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 2px 8px var(--accent-shadow);
+        }
+    }
+
+    .tz-select {
+        padding: 6px 12px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gnome-border);
+        background: var(--gnome-card);
+        color: var(--text-main);
+        cursor: pointer;
+        outline: none;
+        transition: all var(--transition-fast);
+
+        &:hover {
+            border-color: var(--accent);
+        }
+
+        &:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-subtle);
+        }
+
+        option {
+            background: var(--gnome-bg);
+            color: var(--text-main);
+        }
+    }
+}
+
+/* ==========================================================================
+   Light Theme Adjustments
+   ========================================================================== */
+[data-theme='light'] {
+    .analogue-clock-widget {
+        box-shadow: var(--shadow-deep);
+        background: var(--gnome-surface);
+        border-color: var(--gnome-border);
+
+        &::before {
+            background: radial-gradient(circle at 50% 0%, rgba(28, 113, 216, 0.12), transparent 70%);
+        }
+    }
+
+    .clock-stage .clock-canvas {
+        filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.12));
+
+        &:hover {
+            filter: drop-shadow(0 14px 30px rgba(0, 0, 0, 0.18));
+        }
+    }
+
+    .clock-digital-readout {
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px rgba(255, 255, 255, 0.9);
+        border-color: var(--gnome-border-subtle);
+
+        .digital-time {
+            color: var(--text-main);
+            text-shadow: none;
+        }
+    }
+
+    .clock-controls {
+        .control-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border-color: var(--gnome-border);
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.05);
+            }
+
+            &.active {
+                background: var(--accent-subtle);
+                color: var(--accent);
+                border-color: var(--accent);
+            }
+        }
+
+        .tz-select {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: var(--gnome-border);
+
+            option {
+                background: #ffffff;
+                color: #1c1c1c;
+            }
+        }
+    }
+}

@@ -599,6 +599,36 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
     }
 }</code></pre>
         </div>
+
+        <!-- 20. Analogue Clock Widget -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <h4>20. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
+                <p>Native 2D Canvas clock with subpixel Retina scaling, frosted glass dial, 3D beveled hands, date window, smooth sweep vs quartz ticking, and multi-timezone support:</p>
+            </div>
+            <pre><code><span class="cmt">&lt;!-- 1. Component template usage --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"clock-container"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;analogue-clock</span> <span class="attr">id</span>=<span class="str">"london-clock"</span><span class="tag">&gt;&lt;/analogue-clock&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component controller with @ViewChild and reactive signal configuration --&gt;</span>
+<span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> <span class="str">'@widgets/analogue-clock/analogue-clock.component'</span>;
+<span class="kw">import type</span> { <span class="typ">AnalogueClockComponent</span> } <span class="kw">from</span> <span class="str">'@widgets/analogue-clock/analogue-clock.component'</span>;
+
+<span class="dec">@Component</span>({ selector: <span class="str">'dashboard-view'</span> })
+<span class="kw">export class</span> <span class="typ">DashboardViewComponent</span> {
+    <span class="dec">@ViewChild</span>(<span class="str">'#london-clock'</span>)
+    clock?: <span class="typ">AnalogueClockComponent</span> | <span class="kw">null</span>;
+
+    <span class="kw">protected</span> <span class="fn">onInit</span>() {
+        <span class="cmt">// Configure timezone and precision sweep mode</span>
+        <span class="kw">this</span>.clock?.timezone.<span class="fn">set</span>(<span class="str">'Europe/London'</span>);
+        <span class="kw">this</span>.clock?.smoothSeconds.<span class="fn">set</span>(<span class="kw">true</span>);
+        <span class="kw">this</span>.clock?.showNumbers.<span class="fn">set</span>(<span class="kw">true</span>);
+    }
+}</code></pre>
+        </div>
     </div>
 
     <!-- Bottom CTA Button -->
