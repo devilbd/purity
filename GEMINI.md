@@ -66,6 +66,7 @@ purity/
         ├── app.component.scss   # Root styles
         ├── app.component.ts     # Root <app-component> implementation
         ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
+        ├── external/            # External dependency adapters & loaders (e.g. prism-loader for live editor)
         ├── pages/               # Application pages, views & feature showcases
         │   ├── custom/          # <custom-component> with two-way signal bindings
         │   ├── analogue-clock-sample/ # <analogue-clock-sample> showcase of analogue clock configurations

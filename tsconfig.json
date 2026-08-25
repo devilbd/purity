@@ -29,6 +29,7 @@
       "@behaviors/*": ["./src/app/shared/behaviors/*"],
       "@interceptors/*": ["./src/app/shared/interceptors/*"],
       "@widgets/*": ["./src/app/shared/widgets/*"],
+      "@external/*": ["./src/app/external/*"],
       "@styles": ["./src/style.scss"],
       "@styles/*": ["./src/*"]
     },
