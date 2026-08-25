@@ -435,31 +435,74 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 }
 
 /**
- * Safely resolves a child element matching selector from a host or root document
+ * Generates candidate DOM query selectors from a property key when an explicit selector is not specified.
+ * E.g., propertyKey = 'testDemoComponent' -> ['test-demo-component', '#test-demo-component', 'test-demo', '#test-demo', '#testDemoComponent']
+ */
+function getCandidateSelectors(propertyKey: string, explicitSelector?: string): string[] {
+    if (explicitSelector && explicitSelector.trim().length > 0) {
+        return [explicitSelector.trim()];
+    }
+
+    const kebab = toKebabCase(propertyKey);
+    const candidates = new Set<string>();
+
+    // 1. Exact kebab tag name (e.g. <test-demo-component>, <loader>)
+    candidates.add(kebab);
+
+    // 2. Exact kebab ID (e.g. #test-demo-component, #loader)
+    candidates.add('#' + kebab);
+
+    // 3. Tag variations with / without '-component'
+    if (kebab.endsWith('-component')) {
+        const withoutComponent = kebab.slice(0, -10);
+        candidates.add(withoutComponent);
+        candidates.add('#' + withoutComponent);
+    } else {
+        candidates.add(kebab + '-component');
+        candidates.add('#' + kebab + '-component');
+    }
+
+    // 4. Exact propertyKey as ID (e.g. #testDemoComponent)
+    candidates.add('#' + propertyKey);
+
+    return Array.from(candidates);
+}
+
+/**
+ * Safely resolves a child element matching selector or candidate list from a host or root document
  * without throwing illegal invocation when host is a prototype/context wrapper.
  */
-function safeQuerySelector(host: any, selector: string): any {
+function safeQuerySelector(host: any, selectorOrCandidates: string | string[]): any {
     if (typeof document === 'undefined') return null;
 
-    if (host && host.__host) {
+    const selectors = Array.isArray(selectorOrCandidates)
+        ? selectorOrCandidates
+        : [selectorOrCandidates];
+
+    for (const selector of selectors) {
+        if (!selector) continue;
+
+        if (host && host.__host) {
+            try {
+                const el = host.__host.querySelector?.(selector);
+                if (el) return el;
+            } catch (_) {}
+        }
+
+        if (host) {
+            try {
+                const el = host.querySelector?.(selector);
+                if (el) return el;
+            } catch (_) {}
+        }
+
         try {
-            const el = host.__host.querySelector?.(selector);
+            const el = document.querySelector?.(selector);
             if (el) return el;
         } catch (_) {}
     }
 
-    if (host) {
-        try {
-            const el = host.querySelector?.(selector);
-            if (el) return el;
-        } catch (_) {}
-    }
-
-    try {
-        return document.querySelector?.(selector) ?? null;
-    } catch (_) {
-        return null;
-    }
+    return null;
 }
 
 /**
@@ -539,10 +582,11 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
 
         // Ensure child view getters are bound
         if (this.__childViews) {
-            for (const { propertyKey, selector } of this.__childViews) {
+            for (const { propertyKey, selector, candidates } of this.__childViews) {
+                const searchList = candidates || (selector ? [selector] : getCandidateSelectors(propertyKey));
                 Object.defineProperty(this, propertyKey, {
                     get() {
-                        return safeQuerySelector(this, selector);
+                        return safeQuerySelector(this, searchList);
                     },
                     enumerable: true,
                     configurable: true,
@@ -719,12 +763,26 @@ export type ChildViewOptions = ViewChildOptions;
 
 /**
  * ViewChild Decorator
- * Automatically queries and binds child elements / custom components matching the selector
- * when accessing the decorated property on the component instance.
+ * Automatically queries and binds child elements / custom components when accessing the decorated property.
+ * If selector is omitted, the selector is implicitly inferred from the property name in kebab-case
+ * (e.g. `testDemoComponent` -> `<test-demo-component>` / `#test-demo-component`, `loader` -> `<loader-component>` / `#loader`).
+ * An explicit selector is optional and only needed when disambiguating between multiple instances.
  *
- * @param selector CSS selector for the child element or component (e.g. '#component1' or 'custom-component')
+ * @param selectorOrTarget Optional CSS selector string (e.g. '#component1' or 'custom-component'), or target for bare decorator usage
+ * @param propertyKeyOrOptions Optional property key or ViewChild options
  */
-export function ViewChild(selector: string, _options?: ViewChildOptions): any {
+export function ViewChild(selectorOrTarget?: string | any, propertyKeyOrOptions?: any): any {
+    // 1. Bare decorator usage: @ViewChild propertyName: any;
+    if (typeof selectorOrTarget === 'object' && selectorOrTarget !== null && typeof propertyKeyOrOptions === 'string') {
+        const target = selectorOrTarget;
+        const propertyKey = propertyKeyOrOptions;
+        applyViewChild(target, propertyKey, undefined);
+        return;
+    }
+
+    // 2. Factory usage: @ViewChild() or @ViewChild('selector') or @ViewChild(options)
+    const explicitSelector = typeof selectorOrTarget === 'string' ? selectorOrTarget : undefined;
+
     return function (target: any, propertyKeyOrContext: any): any {
         // Stage 3 Decorators (Context object)
         if (
@@ -733,11 +791,12 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
             'name' in propertyKeyOrContext
         ) {
             const propertyName = propertyKeyOrContext.name;
+            const candidates = getCandidateSelectors(propertyName, explicitSelector);
             if (typeof propertyKeyOrContext.addInitializer === 'function') {
                 propertyKeyOrContext.addInitializer(function (this: any) {
                     Object.defineProperty(this, propertyName, {
                         get() {
-                            return safeQuerySelector(this, selector);
+                            return safeQuerySelector(this, candidates);
                         },
                         enumerable: true,
                         configurable: true,
@@ -747,7 +806,7 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
             return function (this: any, initialValue: any) {
                 Object.defineProperty(this, propertyName, {
                     get() {
-                        return safeQuerySelector(this, selector);
+                        return safeQuerySelector(this, candidates);
                     },
                     enumerable: true,
                     configurable: true,
@@ -758,22 +817,27 @@ export function ViewChild(selector: string, _options?: ViewChildOptions): any {
 
         // Standard / TypeScript Property Decorator
         const propertyKey = propertyKeyOrContext;
-        if (!target.__childViews) {
-            target.__childViews = [];
-        }
-        target.__childViews.push({ propertyKey, selector });
-
-        Object.defineProperty(target, propertyKey, {
-            get(this: any) {
-                return safeQuerySelector(this, selector);
-            },
-            set(_value: any) {
-                // allow property override
-            },
-            enumerable: true,
-            configurable: true,
-        });
+        applyViewChild(target, propertyKey, explicitSelector);
     };
+}
+
+function applyViewChild(target: any, propertyKey: string, explicitSelector?: string): void {
+    if (!target.__childViews) {
+        target.__childViews = [];
+    }
+    const candidates = getCandidateSelectors(propertyKey, explicitSelector);
+    target.__childViews.push({ propertyKey, selector: explicitSelector, candidates });
+
+    Object.defineProperty(target, propertyKey, {
+        get(this: any) {
+            return safeQuerySelector(this, candidates);
+        },
+        set(_value: any) {
+            // allow property override
+        },
+        enumerable: true,
+        configurable: true,
+    });
 }
 
 export const ChildView = ViewChild;

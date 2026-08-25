@@ -508,29 +508,33 @@ export class CustomComponent {
 
 ### 11. 🔍 Child View & Component Queries (`@ViewChild`)
 
-Use the `@ViewChild(selector)` decorator to query child DOM elements and child components with fallback resolution for teleported or body-prepended elements:
+Use the `@ViewChild()` decorator to query child DOM elements and child components. When the selector is omitted, the framework implicitly infers candidate selectors from the property name in kebab-case (`<my-component>`, `#my-component`, `<my>`, `#my`). An explicit selector is optional and only needed when disambiguating between multiple instances:
 
 ```typescript
 import { Component, ViewChild, signal } from '@purity/core';
+import type { LoaderComponent } from '@components/loader/loader.component';
 import type { CustomComponent } from '@pages/custom/custom.component';
-import type { ModalViewComponent } from '@components/modal/modal-view.component';
 
 @Component({
     selector: 'demo-component',
     templateUrl: './demo.component.html',
 })
 export class DemoComponent {
-    // Automatically query child elements / components
+    // 1. IMPLICIT RESOLUTION: Automatically finds <loader-component> or #loader
+    @ViewChild()
+    loaderComponent?: LoaderComponent | null;
+
+    // 2. OPTIONAL EXPLICIT SELECTOR: Disambiguates between multiple instances
     @ViewChild('#component1')
     customComponent1?: CustomComponent | null;
 
-    @ViewChild('#demo-modal')
-    modalView?: ModalViewComponent | null;
+    @ViewChild('#component2')
+    customComponent2?: CustomComponent | null;
 
     onTriggerChild() {
         // Clean property access without manual querySelector boilerplate
+        this.loaderComponent?.show('Loading data...');
         this.customComponent1?.customProperty.set('Updated by parent');
-        this.modalView?.open({ title: 'Queried Modal' });
     }
 }
 ```

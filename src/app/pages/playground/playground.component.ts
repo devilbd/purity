@@ -66,10 +66,10 @@ import type { LoaderComponent } from '@components/loader/loader.component';
     templateUrl: './template.html',
 })
 export class PlaygroundDemoComponent {
-    @ViewChild('#loader')
+    @ViewChild()
     private loader?: LoaderComponent | null;
 
-    @ViewChild('#test-demo-component')
+    @ViewChild()
     private testDemoComponent?: TestDemoComponent | null;
 
     selectedUser = signal('');
@@ -96,11 +96,11 @@ export class TestDemoComponent {}`,
         html: `<div class="user-select-card window">
     <h3>👤 Select User Profile</h3>
     
-    <!-- Purity UI Loader Component -->
-    <loader-component id="loader"></loader-component>
+    <!-- Purity UI Loader Component (Implicitly resolved by @ViewChild) -->
+    <loader-component></loader-component>
 
-    <!-- Dynamic Sub-Component Defined in TypeScript Tab -->
-    <test-demo-component id="test-demo-component"></test-demo-component>
+    <!-- Dynamic Sub-Component (Implicitly resolved by @ViewChild) -->
+    <test-demo-component></test-demo-component>
 
     <div class="user-list">
         <div for="let user of users" class="user-item">
@@ -539,9 +539,10 @@ function transformAllClasses(cleanJs: string): { code: string; postStatements: s
 
         if (className) {
             const transformedBody = classBody.replace(
-                /@(?:ViewChild|ChildView)\s*\(\s*([\s\S]*?)\s*\)\s*(?:public\s+|private\s+|protected\s+)?([a-zA-Z0-9_$]+)(?:\s*=\s*[^;\n]+)?(?:\s*;)?/g,
+                /@(?:ViewChild|ChildView)(?:\s*\(\s*([\s\S]*?)\s*\))?\s*(?:public\s+|private\s+|protected\s+)?([a-zA-Z0-9_$]+)(?:\s*=\s*[^;\n]+)?(?:\s*;)?/g,
                 (_, args, prop) => {
-                    postStatements.push(`__purity.ViewChild(${args.trim()})(${className}.prototype, '${prop}');`);
+                    const argStr = args && args.trim() ? args.trim() : '';
+                    postStatements.push(`__purity.ViewChild(${argStr})(${className}.prototype, '${prop}');`);
                     return '';
                 },
             );

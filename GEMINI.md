@@ -141,16 +141,21 @@ Purity features a synchronous reactive primitives engine:
   - **`render(content?: string)`**: Programmatically assigns template strings directly to `innerHTML` and triggers `bindTemplate()`.
   - **`disconnectedCallback(): void`**: Native Web Component lifecycle hook for cleaning up directives, validators, and subscriptions.
 
-* **`@ViewChild(selector: string)`**:
-  Property decorator that automatically queries and binds matching child elements or custom components by CSS selector (with fallback resolution across teleported / body-prepended elements):
+* **`@ViewChild(selector?: string)` / `@ChildView`**:
+  Property decorator that automatically queries and binds matching child elements or custom components. If `selector` is omitted (`@ViewChild()`), the framework implicitly infers candidate selectors from the property name in kebab-case (`<my-component>`, `#my-component`, `<my>`, `#my`). An explicit selector (e.g. `@ViewChild('#specific-id')`) is optional and only required when disambiguating between multiple instances:
   ```typescript
   @Component({ selector: 'my-component' })
   export class MyComponent {
-      @ViewChild('#childComponent')
-      childComponent?: CustomComponent | null;
+      // Implicit selector resolution (<custom-component> / #custom-component):
+      @ViewChild()
+      customComponent?: CustomComponent | null;
+
+      // Optional explicit selector for multi-instance disambiguation:
+      @ViewChild('#secondChild')
+      customComponent2?: CustomComponent | null;
 
       protected onInit() {
-          this.childComponent?.customProperty.set('value');
+          this.customComponent?.customProperty.set('value');
       }
   }
   ```
