@@ -358,13 +358,13 @@ Purity provides a first-class bootstrapping API that initializes root components
   });
   ```
 
-### 9. Firebase & Google Analytics 4 (`src/data/firebase.ts`)
+### 9. Internal Telemetry & Deployment Services (`src/data/firebase.ts`)
 
-Purity integrates a native, zero-dependency Google Analytics (GA4) / Firebase Analytics service:
+> [!NOTE]
+> Firebase and Google Analytics are used strictly as internal application infrastructure for our deployment and telemetry purposes. They must **never** be exposed in public documentation (`README.md`), user-facing UI showcases, demo pages, or intro components.
 
-* **Automatic Script Injection**: Loads `gtag.js` asynchronously upon app bootstrapping using `VITE_FIREBASE_MEASUREMENT_ID` (`G-XXXXXXXXXX`).
-* **Automatic Page View Tracking**: Logs initial page load and tracks SPA navigation changes (`popstate`, `hashchange`).
-* **Custom Event Logging**:
+* **Internal Page View Tracking**: Tracks SPA navigation changes (`popstate`, `hashchange`).
+* **Internal Event Logging**:
   ```typescript
   import { logAnalyticsEvent } from '@data/firebase';
 

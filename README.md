@@ -12,7 +12,6 @@
   <img src="https://img.shields.io/badge/TypeScript-Strict-blue?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Web_Components-Custom_Elements_v1-orange?logo=web-components" alt="Web Components" />
   <img src="https://img.shields.io/badge/Vite-Bundler-646CFF?logo=vite" alt="Vite" />
-  <img src="https://img.shields.io/badge/Firebase-Hosting-FFCA28?logo=firebase" alt="Firebase Hosting" />
   <img src="https://img.shields.io/badge/Dependencies-Zero_Runtime-brightgreen" alt="Zero Dependencies" />
 </p>
 
@@ -45,7 +44,6 @@
 - 🧭 **Draggable Floating Navigation Menu (`<navigation-menu>`)**: Floating draggable orb with GNOME 50 glassmorphic styling, hover drag handle, and integrated radial context menu for app-wide section and subsection navigation.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
-- 🚀 **Firebase Hosting Ready**: Built-in Firebase configuration and single-command deployment (`npm run deploy`).
 
 ---
 
@@ -68,8 +66,6 @@ npm install
 | `npm run build:dev` | Builds the application using development environment profile |
 | `npm run build:prod` | Builds the application using production environment profile |
 | `npm run preview` | Serves the production build locally for testing |
-| `npm run deploy` | Builds production bundle and deploys to Firebase Hosting |
-| `npm run deploy:hosting` | Builds production bundle and deploys only to Firebase Hosting |
 
 ---
 
@@ -82,8 +78,6 @@ purity/
 ├── index.html                   # HTML entry point mounting <app-component>
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
-├── firebase.json                # Firebase Hosting configuration (public: dist, SPA rewrites)
-├── .firebaserc                  # Firebase project ID mapping
 ├── .env.example                 # Environment variables reference template
 ├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
 ├── README.md                    # Project documentation (this file)

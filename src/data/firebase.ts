@@ -74,7 +74,6 @@ export function initGoogleAnalytics(measurementId?: string): boolean {
         });
 
         isAnalyticsInitialized = true;
-        console.info(`[Firebase/Analytics] Google Analytics (GA4) active (Measurement ID: ${mId}, App ID: ${firebaseConfig.appId})`);
 
         // 4. Auto-track SPA navigation events
         window.addEventListener('popstate', () => {
