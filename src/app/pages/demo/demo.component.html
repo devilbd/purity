@@ -28,12 +28,6 @@
         >
             Set explicitly value on login input
         </button>
-        <button
-            class="button-primary modal-open-btn"
-            onclick="onOpenModal()"
-        >
-            🪟 Open Modal Dialog
-        </button>
     </div>
 
     <div id="customComponentCustomProperty">{{customComponent1?.customProperty()}}</div>
@@ -66,13 +60,7 @@
     
     <notification-sample id="notification-sample"></notification-sample>
 
-    <modal-view id="demo-modal">
-        <div class="custom-modal-body">
-            <h4>📦 Custom Projected Modal Content</h4>
-            <p>This template and child components were passed directly into the <code>&lt;modal-view&gt;</code> body via <code>&lt;slot&gt;</code> content projection!</p>
-            <custom-component id="modal-custom-component" name="modalCustom"></custom-component>
-        </div>
-    </modal-view>
+    <modal-sample id="modal-sample"></modal-sample>
 
     <loader-component id="app-loader"></loader-component>
 </div>

@@ -17,6 +17,7 @@ import '@pages/analogue-clock-sample/analogue-clock-sample.component';
 import '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import '@pages/http-sample/http-sample.component';
 import '@pages/notification-sample/notification-sample.component';
+import '@pages/modal-sample/modal-sample.component';
 import '@components/modal/modal-view.component';
 import '@components/date-time-picker/date-time-picker.component';
 import '@components/loader/loader.component';
@@ -30,7 +31,7 @@ import type { RawTemplateComponent } from '@pages/raw-template/raw-template.comp
 import type { FormsValidationComponent } from '@pages/forms-validation/forms-validation.component';
 import type { PipeSampleComponent } from '@pages/pipe-sample/pipe-sample.component';
 import type { ForSampleComponent } from '@pages/for-sample/for-sample.component';
-import type { ModalViewComponent } from '@components/modal/modal-view.component';
+import type { ModalSampleComponent } from '@pages/modal-sample/modal-sample.component';
 import type { LoaderComponent } from '@components/loader/loader.component';
 import type { NotificationComponent } from '@components/notification/notification.component';
 import type { DateTimePickerSampleComponent } from '@pages/date-time-picker-sample/date-time-picker-sample.component';
@@ -72,8 +73,8 @@ export class DemoComponent {
     @ViewChild('#radial-context-menu-sample')
     radialContextMenuSample?: RadialContextMenuSampleComponent | null;
 
-    @ViewChild('#demo-modal')
-    modalView?: ModalViewComponent | null;
+    @ViewChild('#modal-sample')
+    modalSample?: ModalSampleComponent | null;
 
     @ViewChild('#app-loader')
     loader?: LoaderComponent | null;
@@ -157,11 +158,6 @@ export class DemoComponent {
     onLogout() {
         this.dataService.logout();
         this.loggedUser.set(null);
-    }
-
-    onOpenModal() {
-        const modal = this.modalView || (document.querySelector('#demo-modal') as any) || (document.querySelector('modal-view') as any);
-        modal?.open({ title: 'Purity Modal Dialog Showcase' });
     }
 
     setDefaultLogin() {

@@ -1,0 +1,63 @@
+<div class="sample-section window">
+    <div class="sample-header">
+        <div class="sample-title-area">
+            <span class="sample-icon">🪟</span>
+            <div>
+                <h3 class="sample-title">Modal Dialog System (<code>&lt;modal-view&gt;</code>)</h3>
+                <p class="sample-description">
+                    Reusable Web Component dialogs with fine-grained signal state, backdrop blur, maximize/restore toggling, and generic <code>&lt;slot&gt;</code> content projection.
+                </p>
+            </div>
+        </div>
+        <span class="status-pill {{modalStatusClass}}">{{modalStatusText}}</span>
+    </div>
+
+    <!-- Controls Row -->
+    <div class="sample-controls">
+        <button
+            type="button"
+            class="button-primary"
+            onclick="openStandardModal()"
+        >
+            🪟 Open Standard Dialog
+        </button>
+        <button
+            type="button"
+            class="button-secondary"
+            onclick="openProjectedModal()"
+        >
+            📦 Open Projected Content
+        </button>
+        <button
+            type="button"
+            class="button-secondary"
+            onclick="openMaximizedModal()"
+        >
+            🗖 Open Maximized Dialog
+        </button>
+    </div>
+
+    <!-- Standard Modal Dialog -->
+    <modal-view id="sample-standard-modal">
+        <div class="standard-modal-content">
+            <h4>⚡ Standard Purity Modal</h4>
+            <p>This modal is managed completely via Purity signals with smooth GNOME 50 cubic-bezier animations, ESC key listeners, and backdrop click dismissal.</p>
+            <div class="feature-bullets">
+                <span class="feature-tag">✔ Signal-driven isOpen &amp; isMaximized</span>
+                <span class="feature-tag">✔ GNOME 50 Obsidian Glassmorphism</span>
+                <span class="feature-tag">✔ Focus trap &amp; viewport auto-centering</span>
+            </div>
+        </div>
+    </modal-view>
+
+    <!-- Custom Projected Modal Dialog -->
+    <modal-view id="sample-projected-modal">
+        <div class="custom-projected-content">
+            <h4>📦 Custom Projected Component &amp; Slot</h4>
+            <p>This rich template and child component were passed directly into the <code>&lt;modal-view&gt;</code> body via <code>&lt;slot&gt;</code> content projection!</p>
+            <div class="nested-component-box">
+                <custom-component id="modal-nested-custom" name="modalNested"></custom-component>
+            </div>
+        </div>
+    </modal-view>
+</div>

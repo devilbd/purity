@@ -1,0 +1,119 @@
+@use '@styles' as *;
+
+.sample-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: var(--radius-card, 12px);
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-surface);
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0;
+}
+
+.sample-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.sample-title-area {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    .sample-icon {
+        font-size: 24px;
+        line-height: 1.2;
+    }
+
+    .sample-title {
+        margin: 0 0 6px 0;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: var(--text-main);
+
+        code {
+            font-size: 0.9em;
+            color: var(--accent);
+            background: var(--accent-subtle);
+            padding: 2px 6px;
+            border-radius: var(--radius-control, 6px);
+        }
+    }
+
+    .sample-description {
+        margin: 0;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        line-height: 1.5;
+        max-width: 780px;
+
+        code {
+            color: var(--accent);
+            background: var(--accent-subtle);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+    }
+}
+
+.sample-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding-top: 4px;
+}
+
+.standard-modal-content,
+.custom-projected-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--accent);
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.92rem;
+        line-height: 1.5;
+        color: var(--text-main);
+    }
+}
+
+.feature-bullets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 6px;
+
+    .feature-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 10px;
+        border-radius: var(--radius-pill, 999px);
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border);
+        color: var(--text-main);
+    }
+}
+
+.nested-component-box {
+    margin-top: 8px;
+    padding: 12px;
+    background: var(--gnome-subtle);
+    border: 1px dashed var(--gnome-border);
+    border-radius: var(--radius-card, 12px);
+}
