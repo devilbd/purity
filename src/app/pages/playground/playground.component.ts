@@ -56,8 +56,8 @@ export interface CodePreset {
 export const PLAYGROUND_PRESETS: CodePreset[] = [
     {
         id: 'loader-async',
-        name: '⏳ Async Loader & ViewChild',
-        description: 'Using <loader-component> with @ViewChild and async actions.',
+        name: '⏳ Dynamic Components & Loader',
+        description: 'Multi-component architecture, dynamic sub-components, and <loader-component>.',
         ts: `import { Component, signal, effect, ViewChild } from '@purity/core';
 import type { LoaderComponent } from '@components/loader/loader.component';
 
@@ -68,6 +68,9 @@ import type { LoaderComponent } from '@components/loader/loader.component';
 export class PlaygroundDemoComponent {
     @ViewChild('#loader')
     private loader?: LoaderComponent | null;
+
+    @ViewChild('#test-demo-component')
+    private testDemoComponent?: TestDemoComponent | null;
 
     selectedUser = signal('');
     users = signal([
@@ -83,12 +86,21 @@ export class PlaygroundDemoComponent {
             this.selectedUser.set(user);
         }, 1200);
     }
-}`,
+}
+
+@Component({
+    selector: 'test-demo-component',
+    template: '<div class="test-badge">✨ Dynamic Sub-Component Active</div>',
+})
+export class TestDemoComponent {}`,
         html: `<div class="user-select-card window">
     <h3>👤 Select User Profile</h3>
     
     <!-- Purity UI Loader Component -->
     <loader-component id="loader"></loader-component>
+
+    <!-- Dynamic Sub-Component Defined in TypeScript Tab -->
+    <test-demo-component id="test-demo-component"></test-demo-component>
 
     <div class="user-list">
         <div for="let user of users" class="user-item">
@@ -119,6 +131,18 @@ export class PlaygroundDemoComponent {
 
     h3 {
         margin: 0;
+        color: #82aaff;
+    }
+
+    .test-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 12px;
+        background: rgba(130, 170, 255, 0.15);
+        border: 1px dashed rgba(130, 170, 255, 0.4);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
         color: #82aaff;
     }
 
@@ -757,20 +781,43 @@ export class PlaygroundComponent {
 
             // Generate unique selector per compilation to prevent Custom Elements duplicate definition conflict
             const uniqueSelector = `playground-demo-${++this.compilationCount}`;
-            let className = 'PlaygroundDemoComponent';
 
-            const compMatch = cleanJs.match(
-                /@Component(?:\s*\(\s*(?:\{[\s\S]*?\}|['"][^'"]+['"]|\(\s*\))?\s*\))?\s*(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/,
+            // Find all @Component classes in user code
+            const allComponentMatches = Array.from(
+                cleanJs.matchAll(
+                    /@Component(?:\s*\(\s*([\s\S]*?)\s*\))?\s*(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/g,
+                ),
             );
-            if (compMatch) {
-                className = compMatch[1];
-                cleanJs = cleanJs.replace(compMatch[0], `class ${className}`);
+
+            let rootClassName = 'PlaygroundDemoComponent';
+            if (allComponentMatches.length > 0) {
+                const namedRoot = allComponentMatches.find((m) => m[2] === 'PlaygroundDemoComponent');
+                const templateRoot = allComponentMatches.find(
+                    (m) => m[1] && (m[1].includes('template.html') || m[1].includes('templateUrl') || m[1].includes('htmlTemplate')),
+                );
+                rootClassName = namedRoot ? namedRoot[2] : (templateRoot ? templateRoot[2] : allComponentMatches[0][2]);
             } else {
                 const classMatches = Array.from(cleanJs.matchAll(/(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/g));
                 if (classMatches.length > 0) {
-                    className = classMatches[classMatches.length - 1][1];
+                    rootClassName = classMatches[0][1];
                 }
             }
+
+            // Transform all sub-components into __purity.Component(...) registrations
+            cleanJs = cleanJs.replace(
+                /@Component(?:\s*\(\s*([\s\S]*?)\s*\))?\s*(?:export\s+(?:default\s+)?)?class\s+([A-Za-z0-9_$]+)/g,
+                (_, args, cls) => {
+                    if (cls === rootClassName) {
+                        return `class ${cls}`;
+                    }
+                    if (args && args.trim()) {
+                        postStatements.push(`__purity.Component(${args.trim()})(${cls});`);
+                    } else {
+                        postStatements.push(`__purity.Component()(${cls});`);
+                    }
+                    return `class ${cls}`;
+                },
+            );
 
             // Transform @ViewChild / @ChildView inside classes
             const classTransform = transformAllClasses(cleanJs);
@@ -830,9 +877,9 @@ export class PlaygroundComponent {
                     selector: '${uniqueSelector}',
                     template: ${JSON.stringify(htmlContent)}
                 });
-                compDecorator(${className});
+                compDecorator(${rootClassName});
 
-                return ${className};
+                return ${rootClassName};
             `;
 
             const execFn = new Function('__purity', execCode);

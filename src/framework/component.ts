@@ -586,6 +586,25 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
                 ? toKebabCase(context.name.replace(/Component$/, ''))
                 : toKebabCase(target.name.replace(/Component$/, '')));
 
+        // If Custom Element tag is already defined in the browser registry (e.g. playground re-evaluation / HMR),
+        // update its active target constructor, template, and prototype descriptors dynamically.
+        if (typeof customElements !== 'undefined' && selector && customElements.get(selector)) {
+            const existing = customElements.get(selector) as any;
+            existing.__target = target;
+            existing.__options = options;
+            if (options.template) (existing.prototype as any).template = options.template;
+            if (options.templateUrl) (existing.prototype as any).templateUrl = options.templateUrl;
+
+            const descriptors = Object.getOwnPropertyDescriptors(target.prototype);
+            for (const [key, desc] of Object.entries(descriptors)) {
+                if (key !== 'constructor') {
+                    Object.defineProperty(existing.prototype, key, desc);
+                }
+            }
+            attachComponentLifecycle(existing.prototype, options);
+            return existing;
+        }
+
         let CustomElementClass: CustomElementConstructor;
 
         if (target.prototype instanceof HTMLElement) {
@@ -605,7 +624,8 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
                 constructor() {
                     super();
 
-                    const userInstance = new (target as any)();
+                    const activeTarget = (this.constructor as any).__target || target;
+                    const userInstance = new (activeTarget as any)();
 
                     const frameworkProtectedMethods = new Set([
                         'render',
@@ -655,6 +675,9 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
             if (options.template && !(ComponentElement.prototype as any).template) {
                 (ComponentElement.prototype as any).template = options.template;
             }
+
+            (ComponentElement as any).__target = target;
+            (ComponentElement as any).__options = options;
 
             attachComponentLifecycle(ComponentElement.prototype, options);
             CustomElementClass = ComponentElement;
