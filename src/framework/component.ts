@@ -366,8 +366,13 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         if (el.closest('[data-no-bind]')) continue;
         if (el !== rootEl && isInsideNestedComponent(el, rootEl)) continue;
         for (const attr of Array.from(el.attributes)) {
-            const attrName = attr.name;
+            let attrName = attr.name;
             const rawValue = attr.value;
+
+            if (attrName === 'data-purity-val') {
+                attrName = 'value';
+                el.removeAttribute('data-purity-val');
+            }
 
             // Bind event handlers (onclick, oninput, onchange, etc.) to component/item context
             if (attrName.startsWith('on')) {
@@ -458,6 +463,21 @@ function safeQuerySelector(host: any, selector: string): any {
 }
 
 /**
+ * Sanitizes template HTML to prevent browser HTML parser warnings on strict input types
+ * (e.g. type="number", type="range", type="date") before Handlebars expressions are bound.
+ */
+function sanitizeStrictInputAttributes(html: string): string {
+    return html.replace(/<input\b([^>]*?)>/gi, (fullTag, attrs) => {
+        const isStrictType = /\btype=["'](?:number|range|date|time|month|week|datetime-local)["']/i.test(attrs);
+        if (isStrictType && /\bvalue=["']\{\{[\s\S]*?\}\}["']/i.test(attrs)) {
+            const transformedAttrs = attrs.replace(/\bvalue=(["']\{\{[\s\S]*?\}\}["'])/i, 'data-purity-val=$1');
+            return `<input${transformedAttrs}>`;
+        }
+        return fullTag;
+    });
+}
+
+/**
  * Attaches standard Purity component lifecycle methods, template loader, and bindings to a prototype.
  */
 function attachComponentLifecycle(proto: any, options: ComponentOptions) {
@@ -514,7 +534,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
                     },
                 );
             }
-            this.innerHTML = templateToRender;
+            this.innerHTML = sanitizeStrictInputAttributes(templateToRender);
         }
 
         // Ensure child view getters are bound
@@ -548,7 +568,7 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
 
     proto.render = function (this: any, content?: string) {
         if (content !== undefined && content !== null) {
-            this.innerHTML = content;
+            this.innerHTML = sanitizeStrictInputAttributes(content);
             this.bindTemplate?.();
         }
     };
