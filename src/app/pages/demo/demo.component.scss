@@ -1,5 +1,40 @@
 @use '@styles' as *;
 
+.demo-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg, 16px);
+    padding: 24px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--radius-window, 16px);
+
+    > * {
+        margin: 0;
+    }
+
+    custom-component,
+    raw-template,
+    forms-validation,
+    directive-sample,
+    pipe-sample,
+    for-sample,
+    date-time-picker-sample,
+    analogue-clock-sample,
+    radial-context-menu-sample,
+    http-sample,
+    notification-sample,
+    modal-view {
+        display: block;
+        margin: 0;
+
+        > .window {
+            margin: 0;
+        }
+    }
+}
+
 #droppable-container {
     background: var(--gnome-surface);
     backdrop-filter: var(--blur-effect);
@@ -9,7 +44,7 @@
     box-shadow: var(--shadow-deep);
     color: var(--text-main);
     font-family: var(--font-main);
-    margin: var(--spacing-lg);
+    margin: 0;
     padding: 20px;
     transition: background-color var(--transition-normal) ease, border-color var(--transition-normal) ease;
 }

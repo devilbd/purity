@@ -1,8 +1,11 @@
 @use '@styles' as *;
 
 .intro-component-root {
-    margin-bottom: var(--spacing-lg, 12px);
+    margin: 0;
     padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--radius-window, 16px);
 }
 
 .intro-header {

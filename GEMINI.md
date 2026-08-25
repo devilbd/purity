@@ -433,7 +433,25 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
    - Never initialize event listener closures in class field initializers.
 
-6. **TypeScript Configuration**:
+6. **Layout, Spacing & Sizing Standards**:
+   To maintain visual rhythm, consistent sizing, and pixel-perfect alignment across all current and future views, components, widgets, and sections:
+   - **Page Container Width**: `.app-component-root` is constrained to `max-width: var(--header-max-width, 1366px); margin: 0 auto; width: 100%; box-sizing: border-box;`.
+   - **Top-Level Section Spacing**: The root container uses `display: flex; flex-direction: column; gap: var(--spacing-lg, 16px);`.
+   - **Top-Level Custom Elements**: All page-level custom elements (`<header-component>`, `<intro-component>`, `<playground-view>`, `<demo-component>`, `<footer-component>`) must be `display: block; width: 100%; margin: 0; box-sizing: border-box;`. Their internal `.window` or root wrappers must have `margin: 0; width: 100%;` so vertical spacing is governed exclusively by the parent flex `gap`.
+   - **Top-Level Window Padding & Border Radii**:
+     - Content Views (`intro`, `demo`, `playground`): `padding: 24px; border-radius: var(--radius-window, 16px);`.
+     - Navigation & Status Bars (`header`, `footer`): `padding: 18px 24px; border-radius: var(--radius-window, 16px);`.
+   - **Sub-Section Cards & Sample Showcases**:
+     - Container: `display: flex; flex-direction: column; gap: var(--spacing-lg, 16px);` (or CSS grid with `gap: 16px`).
+     - Sub-Card Outer Margins: `margin: 0;` (never use ad-hoc `margin-top` / `margin-bottom` on individual cards).
+     - Sub-Card Padding: `padding: 18px 20px;` (or `padding: 16px 18px;`).
+     - Sub-Card Border Radius: `border-radius: var(--radius-window, 12px);` or `border-radius: var(--radius-card, 12px);`.
+   - **Controls & Micro-Elements**:
+     - Buttons & Inputs: `border-radius: var(--radius-control, 8px); padding: 10px 16px;`.
+     - Pills & Badges: `border-radius: var(--radius-pill, 999px); padding: 2px 7px;` (or `3px 10px;`).
+     - Control Groups / Toolbars: `display: flex; gap: 8px` to `12px; align-items: center;`.
+
+7. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
 
 ---

@@ -1,9 +1,35 @@
 @use '@styles' as *;
 
-playground-view {
+.app-component-root {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg, 16px);
+    width: 100%;
+    max-width: var(--header-max-width, 1366px);
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+header-component,
+intro-component,
+playground-view,
+demo-component,
+footer-component {
     display: block;
     width: 100%;
     box-sizing: border-box;
+    margin: 0;
+
+    > .window,
+    > .playground-container,
+    > .header-component-root,
+    > .intro-component-root,
+    > .demo-container,
+    > .footer-component-root {
+        margin: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
 
 demo-component {

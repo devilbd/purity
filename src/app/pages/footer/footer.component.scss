@@ -2,9 +2,11 @@
 
 .footer-component-root {
     position: relative;
-    padding: 14px 24px;
-    margin-top: var(--spacing-xl, 24px);
-    margin-bottom: var(--spacing-xl, 24px);
+    padding: 18px 24px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--radius-window, 16px);
 }
 
 .footer-content {

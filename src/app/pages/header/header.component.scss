@@ -3,6 +3,10 @@
 .header-component-root {
     position: relative;
     padding: 18px 24px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: var(--radius-window, 16px);
 }
 
 .header-content {

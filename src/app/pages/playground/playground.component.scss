@@ -26,14 +26,14 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    width: auto;
+    width: 100%;
     max-width: 100%;
     min-height: calc(100vh - 40px);
-    margin: var(--spacing-lg, 10px) !important;
+    margin: 0 !important;
     padding: 0 !important;
     background: var(--pn-bg);
     border: 1px solid rgba(130, 170, 255, 0.18);
-    border-radius: var(--radius-window, 12px);
+    border-radius: var(--radius-window, 16px);
     overflow: hidden;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
     font-family: var(--font-main, sans-serif);
