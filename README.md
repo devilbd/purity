@@ -103,6 +103,7 @@ purity/
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
+    │   ├── router.ts            # Signal Router, <router-layout>, routerLink directive, and route guards
     │   └── common.ts            # Shared framework exports
     ├── environments/            # Build configuration & environment profiles
     │   ├── environment.interface.ts # Environment configuration contract
@@ -117,7 +118,7 @@ purity/
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
         ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
@@ -440,9 +441,67 @@ const dragCleanup = drag({
 
 ---
 
-### 9. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
+### 9. 🗺️ Signal Router & Layout Engine (`router.ts`, `<router-layout>`, `routerLink`)
 
-Purity provides a clean `bootstrapApplication()` initialization API that binds environment profiles, registers custom service providers, and mounts root Web Components:
+Purity includes a built-in, type-safe, signal-driven routing engine:
+
+* **Dynamic Parameters & Wildcards**: Full support for parameterized routes (`/users/:id`), wildcards (`/docs/*`), and catch-alls (`**`).
+* **`<router-layout>` Component**: Dynamic container that mounts matching component views instantaneously upon route changes.
+* **`routerLink` Directive**: Declarative navigation links (`<button routerLink="/users/alice">` or `<a routerLink="/">`) with automatic active state styling (`.active-link`, `.active-route`).
+* **Fine-Grained Reactive Signals**: `Router.url()`, `Router.path()`, `Router.params()`, and `Router.queryParams()` update synchronously with zero full-page reloads.
+* **Guards & Lifecycle Hooks**: Route-level `canActivate` protection pipelines and document `title` resolution.
+
+#### Example Usage:
+
+```typescript
+import { Component, signal, effect, inject, Router, type Route } from '@purity/core';
+
+// 1. Define Sub-view Components
+@Component({
+    selector: 'user-view',
+    template: `
+        <div class="user-card">
+            <h4>👤 Profile: {{userId()}}</h4>
+            <p>Active parameter extracted from <code>/users/:id</code></p>
+        </div>
+    `
+})
+export class UserViewComponent {
+    private router = inject(Router);
+    userId = signal('anonymous');
+
+    protected onInit() {
+        effect(() => {
+            this.userId.set(this.router.params().id || 'anonymous');
+        });
+    }
+}
+
+// 2. Configure Route Table
+export const appRoutes: Route[] = [
+    { path: '/', component: HomeViewComponent, title: 'Home' },
+    { path: '/users/:id', component: UserViewComponent, title: (p) => `User ${p.id}` },
+];
+```
+
+```html
+<!-- 3. Navigation Links and Layout Viewport in Component Template -->
+<nav class="nav-bar">
+    <button type="button" routerLink="/">🏠 Home</button>
+    <button type="button" routerLink="/users/alice">👤 Alice</button>
+    <button type="button" routerLink="/users/bob">👤 Bob</button>
+</nav>
+
+<div class="viewport">
+    <router-layout></router-layout>
+</div>
+```
+
+---
+
+### 10. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
+
+Purity provides a clean `bootstrapApplication()` initialization API that binds environment profiles, registers custom service providers and interceptors, configures application routes, and mounts root Web Components:
 
 ```typescript
 import './style.scss';
@@ -452,11 +511,21 @@ import { environment } from '@environments/environment';
 import { ThemeService } from '@data/theme.service';
 import { LoggingInterceptor } from '@interceptors/logging.interceptor';
 import { AuthInterceptor } from '@interceptors/auth.interceptor';
+import { RouterHomeViewComponent } from '@pages/router-sample/home-view.component';
+import { RouterUserViewComponent } from '@pages/router-sample/user-view.component';
 
 bootstrapApplication(AppComponent, {
     environment,
     providers: [ThemeService],
     interceptors: [LoggingInterceptor, AuthInterceptor],
+    routes: [
+        { path: '/', component: RouterHomeViewComponent },
+        { path: '/users/:id', component: RouterUserViewComponent },
+    ],
+    routerOptions: {
+        mode: 'history',
+        scrollRestoration: false,
+    },
 }).catch((err) => {
     console.error('Failed to bootstrap Purity application:', err);
 });
@@ -472,7 +541,7 @@ bootstrapApplication(AppComponent, {
 
 ## 🧩 UI Web Components, Templating & Views
 
-### 10. 🧩 Native Web Components (`@Component` Decorator)
+### 11. 🧩 Native Web Components (`@Component` Decorator)
 
 Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
 
@@ -507,7 +576,7 @@ export class CustomComponent {
 
 ---
 
-### 11. 🔍 Child View & Component Queries (`@ViewChild`)
+### 12. 🔍 Child View & Component Queries (`@ViewChild`)
 
 Use the `@ViewChild()` decorator to query child DOM elements and child components. When the selector is omitted, the framework implicitly infers candidate selectors from the property name in kebab-case (`<my-component>`, `#my-component`, `<my>`, `#my`). An explicit selector is optional and only needed when disambiguating between multiple instances:
 
@@ -542,7 +611,7 @@ export class DemoComponent {
 
 ---
 
-### 12. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
+### 13. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
 Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change. The engine preserves `<pre>` documentation snippets and `[data-no-bind]` blocks while fully binding dynamic expressions inside standalone `<code>` tags:
 
@@ -576,7 +645,7 @@ export class UserCardComponent {
 
 ---
 
-### 13. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+### 14. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
 
 Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
 
@@ -599,7 +668,7 @@ Purity provides native structural loop templates via `for="let item of items"` o
 
 ---
 
-### 14. 📦 Generic Components & Content Projection (`<slot>`)
+### 15. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -625,7 +694,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 15. 🪟 Modal Dialogs (`<modal-view>`)
+### 16. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 
@@ -664,7 +733,7 @@ export class ModalViewComponent {
 
 ---
 
-### 16. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
+### 17. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
 Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
@@ -678,7 +747,7 @@ Purity includes a full-featured, reactive Date & Time Picker custom element styl
 
 ---
 
-### 17. 🎯 Radial Context Menu System (`<radial-context-menu>`)
+### 18. 🎯 Radial Context Menu System (`<radial-context-menu>`)
 
 Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, real-time telemetry state signals, and single-source-of-truth right-click delegation via `setSelector()`:
 
@@ -692,7 +761,7 @@ Purity provides a native circular radial context menu component with glassmorphi
 
 ---
 
-### 18. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
+### 19. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
 
 Purity includes a high-precision 2D Canvas analogue clock widget in `src/app/shared/widgets/analogue-clock/`, designed in GNOME Adwaita Dark and Light aesthetics:
 

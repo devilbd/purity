@@ -355,7 +355,7 @@ Purity includes a built-in, type-safe, signal-driven Routing Engine configured d
 
 * **`<router-layout>` Component & `routerLink` Directive**:
   - `<router-layout></router-layout>`: Layout container dynamically instantiating, mounting, and destroying child view components matching the active route.
-  - `routerLink`: Declarative attribute directive (`<a routerLink="/users/42">` / `<button routerLink="/settings">`) with automated `.active-link` and `.active-route` state class toggling.
+  - `routerLink`: Declarative attribute directive (`<button routerLink="/users/42">` / `<button routerLink="/">`) with automated `.active-link` and `.active-route` state class toggling.
 
 ### 9. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
 
@@ -379,11 +379,17 @@ Purity provides a first-class bootstrapping API that initializes root components
   import { ThemeService } from '@data/theme.service';
   import { LoggingInterceptor } from '@interceptors/logging.interceptor';
   import { AuthInterceptor } from '@interceptors/auth.interceptor';
+  import { RouterHomeViewComponent } from '@pages/router-sample/home-view.component';
+  import { RouterUserViewComponent } from '@pages/router-sample/user-view.component';
 
   bootstrapApplication(AppComponent, {
       environment,
       providers: [FirebaseService, ThemeService],
       interceptors: [LoggingInterceptor, AuthInterceptor],
+      routes: [
+          { path: '/', component: RouterHomeViewComponent },
+          { path: '/users/:id', component: RouterUserViewComponent },
+      ],
   }).then(() => {
       initGoogleAnalytics();
   }).catch((err) => {
@@ -391,7 +397,7 @@ Purity provides a first-class bootstrapping API that initializes root components
   });
   ```
 
-### 9. Internal Telemetry & Deployment Services (`src/data/firebase.ts`)
+### 10. Internal Telemetry & Deployment Services (`src/data/firebase.ts`)
 
 > [!NOTE]
 > Firebase and Google Analytics are used strictly as internal application infrastructure for our deployment and telemetry purposes. They must **never** be exposed in public documentation (`README.md`), user-facing UI showcases, demo pages, or intro components.
