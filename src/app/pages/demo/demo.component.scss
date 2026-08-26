@@ -25,12 +25,16 @@
     radial-context-menu-sample,
     http-sample,
     notification-sample,
-    modal-sample {
+    modal-sample,
+    router-sample {
         display: block;
+        width: 100%;
         margin: 0;
 
         > .window {
             margin: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
     }
 }

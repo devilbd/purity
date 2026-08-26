@@ -93,13 +93,12 @@ navigation-menu {
 /* Glassmorphic Navigation Ball Sphere */
 .nav-ball-orb {
     position: relative;
-    width: 58px;
-    height: 58px;
+    width: 62px;
+    height: 62px;
     padding: 0;
     margin: 0;
     border-radius: 50%;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: radial-gradient(circle at 35% 25%, rgba(53, 132, 228, 0.42), rgba(36, 36, 36, 0.95) 75%);
@@ -138,20 +137,13 @@ navigation-menu {
     }
 
     .orb-icon {
-        font-size: 1.35rem;
+        font-size: 1.95rem;
         line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         filter: drop-shadow(0 2px 6px var(--accent-shadow));
         transition: transform var(--transition-fast) var(--ease-gnome);
-        z-index: 1;
-    }
-
-    .orb-label {
-        font-size: 8.5px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        color: #ffffff;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-        margin-top: 1px;
         z-index: 1;
     }
 
@@ -224,11 +216,6 @@ navigation-menu {
 
         .orb-shine {
             background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 80%, transparent);
-        }
-
-        .orb-label {
-            color: #1c1c1c;
-            text-shadow: none;
         }
 
         &:hover {
