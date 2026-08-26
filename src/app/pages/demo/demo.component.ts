@@ -18,6 +18,7 @@ import '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import '@pages/http-sample/http-sample.component';
 import '@pages/notification-sample/notification-sample.component';
 import '@pages/modal-sample/modal-sample.component';
+import '@pages/router-sample/router-sample.component';
 import '@components/modal/modal-view.component';
 import '@components/date-time-picker/date-time-picker.component';
 import '@components/loader/loader.component';
@@ -38,6 +39,7 @@ import type { DateTimePickerSampleComponent } from '@pages/date-time-picker-samp
 import type { AnalogueClockSampleComponent } from '@pages/analogue-clock-sample/analogue-clock-sample.component';
 import type { RadialContextMenuSampleComponent } from '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
 import type { NotificationSampleComponent } from '@pages/notification-sample/notification-sample.component';
+import type { RouterSampleComponent } from '@pages/router-sample/router-sample.component';
 import { drag } from '@behaviors/draggable/draggable';
 import { droppable } from '@behaviors/droppable/droppable';
 
@@ -87,6 +89,9 @@ export class DemoComponent {
 
     @ViewChild('#analogue-clock-sample')
     analogueClockSample?: AnalogueClockSampleComponent | null;
+
+    @ViewChild('#router-sample')
+    routerSample?: RouterSampleComponent | null;
 
     private dragCleanup?: { destroy: () => void };
     private dropCleanup?: { destroy: () => void };

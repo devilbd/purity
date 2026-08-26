@@ -497,6 +497,203 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+    {
+        id: 'routing',
+        name: '🗺️ Signal Router & Layout',
+        description: 'Client-side routing with <router-layout>, dynamic parameters (:id), and reactive state.',
+        ts: `import { Component, signal, effect, inject, Router, type Route } from '@purity/core';
+
+@Component({
+    selector: 'home-view',
+    template: \`
+        <div class="view-card home-card">
+            <h4>🏠 Dashboard Home</h4>
+            <p>Instant client-side subview transitions with fine-grained reactivity.</p>
+            <div class="pill-badge">Reactivity: Synchronous Signals</div>
+        </div>
+    \`
+})
+export class HomeViewComponent {}
+
+@Component({
+    selector: 'user-view',
+    template: \`
+        <div class="view-card user-card">
+            <h4>👤 User Profile: <code>{{userId()}}</code></h4>
+            <p>Dynamic token extracted reactively from <code>/users/:id</code></p>
+            <div class="pill-badge">Parameter: {{userId()}}</div>
+        </div>
+    \`
+})
+export class UserViewComponent {
+    private router = inject(Router);
+    userId = signal('anonymous');
+
+    protected onInit() {
+        effect(() => {
+            this.userId.set(this.router.params().id || 'anonymous');
+        });
+    }
+}
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    public router = inject(Router);
+
+    private routes: Route[] = [
+        { path: '/', component: HomeViewComponent },
+        { path: '/users/:id', component: UserViewComponent },
+    ];
+
+    protected onInit() {
+        this.router.configureRoutes(this.routes, { mode: 'memory', initialUrl: '/' });
+    }
+
+    goTo(path: string) {
+        this.router.navigateByUrl(path);
+    }
+}`,
+        html: `<div class="router-playground-demo window">
+    <div class="demo-header">
+        <h3>🗺️ Signal Router &amp; Layout</h3>
+        <span class="url-chip"><code>{{router.url()}}</code></span>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-toolbar">
+        <button type="button" class="nav-btn {{router.path() === '/' ? 'active' : ''}}" onclick="goTo('/')">
+            🏠 Home
+        </button>
+        <button type="button" class="nav-btn {{router.path() === '/users/alice' ? 'active' : ''}}" onclick="goTo('/users/alice')">
+            👤 Alice
+        </button>
+        <button type="button" class="nav-btn {{router.path() === '/users/bob' ? 'active' : ''}}" onclick="goTo('/users/bob')">
+            👤 Bob
+        </button>
+    </div>
+
+    <!-- The Router Layout Viewport -->
+    <div class="layout-viewport">
+        <router-layout></router-layout>
+    </div>
+
+    <!-- Live Signal Readout -->
+    <div class="signal-inspector-bar">
+        <span>Active Path: <code>{{router.path()}}</code></span>
+    </div>
+</div>`,
+        scss: `.router-playground-demo {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #232635;
+    border: 1px solid rgba(130, 170, 255, 0.2);
+    border-radius: 12px;
+    color: #eeffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+    .demo-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+
+        h3 {
+            margin: 0;
+            color: #82aaff;
+            font-size: 18px;
+        }
+
+        .url-chip {
+            padding: 4px 10px;
+            background: #1b1e2b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            code { color: #c3e88d; font-weight: 600; }
+        }
+    }
+
+    .nav-toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .nav-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #1b1e2b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #eeffff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: #292d3e;
+                border-color: rgba(130, 170, 255, 0.4);
+            }
+
+            &.active {
+                background: #82aaff;
+                color: #1b1e2b;
+                font-weight: 700;
+                border-color: #82aaff;
+            }
+        }
+    }
+
+    .layout-viewport {
+        padding: 16px;
+        background: #1b1e2b;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        min-height: 110px;
+
+        .view-card {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            h4 {
+                margin: 0;
+                color: #c3e88d;
+                font-size: 15px;
+                code { color: #ffcb6b; }
+            }
+
+            p {
+                margin: 0;
+                font-size: 13px;
+                color: #a6accd;
+                code { color: #82aaff; }
+            }
+
+            .pill-badge {
+                align-self: flex-start;
+                padding: 3px 8px;
+                background: rgba(195, 232, 141, 0.15);
+                border: 1px solid rgba(195, 232, 141, 0.3);
+                color: #c3e88d;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: 600;
+            }
+        }
+    }
+
+    .signal-inspector-bar {
+        font-size: 12px;
+        color: #a6accd;
+        code { color: #ffcb6b; }
+    }
+}`,
+    },
 ];
 
 /**

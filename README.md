@@ -42,6 +42,7 @@
 - ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
 - 🎮 **Interactive Live Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation, Hot Reload, dynamic multi-component execution, and persistent `localStorage` snippet history ("Save written...").
 - 🧭 **Draggable Floating Navigation Menu (`<navigation-menu>`)**: Floating draggable orb with GNOME 50 glassmorphic styling, hover drag handle, and integrated radial context menu for app-wide section and subsection navigation.
+- 🗺️ **Signal Router & Layout Engine (`router.ts`, `<router-layout>`)**: Native type-safe routing engine supporting dynamic parameters (`:id`), query strings (`?tab=...`), route guards (`canActivate`), programmatic navigation (`Router.navigate`), `<router-layout>` subview host, and `routerLink` directive with automated `.active-link` state management.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
 

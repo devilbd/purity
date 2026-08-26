@@ -656,6 +656,8 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
             const existing = customElements.get(selector) as any;
             existing.__target = target;
             existing.__options = options;
+            existing.selector = selector;
+            (target as any).selector = selector;
             if (options.template) (existing.prototype as any).template = options.template;
             if (options.templateUrl) (existing.prototype as any).templateUrl = options.templateUrl;
 
@@ -742,10 +744,15 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
 
             (ComponentElement as any).__target = target;
             (ComponentElement as any).__options = options;
+            (ComponentElement as any).selector = selector;
+            (target as any).selector = selector;
 
             attachComponentLifecycle(ComponentElement.prototype, options);
             CustomElementClass = ComponentElement;
         }
+
+        (CustomElementClass as any).selector = selector;
+        (target as any).selector = selector;
 
         if (selector) {
             defineComponent(selector, CustomElementClass);

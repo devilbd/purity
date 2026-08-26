@@ -1034,6 +1034,55 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
     <span class="cmt">// appRef.destroy() available for complete application teardown</span>
 });</code></pre>
         </div>
+
+        <!-- 25. Signal Routing & Layout Engine -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>25. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
+                    <p>Fine-grained reactive routing, dynamic parameter tokens (<code>/users/:id</code>), automatic lifecycle mounting via <code>&lt;router-layout&gt;</code>, and declarative <code>routerLink</code> directive:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('router')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">bootstrapApplication</span>, <span class="fn">Component</span>, <span class="fn">inject</span>, <span class="typ">Router</span>, <span class="kw">type</span> <span class="typ">Route</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+
+<span class="cmt">// 1. Declare Route Table</span>
+<span class="kw">const</span> routes: <span class="typ">Route</span>[] = [
+    { path: <span class="str">'/'</span>, component: <span class="typ">HomeComponent</span>, title: <span class="str">'Home'</span> },
+    { path: <span class="str">'/users/:id'</span>, component: <span class="typ">UserComponent</span>, title: (p) =&gt; <span class="str">`User ${p.id}`</span> },
+];
+
+<span class="cmt">// 2. Bootstrap application with routes</span>
+<span class="fn">bootstrapApplication</span>(<span class="typ">AppComponent</span>, { routes });
+
+<span class="cmt">&lt;!-- 3. App Template: Layout container &amp; routerLink directive --&gt;</span>
+<span class="tag">&lt;nav&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">routerLink</span>=<span class="str">"/"</span><span class="tag">&gt;</span>Home<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">routerLink</span>=<span class="str">"/users/alice"</span><span class="tag">&gt;</span>Alice<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">routerLink</span>=<span class="str">"/users/bob"</span><span class="tag">&gt;</span>Bob<span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/nav&gt;</span>
+
+<span class="cmt">&lt;!-- Dynamic route component renders inside &lt;router-layout&gt; --&gt;</span>
+<span class="tag">&lt;router-layout&gt;&lt;/router-layout&gt;</span>
+
+<span class="cmt">// 4. Programmatic Navigation &amp; Signal State</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'user-view'</span> })
+<span class="kw">export class</span> <span class="typ">UserComponent</span> {
+    <span class="kw">private</span> router = <span class="fn">inject</span>(<span class="typ">Router</span>);
+
+    <span class="fn">onNavigate</span>() {
+        <span class="kw">this</span>.router.<span class="fn">navigate</span>(<span class="str">'/users/bob'</span>);
+        console.<span class="fn">log</span>(<span class="str">'Active params:'</span>, <span class="kw">this</span>.router.params()); <span class="cmt">// { id: "bob" }</span>
+    }
+}</code></pre>
+        </div>
     </div>
 
     <!-- Bottom CTA Button -->

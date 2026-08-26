@@ -1,5 +1,6 @@
 import { container, type Token, type Constructor } from './di';
 import { HttpClient, type HttpInterceptor, type HttpInterceptorFn } from './http';
+import { Router, type Route, type RouterOptions } from './router';
 
 export interface EnvironmentConfig {
     production: boolean;
@@ -18,6 +19,8 @@ export interface BootstrapOptions {
     environment?: EnvironmentConfig;
     providers?: Provider[];
     interceptors?: Array<HttpInterceptor | (new (...args: any[]) => HttpInterceptor) | HttpInterceptorFn>;
+    routes?: Route[];
+    routerOptions?: RouterOptions;
     rootSelector?: string;
 }
 
@@ -98,7 +101,13 @@ export async function bootstrapApplication(
         }
     }
 
-    // 5. Resolve or find root element in DOM
+    // 5. Initialize Router if routes are configured in bootstrap options
+    if (options.routes && Array.isArray(options.routes)) {
+        const router = container.resolve<Router>(Router);
+        router.configureRoutes(options.routes, options.routerOptions);
+    }
+
+    // 6. Resolve or find root element in DOM
     const rootSelector =
         options.rootSelector ||
         (rootComponent.selector ? rootComponent.selector : null);

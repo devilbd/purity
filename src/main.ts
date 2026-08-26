@@ -7,11 +7,21 @@ import { ThemeService } from '@data/theme.service';
 import { NotifyService } from '@data/notify.service';
 import { LoggingInterceptor } from '@interceptors/logging.interceptor';
 import { AuthInterceptor } from '@interceptors/auth.interceptor';
+import { RouterHomeViewComponent } from '@pages/router-sample/home-view.component';
+import { RouterUserViewComponent } from '@pages/router-sample/user-view.component';
 
 bootstrapApplication(AppComponent, {
     environment,
     providers: [FirebaseService, ThemeService, NotifyService],
     interceptors: [LoggingInterceptor, AuthInterceptor],
+    routes: [
+        { path: '/', component: RouterHomeViewComponent },
+        { path: '/users/:id', component: RouterUserViewComponent },
+    ],
+    routerOptions: {
+        mode: 'history',
+        scrollRestoration: false,
+    },
 }).then(() => {
     initGoogleAnalytics();
 }).catch((err) => {

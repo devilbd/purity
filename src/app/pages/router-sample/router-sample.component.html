@@ -1,0 +1,120 @@
+<div class="window router-sample-root">
+    <!-- Sample Header & Description -->
+    <div class="sample-header">
+        <h4>🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>)</h4>
+        <span class="badge-pill">Routing Engine + Signals</span>
+    </div>
+    <p class="sample-desc">
+        Demonstrating Purity's native signal-based Routing Engine with dynamic parameters (<code>/users/:id</code>), automatic subview lifecycle mounting via <code>&lt;router-layout&gt;</code>, live signal telemetry, and GNOME 50 Headerbar layout:
+    </p>
+
+    <!-- Showcase Navigation Bar -->
+    <div class="router-demo-navbar">
+        <div class="nav-links-group">
+            <button
+                type="button"
+                routerLink="/"
+                class="nav-tab-btn {{router.path() === '/' ? 'active' : ''}}"
+                onclick="onNavigate('/')"
+            >
+                🏠 Home
+            </button>
+            <button
+                type="button"
+                routerLink="/users/alice"
+                class="nav-tab-btn {{router.path() === '/users/alice' ? 'active' : ''}}"
+                onclick="onNavigate('/users/alice')"
+            >
+                👤 Alice (<code>:id</code>)
+            </button>
+            <button
+                type="button"
+                routerLink="/users/bob"
+                class="nav-tab-btn {{router.path() === '/users/bob' ? 'active' : ''}}"
+                onclick="onNavigate('/users/bob')"
+            >
+                👤 Bob (<code>:id</code>)
+            </button>
+        </div>
+    </div>
+
+    <!-- Parameter Navigation Box -->
+    <div class="custom-route-toolbar">
+        <div class="custom-user-form">
+            <label class="toolbar-label">Navigate dynamic <code>/users/:id</code> parameter:</label>
+            <div class="input-with-button">
+                <input
+                    type="text"
+                    class="input-primary"
+                    placeholder="Enter user id (e.g. charlie, david, emily)..."
+                    value="{{customUserId()}}"
+                    oninput="onCustomUserIdInput(this)"
+                />
+                <button
+                    type="button"
+                    class="button-primary load-user-btn"
+                    onclick="onCustomUserNavigate()"
+                >
+                    🚀 Go to /users/{{customUserId()}}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Router Layout Container with strict GNOME 50 Headerbar -->
+    <div class="router-layout-wrapper window">
+        <div class="gnome-headerbar">
+            <div class="headerbar-left">
+                <span class="gnome-app-icon">🗺️</span>
+                <span class="gnome-header-title">Purity Route Viewport</span>
+            </div>
+            <div class="headerbar-center">
+                <div class="gnome-address-chip">
+                    <span class="chip-status-dot"></span>
+                    <span class="chip-scheme">purity://</span>
+                    <span class="chip-path">{{activeUrl()}}</span>
+                </div>
+            </div>
+            <div class="headerbar-right">
+                <button
+                    type="button"
+                    class="gnome-header-btn"
+                    title="Reload current route"
+                    onclick="onRefreshRoute()"
+                >
+                    🔄
+                </button>
+            </div>
+        </div>
+
+        <div class="layout-viewport">
+            <router-layout></router-layout>
+        </div>
+    </div>
+
+    <!-- Reactive Signal Inspector -->
+    <div class="router-inspector">
+        <div class="inspector-header">
+            <span class="inspector-title">⚡ Live Router Signal Inspector</span>
+            <span class="inspector-badge">Fine-Grained Signals</span>
+        </div>
+        <div class="inspector-grid">
+            <div class="inspector-card">
+                <span class="inspector-key">router.url()</span>
+                <code class="inspector-value">{{activeUrl()}}</code>
+            </div>
+            <div class="inspector-card">
+                <span class="inspector-key">router.path()</span>
+                <code class="inspector-value">{{router.path()}}</code>
+            </div>
+            <div class="inspector-card">
+                <span class="inspector-key">router.params()</span>
+                <code class="inspector-value">{{activeParamsJson()}}</code>
+            </div>
+            <div class="inspector-card">
+                <span class="inspector-key">router.queryParams()</span>
+                <code class="inspector-value">{{activeQueryParamsJson()}}</code>
+            </div>
+        </div>
+    </div>
+</div>

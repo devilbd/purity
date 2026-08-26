@@ -51,6 +51,7 @@ purity/
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
+    │   ├── router.ts            # Signal Router, <router-layout>, routerLink directive, and route guards
     │   └── common.ts            # Shared framework exports
     ├── environments/            # Build configuration & environment profiles
     │   ├── environment.interface.ts # Environment configuration contract
@@ -82,6 +83,7 @@ purity/
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> in-browser live editor, compiler & localStorage history (GNOME 50 / Palenight)
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
+        │   ├── router-sample/   # <router-sample> interactive router showcase with <router-layout> and signal inspector
         │   └── raw-template/    # <raw-template> dynamic inline template rendering
         └── shared/
             ├── behaviors/       # Composable DOM behaviors
@@ -331,14 +333,39 @@ Form Validators decouple validation rules and CSS class application from UI comp
   - **`validate[FieldName](value, element)`**: Validation method defined on the class for each field.
   - **`validateAll()`**: Method automatically provided to trigger validation across all configured fields.
 
-### 8. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
+### 8. Signal Router & Layout Engine (`router.ts`)
 
-Purity provides a first-class bootstrapping API that initializes root components, binds environment configurations into DI, registers custom providers and interceptors, automatically synchronizes themes, and manages application lifecycles:
+Purity includes a built-in, type-safe, signal-driven Routing Engine configured during application bootstrap:
+
+* **`Route` Definitions**:
+  - `path`: Pattern string (e.g. `'/'`, `'dashboard'`, `'users/:id'`, `'settings/*'`, `'**'`).
+  - `component`: Component class constructor or custom element tag string.
+  - `redirectTo?: string`: Automated path redirect.
+  - `title?: string | ((params) => string)`: Automatic document title resolution.
+  - `canActivate?: Array<CanActivateFn | Token>`: Navigation guard pipeline returning `boolean | Promise<boolean>`.
+  - `data?: Record<string, any>`: Static route metadata.
+
+* **`Router` Service (`@Injectable('Router')`)**:
+  - **`url`**: Signal of full active URL.
+  - **`path`**: Signal of current normalized pathname.
+  - **`params`**: Signal of extracted route parameters (e.g. `{ id: '42' }`).
+  - **`queryParams`**: Signal of parsed query string parameters (e.g. `{ tab: 'general' }`).
+  - **`data`**: Signal of merged active route data.
+  - **`navigate(path, options?)` / `navigateByUrl(url, options?)`**: Programmatic navigation methods.
+
+* **`<router-layout>` Component & `routerLink` Directive**:
+  - `<router-layout></router-layout>`: Layout container dynamically instantiating, mounting, and destroying child view components matching the active route.
+  - `routerLink`: Declarative attribute directive (`<a routerLink="/users/42">` / `<button routerLink="/settings">`) with automated `.active-link` and `.active-route` state class toggling.
+
+### 9. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
+
+Purity provides a first-class bootstrapping API that initializes root components, binds environment configurations into DI, registers custom providers, interceptors, and routes, automatically synchronizes themes, and manages application lifecycles:
 
 * **`bootstrapApplication(rootComponent, options?: BootstrapOptions)`**:
   - Registers the active environment configuration under the `'ENVIRONMENT'` token.
   - Automatically initializes the theme (`ThemeService` / `localStorage` / OS preference).
   - Automatically wires `interceptors: [...]` directly into the `HttpClient` pipeline.
+  - Automatically configures routes (`routes: [...]`, `routerOptions: { ... }`) into `Router`.
   - Automatically queries and mounts the root custom element.
   - Exposes debug tools on `(window as any).__PURITY_APP__` in development mode.
   - Returns a Promise resolving to `ApplicationRef` with `.destroy()`, `.rootElement`, and `.environment`.
