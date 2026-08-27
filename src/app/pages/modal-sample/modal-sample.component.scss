@@ -69,6 +69,15 @@
     gap: 12px;
     align-items: center;
     padding-top: 4px;
+
+    button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        line-height: 1.2;
+        margin: 0;
+    }
 }
 
 .standard-modal-content,

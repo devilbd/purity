@@ -545,6 +545,55 @@ export interface HttpResource<T> {
     refetch: () => Promise<HttpResponse<T> | null>;
 }
 
+const BREEZE_PROGRESS_FRAMES: string[] = Array.from({ length: 23 }, (_, i) => {
+    const num = String(i + 1).padStart(2, '0');
+    return `url('/cursors/progress-${num}.svg') 4 4, progress`;
+});
+
+let loadingCursorTimer: any = null;
+let currentProgressFrameIndex = 0;
+let activeLoadingHolders = 0;
+
+/**
+ * Starts the animated Breeze progress/loading cursor.
+ * Supports reference counting across multiple concurrent HTTP requests and loaders.
+ */
+export function startLoadingCursor(): void {
+    if (typeof document === 'undefined') return;
+    activeLoadingHolders++;
+    document.documentElement.classList.add('http-loading');
+    document.body?.classList.add('http-loading');
+
+    if (!loadingCursorTimer) {
+        currentProgressFrameIndex = 0;
+        loadingCursorTimer = setInterval(() => {
+            currentProgressFrameIndex = (currentProgressFrameIndex + 1) % BREEZE_PROGRESS_FRAMES.length;
+            document.documentElement.style.setProperty(
+                '--cursor-progress',
+                BREEZE_PROGRESS_FRAMES[currentProgressFrameIndex],
+            );
+        }, 45);
+    }
+}
+
+/**
+ * Stops the animated Breeze progress/loading cursor when all holders have released it.
+ */
+export function stopLoadingCursor(): void {
+    if (typeof document === 'undefined') return;
+    activeLoadingHolders = Math.max(0, activeLoadingHolders - 1);
+    if (activeLoadingHolders === 0) {
+        document.documentElement.classList.remove('http-loading');
+        document.body?.classList.remove('http-loading');
+
+        if (loadingCursorTimer) {
+            clearInterval(loadingCursorTimer);
+            loadingCursorTimer = null;
+        }
+        document.documentElement.style.removeProperty('--cursor-progress');
+    }
+}
+
 /**
  * Injectable HTTP Client Service providing comprehensive HTTP methods,
  * interceptor pipeline chaining, and reactive signal helpers.
@@ -603,6 +652,7 @@ export class HttpClient {
 
         this.activeRequests.update((count) => count + 1);
         this.isLoading.set(true);
+        startLoadingCursor();
 
         const chain: Array<HttpInterceptorFn> = this.interceptors.map((interceptor) => {
             if (typeof interceptor === 'function') {
@@ -632,7 +682,9 @@ export class HttpClient {
             return response as HttpResponse<T>;
         } finally {
             this.activeRequests.update((count) => Math.max(0, count - 1));
-            this.isLoading.set(this.activeRequests() > 0);
+            const stillActive = this.activeRequests() > 0;
+            this.isLoading.set(stillActive);
+            stopLoadingCursor();
         }
     }
 

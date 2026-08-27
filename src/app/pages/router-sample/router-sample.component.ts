@@ -19,8 +19,8 @@ export class RouterSampleComponent {
     activeQueryParamsJson = signal<string>('{}');
 
     public sampleRoutes: Route[] = [
-        { path: '/', component: RouterHomeViewComponent, title: 'Home - Purity Router' },
-        { path: '/users/:id', component: RouterUserViewComponent, title: (p) => `User ${p.id} - Purity Router` },
+        { path: '/', component: RouterHomeViewComponent, title: '..::: Purity :::..' },
+        { path: '/users/:id', component: RouterUserViewComponent, title: '..::: Purity :::..' },
     ];
 
     protected onInit() {

@@ -62,4 +62,11 @@
     --cursor-context-menu: url('/cursors/context-menu.svg') 4 4, context-menu;
     --cursor-progress: url('/cursors/progress-01.svg') 4 4, progress;
     --cursor-wait: url('/cursors/wait-01.svg') 16 15, wait;
+    --cursor-copy: url('/cursors/copy.svg') 16 4, copy;
+    --cursor-alias: url('/cursors/alias.svg') 16 4, alias;
+    --cursor-cell: url('/cursors/cell.svg') 16 16, cell;
+    --cursor-color-picker: url('/cursors/color-picker.svg') 4 16, crosshair;
+    --cursor-pencil: url('/cursors/pencil.svg') 4 16, crosshair;
+    --cursor-vertical-text: url('/cursors/vertical-text.svg') 16 15, vertical-text;
+    --cursor-dnd-no-drop: url('/cursors/dnd-no-drop.svg') 16 15, no-drop;
 }

@@ -2,6 +2,15 @@
 
 loader-component {
     display: inline-block;
+
+    &.is-loading,
+    &.visible {
+        cursor: var(--cursor-progress) !important;
+
+        * {
+            cursor: var(--cursor-progress) !important;
+        }
+    }
 }
 
 .loader-inline-root {
@@ -19,6 +28,11 @@ loader-component {
     font-size: 12px;
     line-height: 1.2;
     transition: opacity 0.15s ease-out;
+    cursor: var(--cursor-progress) !important;
+
+    * {
+        cursor: var(--cursor-progress) !important;
+    }
 
     &.visible {
         display: inline-flex;

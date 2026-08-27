@@ -88,7 +88,7 @@
                 border-radius: 6px;
                 padding: 6px 12px;
                 font-size: 12.5px;
-                cursor: pointer;
+                cursor: var(--cursor-pointer);
                 outline: none;
                 transition: all 0.2s ease;
                 font-family: inherit;
@@ -184,7 +184,7 @@
                 background: transparent;
                 border: none;
                 border-bottom: 2px solid transparent;
-                cursor: pointer;
+                cursor: var(--cursor-pointer);
                 font-family: var(--font-mono, monospace);
                 transition: all 0.2s ease;
                 flex-shrink: 0;
@@ -524,7 +524,7 @@
         border: 1px solid var(--pn-bg-active);
         background: var(--pn-bg);
         color: var(--pn-fg);
-        cursor: pointer;
+        cursor: var(--cursor-pointer);
         transition: all 0.2s ease;
         font-family: inherit;
 

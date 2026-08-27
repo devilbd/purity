@@ -95,7 +95,7 @@
         border: 1px solid var(--gnome-border-subtle);
         background: var(--gnome-input);
         color: var(--text-main);
-        cursor: pointer;
+        cursor: var(--cursor-pointer);
         transition: all var(--transition-fast) var(--ease-gnome);
         @include button-hover-lift;
 
@@ -278,7 +278,7 @@
                 border: 1px solid var(--gnome-border-subtle);
                 border-radius: 50%;
                 font-size: 13px;
-                cursor: pointer;
+                cursor: var(--cursor-pointer);
                 color: var(--text-main);
                 transition: all var(--transition-fast) var(--ease-gnome);
 

@@ -64,7 +64,7 @@
             font-size: 13px;
             font-weight: 600;
             border-radius: var(--radius-control);
-            cursor: pointer;
+            cursor: var(--cursor-pointer);
             @include button-hover-lift;
 
             .method-tag {

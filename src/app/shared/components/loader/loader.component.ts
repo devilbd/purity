@@ -1,4 +1,4 @@
-import { Component, signal } from '@purity/core';
+import { Component, signal, effect, startLoadingCursor, stopLoadingCursor } from '@purity/core';
 import './loader.component.scss';
 
 @Component({
@@ -8,6 +8,34 @@ import './loader.component.scss';
 export class LoaderComponent {
     public isLoading = signal<boolean>(false);
     public message = signal<string>('Loading...');
+
+    private isHoldingCursor = false;
+
+    protected onInit(): void {
+        // Reactively observe loader state to manage host CSS classes and animated Breeze cursor
+        effect(() => {
+            const loading = this.isLoading();
+            const host = (this as any).element as HTMLElement | null;
+            if (host) {
+                host.classList.toggle('is-loading', loading);
+            }
+
+            if (loading && !this.isHoldingCursor) {
+                this.isHoldingCursor = true;
+                startLoadingCursor();
+            } else if (!loading && this.isHoldingCursor) {
+                this.isHoldingCursor = false;
+                stopLoadingCursor();
+            }
+        });
+    }
+
+    protected onDestroy(): void {
+        if (this.isHoldingCursor) {
+            this.isHoldingCursor = false;
+            stopLoadingCursor();
+        }
+    }
 
 
     /**

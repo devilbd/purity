@@ -65,7 +65,7 @@ radial-context-menu, :host {
     left: 0;
     width: 100%;
     height: 100%;
-    cursor: pointer;
+    cursor: var(--cursor-pointer);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -190,7 +190,7 @@ radial-context-menu, :host {
     border-radius: 50%;
     display: grid;
     place-items: center;
-    cursor: pointer;
+    cursor: var(--cursor-pointer);
     z-index: 10;
     transition: all var(--transition-fast) cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--shadow-deep), inset 0 2px 4px rgba(255, 255, 255, 0.2);

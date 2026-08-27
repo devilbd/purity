@@ -15,8 +15,8 @@ bootstrapApplication(AppComponent, {
     providers: [FirebaseService, ThemeService, NotifyService],
     interceptors: [LoggingInterceptor, AuthInterceptor],
     routes: [
-        { path: '/', component: RouterHomeViewComponent },
-        { path: '/users/:id', component: RouterUserViewComponent },
+        { path: '/', component: RouterHomeViewComponent, title: '..::: Purity :::..' },
+        { path: '/users/:id', component: RouterUserViewComponent, title: '..::: Purity :::..' },
     ],
     routerOptions: {
         mode: 'history',

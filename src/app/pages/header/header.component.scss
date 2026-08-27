@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-xs, 4px);
-    cursor: pointer;
+    cursor: var(--cursor-pointer);
     position: relative;
     padding: 8px 18px;
     border-radius: var(--radius-window, 16px);
@@ -136,7 +136,7 @@
     -webkit-backdrop-filter: var(--blur-subtle);
     border: 1px solid var(--gnome-border);
     color: var(--text-main);
-    cursor: pointer;
+    cursor: var(--cursor-pointer);
     font-family: var(--font-main);
     font-size: var(--font-size-xs, 12px);
     font-weight: 700;

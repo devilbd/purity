@@ -107,7 +107,7 @@ modal-view {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
+    cursor: var(--cursor-pointer);
     font-size: 14px;
     transition: all var(--transition-fast) ease;
 

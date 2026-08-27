@@ -64,7 +64,7 @@
             font-size: 13px;
             font-weight: 600;
             border-radius: var(--radius-control);
-            cursor: pointer;
+            cursor: var(--cursor-pointer);
             @include button-hover-lift;
 
             .type-icon {
@@ -152,7 +152,7 @@
                     background: var(--gnome-input);
                     border: 1px solid var(--gnome-border-subtle);
                     color: var(--text-secondary);
-                    cursor: pointer;
+                    cursor: var(--cursor-pointer);
                     @include button-hover-lift;
 
                     &.active {
@@ -200,7 +200,7 @@
                 font-size: 12px;
                 font-weight: 600;
                 border-radius: var(--radius-control);
-                cursor: pointer;
+                cursor: var(--cursor-pointer);
                 @include button-hover-lift;
 
                 &.btn-success {
