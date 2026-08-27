@@ -37,6 +37,7 @@
 - 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
 - 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
+- 🖱️ **KDE Plasma Breeze Cursor System**: Complete cursor hierarchy using vector SVG cursors from KDE Plasma (`breeze_cursors`), including a 23-frame animated progress spinner cursor (`var(--cursor-progress)`) automatically synchronized with HTTP requests and reactive UI loaders.
 - 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
 - ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
@@ -74,8 +75,9 @@ npm install
 
 ```
 purity/
-├── public/                      # Static assets served at root (purity_logo.png, favicon)
-│   └── purity_logo.png
+├── public/                      # Static assets served at root
+│   ├── cursors/                 # KDE Plasma Breeze scalable vector cursors (91 SVGs)
+│   └── purity_logo.png          # Purity framework logo
 ├── index.html                   # HTML entry point mounting <app-component>
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
@@ -87,19 +89,19 @@ purity/
     ├── main.ts                  # Application entry point (bootstraps root component & imports global style.scss)
     ├── style.scss               # Master global stylesheet importing modular design system
     ├── styles/                  # Modular SCSS architecture & Theme Engine
-    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters)
+    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters, Breeze cursor tokens)
     │   ├── _mixins.scss         # SCSS mixins (glassmorphism, flex, button lifts, scrollbars)
     │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens (baseline default)
     │   ├── _theme-light.scss    # GNOME Adwaita Light theme tokens
     │   ├── _themes.scss         # Theme loader (binds :root, html, body & [data-theme='dark'|'light'])
-    │   ├── _base.scss           # Base typography, body, window, buttons, code blocks, and inputs
+    │   ├── _base.scss           # Base typography, body, window, buttons, code blocks, inputs, and Breeze cursor hierarchy
     │   └── index.scss           # Barrel export for @use '@styles' as *;
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM utilities, and module re-exports
     │   ├── component.ts         # @Component, @ViewChild, lifecycle, template inliner, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── bootstrap.ts         # bootstrapApplication entry, providers, and environment tokens
-    │   ├── http.ts              # HttpClient service, HttpInterceptor pipeline, HttpHeaders, HttpParams, and resources
+    │   ├── http.ts              # HttpClient service, HttpInterceptor pipeline, HttpHeaders, HttpParams, resources, and Breeze cursor animation engine
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
@@ -117,8 +119,11 @@ purity/
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styling
         ├── app.component.ts     # Root <app-component> class
-        ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── assets/              # Fonts (Adwaita Mono), KDE Plasma Breeze cursors, and static assets (radial menu SVGs)
+        │   ├── cursors/         # Scalable vector cursor assets (91 SVGs)
+        │   ├── mono/            # Adwaita Mono font
+        │   └── radial-context-menu/ # Radial menu icon SVGs
+        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (highlight)
@@ -284,9 +289,13 @@ export class PostsPageComponent {
 }
 ```
 
+#### 4. Animated Breeze Loading Cursor Lifecycle
+
+`HttpClient` automatically triggers an animated 23-frame KDE Plasma Breeze progress cursor (`progress-01.svg` to `progress-23.svg` cycling at ~22fps) whenever HTTP requests are active. It uses reference-counted helpers (`startLoadingCursor()` / `stopLoadingCursor()`) shared across the framework so multiple concurrent network calls and active UI loaders (`<loader-component>`) never cancel loading animations prematurely.
+
 ---
 
-### 4. 🌓 Modular SCSS Theming & ThemeService (`theme.service.ts`)
+### 4. 🌓 Modular SCSS Theming, ThemeService & KDE Plasma Breeze Cursors
 
 Purity provides a first-class theming engine supporting **Dark** (GNOME Adwaita Dark, set as default base foundation) and **Light** (GNOME Adwaita Light) modes. Variables are mapped dynamically to `:root`, `html[data-theme='dark']`, and `html[data-theme='light']`:
 
@@ -304,6 +313,21 @@ console.log(themeService.isDark());       // true | false
 themeService.toggleTheme();
 themeService.setTheme('light');
 ```
+
+#### KDE Plasma Breeze Cursor System
+
+All interactive components, draggable widgets, code blocks, inputs, buttons, and loading states strictly utilize KDE Plasma Breeze vector cursors defined via CSS variables in `src/styles/_variables.scss`:
+
+| Token | Cursor Type | Target Elements |
+|---|---|---|
+| `var(--cursor-default)` | Breeze Arrow Pointer | Standard body, containers, text cards |
+| `var(--cursor-pointer)` | Breeze Pointer Hand | Buttons, navigation links, dropdown toggles, tabs |
+| `var(--cursor-text)` | Breeze I-Beam | Inputs, textareas, contenteditable, code blocks |
+| `var(--cursor-grab)` | Breeze Open Hand | Draggable widgets, floating navigation orb |
+| `var(--cursor-grabbing)` | Breeze Closed Hand | Active dragging state (`.is-dragging`) |
+| `var(--cursor-not-allowed)` | Breeze Prohibited Slash | Disabled buttons, restricted calendar dates |
+| `var(--cursor-progress)` | Breeze Animated Spinner | Active HTTP requests, visible `<loader-component>` |
+| `var(--cursor-wait)` | Breeze Hourglass/Watch | Blocking operations, background sync |
 
 ---
 
@@ -733,7 +757,53 @@ export class ModalViewComponent {
 
 ---
 
-### 17. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
+### 17. ⏳ Reactive HTTP & UI Loader Component (`<loader-component>`)
+
+Purity provides a lightweight, reactive inline loader custom element styled with GNOME 50 glassmorphism, accent SVG track animation, and automated Breeze loading cursor coordination:
+
+```typescript
+import { Component, signal, effect, startLoadingCursor, stopLoadingCursor } from '@purity/core';
+import './loader.component.scss';
+
+@Component({
+    selector: 'loader-component',
+    templateUrl: './loader.component.html',
+})
+export class LoaderComponent {
+    public isLoading = signal<boolean>(false);
+    public message = signal<string>('Loading...');
+
+    protected onInit() {
+        // Observes isLoading reactively and triggers the animated Breeze progress cursor
+        effect(() => {
+            const loading = this.isLoading();
+            const host = (this as any).element as HTMLElement | null;
+            if (host) host.classList.toggle('is-loading', loading);
+            if (loading) startLoadingCursor();
+            else stopLoadingCursor();
+        });
+    }
+
+    public show(msg: string = 'Loading...'): void {
+        this.message.set(msg);
+        this.isLoading.set(true);
+    }
+
+    public hide(): void {
+        this.isLoading.set(false);
+    }
+}
+```
+
+#### Usage in Templates:
+
+```html
+<loader-component id="http-loader"></loader-component>
+```
+
+---
+
+### 18. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
 Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
@@ -747,7 +817,7 @@ Purity includes a full-featured, reactive Date & Time Picker custom element styl
 
 ---
 
-### 18. 🎯 Radial Context Menu System (`<radial-context-menu>`)
+### 19. 🎯 Radial Context Menu System (`<radial-context-menu>`)
 
 Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, real-time telemetry state signals, and single-source-of-truth right-click delegation via `setSelector()`:
 
@@ -761,7 +831,7 @@ Purity provides a native circular radial context menu component with glassmorphi
 
 ---
 
-### 19. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
+### 20. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
 
 Purity includes a high-precision 2D Canvas analogue clock widget in `src/app/shared/widgets/analogue-clock/`, designed in GNOME Adwaita Dark and Light aesthetics:
 

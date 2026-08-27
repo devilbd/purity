@@ -11,7 +11,7 @@
 - **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
 - **Transform Pipes**: Data transformation and formatting engine with `@Pipe` and `BasePipe`, supporting static arguments as well as dynamic reactive signal parameters in templates.
 - **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with GPU acceleration, boundary constraints, and snap support) that attach seamlessly without inheritance.
-- **GNOME 50 Design System & Modular SCSS Theming**: All Purity UI design, components, widgets, buttons, inputs, dropdowns, and layouts strictly adhere to **GNOME 50 Adwaita** design standards (translucent glassmorphism, refined corner radii, subtle specular borders, GNOME cubic bezier animations, and Breeze cursor hierarchy) with Dark (baseline default) and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
+- **GNOME 50 Design System, Modular SCSS Theming & KDE Plasma Breeze Cursors**: All Purity UI design, components, widgets, buttons, inputs, dropdowns, and layouts strictly adhere to **GNOME 50 Adwaita** design standards (translucent glassmorphism, refined corner radii, subtle specular borders, GNOME cubic bezier animations, and full KDE Plasma Breeze cursor tokens with a 23-frame animated progress cursor engine) with Dark (baseline default) and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
 ---
@@ -20,8 +20,9 @@
 
 ```
 purity/
-├── public/                      # Static assets served at root (purity_logo.png, favicon)
-│   └── purity_logo.png
+├── public/                      # Static assets served at root
+│   ├── cursors/                 # KDE Plasma Breeze vector cursors (91 SVG assets)
+│   └── purity_logo.png          # Framework branding logo
 ├── index.html                   # Application entry HTML mounting <app-component>
 ├── package.json                 # Project dependencies, scripts (Vite + TypeScript + Sass)
 ├── tsconfig.json                # Strict TypeScript configuration
@@ -35,19 +36,19 @@ purity/
     ├── main.ts                  # Application entry point (bootstraps root component, providers, interceptors & global style.scss)
     ├── style.scss               # Master global stylesheet importing modular design system
     ├── styles/                  # Modular SCSS architecture & Theme Engine
-    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters)
+    │   ├── _variables.scss      # Global non-theme variables (radii, typography, spacing, transitions, blur filters, Breeze cursor tokens)
     │   ├── _mixins.scss         # SCSS mixins (glassmorphism, flex, button lifts, scrollbars)
     │   ├── _theme-dark.scss     # GNOME Adwaita Dark theme tokens (baseline default)
     │   ├── _theme-light.scss    # GNOME Adwaita Light theme tokens
     │   ├── _themes.scss         # Theme loader (binds :root, html, body & [data-theme='dark'|'light'])
-    │   ├── _base.scss           # Base typography, body, window, buttons, code blocks, and inputs
+    │   ├── _base.scss           # Base typography, body, window, buttons, code blocks, inputs, and Breeze cursor hierarchy
     │   └── index.scss           # Barrel export for @use '@styles' as *;
     ├── framework/               # Core framework modules
     │   ├── core.ts              # Signals, effects, DOM helpers, and module re-exports
     │   ├── component.ts         # @Component decorator, custom element lifecycle, template loader, slot & pipe engine
     │   ├── di.ts                # Dependency Injection container and @Injectable decorator
     │   ├── bootstrap.ts         # bootstrapApplication entry, providers, and environment tokens
-    │   ├── http.ts              # HttpClient service, HttpInterceptor pipeline, HttpHeaders, HttpParams, and resources
+    │   ├── http.ts              # HttpClient service, HttpInterceptor pipeline, HttpHeaders, HttpParams, resources, and Breeze progress cursor engine
     │   ├── pipe.ts              # @Pipe decorator, BasePipe, PipeTransform, pipe registry
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
@@ -66,7 +67,10 @@ purity/
         ├── app.component.html   # Root template
         ├── app.component.scss   # Root styles
         ├── app.component.ts     # Root <app-component> implementation
-        ├── assets/              # Fonts (Adwaita Mono) and static assets (radial menu SVGs)
+        ├── assets/              # Fonts (Adwaita Mono), KDE Plasma Breeze cursors, and static assets (radial menu SVGs)
+        │   ├── cursors/         # Scalable vector cursor assets (91 SVGs)
+        │   ├── mono/            # Adwaita Mono font
+        │   └── radial-context-menu/ # Radial menu icon SVGs
         ├── external/            # External dependency adapters & loaders (e.g. prism-loader for live editor)
         ├── pages/               # Application pages, views & feature showcases
         │   ├── custom/          # <custom-component> with two-way signal bindings
@@ -79,6 +83,7 @@ purity/
         │   ├── header/          # <header-component> navigation bar with logo and theme toggle
         │   ├── http-sample/     # <http-sample> clean HTTP client showcase consuming centralized interceptors
         │   ├── intro/           # <intro-component> framework overview & code samples
+        │   ├── modal-sample/    # <modal-sample> interactive showcase for modal dialog system
         │   ├── notification-sample/ # <notification-sample> interactive showcase for toast notifications & positions
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> in-browser live editor, compiler & localStorage history (GNOME 50 / Palenight)
@@ -275,6 +280,9 @@ Purity provides a native, zero-dependency, type-safe HTTP Client service registe
       }
   }
   ```
+
+* **Animated Breeze Loading Cursor Lifecycle**:
+  `HttpClient` automatically triggers an animated 23-frame KDE Plasma Breeze progress cursor (`progress-01.svg` to `progress-23.svg` at ~22fps) whenever HTTP requests are in flight. It utilizes ref-counted helpers (`startLoadingCursor()` / `stopLoadingCursor()`) shared with `<loader-component>` so concurrent network requests and UI loaders never cancel animation prematurely.
 
 ### 5. Transform Pipes (`pipe.ts`)
 
@@ -624,6 +632,9 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
      - Inputs & Selects (`.input-primary`): Inset depth shadow (`inset 0 1px 2px rgba(0, 0, 0, 0.1)`), custom SVG arrow indicators, and standard 3px accent focus ring (`0 0 0 3px var(--accent-shadow)`).
    - **Motion & Physics**: Transitions must use GNOME cubic-bezier easing (`var(--ease-gnome) = cubic-bezier(0.25, 0.8, 0.25, 1)`) and spring curves (`var(--ease-spring) = cubic-bezier(0.34, 1.56, 0.64, 1)`).
    - **Dual Theme Fidelity**: Full parity across Dark (baseline GNOME Adwaita obsidian) and Light (frosted alabaster) themes.
+   - **KDE Plasma Breeze Cursor System**:
+     - All cursors across the framework, components, buttons, draggable widgets, resize handles, and inputs strictly use KDE Plasma Breeze design tokens (`var(--cursor-default)`, `var(--cursor-pointer)`, `var(--cursor-text)`, `var(--cursor-grab)`, `var(--cursor-grabbing)`, `var(--cursor-not-allowed)`, `var(--cursor-progress)`, `var(--cursor-wait)`).
+     - HTTP requests (`HttpClient`) and active UI loaders (`LoaderComponent`) automatically drive the 23-frame animated progress cursor (`var(--cursor-progress)`) with reference counting.
 
 8. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
