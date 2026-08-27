@@ -23,6 +23,8 @@ purity/
 ├── public/                      # Static assets served at root
 │   ├── cursors/                 # KDE Plasma Breeze vector cursors (91 SVG assets)
 │   └── purity_logo.png          # Framework branding logo
+├── scripts/                     # Automation & deployment scripts
+│   └── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
 ├── index.html                   # Application entry HTML mounting <app-component>
 ├── package.json                 # Project dependencies, scripts (Vite + TypeScript + Sass)
 ├── tsconfig.json                # Strict TypeScript configuration
@@ -664,5 +666,5 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 | `npm run build:dev` | Runs TypeScript compiler (`tsc`) and Vite development bundle |
 | `npm run build:prod` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
 | `npm run preview` | Previews the production build locally |
-| `npm run deploy` | Builds the app with production profile and deploys to Firebase Hosting |
-| `npm run deploy:hosting` | Builds the app with production profile and deploys only to Firebase Hosting |
+| `npm run build:deploy` / `npm run deploy` | Executes `scripts/build-and-deploy.sh` to compile, verify, and deploy to Firebase Hosting |
+| `npm run deploy:hosting` | Executes `scripts/build-and-deploy.sh --only hosting` |

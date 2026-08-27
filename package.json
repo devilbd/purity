@@ -9,8 +9,9 @@
     "build:dev": "tsc && vite build --mode development",
     "build:prod": "tsc && vite build --mode production",
     "preview": "vite preview",
-    "deploy": "npm run build:prod && firebase deploy",
-    "deploy:hosting": "npm run build:prod && firebase deploy --only hosting"
+    "deploy": "bash scripts/build-and-deploy.sh",
+    "deploy:hosting": "bash scripts/build-and-deploy.sh --only hosting",
+    "build:deploy": "bash scripts/build-and-deploy.sh"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.6",

@@ -68,6 +68,8 @@ npm install
 | `npm run build:dev` | Builds the application using development environment profile |
 | `npm run build:prod` | Builds the application using production environment profile |
 | `npm run preview` | Serves the production build locally for testing |
+| `npm run build:deploy` / `npm run deploy` | Runs `scripts/build-and-deploy.sh` to compile, verify, and deploy to Firebase |
+| `npm run deploy:hosting` | Runs `scripts/build-and-deploy.sh --only hosting` |
 
 ---
 
@@ -78,6 +80,8 @@ purity/
 ├── public/                      # Static assets served at root
 │   ├── cursors/                 # KDE Plasma Breeze scalable vector cursors (91 SVGs)
 │   └── purity_logo.png          # Purity framework logo
+├── scripts/                     # Automation & deployment scripts
+│   └── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
 ├── index.html                   # HTML entry point mounting <app-component>
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
