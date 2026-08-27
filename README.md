@@ -24,7 +24,7 @@
 ### Key Highlights
 
 - ⚡ **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
-- 🔄 **Fine-Grained Reactivity**: Synchronous `signal` and `effect` primitives with automated dependency tracking.
+- 🔄 **Fine-Grained Reactivity**: Synchronous `signal`, `computed`, and `effect` primitives with automated dependency tracking and sub-microsecond updates.
 - 💉 **First-Class Dependency Injection**: Built-in DI container with `@Injectable` decorator and `inject()` token resolution.
 - 🌐 **Native HTTP Client & Interceptors**: Injectable `HttpClient` service with full HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`), composable onion-model request/response interceptors, typed models (`HttpRequest`, `HttpResponse`, `HttpErrorResponse`), header/query helpers (`HttpHeaders`, `HttpParams`), and reactive signal resource bindings (`createResource`).
 - ⚡ **Transform Pipes**: Reusable formatting classes with `@Pipe` and `BasePipe`, supporting static arguments and dynamic reactive signal parameters in templates (`{{ val | myPipe: isDynamicSignal() }}`).
@@ -137,28 +137,32 @@ purity/
 
 ## 💻 Core Framework Architecture & Primitives
 
-### 1. 🔄 Fine-Grained Reactive Signals & Effects (`core.ts`)
+### 1. 🔄 Fine-Grained Reactive Signals, Computed Values & Effects (`core.ts`)
 
 Purity features a synchronous reactivity engine with automated dependency tracking and sub-microsecond updates:
 
 ```typescript
-import { signal, effect } from '@purity/core';
+import { signal, effect, computed } from '@purity/core';
 
 // 1. Create typed reactive signals
-const count = signal<number>(0);
+const count = signal<number>(5);
 const multiplier = signal<number>(2);
 
 // 2. Read value via getter call
-console.log(count()); // 0
+console.log(count()); // 5
 
-// 3. Mutate value with .set() or computed .update()
+// 3. Derived read-only values with computed() (recalculates automatically)
+const total = computed(() => count() * multiplier());
+const isEven = computed(() => count() % 2 === 0);
+console.log(total()); // 10
+
+// 4. Mutate value with .set() or .update()
 count.set(10);
-count.update(n => n + 1); // 11
+count.update(n => n + 1); // 11 -> total() automatically becomes 22
 
-// 4. Effects automatically register signal dependencies and re-run on changes
+// 5. Effects automatically register signal/computed dependencies and re-run synchronously
 effect(() => {
-    const total = count() * multiplier();
-    console.log(`Calculated total: ${total} (count: ${count()})`);
+    console.log(`Calculated total: ${total()} | Is Even: ${isEven()}`);
 });
 ```
 

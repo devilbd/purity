@@ -3,7 +3,7 @@
 ## Overview
 
 **Purity** is a lightweight, native TypeScript frontend framework built from scratch on top of modern web standards:
-- **Fine-Grained Reactivity**: Built-in signal and effect system (`signal`, `effect`) with automatic dependency tracking and sub-microsecond synchronous updates.
+- **Fine-Grained Reactivity**: Built-in synchronous signal, computed value, and effect system (`signal`, `computed`, `effect`) with automatic dependency tracking and sub-microsecond updates.
 - **Native Web Components**: Plain classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with synchronous template inlining, expression caching, and lifecycle management.
 - **Dependency Injection**: First-class DI container with `@Injectable` decorator and `inject()` resolution.
 - **HTTP Client & Interceptor Pipeline**: Full-featured HTTP service with all standard methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`), centralized class-based request/response interceptors (`@interceptors/*`), typed models (`HttpRequest`, `HttpResponse`, `HttpErrorResponse`), header/query param helpers (`HttpHeaders`, `HttpParams`), and reactive signal resource helpers (`createResource`).
@@ -128,11 +128,23 @@ Purity features a synchronous reactive primitives engine:
   count.update(n => n + 1); // Update: 6
   ```
 
+* **`computed<T>(fn: () => T): ReadonlySignal<T>`**:
+  Creates a read-only derived signal that automatically recalculates and notifies downstream subscribers whenever its dependent signals change.
+  ```typescript
+  const count = signal(5);
+  const multiplier = signal(2);
+  const total = computed(() => count() * multiplier());
+
+  console.log(total()); // 10
+  count.set(10);
+  console.log(total()); // 20
+  ```
+
 * **`effect(fn: Function): void`**:
-  Tracks signals accessed during execution and automatically re-runs whenever any dependent signal changes.
+  Tracks signals and computed values accessed during execution and automatically re-runs synchronously whenever any dependency changes.
   ```typescript
   effect(() => {
-      console.log(`Current count: ${count()}`);
+      console.log(`Current count: ${count()}, total: ${total()}`);
   });
   ```
 

@@ -192,20 +192,28 @@ export class TestDemoComponent {}`,
     },
     {
         id: 'counter',
-        name: '⚡ Reactive Signals & Counter',
-        description: 'Fine-grained signals, computed effect, and event handlers.',
-        ts: `import { Component, signal, effect } from '@purity/core';
+        name: '⚡ Reactive Signals & Computed Values',
+        description: 'Fine-grained signals, derived computed() values, and reactive effects.',
+        ts: `import { Component, signal, effect, computed } from '@purity/core';
 
 @Component({
     selector: 'playground-demo',
     templateUrl: './template.html',
 })
 export class PlaygroundDemoComponent {
-    count = signal(0);
-    multiplier = signal(2);
+    count = signal(4);
+    multiplier = signal(3);
 
-    get doubled(): number {
-        return this.count() * this.multiplier();
+    // Derived reactive computed signals
+    doubled = computed(() => this.count() * this.multiplier());
+    isEven = computed(() => this.count() % 2 === 0);
+    status = computed(() => (this.count() >= 10 ? '🔥 High Output' : '🌱 Steady State'));
+
+    protected onInit() {
+        // Effects track dependencies automatically
+        effect(() => {
+            console.log(\`[Reactivity] count: \${this.count()}, doubled: \${this.doubled()}, isEven: \${this.isEven()}\`);
+        });
     }
 
     onIncrement() {
@@ -216,19 +224,35 @@ export class PlaygroundDemoComponent {
         this.count.update(n => Math.max(0, n - 1));
     }
 
+    onMultiply() {
+        this.multiplier.update(m => (m >= 10 ? 2 : m + 1));
+    }
+
     onReset() {
         this.count.set(0);
+        this.multiplier.set(2);
     }
 }`,
         html: `<div class="counter-card window">
-    <h3>⚡ Reactive Signals Counter</h3>
+    <h3>⚡ Reactive Signals & Computed Values</h3>
+    <p>Fine-grained <code>signal()</code>, derived <code>computed()</code>, and automatic <code>effect()</code> tracking.</p>
+
     <div class="stat-display">
-        <span class="stat-num">{{count()}}</span>
-        <span class="stat-calc">Doubled: {{doubled}} (x{{multiplier()}})</span>
+        <div class="stat-main-row">
+            <span class="stat-num">{{count()}}</span>
+            <span class="badge {{isEven() ? 'badge-even' : 'badge-odd'}}">{{isEven() ? 'EVEN' : 'ODD'}}</span>
+        </div>
+        <div class="stat-breakdown">
+            <span>Multiplier: <strong>×{{multiplier()}}</strong></span>
+            <span>Computed Total: <strong>{{doubled()}}</strong></span>
+            <span>Status: <strong class="status-tag">{{status()}}</strong></span>
+        </div>
     </div>
+
     <div class="button-row">
         <button type="button" class="button-primary" onclick="onIncrement()">➕ Increment</button>
         <button type="button" class="button-secondary" onclick="onDecrement()">➖ Decrement</button>
+        <button type="button" class="button-secondary" onclick="onMultiply()">✖️ Multiplier +1</button>
         <button type="button" class="button-cancel" onclick="onReset()">↺ Reset</button>
     </div>
 </div>`,
@@ -249,21 +273,65 @@ export class PlaygroundDemoComponent {
         font-size: 1.2rem;
     }
 
+    p {
+        margin: 0;
+        color: #a6accd;
+        font-size: 13px;
+    }
+
     .stat-display {
         display: flex;
         flex-direction: column;
-        gap: 4px;
+        gap: 10px;
+        background: #1b1e2b;
+        padding: 16px;
+        border-radius: 8px;
 
-        .stat-num {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: #c3e88d;
-            font-family: monospace;
+        .stat-main-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            .stat-num {
+                font-size: 2.8rem;
+                font-weight: 800;
+                color: #c3e88d;
+                font-family: monospace;
+                line-height: 1;
+            }
+
+            .badge {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 4px 8px;
+                border-radius: 4px;
+
+                &.badge-even {
+                    background: rgba(195, 232, 141, 0.2);
+                    color: #c3e88d;
+                }
+
+                &.badge-odd {
+                    background: rgba(255, 203, 107, 0.2);
+                    color: #ffcb6b;
+                }
+            }
         }
 
-        .stat-calc {
-            font-size: 0.95rem;
-            color: #676e95;
+        .stat-breakdown {
+            display: flex;
+            gap: 16px;
+            font-size: 0.9rem;
+            color: #89ddff;
+            flex-wrap: wrap;
+
+            strong {
+                color: #ffffff;
+            }
+
+            .status-tag {
+                color: #f78c6c;
+            }
         }
     }
 

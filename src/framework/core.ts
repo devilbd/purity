@@ -4,10 +4,13 @@ export type Signal<T> = {
     update(fn: (val: T) => T): void;
 };
 
+export type ReadonlySignal<T> = () => T;
+export type ComputedSignal<T> = ReadonlySignal<T>;
+
 const context: Function[] = [];
 
 /**
- * Reactivity
+ * Reactivity Primitives
  */
 export const signal = <T>(initialValue: T): Signal<T> => {
     let value = initialValue;
@@ -42,6 +45,20 @@ export const effect = (fn: Function) => {
         }
     };
     execute();
+};
+
+/**
+ * Creates a read-only computed signal that automatically derives its value
+ * and reacts synchronously whenever any dependent signals change.
+ */
+export const computed = <T>(fn: () => T): ReadonlySignal<T> => {
+    const internalSignal = signal<T>(undefined as unknown as T);
+
+    effect(() => {
+        internalSignal.set(fn());
+    });
+
+    return (() => internalSignal()) as ReadonlySignal<T>;
 };
 
 /**

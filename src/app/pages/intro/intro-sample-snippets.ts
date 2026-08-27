@@ -10,16 +10,28 @@ export const INTRO_SAMPLE_SNIPPETS: Record<string, IntroSampleSnippet> = {
     // 1. Reactivity
     reactivity: {
         id: 'reactivity',
-        title: '🔄 Fine-Grained Reactive Signals & Effects',
-        ts: `import { Component, signal, effect } from '@purity/core';
+        title: '🔄 Fine-Grained Reactive Signals, Effects & Computed Values',
+        ts: `import { Component, signal, effect, computed } from '@purity/core';
 
 @Component({
     selector: 'playground-demo',
     templateUrl: './template.html',
 })
 export class PlaygroundDemoComponent {
-    count = signal<number>(0);
+    count = signal<number>(5);
     multiplier = signal<number>(2);
+
+    // Derived reactive computed signals
+    total = computed(() => this.count() * this.multiplier());
+    isEven = computed(() => this.count() % 2 === 0);
+    summary = computed(() => \`\${this.count()} items × \${this.multiplier()} = \${this.total()}\`);
+
+    protected onInit() {
+        // Effects track dependencies automatically
+        effect(() => {
+            console.log(\`[Reactivity] count: \${this.count()}, total: \${this.total()}\`);
+        });
+    }
 
     increment() {
         this.count.update(n => n + 1);
@@ -39,8 +51,8 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="sample-card window">
-    <h3>🔄 Signals & Reactive Effects</h3>
-    <p>Synchronous reactivity with automatic dependency tracking.</p>
+    <h3>🔄 Signals, Computed & Effects</h3>
+    <p>Synchronous reactivity with automatic dependency tracking and derived computed signals.</p>
 
     <div class="stat-grid">
         <div class="stat-box">
@@ -52,9 +64,14 @@ export class PlaygroundDemoComponent {
             <span class="stat-value">×{{multiplier()}}</span>
         </div>
         <div class="stat-box highlight">
-            <span class="stat-label">Total</span>
-            <span class="stat-value">{{count() * multiplier()}}</span>
+            <span class="stat-label">Computed Total</span>
+            <span class="stat-value">{{total()}}</span>
         </div>
+    </div>
+
+    <div class="derived-badge-row">
+        <span class="pill-badge">Parity: {{isEven() ? 'EVEN' : 'ODD'}}</span>
+        <span class="pill-badge">Formula: {{summary()}}</span>
     </div>
 
     <div class="actions-row">
@@ -104,6 +121,22 @@ export class PlaygroundDemoComponent {
             .stat-value { font-size: 20px; font-weight: 700; color: #eeffff; }
 
             &.highlight .stat-value { color: #c3e88d; }
+        }
+    }
+
+    .derived-badge-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .pill-badge {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(130, 170, 255, 0.15);
+            color: #82aaff;
+            border: 1px solid rgba(130, 170, 255, 0.3);
+            font-weight: 600;
         }
     }
 

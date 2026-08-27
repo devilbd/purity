@@ -43,8 +43,8 @@
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>1. 🔄 Fine-Grained Reactive Signals &amp; Effects (<code>core.ts</code>)</h4>
-                    <p>Synchronous reactivity primitives with automated dependency tracking and sub-microsecond updates:</p>
+                    <h4>1. 🔄 Fine-Grained Reactive Signals, Effects &amp; Computed Values (<code>core.ts</code>)</h4>
+                    <p>Synchronous reactivity primitives with automated dependency tracking, derived computed signals, and sub-microsecond updates:</p>
                 </div>
                 <button
                     type="button"
@@ -55,23 +55,27 @@
                     🎮 Edit in Playground
                 </button>
             </div>
-            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">signal</span>, <span class="fn">effect</span>, <span class="fn">computed</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
 
 <span class="cmt">// 1. Create typed reactive signals</span>
-<span class="kw">const</span> count = <span class="fn">signal</span>&lt;<span class="typ">number</span>&gt;(<span class="num">0</span>);
+<span class="kw">const</span> count = <span class="fn">signal</span>&lt;<span class="typ">number</span>&gt;(<span class="num">5</span>);
 <span class="kw">const</span> multiplier = <span class="fn">signal</span>&lt;<span class="typ">number</span>&gt;(<span class="num">2</span>);
 
 <span class="cmt">// 2. Read value via getter call</span>
-console.<span class="fn">log</span>(count()); <span class="cmt">// 0</span>
+console.<span class="fn">log</span>(count()); <span class="cmt">// 5</span>
 
-<span class="cmt">// 3. Mutate value with .set() or computed .update()</span>
+<span class="cmt">// 3. Derived read-only values with computed() (auto-recalculates on dependency updates)</span>
+<span class="kw">const</span> total = <span class="fn">computed</span>(() =&gt; count() * multiplier());
+<span class="kw">const</span> isEven = <span class="fn">computed</span>(() =&gt; count() % <span class="num">2</span> === <span class="num">0</span>);
+console.<span class="fn">log</span>(total()); <span class="cmt">// 10</span>
+
+<span class="cmt">// 4. Mutate signals with .set() or .update()</span>
 count.<span class="fn">set</span>(<span class="num">10</span>);
-count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <span class="cmt">// 11</span>
+count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <span class="cmt">// 11 -&gt; total() automatically becomes 22</span>
 
-<span class="cmt">// 4. Effects automatically register signal dependencies and re-run on changes</span>
+<span class="cmt">// 5. Effects automatically register dependencies and execute synchronously</span>
 <span class="fn">effect</span>(() =&gt; {
-    <span class="kw">const</span> total = count() * multiplier();
-    console.<span class="fn">log</span>(<span class="str">`Calculated total: ${total} (count: ${count()})`</span>);
+    console.<span class="fn">log</span>(<span class="str">`Total: ${total()} | Is Even: ${isEven()}`</span>);
 });</code></pre>
         </div>
 
