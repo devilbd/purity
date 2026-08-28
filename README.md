@@ -131,7 +131,7 @@ purity/
         │   ├── cursors/         # Scalable vector cursor assets (91 SVGs)
         │   ├── mono/            # Adwaita Mono font
         │   └── radial-context-menu/ # Radial menu icon SVGs
-        ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
+        ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (e.g. dropdown, highlight)
@@ -895,7 +895,8 @@ Purity includes a full-featured, reactive Date & Time Picker custom element styl
 - **Reactivity & Signals**: State (`selectedDate`, `isOpen`, `viewDate`, `workingHours`, `workingMinutes`, `restrictions`, `enableBlur`) driven by fine-grained Purity signals.
 - **Direct Body Overlay Teleportation**: Dropdown overlay automatically attaches directly to `document.body` at `z-index: 9999`, rendering cleanly above all other cards, stacking contexts, and radial menus without clipping.
 - **Smart Viewport Auto-Placement**: Automatically measures available screen headroom and footroom to flip the popup above (`placement-top`) or below (`placement-bottom`) the trigger button, with horizontal auto-alignment and window scroll tracking.
-- **Year Navigation Submenu**: Fast multi-year scrollable selector overlay with smooth animated chevron toggle.
+- **Year Navigation Submenu & Frosted Body Blur**: Fast multi-year scrollable selector overlay with smooth animated chevron toggle, applying a frosted background blur effect (`filter: blur(6px)`) to the calendar body grid while year selection is active.
+- **Glassmorphic Surface Blur Tokens**: Configurable glassmorphism blur overlay (`enableBlur`, `--dp-surface-bg`, `--dp-surface-blur-bg`) with hardware-accelerated backdrop filters (`var(--blur-effect)`, `var(--blur-heavy)`).
 - **24-Hour Time Capsule**: Dual numeric hours & minutes input supporting text entry, key navigation, and mouse-wheel scrolling (`handleWheel`).
 - **Date & Time Restrictions**: Configurable boundaries via `DateRestriction` (`futureOnly`, `pastOnly`, `minDate`, `maxDate`, `daysBack`, `daysForward`, `minTime`, `maxTime`, `disabledDates`).
 - **DatePipe Formatting**: Built-in `@Pipe('date')` transform pipe for flexible Handlebars date expressions (`{{ myDate() | date: 'EEEE, MMMM d, yyyy HH:mm' }}`).

@@ -78,15 +78,16 @@ purity/
         │   └── radial-context-menu/ # Radial menu icon SVGs
         ├── external/            # External dependency adapters & loaders (e.g. prism-loader for live editor)
         ├── pages/               # Application pages, views & feature showcases
-        │   ├── custom/          # <custom-component> with two-way signal bindings
         │   ├── analogue-clock-sample/ # <analogue-clock-sample> showcase of analogue clock configurations
         │   ├── date-time-picker-sample/ # <date-time-picker-sample> showcase of date-time-picker configurations
-        │   ├── demo/            # <demo-component> live framework interactive showcase
+        │   ├── demo/            # <demo-component> live framework interactive showcase hosting packaged sample components
         │   ├── directive-sample/ # <directive-sample> demonstrating directive usage
+        │   ├── footer/          # <footer-component> application footer with live framework telemetry
         │   ├── forms-validation/ # <forms-validation> sample form component with submit validation
         │   ├── for-sample/      # <for-sample> demonstrating structural for array repeater
         │   ├── header/          # <header-component> navigation bar with logo and theme toggle
         │   ├── http-sample/     # <http-sample> clean HTTP client showcase consuming centralized interceptors
+        │   ├── if-sample/       # <if-sample> demonstrating structural conditional directives (if, else-if, else)
         │   ├── intro/           # <intro-component> framework overview & code samples
         │   ├── modal-sample/    # <modal-sample> interactive showcase for modal dialog system
         │   ├── notification-sample/ # <notification-sample> interactive showcase for toast notifications & positions
@@ -94,7 +95,7 @@ purity/
         │   ├── playground/      # <playground-view> in-browser live editor, compiler & localStorage history (GNOME 50 / Palenight)
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
         │   ├── router-sample/   # <router-sample> interactive router showcase with <router-layout> and signal inspector
-        │   └── raw-template/    # <raw-template> dynamic inline template rendering
+        │   └── virtual-for-sample/ # <virtual-for-sample> high-performance 100k virtual scroll repeater showcase
         └── shared/
             ├── behaviors/       # Composable DOM behaviors
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support

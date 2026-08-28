@@ -58,7 +58,6 @@ export class NavigationMenuComponent {
                 name: 'Core',
                 image: '⚡',
                 children: [
-                    { name: 'Signals & State', image: '🔄', data: { hash: '#component1' } },
                     { name: 'Signal Router', image: '🗺️', data: { hash: '#router-sample' } },
                     { name: 'Conditionals (if)', image: '🔀', data: { hash: '#if-sample' } },
                     { name: 'Array Repeater', image: '🔁', data: { hash: '#for-sample' } },
@@ -67,8 +66,6 @@ export class NavigationMenuComponent {
                     { name: 'DOM Directives', image: '🎯', data: { hash: '#directive-sample' } },
                     { name: 'Form Validation', image: '📋', data: { hash: '#forms-validation' } },
                     { name: 'HTTP Client', image: '🌐', data: { hash: '#http-sample' } },
-                    { name: 'Raw Template', image: '📄', data: { hash: '#raw-template' } },
-                    { name: 'Drag & Drop', image: '🖐️', data: { hash: '#droppable-container' } },
                 ],
             },
             {
@@ -179,7 +176,7 @@ export class NavigationMenuComponent {
         const demoEl = document.querySelector('#demo-window') as HTMLElement | null;
         const targetInsideDemo = demoEl && demoEl.querySelector(hash);
 
-        if (targetInsideDemo || hash.includes('sample') || hash.includes('component1') || hash.includes('forms') || hash.includes('droppable') || hash.includes('demo')) {
+        if (targetInsideDemo || hash.includes('sample') || hash.includes('forms') || hash.includes('app-loader') || hash.includes('demo')) {
             if (demoEl) {
                 demoEl.classList.remove('demo-hidden');
                 demoEl.classList.add('demo-visible');

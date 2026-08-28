@@ -1,46 +1,5 @@
 <div class="window demo-container">
     <h3>Live Framework Demo</h3>
-    <div class="flex-vertical">
-        <div id="result" class="{{loginStatus}}">{{loggedUser() ?? 'Not signed in.'}}</div>
-        <input id="username" type="text" class="input-primary" value="{{loggedUser()}}" />
-        <input
-            type="text"
-            class="input-primary user-input"
-            oninput="onTextInput(this)"
-        />
-    </div>
-    <div class="flex-horizontal">
-        <button
-            class="button-primary login-btn"
-            onclick="onLogin()"
-        >
-            Login
-        </button>
-        <button
-            class="button-cancel logout-btn"
-            onclick="onLogout()"
-        >
-            Logout
-        </button>
-        <button
-            class="button-primary default-login-btn"
-            onclick="setDefaultLogin()"
-        >
-            Set explicitly value on login input
-        </button>
-    </div>
-
-    <div id="customComponentCustomProperty">{{customComponent1?.customProperty()}}</div>
-
-    <custom-component id="component1" name="customComponent1"></custom-component>
-
-    <div id="droppable-container">
-        Drop here
-    </div>
-
-    <custom-component id="component2" name="customComponent2"></custom-component>
-
-    <raw-template id="raw-template"></raw-template>
 
     <forms-validation id="forms-validation"></forms-validation>
 

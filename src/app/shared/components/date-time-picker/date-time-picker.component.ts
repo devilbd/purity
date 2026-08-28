@@ -443,6 +443,14 @@ export class DateTimePickerComponent {
         this._overlayEl.classList.add('is-open');
         this._overlayEl.classList.remove('is-closed');
         this._overlayEl.classList.toggle('blur-enabled', this.enableBlur());
+
+        const calBody = this._overlayEl.querySelector('.calendar-body');
+        const yearOverlay = this._overlayEl.querySelector('.year-selector-overlay');
+        if (calBody) calBody.classList.remove('blurred');
+        if (yearOverlay) {
+            yearOverlay.classList.remove('is-visible');
+            yearOverlay.classList.add('is-hidden');
+        }
     }
 
     public close(): void {
@@ -496,7 +504,7 @@ export class DateTimePickerComponent {
             const calBody = this._overlayEl.querySelector('.calendar-body');
             const yearOverlay = this._overlayEl.querySelector('.year-selector-overlay');
             if (calBody) {
-                calBody.classList.toggle('blurred', this.enableBlur() && nextMode === 'year');
+                calBody.classList.toggle('blurred', nextMode === 'year');
             }
             if (yearOverlay) {
                 yearOverlay.classList.toggle('is-visible', nextMode === 'year');

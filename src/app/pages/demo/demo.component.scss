@@ -14,19 +14,12 @@
         padding: 16px 10px;
         gap: 12px;
         border-radius: 12px;
-
-        .flex-horizontal {
-            flex-wrap: wrap;
-            gap: 8px;
-        }
     }
 
     > * {
         margin: 0;
     }
 
-    custom-component,
-    raw-template,
     forms-validation,
     directive-sample,
     pipe-sample,
@@ -50,18 +43,4 @@
             box-sizing: border-box;
         }
     }
-}
-
-#droppable-container {
-    background: var(--gnome-surface);
-    backdrop-filter: var(--blur-effect);
-    -webkit-backdrop-filter: var(--blur-effect);
-    border: 1px solid var(--gnome-border);
-    border-radius: var(--radius-window);
-    box-shadow: var(--shadow-deep);
-    color: var(--text-main);
-    font-family: var(--font-main);
-    margin: 0;
-    padding: 20px;
-    transition: background-color var(--transition-normal) ease, border-color var(--transition-normal) ease;
 }
