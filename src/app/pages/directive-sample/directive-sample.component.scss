@@ -21,4 +21,86 @@
             margin-left: var(--spacing-sm, 5px);
         }
     }
+
+    .dropdown-demo-section {
+        margin-top: var(--spacing-lg, 16px);
+        padding-top: var(--spacing-md, 12px);
+        border-top: 1px solid var(--gnome-border-subtle);
+
+        h4 {
+            margin: 0 0 6px 0;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            code {
+                color: var(--accent);
+                background: var(--accent-subtle);
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
+        }
+
+        .demo-desc {
+            margin: 0 0 14px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+
+            code {
+                color: var(--accent);
+            }
+        }
+
+        .dropdown-demo-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            margin-bottom: 16px;
+
+            .dropdown-demo-box {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                flex: 1 1 240px;
+
+                label {
+                    font-size: var(--font-size-sm, 13.5px);
+                    font-weight: 600;
+                    color: var(--text-secondary);
+                }
+            }
+        }
+
+        .dropdown-output-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--gnome-card);
+            backdrop-filter: var(--blur-subtle);
+            -webkit-backdrop-filter: var(--blur-subtle);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-control, 8px);
+
+            .output-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-secondary);
+            }
+
+            .output-value {
+                font-family: var(--font-mono, monospace);
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--accent);
+                background: var(--accent-subtle);
+                padding: 2px 8px;
+                border-radius: 4px;
+            }
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import './style.scss';
+import '@directives/dropdown.directive';
 import { bootstrapApplication } from '@purity/core';
 import { AppComponent } from '@app/app.component';
 import { environment } from '@environments/environment';

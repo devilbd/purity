@@ -82,13 +82,38 @@ analogue-clock {
     }
 
     .clock-tz-badge {
-        font-family: 'Adwaita Mono', monospace;
-        font-size: 0.78rem;
-        color: var(--text-secondary);
-        background: var(--gnome-card);
-        padding: 4px 10px;
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--gnome-border-subtle);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-mono, 'Adwaita Mono', monospace);
+        font-size: 0.76rem;
+        font-weight: 600;
+        color: var(--accent);
+        background: var(--accent-subtle);
+        backdrop-filter: var(--blur-subtle);
+        -webkit-backdrop-filter: var(--blur-subtle);
+        padding: 4px 12px;
+        border-radius: var(--radius-pill, 999px);
+        border: 1px solid var(--accent-shadow);
+        box-shadow: 0 2px 8px var(--accent-shadow), inset 0 1px rgba(255, 255, 255, 0.1);
+        letter-spacing: 0.02em;
+        transition: all var(--transition-fast) var(--ease-gnome);
+
+        .tz-icon {
+            font-size: 0.82rem;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .tz-text {
+            line-height: 1.2;
+        }
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px var(--accent-shadow), inset 0 1px rgba(255, 255, 255, 0.2);
+        }
     }
 }
 
@@ -207,50 +232,29 @@ analogue-clock {
         }
     }
 
-    .select-wrapper {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-
-        .tz-select {
+    .tz-dropdown {
+        .dropdown-trigger {
             margin: 0;
-            padding: 9px 36px 9px 14px;
+            padding: 9px 16px;
             font-family: var(--font-main);
             font-size: var(--font-size-sm, 13.5px);
             font-weight: 600;
             border-radius: var(--radius-control, 8px);
             border: 1px solid var(--gnome-border);
-            background-color: var(--gnome-input);
+            background-color: var(--gnome-card);
             backdrop-filter: var(--blur-subtle);
             -webkit-backdrop-filter: var(--blur-subtle);
             color: var(--text-main);
-            cursor: var(--cursor-pointer);
-            outline: none;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%233584e4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 13px;
-            transition: all var(--transition-fast) ease;
+            box-shadow: var(--shadow-control);
 
-            &:hover {
-                background-color: var(--gnome-input-hover);
+            &:hover:not(:disabled) {
+                background-color: var(--gnome-hover);
                 border-color: var(--gnome-border-focus);
             }
 
-            &:focus {
-                background-color: var(--gnome-input-focus);
+            &:focus-visible {
                 border-color: var(--accent);
                 box-shadow: 0 0 0 3px var(--accent-shadow);
-            }
-
-            option {
-                background-color: var(--gnome-surface, #242424);
-                color: var(--text-main, #ffffff);
-                padding: 6px 10px;
             }
         }
     }
@@ -267,6 +271,15 @@ analogue-clock {
 
         &::before {
             background: radial-gradient(circle at 50% 0%, rgba(28, 113, 216, 0.12), transparent 70%);
+        }
+    }
+
+    .clock-header {
+        .clock-tz-badge {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border-color: var(--accent-shadow);
+            box-shadow: 0 2px 6px var(--accent-shadow), inset 0 1px rgba(255, 255, 255, 0.8);
         }
     }
 
@@ -308,15 +321,14 @@ analogue-clock {
             }
         }
 
-        .select-wrapper .tz-select {
-            background-color: var(--gnome-input);
+        .tz-dropdown .dropdown-trigger {
+            background-color: var(--gnome-card);
             border-color: var(--gnome-border);
             color: var(--text-main);
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%231c71d8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
-            option {
-                background-color: #ffffff;
-                color: #1c1c1c;
+            &:hover:not(:disabled) {
+                background-color: var(--gnome-hover);
+                border-color: var(--gnome-border-focus);
             }
         }
     }

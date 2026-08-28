@@ -1,4 +1,5 @@
-import { Component, signal, ViewChild } from '@purity/core';
+import { Component, inject, signal, ViewChild } from '@purity/core';
+import { ThemeService } from '@data/theme.service';
 import './navigation-menu.component.scss';
 import '@components/radial-context-menu/radial-context-menu.component';
 import type { RadialContextMenuComponent, MenuItem } from '@components/radial-context-menu/radial-context-menu.component';
@@ -9,6 +10,7 @@ import { drag } from '@behaviors/draggable/draggable';
     templateUrl: './src/app/shared/components/navigation-menu/navigation-menu.component.html',
 })
 export class NavigationMenuComponent {
+    private themeService = inject(ThemeService);
     public isOpen = signal<boolean>(false);
 
     @ViewChild('#nav-radial-menu')
@@ -88,6 +90,15 @@ export class NavigationMenuComponent {
                 ],
             },
             {
+                name: 'Theme',
+                image: '🎨',
+                children: [
+                    { name: 'Dark Theme', image: '🌙', data: { theme: 'dark' } },
+                    { name: 'Light Theme', image: '☀️', data: { theme: 'light' } },
+                    { name: 'Toggle Theme', image: '🌓', data: { theme: 'toggle' } },
+                ],
+            },
+            {
                 name: 'Playground',
                 image: '🎮',
                 data: { hash: '#playground-window' },
@@ -151,6 +162,16 @@ export class NavigationMenuComponent {
     }
 
     public handleNavigate(item: MenuItem): void {
+        // Handle theme switching actions
+        if (item.data?.theme) {
+            if (item.data.theme === 'toggle') {
+                this.themeService.toggleTheme();
+            } else if (item.data.theme === 'dark' || item.data.theme === 'light') {
+                this.themeService.setTheme(item.data.theme);
+            }
+            return;
+        }
+
         const hash = item.data?.hash;
         if (!hash || typeof document === 'undefined') return;
 

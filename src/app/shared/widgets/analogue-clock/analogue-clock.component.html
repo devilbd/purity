@@ -6,8 +6,9 @@
             <span class="clock-title">{{title()}}</span>
             <span class="clock-badge">{{smoothSeconds() ? 'Smooth' : 'Quartz'}}</span>
         </div>
-        <div class="clock-tz-badge">
-            <span>{{timezoneLabel()}}</span>
+        <div class="clock-tz-badge" title="Active Timezone">
+            <span class="tz-icon">🌐</span>
+            <span class="tz-text">{{timezoneLabel()}}</span>
         </div>
     </div>
 
@@ -65,20 +66,37 @@
             <span>{{showDateBadge() ? '📅 Date Aperture' : '🔲 Clean Dial'}}</span>
         </button>
 
-        <div class="select-wrapper">
-            <select
-                class="input-primary tz-select"
-                onchange="onTimezoneChange(this.value)"
-                title="Select Clock Timezone"
-            >
-                <option value="local" selected>📍 Local Time</option>
-                <option value="UTC">🌐 UTC / GMT</option>
-                <option value="America/New_York">🗽 New York (EST/EDT)</option>
-                <option value="Europe/London">🇬🇧 London (GMT/BST)</option>
-                <option value="Europe/Paris">🇫🇷 Paris (CET/CEST)</option>
-                <option value="Asia/Tokyo">🇯🇵 Tokyo (JST)</option>
-                <option value="Australia/Sydney">🇦🇺 Sydney (AEST/AEDT)</option>
-            </select>
-        </div>
+        <dropdown label="{{timezoneLabel()}}" class="tz-dropdown">
+            <ul>
+                <li onclick="onTimezoneChange('local')" class="{{timezone() === 'local' ? 'is-selected' : ''}}">
+                    <span class="item-icon">📍</span>
+                    <span class="item-text">Local Time</span>
+                </li>
+                <li onclick="onTimezoneChange('UTC')" class="{{timezone() === 'UTC' ? 'is-selected' : ''}}">
+                    <span class="item-icon">🌐</span>
+                    <span class="item-text">UTC / GMT</span>
+                </li>
+                <li onclick="onTimezoneChange('America/New_York')" class="{{timezone() === 'America/New_York' ? 'is-selected' : ''}}">
+                    <span class="item-icon">🗽</span>
+                    <span class="item-text">New York (EST/EDT)</span>
+                </li>
+                <li onclick="onTimezoneChange('Europe/London')" class="{{timezone() === 'Europe/London' ? 'is-selected' : ''}}">
+                    <span class="item-icon">🇬🇧</span>
+                    <span class="item-text">London (GMT/BST)</span>
+                </li>
+                <li onclick="onTimezoneChange('Europe/Paris')" class="{{timezone() === 'Europe/Paris' ? 'is-selected' : ''}}">
+                    <span class="item-icon">🇫🇷</span>
+                    <span class="item-text">Paris (CET/CEST)</span>
+                </li>
+                <li onclick="onTimezoneChange('Asia/Tokyo')" class="{{timezone() === 'Asia/Tokyo' ? 'is-selected' : ''}}">
+                    <span class="item-icon">🇯🇵</span>
+                    <span class="item-text">Tokyo (JST)</span>
+                </li>
+                <li onclick="onTimezoneChange('Australia/Sydney')" class="{{timezone() === 'Australia/Sydney' ? 'is-selected' : ''}}">
+                    <span class="item-icon">🇦🇺</span>
+                    <span class="item-text">Sydney (AEST/AEDT)</span>
+                </li>
+            </ul>
+        </dropdown>
     </div>
 </div>

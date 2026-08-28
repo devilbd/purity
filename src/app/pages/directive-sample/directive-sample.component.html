@@ -22,4 +22,60 @@
             highlight="blue"
         />
     </div>
+
+    <div class="dropdown-demo-section">
+        <h4>Custom <code>&lt;dropdown&gt;</code> Directives & Templates</h4>
+        <p class="demo-desc">
+            Dropdowns declare inner templates with custom <code>&lt;ul&gt;</code>, <code>&lt;li&gt;</code>, icons, and event handlers addressed directly to the consuming component:
+        </p>
+
+        <div class="dropdown-demo-row">
+            <!-- 1. Simple Dropdown -->
+            <div class="dropdown-demo-box">
+                <label>Simple List Dropdown:</label>
+                <dropdown label="Select an item">
+                    <ul>
+                        <li onclick="onParentWhereIsConsumedClick('Item 1 (Simple)')">Item 1</li>
+                        <li onclick="onParentWhereIsConsumedClick('Item 2 (Simple)')">Item 2</li>
+                        <li onclick="onParentWhereIsConsumedClick('Item 3 (Simple)')">Item 3</li>
+                    </ul>
+                </dropdown>
+            </div>
+
+            <!-- 2. Rich Dropdown with Icons and Badges -->
+            <div class="dropdown-demo-box">
+                <label>Rich Custom Item Dropdown:</label>
+                <dropdown label="Choose Framework Service">
+                    <ul>
+                        <div class="dropdown-header">Core Engine</div>
+                        <li onclick="onParentWhereIsConsumedClick('Signals & Reactivity')">
+                            <span class="item-icon">⚡</span>
+                            <span class="item-text">Signals & Reactivity</span>
+                            <span class="item-badge">Core</span>
+                        </li>
+                        <li onclick="onParentWhereIsConsumedClick('Custom Web Components')">
+                            <span class="item-icon">🧩</span>
+                            <span class="item-text">Web Components v1</span>
+                            <span class="item-badge">Native</span>
+                        </li>
+                        <hr class="dropdown-divider" />
+                        <div class="dropdown-header">Ecosystem</div>
+                        <li onclick="onParentWhereIsConsumedClick('Dependency Injection')">
+                            <span class="item-icon">💉</span>
+                            <span class="item-text">Dependency Injection</span>
+                        </li>
+                        <li onclick="onParentWhereIsConsumedClick('HTTP Client Pipeline')">
+                            <span class="item-icon">🌐</span>
+                            <span class="item-text">HTTP Interceptors</span>
+                        </li>
+                    </ul>
+                </dropdown>
+            </div>
+        </div>
+
+        <div class="dropdown-output-card">
+            <span class="output-title">Consuming Component State:</span>
+            <code class="output-value">{{selectedDropdownItem()}}</code>
+        </div>
+    </div>
 </div>

@@ -1,0 +1,307 @@
+@use '@styles' as *;
+
+/* ==========================================================================
+   Purity Design System - Dropdown Component & Directive
+   GNOME 50 Adwaita Glassmorphism & KDE Plasma Breeze Cursors
+   ========================================================================== */
+
+dropdown,
+[dropdown],
+.p-dropdown {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+    font-family: var(--font-main);
+    user-select: none;
+    -webkit-user-select: none;
+
+    /* 1. Default Trigger Button */
+    .dropdown-trigger {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        min-width: 150px;
+        padding: 9px 14px;
+        margin: 0;
+        border-radius: var(--radius-control, 8px);
+        border: 1px solid var(--gnome-border);
+        background-color: var(--gnome-input);
+        backdrop-filter: var(--blur-subtle);
+        -webkit-backdrop-filter: var(--blur-subtle);
+        color: var(--text-main);
+        font-family: var(--font-main);
+        font-size: var(--font-size-sm, 13.5px);
+        font-weight: 600;
+        cursor: var(--cursor-pointer);
+        outline: none;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), var(--shadow-control);
+        transition: all var(--transition-fast) var(--ease-gnome);
+        box-sizing: border-box;
+
+        .dropdown-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: left;
+            flex: 1;
+        }
+
+        .dropdown-chevron {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            flex-shrink: 0;
+            transition: transform var(--transition-fast) var(--ease-gnome);
+
+            svg {
+                display: block;
+            }
+        }
+
+        &:hover:not(:disabled) {
+            background-color: var(--gnome-input-hover);
+            border-color: var(--gnome-border-focus);
+            transform: translateY(-1px);
+        }
+
+        &:focus-visible {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-shadow);
+        }
+
+        &:disabled,
+        &.disabled {
+            opacity: 0.45;
+            cursor: var(--cursor-not-allowed) !important;
+            pointer-events: none;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+    }
+
+    /* 2. Open State on Host Element */
+    &.dropdown-open,
+    &.p-dropdown--open {
+        .dropdown-trigger {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-shadow);
+            transform: translateY(0);
+
+            .dropdown-chevron {
+                transform: rotate(180deg);
+            }
+        }
+    }
+}
+
+/* ==========================================================================
+   3. Dropdown Body (Teleported directly to document.body for top z-index layer)
+   ========================================================================== */
+.p-dropdown-body,
+.dropdown-body {
+    position: fixed;
+    z-index: 10000;
+    width: max-content;
+    max-width: min(380px, calc(100vw - 20px));
+    max-height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 6px;
+    box-sizing: border-box;
+
+    background: var(--gnome-surface-solid, #242424);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-card, 12px);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+    font-family: var(--font-main);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top center;
+    transition: opacity var(--transition-fast) var(--ease-gnome),
+                transform var(--transition-fast) var(--ease-gnome),
+                visibility var(--transition-fast);
+
+    @include custom-scrollbar(5px);
+
+    &.is-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
+    }
+
+    &.placement-top {
+        transform-origin: bottom center;
+        transform: translateY(6px) scale(0.98);
+
+        &.is-open {
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* 4. Lists inside Dropdown Body */
+    ul,
+    ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* 5. Items inside Dropdown Body (li, a, button, .dropdown-item) */
+    li,
+    a,
+    button.dropdown-item,
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        margin: 0;
+        border-radius: var(--radius-control, 8px);
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text-main);
+        font-family: var(--font-main);
+        font-size: var(--font-size-sm, 13.5px);
+        font-weight: 500;
+        text-decoration: none;
+        cursor: var(--cursor-pointer);
+        transition: all var(--transition-fast) var(--ease-gnome);
+        box-sizing: border-box;
+        width: 100%;
+        text-align: left;
+        user-select: none;
+        -webkit-user-select: none;
+
+        &:hover:not(:disabled):not(.disabled) {
+            background: var(--gnome-hover);
+            color: var(--text-main);
+            transform: translateX(2px);
+        }
+
+        &:active:not(:disabled):not(.disabled) {
+            background: var(--gnome-active);
+            transform: translateX(0);
+        }
+
+        &.is-selected,
+        &.active {
+            background: var(--accent-subtle);
+            color: var(--accent);
+            font-weight: 600;
+            border-color: var(--accent-shadow);
+        }
+
+        &:disabled,
+        &.disabled {
+            opacity: 0.4;
+            cursor: var(--cursor-not-allowed) !important;
+            pointer-events: none;
+        }
+
+        .item-icon {
+            font-size: 1.1em;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .item-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .item-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: var(--radius-pill, 999px);
+            background: var(--accent-subtle);
+            color: var(--accent);
+        }
+    }
+
+    /* 6. Headers & Dividers */
+    .dropdown-header,
+    h6 {
+        padding: 6px 12px 2px;
+        margin: 0;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-secondary);
+    }
+
+    hr,
+    .dropdown-divider {
+        border: none;
+        border-top: 1px solid var(--gnome-border-subtle);
+        margin: 4px 6px;
+    }
+}
+
+/* ==========================================================================
+   Light Theme Adjustments
+   ========================================================================== */
+[data-theme='light'] {
+    dropdown,
+    [dropdown],
+    .p-dropdown {
+        .dropdown-trigger {
+            background-color: var(--gnome-input);
+            border-color: var(--gnome-border);
+            color: var(--text-main);
+
+            &:hover:not(:disabled) {
+                background-color: var(--gnome-input-hover);
+                border-color: var(--gnome-border-focus);
+            }
+        }
+    }
+}
+
+body[data-theme='light'] .p-dropdown-body,
+[data-theme='light'] .p-dropdown-body,
+html[data-theme='light'] .p-dropdown-body {
+    background: var(--gnome-surface);
+    border-color: var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+
+    li,
+    a,
+    button.dropdown-item,
+    .dropdown-item {
+        color: var(--text-main);
+
+        &:hover:not(:disabled):not(.disabled) {
+            background: var(--gnome-hover);
+        }
+
+        &.is-selected,
+        &.active {
+            background: var(--accent-subtle);
+            color: var(--accent);
+        }
+    }
+}

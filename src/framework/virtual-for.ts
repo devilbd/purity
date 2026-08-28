@@ -120,7 +120,10 @@ export function bindVirtualFor(
     evaluateValueFn: (expr: string, ctx: any) => any,
     isInsideNestedComponentFn: (node: Node, root: HTMLElement) => boolean,
 ): void {
-    const allElements = Array.from(rootEl.querySelectorAll('*')).filter(
+    const candidates = hasVirtualForAttribute(rootEl)
+        ? [rootEl, ...Array.from(rootEl.querySelectorAll('*'))]
+        : Array.from(rootEl.querySelectorAll('*'));
+    const allElements = candidates.filter(
         (el): el is HTMLElement => el instanceof HTMLElement && hasVirtualForAttribute(el),
     );
 

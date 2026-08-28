@@ -12,7 +12,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 - **Component Model**: Plain classes decorated with `@Component({ selector, templateUrl })` with compile-time template inlining (`?raw`), `<slot>` content projection, structural iteration (`for="let item of items"` and `virtual-for`), and structural conditionals (`if`, `else-if`, `else`).
 - **HTTP Client**: `HttpClient` service consuming centralized class-based interceptors (`HttpInterceptor`) under `@interceptors/*` and driving the KDE Plasma Breeze progress cursor engine.
 - **Transform Pipes**: Reusable data transformers implementing `BasePipe` and decorated with `@Pipe('name')` integrated into Handlebars expressions (`{{ val | pipe: arg1 }}`).
-- **Custom Directives**: Attribute directives implementing `BaseDirective` and decorated with `@Directive('selector')`.
+- **Custom Directives**: Attribute and tag-level reactivity and DOM augmentation with `@Directive` and `BaseDirective` (e.g. `highlight`, `<dropdown>`).
 - **Form Validators**: Decoupled validation classes implementing `BaseValidator` and decorated with `@Validator({ form, fields })`.
 - **Composable Behaviors**: Modular interaction helpers (`drag`, `droppable`) under `@behaviors/*`.
 - **Routing**: Signal Router with `<router-layout>` and `routerLink` directive.

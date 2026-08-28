@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@purity/core';
+import { Component, effect, inject, signal } from '@purity/core';
 import { ThemeService, type AppTheme } from '@data/theme.service';
 import './header.component.scss';
 
@@ -12,12 +12,13 @@ export class HeaderComponent {
     public currentTheme = signal<AppTheme>('dark');
 
     protected onInit(): void {
-        this.syncState();
+        effect(() => {
+            this.syncState();
+        });
     }
 
     public onToggleTheme(): void {
         this.themeService.toggleTheme();
-        this.syncState();
     }
 
     private syncState(): void {

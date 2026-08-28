@@ -67,8 +67,9 @@ export class VirtualForSampleComponent {
     private metricsTimer?: number;
 
     public filteredItems = computed<DataRecord[]>(() => {
-        const query = this.searchQuery().toLowerCase().trim();
-        const all = this.items();
+        const raw = this.searchQuery();
+        const query = (typeof raw === 'string' ? raw : String(raw ?? '')).toLowerCase().trim();
+        const all = this.items() || [];
         if (!query) return all;
         return all.filter(
             (item) =>
@@ -110,8 +111,15 @@ export class VirtualForSampleComponent {
         this.renderTimeMs.set(parseFloat(elapsed));
     }
 
-    public onSearchInput(input: HTMLInputElement): void {
-        this.searchQuery.set(input.value);
+    public onSearchInput(input: HTMLInputElement | any): void {
+        const val = input && typeof input.value === 'string'
+            ? input.value
+            : input && input.target && typeof input.target.value === 'string'
+                ? input.target.value
+                : typeof input === 'string'
+                    ? input
+                    : '';
+        this.searchQuery.set(val);
     }
 
     public clearSearch(): void {
@@ -122,8 +130,15 @@ export class VirtualForSampleComponent {
 
     public jumpTarget = signal<number>(0);
 
-    public onJumpInput(input: HTMLInputElement): void {
-        this.jumpIndexInput.set(input.value);
+    public onJumpInput(input: HTMLInputElement | any): void {
+        const val = input && typeof input.value === 'string'
+            ? input.value
+            : input && input.target && typeof input.target.value === 'string'
+                ? input.target.value
+                : typeof input === 'string'
+                    ? input
+                    : '';
+        this.jumpIndexInput.set(val);
     }
 
     public jumpToSpecifiedIndex(align: 'start' | 'center' | 'end' = 'center'): void {

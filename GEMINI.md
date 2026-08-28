@@ -99,7 +99,7 @@ purity/
             ├── behaviors/       # Composable DOM behaviors
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
-            ├── directives/      # Reusable DOM directives (e.g. highlight)
+            ├── directives/      # Reusable DOM directives (e.g. dropdown, highlight)
             ├── interceptors/    # Centralized HTTP interceptor classes (@interceptors/*)
             │   ├── auth.interceptor.ts    # Centralized Bearer token auth interceptor
             │   └── logging.interceptor.ts # Centralized latency & status logging interceptor
@@ -358,7 +358,9 @@ Transform Pipes decouple data transformation and formatting logic from component
 Directives attach custom behavior and reactivity to DOM elements:
 
 * **`@Directive(selector: string | DirectiveOptions)`**:
-  Class decorator that registers a directive matching an element attribute (e.g. `@Directive('highlight')` or `@Directive('[highlight]')`).
+  Class decorator that registers a directive matching an element attribute (e.g. `@Directive('highlight')`, `@Directive('[highlight]')`) or custom element tag (e.g. `@Directive('dropdown')` matching `<dropdown>`).
+
+  **Example 1: Highlight Directive**
   ```typescript
   @Directive('highlight')
   export class HighlightDirective extends BaseDirective {
@@ -376,6 +378,30 @@ Directives attach custom behavior and reactivity to DOM elements:
       }
   }
   ```
+
+  **Example 2: `<dropdown>` Component & Directive Engine**
+  Purity includes a native `<dropdown>` directive engine that allows consumers to declare custom inner templates with standard `<ul>`, `<li>`, icons, headers, and dividers. All event handlers (`onclick`) inside the template are bound to and executed within the **consuming parent component**:
+
+  ```html
+  <!-- Consuming in any component template -->
+  <dropdown label="Framework Services">
+      <ul>
+          <div class="dropdown-header">Core Primitives</div>
+          <li onclick="onSelectService('signals')">
+              <span class="item-icon">⚡</span>
+              <span class="item-text">Synchronous Signals</span>
+              <span class="item-badge">Core</span>
+          </li>
+          <li onclick="onSelectService('components')">
+              <span class="item-icon">🧩</span>
+              <span class="item-text">Web Components v1</span>
+              <span class="item-badge">Native</span>
+          </li>
+      </ul>
+  </dropdown>
+  ```
+
+  The dropdown body is automatically **teleported to `document.body`** with `position: fixed; z-index: 10000`, escaping any parent container `overflow: hidden`, `backdrop-filter`, or stacking context clipping while tracking the trigger's coordinates across all scrollable windows.
 
 ### 7. Form Validation (`validator.ts`)
 

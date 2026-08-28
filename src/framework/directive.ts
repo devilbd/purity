@@ -74,6 +74,7 @@ export function Directive(
 export abstract class BaseDirective implements DirectiveLifecycle {
     element!: HTMLElement;
     value?: any;
+    context?: any;
 
     onInit?(): void;
     onChanges?(value: any, oldValue?: any): void;
@@ -104,15 +105,32 @@ export function bindDirectives(
                 matchedAttrName = selector;
             } else if (el.hasAttribute(`[${selector}]`)) {
                 matchedAttrName = `[${selector}]`;
+            } else if (el.tagName.toLowerCase() === selector.toLowerCase()) {
+                matchedAttrName = selector;
             }
 
             if (matchedAttrName !== null) {
                 const instance = new DirectiveConstructor();
                 instance.element = el;
+                (instance as any).context = context;
 
                 // Setup MutationObserver to notify directive when properties/attributes of DOM change
                 const observer = new MutationObserver((mutations) => {
                     for (const mutation of mutations) {
+                        if (
+                            mutation.type === 'attributes' &&
+                            (mutation.attributeName === matchedAttrName ||
+                                mutation.attributeName === `[${matchedAttrName}]` ||
+                                mutation.attributeName === 'label' ||
+                                mutation.attributeName === 'value')
+                        ) {
+                            const newAttrVal = el.getAttribute(mutation.attributeName);
+                            if (newAttrVal !== null && newAttrVal !== instance.value) {
+                                const oldVal = instance.value;
+                                instance.value = newAttrVal;
+                                instance.onChanges?.(newAttrVal, oldVal);
+                            }
+                        }
                         instance.onDOMChange?.(mutation);
                     }
                 });
@@ -132,7 +150,11 @@ export function bindDirectives(
                 el.addEventListener('input', domEventListener);
                 el.addEventListener('change', domEventListener);
 
-                const rawAttrValue = el.getAttribute(matchedAttrName) || '';
+                const rawAttrValue =
+                    el.getAttribute(matchedAttrName) ??
+                    el.getAttribute('label') ??
+                    el.getAttribute('value') ??
+                    '';
 
                 if (rawAttrValue.includes('{{')) {
                     // Reactive attribute value

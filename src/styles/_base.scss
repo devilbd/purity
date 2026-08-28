@@ -383,17 +383,110 @@ body.http-loading,
     }
 }
 
+/* Translucent Glass Select / Dropdown Control */
+select,
+.select-primary {
+    @extend .base-input;
+
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--gnome-input);
+    backdrop-filter: var(--blur-subtle);
+    -webkit-backdrop-filter: var(--blur-subtle);
+
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-control);
+    color: var(--text-main);
+    padding: 10px 38px 10px 14px;
+    font-family: var(--font-main);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1), var(--shadow-control);
+    transition: all var(--transition-fast) var(--ease-gnome);
+    cursor: var(--cursor-pointer);
+    outline: none;
+
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: var(--select-chevron-icon);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 14px;
+
+    &:hover:not(:disabled) {
+        background-color: var(--gnome-input-hover);
+        border-color: var(--gnome-border-focus);
+        transform: translateY(-1px);
+    }
+
+    &:focus {
+        background-color: var(--gnome-input-focus);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-shadow);
+        transform: translateY(0);
+    }
+
+    &:active:not(:disabled) {
+        background-color: var(--gnome-active);
+        transform: translateY(0);
+    }
+
+    &:disabled,
+    &.disabled {
+        opacity: 0.45;
+        cursor: var(--cursor-not-allowed) !important;
+        pointer-events: none;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    option,
+    optgroup {
+        background-color: var(--gnome-surface-solid, #242424);
+        color: var(--text-main, #ffffff);
+        font-family: var(--font-main);
+        font-size: var(--font-size-sm);
+        padding: 8px 12px;
+    }
+}
+
+/* Select Container Helper */
+.select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+}
+
 .input-primary.error,
 .input-primary.is-invalid,
+select.error,
+select.is-invalid,
+.select-primary.error,
+.select-primary.is-invalid,
 .is-invalid {
     border-color: var(--gnome-error) !important;
     box-shadow: 0 0 0 3px var(--gnome-error-bg) !important;
 }
 
 .input-primary.is-valid,
+select.is-valid,
+.select-primary.is-valid,
 .is-valid {
     border-color: var(--gnome-success) !important;
     box-shadow: 0 0 0 3px var(--gnome-success-bg) !important;
+}
+
+/* Light Theme Option Dropdown Styling */
+[data-theme='light'] {
+    select option,
+    select optgroup,
+    .select-primary option,
+    .select-primary optgroup {
+        background-color: #ffffff;
+        color: #1c1c1c;
+    }
 }
 
 /* Typography & Layout Helpers */

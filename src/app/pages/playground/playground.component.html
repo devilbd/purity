@@ -9,16 +9,19 @@
         </div>
 
         <div class="preset-selector-group">
-            <label for="preset-select" class="preset-label">Preset / History:</label>
+            <label class="preset-label">Preset / History:</label>
             <div class="preset-select-wrapper">
-                <select
-                    id="preset-select"
-                    class="preset-select"
-                    aria-label="Preset or Saved Draft"
-                    onchange="onPresetSelect(this.value)"
-                >
-                    <option for="let p of allPresets" value="{{p.id}}">{{p.name}}</option>
-                </select>
+                <dropdown label="{{selectedPresetName}}" class="preset-dropdown">
+                    <ul>
+                        <li
+                            for="let p of allPresets"
+                            onclick="onPresetSelect(p.id)"
+                            class="{{p.id === selectedPresetId() ? 'is-selected' : ''}}"
+                        >
+                            <span class="item-text">{{p.name}}</span>
+                        </li>
+                    </ul>
+                </dropdown>
             </div>
 
             <div class="preset-actions-group">

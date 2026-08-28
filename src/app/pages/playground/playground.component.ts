@@ -29,6 +29,8 @@ import { AnalogueClockComponent } from '@widgets/analogue-clock/analogue-clock.c
 // Directives, Pipes & Validators
 import '@directives/highlight.directive';
 import { HighlightDirective } from '@directives/highlight.directive';
+import '@directives/dropdown.directive';
+import { DropdownDirective } from '@directives/dropdown.directive';
 import '@pipes/uppercase.pipe';
 import { UppercasePipe } from '@pipes/uppercase.pipe';
 import '@pipes/date.pipe';
@@ -1426,6 +1428,223 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+    {
+        id: 'dropdown',
+        name: '🔽 Custom Dropdowns',
+        description: '<dropdown> component & directive with inline templates, parent event handlers, and glassmorphism.',
+        ts: `import { Component, signal } from '@purity/core';
+
+@Component({
+    selector: 'playground-dropdown-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDropdownDemoComponent {
+    selectedCategory = signal('Web Components');
+    selectedFramework = signal('Purity Core');
+    lastActionLog = signal('Ready. Select an item from any dropdown.');
+
+    onSelectCategory(category: string) {
+        this.selectedCategory.set(category);
+        this.lastActionLog.set(\`Selected category: "\${category}" at \${new Date().toLocaleTimeString()}\`);
+    }
+
+    onSelectFramework(fw: string) {
+        this.selectedFramework.set(fw);
+        this.lastActionLog.set(\`Chosen module: "\${fw}" at \${new Date().toLocaleTimeString()}\`);
+    }
+
+    onReset() {
+        this.selectedCategory.set('Web Components');
+        this.selectedFramework.set('Purity Core');
+        this.lastActionLog.set('Reset to default selections.');
+    }
+}`,
+        html: `<div class="dropdown-demo-card window">
+    <div class="demo-header">
+        <h3>🔽 Custom & Declarative Dropdowns</h3>
+        <p class="demo-subtitle">
+            Inline template declaration, consuming parent event scoping, and glassmorphic body teleportation.
+        </p>
+    </div>
+
+    <div class="dropdowns-grid">
+        <!-- 1. Category Dropdown -->
+        <div class="dropdown-panel">
+            <label class="panel-label">Framework Area</label>
+            <dropdown label="{{selectedCategory()}}" class="custom-dd">
+                <ul>
+                    <div class="dropdown-header">Reactive Core</div>
+                    <li onclick="onSelectCategory('Signals & Computed')">
+                        <span class="item-icon">⚡</span>
+                        <span class="item-text">Signals & Computed</span>
+                        <span class="item-badge">Core</span>
+                    </li>
+                    <li onclick="onSelectCategory('Effects & Tracking')">
+                        <span class="item-icon">🔄</span>
+                        <span class="item-text">Effects & Tracking</span>
+                    </li>
+                    <hr class="dropdown-divider" />
+                    <div class="dropdown-header">Architecture</div>
+                    <li onclick="onSelectCategory('Web Components')">
+                        <span class="item-icon">🧩</span>
+                        <span class="item-text">Web Components</span>
+                        <span class="item-badge">v1</span>
+                    </li>
+                    <li onclick="onSelectCategory('Dependency Injection')">
+                        <span class="item-icon">💉</span>
+                        <span class="item-text">Dependency Injection</span>
+                    </li>
+                    <li onclick="onSelectCategory('HTTP Interceptors')">
+                        <span class="item-icon">🌐</span>
+                        <span class="item-text">HTTP Interceptors</span>
+                    </li>
+                </ul>
+            </dropdown>
+        </div>
+
+        <!-- 2. Services Dropdown -->
+        <div class="dropdown-panel">
+            <label class="panel-label">Module / Service</label>
+            <dropdown label="{{selectedFramework()}}" class="custom-dd">
+                <ul>
+                    <li onclick="onSelectFramework('Purity Core')">
+                        <span class="item-icon">📦</span>
+                        <span class="item-text">@purity/core</span>
+                    </li>
+                    <li onclick="onSelectFramework('Theme Engine')">
+                        <span class="item-icon">🌓</span>
+                        <span class="item-text">Theme Engine</span>
+                    </li>
+                    <li onclick="onSelectFramework('Signal Router')">
+                        <span class="item-icon">🗺️</span>
+                        <span class="item-text">Signal Router</span>
+                    </li>
+                    <li onclick="onSelectFramework('Breeze Cursors')">
+                        <span class="item-icon">🖱️</span>
+                        <span class="item-text">Breeze Cursors</span>
+                    </li>
+                </ul>
+            </dropdown>
+        </div>
+    </div>
+
+    <!-- Output Status Card -->
+    <div class="status-output">
+        <div class="status-row">
+            <span class="status-key">Active Selection:</span>
+            <span class="status-pill">{{selectedCategory()}} / {{selectedFramework()}}</span>
+        </div>
+        <div class="status-row">
+            <span class="status-key">Event Log:</span>
+            <span class="status-text">{{lastActionLog()}}</span>
+        </div>
+    </div>
+
+    <div class="demo-actions">
+        <button type="button" class="button-secondary" onclick="onReset()">
+            🔄 Reset Selections
+        </button>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.dropdown-demo-card {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 620px;
+    margin: 0 auto;
+
+    .demo-header {
+        h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .demo-subtitle {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+    }
+
+    .dropdowns-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+
+        .dropdown-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .panel-label {
+                font-size: 12.5px;
+                font-weight: 600;
+                color: var(--text-secondary);
+            }
+
+            .custom-dd {
+                width: 100%;
+            }
+        }
+    }
+
+    .status-output {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: var(--radius-card, 12px);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+
+            .status-key {
+                font-weight: 600;
+                color: var(--text-secondary);
+                min-width: 110px;
+            }
+
+            .status-pill {
+                font-family: var(--font-mono, monospace);
+                font-weight: 700;
+                color: var(--accent);
+                background: var(--accent-subtle);
+                padding: 2px 8px;
+                border-radius: 4px;
+            }
+
+            .status-text {
+                color: var(--text-main);
+                font-size: 12.5px;
+            }
+        }
+    }
+
+    .demo-actions {
+        display: flex;
+        justify-content: flex-end;
+    }
+}`,
+    },
 ];
 
 /**
@@ -1552,8 +1771,24 @@ export class PlaygroundComponent {
         return [...PLAYGROUND_PRESETS, ...this.savedPresets()];
     }
 
+    get selectedPresetName(): string {
+        const found = this.allPresets.find(p => p.id === this.selectedPresetId());
+        return found ? found.name : 'Choose Preset...';
+    }
+
     get isCustomSelected(): boolean {
         return this.savedPresets().some(p => p.id === this.selectedPresetId());
+    }
+
+    private get hostElement(): HTMLElement {
+        if ((this as any)?.__host instanceof HTMLElement) {
+            return (this as any).__host;
+        }
+        if (typeof document !== 'undefined') {
+            const found = document.querySelector('playground-view');
+            if (found instanceof HTMLElement) return found;
+        }
+        return typeof document !== 'undefined' ? document.body : ({} as HTMLElement);
     }
 
     protected onInit() {
@@ -1582,7 +1817,7 @@ export class PlaygroundComponent {
 
             // Bind continuous scroll lock on textarea
             setTimeout(() => {
-                const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+                const root = this.hostElement;
                 const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
                 if (textarea) {
                     const sync = () => this.onScroll(textarea);
@@ -1607,7 +1842,7 @@ export class PlaygroundComponent {
 
     setTab(tab: 'ts' | 'html' | 'scss') {
         this.activeTab.set(tab);
-        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const root = this.hostElement;
         const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
         if (textarea) {
             textarea.scrollTop = 0;
@@ -1639,7 +1874,7 @@ export class PlaygroundComponent {
         this.tsCode.set(preset.ts);
         this.htmlCode.set(preset.html);
         this.scssCode.set(preset.scss);
-        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const root = this.hostElement;
         const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
         if (textarea) {
             textarea.scrollTop = 0;
@@ -1696,16 +1931,11 @@ export class PlaygroundComponent {
 
         this.notify.info('Draft Deleted', `Removed "${custom.name}" from local history.`);
         this.onPresetSelect(PLAYGROUND_PRESETS[0].id);
-
-        const select = document.querySelector('#preset-select') as HTMLSelectElement | null;
-        if (select) {
-            select.value = PLAYGROUND_PRESETS[0].id;
-        }
     }
 
     updateHighlight() {
         if (typeof document === 'undefined') return;
-        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const root = this.hostElement;
         const codeEl = root.querySelector?.('#highlight-code') || document.querySelector('#highlight-code');
         if (!codeEl) return;
 
@@ -1731,7 +1961,7 @@ export class PlaygroundComponent {
     }
 
     onScroll(textarea: HTMLTextAreaElement) {
-        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const root = this.hostElement;
         const pre = root.querySelector?.('.highlight-layer') || document.querySelector('.highlight-layer');
         if (pre) {
             pre.scrollTop = textarea.scrollTop;
@@ -1921,6 +2151,7 @@ export class PlaygroundComponent {
                 RadialContextMenuComponent,
                 AnalogueClockComponent,
                 HighlightDirective,
+                DropdownDirective,
                 UppercasePipe,
                 DatePipe,
                 MyTransformPipe,

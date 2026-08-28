@@ -364,64 +364,62 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
             break;
         }
 
-        // Insert anchor bookmarks at the location of `el`
-        const startAnchor = document.createComment(`if-start: ${ifExpr}`);
-        const endAnchor = document.createComment(`if-end`);
-        parent.insertBefore(startAnchor, el);
-        parent.insertBefore(endAnchor, el);
+        const anchor = document.createComment(`conditional-block`);
+        parent.insertBefore(anchor, el);
 
-        // Remove all branch DOM elements from the active document tree
-        for (const item of siblingElementsToRemove) {
-            if (item.parentNode) {
-                item.parentNode.removeChild(item);
+        for (const remEl of siblingElementsToRemove) {
+            if (remEl.parentNode) {
+                remEl.parentNode.removeChild(remEl);
             }
         }
 
+        let currentRenderedNode: HTMLElement | null = null;
         let currentRenderedIndex = -1;
 
         effect(() => {
             let matchedIndex = -1;
 
             for (let i = 0; i < branches.length; i++) {
-                const branch = branches[i];
-                if (branch.type === 'else') {
+                const b = branches[i];
+                if (b.type === 'else') {
                     matchedIndex = i;
                     break;
                 }
-
-                const rawVal = evaluateValue(branch.expr, context);
-                const isTruthy =
-                    rawVal !== false &&
-                    rawVal !== 0 &&
-                    rawVal !== '' &&
-                    rawVal !== null &&
-                    rawVal !== undefined;
-
-                if (isTruthy) {
+                const result = evaluateValue(b.expr, context);
+                if (
+                    result !== false &&
+                    result !== null &&
+                    result !== undefined &&
+                    result !== '' &&
+                    result !== 0
+                ) {
                     matchedIndex = i;
                     break;
                 }
             }
 
-            if (matchedIndex === currentRenderedIndex) {
+            if (matchedIndex === currentRenderedIndex && currentRenderedNode) {
                 return;
             }
 
-            // Clean up previous rendered nodes between startAnchor and endAnchor
-            while (startAnchor.nextSibling && startAnchor.nextSibling !== endAnchor) {
-                const nodeToRemove = startAnchor.nextSibling;
-                nodeToRemove.parentNode?.removeChild(nodeToRemove);
+            if (currentRenderedNode && currentRenderedNode.parentNode) {
+                currentRenderedNode.parentNode.removeChild(currentRenderedNode);
+                currentRenderedNode = null;
             }
-
             currentRenderedIndex = matchedIndex;
 
-            if (matchedIndex !== -1 && endAnchor.parentNode) {
-                const matchedBranch = branches[matchedIndex];
-                const clone = matchedBranch.templateEl.cloneNode(true) as HTMLElement;
-                endAnchor.parentNode.insertBefore(clone, endAnchor);
+            if (matchedIndex === -1) {
+                return;
+            }
 
-                // Recursively build, compile, and bind the cloned subtree with the active context
-                bindTemplateTree(clone, context, componentInstance);
+            const matchedBranch = branches[matchedIndex];
+            const clone = matchedBranch.templateEl.cloneNode(true) as HTMLElement;
+
+            bindTemplateTree(clone, context, componentInstance);
+
+            if (anchor.parentNode) {
+                anchor.parentNode.insertBefore(clone, anchor);
+                currentRenderedNode = clone;
             }
         });
     }
@@ -429,15 +427,15 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
     // 2. Process high-performance Virtualized For repeaters (`virtual-for`) inside rootEl
     bindVirtualFor(rootEl, context, componentInstance, bindTemplateTree, evaluateValue, isInsideNestedComponent);
 
-    // 3. Process structural standard `for` loops inside rootEl
-    const allForElements = Array.from(rootEl.querySelectorAll('*')).filter(
-        (el): el is HTMLElement => el instanceof HTMLElement && hasForAttribute(el) && !hasVirtualForAttribute(el),
-    );
-    const topLevelForElements = allForElements.filter((el) => {
+    // 3. Process structural array loop templates (`for="let item of items"`) inside rootEl
+    const candidateForElements = Array.from(rootEl.querySelectorAll('*')).filter((el): el is HTMLElement => {
+        if (!(el instanceof HTMLElement)) return false;
+        if (getForAttribute(el) === null) return false;
+        if (el.closest('[data-no-bind]')) return false;
         if (isInsideNestedComponent(el, rootEl)) return false;
         let p = el.parentElement;
         while (p && p !== rootEl) {
-            if (hasForAttribute(p) || isStructuralConditional(p) || hasVirtualForAttribute(p)) {
+            if (isStructuralConditional(p) || hasForAttribute(p) || hasVirtualForAttribute(p)) {
                 return false;
             }
             p = p.parentElement;
@@ -445,13 +443,8 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         return true;
     });
 
-    for (const el of topLevelForElements) {
-        if (!(el instanceof HTMLElement)) continue;
-        if (el.closest('[data-no-bind]')) continue;
-
-        const forAttr = getForAttribute(el);
-        if (!forAttr) continue;
-
+    for (const el of candidateForElements) {
+        const forAttr = getForAttribute(el)!;
         // Matches: let item of items, let item, index of items, let (item, i) of items, item of items
         const match = forAttr.match(
             /^(?:let\s+)?(?:\(?\s*([a-zA-Z0-9_$]+)(?:\s*,\s*([a-zA-Z0-9_$]+))?\s*\)?)\s+of\s+([\s\S]+)$/,
@@ -513,19 +506,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         });
     }
 
-    // 2. Bind Directives and Validators
-    if (componentInstance) {
-        const directives = bindDirectives(rootEl, componentInstance);
-        if (componentInstance.activeDirectives) {
-            componentInstance.activeDirectives.push(...directives);
-        }
-        const validators = bindValidators(rootEl, componentInstance);
-        if (componentInstance.activeValidators) {
-            componentInstance.activeValidators.push(...validators);
-        }
-    }
-
-    // 3. Bind Text Node interpolations
+    // 4. Bind Text Node interpolations
     const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
     const textNodes: Text[] = [];
     let node: Node | null;
@@ -589,7 +570,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         }
     }
 
-    // 4. Bind Element Attributes & Event Handlers
+    // 5. Bind Element Attributes & Event Handlers
     const elementsWithAttrs = [rootEl, ...Array.from(rootEl.querySelectorAll('*'))];
     for (const el of elementsWithAttrs) {
         if (!(el instanceof HTMLElement)) continue;
@@ -660,6 +641,18 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     }
                 });
             }
+        }
+    }
+
+    // 6. Bind Directives and Validators
+    if (componentInstance) {
+        const directives = bindDirectives(rootEl, componentInstance);
+        if (componentInstance.activeDirectives) {
+            componentInstance.activeDirectives.push(...directives);
+        }
+        const validators = bindValidators(rootEl, componentInstance);
+        if (componentInstance.activeValidators) {
+            componentInstance.activeValidators.push(...validators);
         }
     }
 }

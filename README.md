@@ -39,6 +39,7 @@
 - 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
 - 🖱️ **KDE Plasma Breeze Cursor System**: Complete cursor hierarchy using vector SVG cursors from KDE Plasma (`breeze_cursors`), including a 23-frame animated progress spinner cursor (`var(--cursor-progress)`) automatically synchronized with HTTP requests and reactive UI loaders.
 - 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 🔽 **Declarative Custom Dropdowns (`<dropdown>`)**: Native dropdown directive and component engine with inline consumer template projection (`<ul>`, `<li>`), parent component event scoping (`onclick`), fixed dynamic positioning, `document.body` teleportation at `z-index: 10000`, and GNOME 50 frosted glassmorphism.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
 - ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
 - 🎮 **Interactive Live Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation, Hot Reload, dynamic multi-component execution, and persistent `localStorage` snippet history ("Save written...").
@@ -133,7 +134,7 @@ purity/
         ├── pages/               # Application pages, views & feature showcases (header, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, custom, directive-sample, forms-validation, for-sample, pipe-sample, raw-template)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
-            ├── directives/      # Reusable DOM directives (highlight)
+            ├── directives/      # Reusable DOM directives (e.g. dropdown, highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
             ├── widgets/         # Rich standalone widgets (analogue-clock)
@@ -440,6 +441,39 @@ export class HighlightDirective extends BaseDirective {
 <p highlight="gold">Static highlight</p>
 <div highlight="{{activeVariant()}}">Reactive highlight</div>
 ```
+
+#### Custom `<dropdown>` Component & Directive Engine
+
+Purity provides a native `<dropdown>` directive engine (`@Directive('dropdown')`) allowing consumers to declare custom inner templates with standard `<ul>`, `<li>`, icons, headers, and dividers. All event handlers (`onclick`) are scoped to the **consuming parent component**:
+
+```html
+<!-- Consuming in any component template -->
+<dropdown label="Framework Services">
+    <ul>
+        <div class="dropdown-header">Core Primitives</div>
+        <li onclick="onSelectService('signals')">
+            <span class="item-icon">⚡</span>
+            <span class="item-text">Synchronous Signals</span>
+            <span class="item-badge">Core</span>
+        </li>
+        <li onclick="onSelectService('components')">
+            <span class="item-icon">🧩</span>
+            <span class="item-text">Web Components v1</span>
+            <span class="item-badge">Native</span>
+        </li>
+        <hr class="dropdown-divider" />
+        <div class="dropdown-header">Networking</div>
+        <li onclick="onSelectService('http')">
+            <span class="item-icon">🌐</span>
+            <span class="item-text">HTTP Client Pipeline</span>
+        </li>
+    </ul>
+</dropdown>
+```
+
+- **Document Body Teleportation**: The dropdown popup body is automatically appended directly to `document.body` (`z-index: 10000; position: fixed`), preventing parent `overflow: hidden`, `backdrop-filter`, or stacking context clipping.
+- **Dynamic Positioning & Viewport Boundary Auto-Placement**: Automatically detects screen bounds to flip upward if near the viewport bottom and updates coordinates dynamically on window scroll and resize.
+- **GNOME 50 Design System**: Glassmorphic frosted blur (`backdrop-filter: var(--blur-effect)`), specular borders, smooth cubic-bezier transitions, and KDE Plasma Breeze cursors.
 
 ---
 

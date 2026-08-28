@@ -8,6 +8,7 @@ import './directive-sample.component.scss';
 })
 export class DirectiveSampleComponent {
     highlightVariant = signal('green');
+    selectedDropdownItem = signal<string>('None selected yet');
 
     setGreen() {
         this.highlightVariant.set('green');
@@ -23,5 +24,9 @@ export class DirectiveSampleComponent {
 
     setRed() {
         this.highlightVariant.set('red');
+    }
+
+    onParentWhereIsConsumedClick(itemName: string) {
+        this.selectedDropdownItem.set(itemName);
     }
 }

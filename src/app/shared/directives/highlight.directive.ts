@@ -15,7 +15,14 @@ export class HighlightDirective extends BaseDirective {
     }
 
     onDOMChange(recordOrEvent: MutationRecord | Event) {
-        if (recordOrEvent instanceof Event && recordOrEvent.type === 'input') {
+        if (recordOrEvent instanceof MutationRecord) {
+            if (recordOrEvent.attributeName === 'highlight' || recordOrEvent.attributeName === '[highlight]') {
+                const newColor = this.element.getAttribute('highlight') || this.element.getAttribute('[highlight]');
+                if (newColor && newColor !== this.value) {
+                    this.onChanges(newColor);
+                }
+            }
+        } else if (recordOrEvent instanceof Event && recordOrEvent.type === 'input') {
             const input = this.element as HTMLInputElement;
             if (input.value && input.value.length > 5) {
                 this.element.classList.add('p-highlight--valid');
