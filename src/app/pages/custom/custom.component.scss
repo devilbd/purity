@@ -1,0 +1,60 @@
+@use '@styles' as *;
+
+.custom-component-root {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    box-shadow: var(--shadow-deep);
+    transition: transform var(--transition-fast) var(--ease-gnome), box-shadow var(--transition-fast) var(--ease-gnome);
+
+    h3 {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0;
+        font-size: 16px;
+        color: var(--text-main);
+
+        .custom-property-display {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .drag-handle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(53, 132, 228, 0.9), rgba(98, 160, 234, 0.8));
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: var(--radius-pill, 999px);
+            box-shadow: 0 4px 12px rgba(53, 132, 228, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            cursor: var(--cursor-grab, grab);
+            user-select: none;
+            touch-action: none;
+            transition: all var(--transition-fast) var(--ease-gnome);
+
+            &:hover {
+                filter: brightness(1.1);
+                box-shadow: 0 6px 16px rgba(53, 132, 228, 0.45), inset 0 1px 1.5px rgba(255, 255, 255, 0.7);
+                transform: translateY(-1px);
+            }
+
+            &:active {
+                cursor: var(--cursor-grabbing, grabbing);
+                transform: translateY(0);
+            }
+        }
+    }
+}

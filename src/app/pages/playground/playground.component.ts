@@ -1156,8 +1156,11 @@ export class PlaygroundDemoComponent {
             accepts: '#drag-token',
             hoverClass: 'zone-hover',
             onDrop: (el) => {
-                el.innerText = '🎯 Dropped!';
-                el.style.background = '#2ec27e';
+                el.classList.add('is-dropped');
+                const title = el.querySelector('.token-title') as HTMLElement | null;
+                const icon = el.querySelector('.token-icon') as HTMLElement | null;
+                if (title) title.innerText = 'Dropped!';
+                if (icon) icon.innerText = '✨';
             },
         });
     }
@@ -1168,65 +1171,256 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="sample-card window">
-    <h3>🎯 Drag &amp; Drop Behaviors</h3>
-    <p>Pointer-based GPU accelerated interaction with boundary constraints.</p>
+    <div class="header-row">
+        <h3>🎯 Composable Drag &amp; Drop Behaviors</h3>
+        <span class="badge-pill">GNOME 50 Glassmorphism</span>
+    </div>
+    <p>Hardware-accelerated pointer interaction with boundary constraints and magnetic snap-to-center.</p>
 
     <div id="drop-arena" class="arena">
-        <div id="drag-token" class="drag-token">🖐 Drag Me</div>
-        <div id="target-zone" class="target-zone">🎯 Drop Target</div>
+        <div id="drag-token" class="drag-token">
+            <div class="token-sheen"></div>
+            <span class="token-icon">🖐️</span>
+            <div class="token-content">
+                <span class="token-title">Drag Token</span>
+                <span class="token-sub">Adwaita Glass</span>
+            </div>
+            <div class="grip-dots">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+        <div id="target-zone" class="target-zone">
+            <span class="target-icon">🎯</span>
+            <span class="target-label">Drop Target</span>
+            <span class="target-hint">Snap Area</span>
+        </div>
     </div>
 </div>`,
         scss: `.sample-card {
     padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: rgba(30, 30, 34, 0.75);
+    backdrop-filter: blur(40px) saturate(160%);
+    -webkit-backdrop-filter: blur(40px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    color: #ffffff;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12);
 
-    h3 { margin: 0 0 6px 0; color: #82aaff; }
-    p { margin: 0 0 16px 0; color: #a6accd; font-size: 13px; }
+    .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 4px;
+
+        h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #79c0ff;
+            letter-spacing: -0.2px;
+        }
+
+        .badge-pill {
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 999px;
+            background: rgba(53, 132, 228, 0.18);
+            color: #79c0ff;
+            border: 1px solid rgba(53, 132, 228, 0.35);
+        }
+    }
+
+    p {
+        margin: 0 0 18px 0;
+        color: #9a9996;
+        font-size: 13.5px;
+        line-height: 1.4;
+    }
 
     .arena {
         position: relative;
-        height: 220px;
-        background: #1b1e2b;
-        border-radius: 8px;
-        border: 1px dashed rgba(130, 170, 255, 0.3);
+        height: 240px;
+        background: radial-gradient(circle at 20% 30%, rgba(53, 132, 228, 0.12), transparent 50%),
+                    radial-gradient(circle at 80% 70%, rgba(145, 65, 172, 0.12), transparent 50%),
+                    rgba(18, 20, 28, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.06);
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 20px;
+        padding: 24px 28px;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 24px 24px;
+            pointer-events: none;
+        }
 
         .drag-token {
-            width: 100px;
-            height: 60px;
-            background: #82aaff;
-            color: #000;
-            font-weight: 700;
-            border-radius: 8px;
+            position: relative;
+            width: 148px;
+            height: 76px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(53, 132, 228, 0.92) 0%, rgba(98, 160, 234, 0.82) 45%, rgba(53, 132, 228, 0.95) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 24px rgba(53, 132, 228, 0.38),
+                        0 3px 8px rgba(0, 0, 0, 0.35),
+                        inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+                        inset 0 -1px 2px rgba(0, 0, 0, 0.25);
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 10px;
+            padding: 0 14px;
             cursor: grab;
             user-select: none;
+            touch-action: none;
             z-index: 10;
+            transition: box-shadow 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+                        border-color 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+                        filter 0.2s ease;
+
+            .token-sheen {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 48%;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 75%, transparent 100%);
+                border-radius: 11px 11px 0 0;
+                pointer-events: none;
+            }
+
+            .token-icon {
+                font-size: 24px;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+                flex-shrink: 0;
+            }
+
+            .token-content {
+                display: flex;
+                flex-direction: column;
+                gap: 1px;
+                flex: 1;
+                min-width: 0;
+
+                .token-title {
+                    font-size: 13.5px;
+                    font-weight: 700;
+                    color: #ffffff;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .token-sub {
+                    font-size: 10.5px;
+                    font-weight: 500;
+                    color: rgba(255, 255, 255, 0.82);
+                    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+                }
+            }
+
+            .grip-dots {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                opacity: 0.65;
+                span {
+                    width: 3px;
+                    height: 3px;
+                    background: #ffffff;
+                    border-radius: 50%;
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+                }
+            }
+
+            &:hover:not(.is-dragging) {
+                box-shadow: 0 12px 32px rgba(53, 132, 228, 0.5),
+                            0 4px 12px rgba(0, 0, 0, 0.35),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.8);
+                border-color: rgba(255, 255, 255, 0.55);
+                filter: brightness(1.05);
+            }
+
+            &.is-dragging {
+                cursor: grabbing !important;
+                box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55),
+                            0 0 35px rgba(53, 132, 228, 0.65),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.85);
+                border-color: rgba(255, 255, 255, 0.65);
+                filter: brightness(1.12);
+                z-index: 100;
+            }
+
+            &.is-dropped {
+                background: linear-gradient(135deg, rgba(46, 194, 126, 0.95) 0%, rgba(87, 227, 137, 0.85) 50%, rgba(46, 194, 126, 0.95) 100%);
+                box-shadow: 0 10px 30px rgba(46, 194, 126, 0.45),
+                            inset 0 1px 2px rgba(255, 255, 255, 0.75);
+                border-color: rgba(255, 255, 255, 0.55);
+            }
         }
 
         .target-zone {
-            width: 140px;
-            height: 90px;
-            background: rgba(130, 170, 255, 0.08);
-            border: 2px dashed #82aaff;
-            border-radius: 8px;
+            position: relative;
+            width: 154px;
+            height: 100px;
+            background: rgba(53, 132, 228, 0.06);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px dashed rgba(53, 132, 228, 0.4);
+            border-radius: 14px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25),
+                        0 4px 16px rgba(0, 0, 0, 0.15);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #82aaff;
-            font-weight: 600;
+            gap: 3px;
+            color: #79c0ff;
+            transition: all 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+            .target-icon {
+                font-size: 22px;
+                filter: drop-shadow(0 2px 6px rgba(53, 132, 228, 0.35));
+            }
+
+            .target-label {
+                font-size: 13px;
+                font-weight: 700;
+                letter-spacing: 0.1px;
+            }
+
+            .target-hint {
+                font-size: 10.5px;
+                font-weight: 500;
+                opacity: 0.75;
+            }
 
             &.zone-hover {
-                background: rgba(195, 232, 141, 0.2);
-                border-color: #c3e88d;
-                color: #c3e88d;
+                background: rgba(46, 194, 126, 0.16) !important;
+                border: 2px dashed #2ec27e !important;
+                color: #2ec27e !important;
+                box-shadow: 0 0 35px rgba(46, 194, 126, 0.35),
+                            inset 0 0 20px rgba(46, 194, 126, 0.2) !important;
+                transform: scale(1.03);
+
+                .target-icon {
+                    filter: drop-shadow(0 0 12px rgba(46, 194, 126, 0.6));
+                }
             }
         }
     }

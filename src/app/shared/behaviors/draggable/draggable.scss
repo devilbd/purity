@@ -11,10 +11,11 @@
 .is-dragging {
     z-index: 1000 !important;
     user-select: none !important;
-    filter: brightness(1.05);
     cursor: var(--cursor-grabbing, grabbing) !important;
     transition: none !important; /* CRITICAL: Smooth instantaneous dragging without transform delay */
     will-change: transform;
+    filter: brightness(1.1) contrast(1.05);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5), 0 0 30px var(--accent-shadow, rgba(53, 132, 228, 0.45)), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
 
     .drag-handle {
         cursor: var(--cursor-grabbing, grabbing) !important;
@@ -22,20 +23,20 @@
 }
 
 .snap-hit {
-    animation: snap-thud 0.12s ease-out;
+    animation: snap-thud 0.16s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
 
 @keyframes snap-thud {
     0% {
         scale: 1;
-        filter: brightness(1.05);
+        filter: brightness(1.1);
     }
-    50% {
+    45% {
         scale: 0.96;
-        filter: brightness(1.25);
+        filter: brightness(1.35) drop-shadow(0 0 12px var(--accent, #3584e4));
     }
     100% {
         scale: 1;
-        filter: brightness(1.05);
+        filter: brightness(1.1);
     }
 }
