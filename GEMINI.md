@@ -31,6 +31,9 @@ purity/
 ├── firebase.json                # Firebase Hosting configuration (public: dist, SPA rewrites)
 ├── .firebaserc                  # Firebase project ID mapping
 ├── .env.example                 # Environment variables reference template
+├── .antigravityrules            # Antigravity agent rules & architectural constraints
+├── .cursorrules                 # Cursor agent rules & architectural constraints
+├── AGENTS.md                    # Multi-agent guidelines & architectural rules
 ├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
 ├── GEMINI.md                    # Project context & architecture guide (this file)
 ├── README.md                    # Public documentation

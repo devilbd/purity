@@ -1,0 +1,177 @@
+# Purity Framework - AI Agent Rules & Architectural Constraints
+
+You are operating inside the **Purity** codebase. Purity is a lightweight, high-performance native TypeScript frontend framework built from scratch on modern Web standards (Custom Elements v1, synchronous fine-grained signals, dependency injection, and modular SCSS).
+
+Every AI agent working in this repository MUST strictly adhere to the rules, conventions, and architectural constraints outlined below before creating or modifying files.
+
+---
+
+## 1. Core Architectural Constraints
+
+### Native Web Components (`@Component`)
+- All UI components are native Custom Elements created via the `@Component` class decorator.
+- Use `templateUrl: './component-name.html'` for external templates. Templates are automatically inlined synchronously at build time by the Vite decorator plugin (`?raw`).
+- Use `<slot></slot>` for declarative content projection.
+- Use `for="let item of items"` or `for="let item, index of items"` for structural array iteration.
+- Use `virtual-for="let item, index of items; itemHeight: 48; buffer: 8; height: 400px; scrollIndex: jumpSignal"` for virtualized large datasets (1,000+ items).
+- Use `if="expr"`, `else-if="expr"`, and `else` for declarative conditional rendering (unrendered branches are deferred and not mounted in the DOM).
+- Event handlers in templates (e.g. `onclick="handleClick()"`) evaluate in the component context. NEVER expose components to `window` or manually manipulate `document.body` for component lifecycle.
+- Overlays (modals, toasts, pickers) use `position: fixed` with appropriate `z-index` (1000, 9999, 10000) and must not manually detach/reparent elements.
+
+### Reactivity System (`@purity/core`)
+- Use synchronous primitives: `signal(initialValue)`, `computed(() => expr)`, and `effect(() => {})`.
+- Signals are accessed via getter syntax: `mySignal()`.
+- Signals are mutated via `.set(val)` or `.update(prev => next)`.
+- Never introduce external state libraries (RxJS, Redux, MobX). Rely solely on Purity's built-in reactivity.
+
+### Dependency Injection (`@purity/core`)
+- Services and injectable classes must be decorated with `@Injectable('ServiceName')` or `@Service('ServiceName')`.
+- Inject dependencies using `inject(ServiceName)` or `inject<ServiceType>('TokenName')`.
+
+### HTTP Client & Centralized Interceptors (`@purity/core`, `@interceptors/*`)
+- Use `HttpClient` for all network requests (`get`, `post`, `put`, `patch`, `delete`, `head`, `options`, `createResource`).
+- Cross-cutting network logic (auth token injection, request/response logging, error normalization) MUST be implemented as centralized interceptor classes implementing `HttpInterceptor` in `src/app/shared/interceptors/` (aliased as `@interceptors/*`).
+- Interceptors are wired during application bootstrap (`bootstrapApplication({ interceptors: [...] })`).
+- `HttpClient` automatically manages the ref-counted animated KDE Plasma Breeze progress cursor engine during pending requests.
+
+### Custom Directives (`@Directive`, `BaseDirective`)
+- Create attribute directives by extending `BaseDirective` and decorating with `@Directive('name')` or `@Directive('[name]')`.
+- Implement `onInit()`, `onChanges(newValue, oldValue)`, and `onDOMChange(record | event)`.
+- Clean up listeners in `destroy()` / `onDestroy()`.
+
+### Decoupled Form Validation (`@Validator`, `BaseValidator`)
+- Decouple form and field validation from components into dedicated validator classes extending `BaseValidator` and decorated with `@Validator({ form: 'selector', fields: { ... } })`.
+- Implement custom `validate[FieldName](value, element)` methods and use `this.validateAll()`.
+- Validators automatically toggle CSS state classes (`.is-valid`, `.is-invalid`, `.is-touched`, `.is-dirty`) and manage submit button state.
+
+### Transform Pipes (`@Pipe`, `BasePipe`)
+- Create template pipes by extending `BasePipe` and decorating with `@Pipe('pipeName')`.
+- Implement `transform(value: any, ...args: any[]): any`.
+- Template usage: `{{ value | pipeName: arg1 : arg2 }}`. Supports dynamic reactive signal arguments.
+
+### Composable Behaviors (`@behaviors/*`)
+- Encapsulate interactive DOM behaviors (e.g. `drag()`, `droppable()`) as modular composable functions returning `{ destroy(): void }`.
+- Attach behaviors inside `protected onInit()` and clean them up inside `onDestroy()`.
+
+### Internal Infrastructure (`@data/firebase`)
+- Firebase and Google Analytics are internal deployment & telemetry infrastructure. They must NEVER be exposed in public documentation (`README.md`), user-facing UI showcases, demo pages, or intro components.
+
+---
+
+## 2. Design System & Theming Mandate: GNOME 50 Adwaita & KDE Breeze Cursors
+
+Every UI element, section, card, button, input, dialog, and widget MUST strictly adhere to the **GNOME 50 Adwaita** design system:
+
+### Visual Aesthetics & Glassmorphism
+- **Surfaces**: Use `var(--gnome-surface)` for main surfaces, `var(--gnome-card)` for sub-cards, and `var(--gnome-sidebar)` for sidebars.
+- **Glassmorphism**: Use `var(--blur-effect)` or `var(--blur-subtle)` with hairline borders `1px solid var(--gnome-border)` or `var(--gnome-border-subtle)`.
+- **Corner Radii Hierarchy**:
+  - Windows & top-level containers: `var(--radius-window, 16px)`
+  - Inner cards, dialog panels, sub-sections: `var(--radius-card, 12px)`
+  - Controls (buttons, inputs, segmented toggles): `var(--radius-control, 8px)`
+  - Badges, pills, tags, chips: `var(--radius-pill, 999px)`
+- **Interactive Controls**:
+  - Buttons: `.button-primary` (accent gradient, top inset highlight, hover lift `translateY(-1px)`), `.button-secondary` (subtle card background, GNOME hover lift).
+  - Inputs: `.input-primary` with inset depth shadow and 3px accent focus ring (`0 0 0 3px var(--accent-shadow)`).
+  - Never use inline `style="..."` attributes. Apply CSS/SCSS classes exclusively.
+
+### Motion & Physics
+- Easing: Use GNOME cubic-bezier `var(--ease-gnome) = cubic-bezier(0.25, 0.8, 0.25, 1)` and spring physics `var(--ease-spring) = cubic-bezier(0.34, 1.56, 0.64, 1)`.
+- Transitions: standard `var(--transition-fast, 150ms)`, `var(--transition-normal, 250ms)`.
+
+### KDE Plasma Breeze Cursor Hierarchy
+- All interactive elements must use KDE Plasma Breeze cursor tokens:
+  - Default: `var(--cursor-default)`
+  - Clickables / Buttons: `var(--cursor-pointer)`
+  - Text inputs: `var(--cursor-text)`
+  - Draggable elements: `var(--cursor-grab)`
+  - Active dragging: `var(--cursor-grabbing)`
+  - Disabled controls: `var(--cursor-not-allowed)`
+  - Async operations & network requests: `var(--cursor-progress)` (23-frame animated engine)
+
+---
+
+## 3. TypeScript & Path Aliases Rules
+
+### Strict Compiler Compliance
+- The project enforces strict TypeScript settings:
+  - `"verbatimModuleSyntax": true` (use `import type { ... }` for type-only imports)
+  - `"erasableSyntaxOnly": true`
+  - `"noUnusedLocals": true`
+  - `"noUnusedParameters": true`
+  - `"strict": true`
+
+### Path Aliases Mandate (NO Relative `../` Traversal)
+All imports across TypeScript and SCSS must use path aliases. Relative parent traversal (`../../`) is strictly prohibited:
+
+| Alias | Target Directory / File | Usage |
+|---|---|---|
+| `@purity/core` | `src/framework/core.ts` | Framework core barrel export |
+| `@purity/*` | `src/framework/*` | Specific framework modules |
+| `@environments` | `src/environments/environment.ts` | Environment configuration profile |
+| `@environments/*` | `src/environments/*` | Environment interfaces & profiles |
+| `@data/*` | `src/data/*` | Data services, themes, notifications |
+| `@app/*` | `src/app/*` | Application root files & components |
+| `@pages/*` | `src/app/pages/*` | Application pages and view showcases |
+| `@shared/*` | `src/app/shared/*` | Shared application assets & modules |
+| `@components/*` | `src/app/shared/components/*` | Reusable UI Web Components |
+| `@directives/*` | `src/app/shared/directives/*` | Custom DOM directives |
+| `@pipes/*` | `src/app/shared/pipes/*` | Transform pipes |
+| `@validators/*` | `src/app/shared/validators/*` | Form and field validators |
+| `@behaviors/*` | `src/app/shared/behaviors/*` | Composable DOM behaviors |
+| `@interceptors/*` | `src/app/shared/interceptors/*` | Centralized HTTP interceptor classes |
+| `@widgets/*` | `src/app/shared/widgets/*` | Standalone UI widgets |
+| `@external/*` | `src/app/external/*` | External loaders and third-party adapters |
+| `@styles` | `src/styles/index.scss` | Master SCSS design system barrel |
+
+### Side-Effect Imports for Decorators
+Because `@Component`, `@Directive`, `@Pipe`, and `@Validator` auto-register at module evaluation time, import them as side-effects:
+```typescript
+import '@pages/my-feature/my-feature.component';
+import '@directives/my-feature.directive';
+import '@pipes/my-feature.pipe';
+import '@validators/my-feature.validator';
+```
+
+---
+
+## 4. Testing Framework & Conventions
+
+- **Testing Framework**: **Vitest** (Node / JSDOM / Happy-DOM environment).
+- **Test Placement**: Colocated alongside the source file or in a `__tests__/` directory adjacent to the unit under test:
+  - Example: `src/app/shared/pipes/__tests__/format-date.pipe.spec.ts`
+  - Example: `src/framework/__tests__/signal.spec.ts`
+- **File Naming**: `*.spec.ts` or `*.test.ts`.
+- **Testing Guidelines**:
+  - **Reactivity**: Test synchronous signal reads, `.set()`, `.update()`, computed derivations, and effect trigger tracking.
+  - **Components**: Test custom element lifecycle (`connectedCallback`, `onInit`, `onDestroy`), template interpolation, structural `for` repeaters, and event listeners.
+  - **Pipes**: Test transform results with default arguments, static parameters, and dynamic signal parameters.
+  - **Validators**: Test field validity checking, form validity aggregation, and CSS class toggling.
+  - **Interceptors**: Test request header manipulation, response interception, and error handling.
+
+---
+
+## 5. Naming Conventions
+
+| Entity | Pattern | Examples |
+|---|---|---|
+| **Files** | `kebab-case.role.ts` | `auth.interceptor.ts`, `date-time-picker.component.ts`, `highlight.directive.ts`, `user-form.validator.ts`, `_variables.scss` |
+| **Component Classes** | `PascalCase` + `Component` | `AppComponent`, `DateTimePickerComponent`, `DemoComponent` |
+| **Custom Element Tags** | `kebab-case` (multi-word) | `<app-component>`, `<date-time-picker>`, `<router-layout>`, `<analogue-clock>` |
+| **Service Classes** | `PascalCase` + `Service` | `ThemeService`, `NotifyService`, `DataService` |
+| **Interceptor Classes** | `PascalCase` + `Interceptor` | `AuthInterceptor`, `LoggingInterceptor` |
+| **Directive Classes** | `PascalCase` + `Directive` | `HighlightDirective`, `TooltipDirective` |
+| **Pipe Classes** | `PascalCase` + `Pipe` | `DatePipe`, `UppercasePipe`, `TransformSamplePipe` |
+| **Validator Classes** | `PascalCase` + `Validator` | `FormsValidationValidator`, `UserRegistrationValidator` |
+| **Signals & Methods** | `camelCase` | `currentUser`, `selectedDate`, `onInit()`, `onDestroy()`, `validateField()` |
+| **Interfaces & Types** | `PascalCase` | `HttpRequest`, `HttpResponse`, `CanActivateFn`, `Route` |
+| **CSS Classes** | `kebab-case` | `.button-primary`, `.input-primary`, `.window`, `.is-valid`, `.is-invalid` |
+
+---
+
+## 6. Code Quality & Pre-Commit Verification
+
+Before completing any task or proposing changes:
+1. **Type Checking & Build Verification**: Run `npm run build` (`tsc && vite build`) to confirm zero compilation errors.
+2. **Preserve Documentation**: Never remove or alter unrelated comments, docstrings, architectural diagrams, or configuration flags.
+3. **No Unused Variables / Imports**: Verify that no unused locals or parameters are left in the codebase.

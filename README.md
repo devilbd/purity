@@ -86,6 +86,9 @@ purity/
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
 ├── .env.example                 # Environment variables reference template
+├── .antigravityrules            # Antigravity agent rules & architectural constraints
+├── .cursorrules                 # Cursor agent rules & architectural constraints
+├── AGENTS.md                    # Multi-agent guidelines & architectural rules
 ├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
 ├── README.md                    # Project documentation (this file)
 ├── GEMINI.md                    # Agent context & architecture reference
