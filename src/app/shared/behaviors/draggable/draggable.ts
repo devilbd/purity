@@ -27,17 +27,21 @@ export function drag(options: DraggableOptions) {
     let initialPointerX = 0;
     let initialPointerY = 0;
 
+    // Invariant base geometry captured at drag start (immune to transform feedback loops)
+    let baseLeft = 0;
+    let baseTop = 0;
+    let baseWidth = 0;
+    let baseHeight = 0;
+    let initialScrollX = 0;
+    let initialScrollY = 0;
+
     let currentDropTarget: { element: HTMLElement; options: DroppableOptions } | null = null;
-    let lastSnappedX = 0;
-    let lastSnappedY = 0;
-    const container = options.constrainTo ? getElement(options.constrainTo) : null;
     let activeHandle: HTMLElement | null = null;
     let rafId: number | null = null;
     const DRAG_THRESHOLD = 3;
 
-    // Helper to get current transform values
+    // Helper to get current transform translation
     const getTransform = () => {
-        if (!element.style.transform) return { x: 0, y: 0 };
         const style = window.getComputedStyle(element);
         if (!style.transform || style.transform === 'none') return { x: 0, y: 0 };
         try {
@@ -49,6 +53,8 @@ export function drag(options: DraggableOptions) {
     };
 
     const onPointerDown = (e: PointerEvent) => {
+        if (e.button !== 0) return; // Only process main left-clicks
+
         const target = e.target as HTMLElement;
 
         // Prevent drag on interactive elements
@@ -57,8 +63,9 @@ export function drag(options: DraggableOptions) {
         }
 
         if (options.handle) {
-            activeHandle = target.closest(options.handle) as HTMLElement;
-            if (!activeHandle || !element.contains(activeHandle)) {
+            activeHandle = target.closest(options.handle) as HTMLElement | null;
+            if (!activeHandle || (!element.contains(activeHandle) && activeHandle !== element)) {
+                activeHandle = null;
                 return;
             }
         } else {
@@ -84,11 +91,21 @@ export function drag(options: DraggableOptions) {
                 isDragging = true;
                 startX = initialPointerX;
                 startY = initialPointerY;
-                lastSnappedX = currentX;
-                lastSnappedY = currentY;
 
-                element.setPointerCapture(e.pointerId);
+                try {
+                    element.setPointerCapture(e.pointerId);
+                } catch {}
+
                 element.classList.add('is-dragging');
+
+                // Capture initial un-transformed layout geometry
+                const elRect = element.getBoundingClientRect();
+                baseLeft = elRect.left - currentX;
+                baseTop = elRect.top - currentY;
+                baseWidth = elRect.width;
+                baseHeight = elRect.height;
+                initialScrollX = window.scrollX;
+                initialScrollY = window.scrollY;
 
                 options.onDragStart?.(element);
             } else {
@@ -96,62 +113,74 @@ export function drag(options: DraggableOptions) {
             }
         }
 
+        // Compute mouse-driven translation
         let nextX = currentX + (e.clientX - startX);
         let nextY = currentY + (e.clientY - startY);
 
-        // Container boundary constraints (if constrained to a container other than body)
-        if (container && container !== document.body) {
-            const cRect = container.getBoundingClientRect();
-            const eRect = element.getBoundingClientRect();
-            const minX = currentX - (eRect.left - cRect.left);
-            const maxX = currentX + (cRect.right - eRect.right);
-            const minY = currentY - (eRect.top - cRect.top);
-            const maxY = currentY + (cRect.bottom - eRect.bottom);
+        // Account for any viewport scroll during the drag gesture
+        const scrollDeltaX = window.scrollX - initialScrollX;
+        const scrollDeltaY = window.scrollY - initialScrollY;
+        const currentBaseLeft = baseLeft - scrollDeltaX;
+        const currentBaseTop = baseTop - scrollDeltaY;
 
-            nextX = Math.max(minX, Math.min(maxX, nextX));
-            nextY = Math.max(minY, Math.min(maxY, nextY));
-        }
-
-        // Handle Droppable detection
+        // Handle Droppable target detection
         const dropTarget = findDropTarget(e.clientX, e.clientY, element);
         if (dropTarget !== currentDropTarget) {
-            const hoverClass = currentDropTarget?.options.hoverClass || 'droppable-hover';
-
             if (currentDropTarget) {
-                currentDropTarget.element.classList.remove(hoverClass);
+                const prevHover = currentDropTarget.options.hoverClass || 'droppable-hover';
+                currentDropTarget.element.classList.remove(prevHover);
                 currentDropTarget.options.onLeave?.(element);
             }
             if (dropTarget) {
-                dropTarget.element.classList.add(dropTarget.options.hoverClass || 'droppable-hover');
+                const newHover = dropTarget.options.hoverClass || 'droppable-hover';
+                dropTarget.element.classList.add(newHover);
                 dropTarget.options.onEnter?.(element);
             }
             currentDropTarget = dropTarget;
         }
 
-        // Snap to center logic: only if currentDropTarget matches options.snapTo
+        // Snap to drop target center (if current drop target matches snapTo selector)
         if (options.snapTo && currentDropTarget?.element.matches(options.snapTo)) {
             const targetRect = currentDropTarget.element.getBoundingClientRect();
-            const eRect = element.getBoundingClientRect();
             const targetCenterX = targetRect.left + targetRect.width / 2;
             const targetCenterY = targetRect.top + targetRect.height / 2;
-            const elementCenterX = eRect.left + eRect.width / 2;
-            const elementCenterY = eRect.top + eRect.height / 2;
 
-            nextX = nextX + (targetCenterX - elementCenterX);
-            nextY = nextY + (targetCenterY - elementCenterY);
+            const elementBaseCenterX = currentBaseLeft + baseWidth / 2;
+            const elementBaseCenterY = currentBaseTop + baseHeight / 2;
 
-            if (Math.abs(nextX - lastSnappedX) > 1 || Math.abs(nextY - lastSnappedY) > 1) {
-                lastSnappedX = nextX;
-                lastSnappedY = nextY;
-                element.classList.add('snap-hit');
-            }
+            nextX = targetCenterX - elementBaseCenterX;
+            nextY = targetCenterY - elementBaseCenterY;
+
+            element.classList.add('snap-hit');
         } else {
             element.classList.remove('snap-hit');
         }
 
+        // Container boundary constraints (if constrained to a container)
+        const container = options.constrainTo
+            ? (options.constrainTo === 'parent'
+                ? element.parentElement
+                : (getElement(options.constrainTo) || (element.closest(options.constrainTo) as HTMLElement | null)))
+            : null;
+
+        if (container && container !== document.body) {
+            const cRect = container.getBoundingClientRect();
+            const minX = cRect.left - currentBaseLeft;
+            const maxX = cRect.right - (currentBaseLeft + baseWidth);
+            const minY = cRect.top - currentBaseTop;
+            const maxY = cRect.bottom - (currentBaseTop + baseHeight);
+
+            if (minX <= maxX) {
+                nextX = Math.max(minX, Math.min(maxX, nextX));
+            }
+            if (minY <= maxY) {
+                nextY = Math.max(minY, Math.min(maxY, nextY));
+            }
+        }
+
         options.onDragMove?.(element, nextX, nextY);
 
-        // Schedule hardware-accelerated transform update
+        // Hardware-accelerated transform update via requestAnimationFrame
         if (rafId) cancelAnimationFrame(rafId);
         rafId = requestAnimationFrame(() => {
             element.style.transform = `translate3d(${nextX}px, ${nextY}px, 0px)`;
@@ -165,16 +194,24 @@ export function drag(options: DraggableOptions) {
             return;
         }
 
+        if (rafId) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+        }
+
         options.onDragEnd?.(element);
 
         isDragging = false;
         if (element.hasPointerCapture(e.pointerId)) {
-            element.releasePointerCapture(e.pointerId);
+            try {
+                element.releasePointerCapture(e.pointerId);
+            } catch {}
         }
 
-        // Handle Drop
+        // Handle Drop callback
         if (currentDropTarget) {
-            currentDropTarget.element.classList.remove(currentDropTarget.options.hoverClass || 'droppable-hover');
+            const hoverClass = currentDropTarget.options.hoverClass || 'droppable-hover';
+            currentDropTarget.element.classList.remove(hoverClass);
             currentDropTarget.options.onDrop?.(element);
             currentDropTarget = null;
         }

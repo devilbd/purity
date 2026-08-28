@@ -1127,6 +1127,111 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+    {
+        id: 'behaviors',
+        name: '🎯 Drag & Drop Behaviors',
+        description: 'Composable pointer-based drag & droppable interaction with container constraints and center snapping.',
+        ts: `import { Component } from '@purity/core';
+import { drag } from '@behaviors/draggable/draggable';
+import { droppable } from '@behaviors/droppable/droppable';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    private dragCleanup?: { destroy: () => void };
+    private dropCleanup?: { destroy: () => void };
+
+    protected onInit() {
+        this.dragCleanup = drag({
+            selector: '#drag-token',
+            constrainTo: '#drop-arena',
+            snapTo: '#target-zone',
+            handle: '#drag-token',
+        });
+
+        this.dropCleanup = droppable({
+            selector: '#target-zone',
+            accepts: '#drag-token',
+            hoverClass: 'zone-hover',
+            onDrop: (el) => {
+                el.innerText = '🎯 Dropped!';
+                el.style.background = '#2ec27e';
+            },
+        });
+    }
+
+    protected onDestroy() {
+        this.dragCleanup?.destroy();
+        this.dropCleanup?.destroy();
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>🎯 Drag &amp; Drop Behaviors</h3>
+    <p>Pointer-based GPU accelerated interaction with boundary constraints.</p>
+
+    <div id="drop-arena" class="arena">
+        <div id="drag-token" class="drag-token">🖐 Drag Me</div>
+        <div id="target-zone" class="target-zone">🎯 Drop Target</div>
+    </div>
+</div>`,
+        scss: `.sample-card {
+    padding: 24px;
+    background: #232635;
+    border-radius: 12px;
+    color: #eeffff;
+
+    h3 { margin: 0 0 6px 0; color: #82aaff; }
+    p { margin: 0 0 16px 0; color: #a6accd; font-size: 13px; }
+
+    .arena {
+        position: relative;
+        height: 220px;
+        background: #1b1e2b;
+        border-radius: 8px;
+        border: 1px dashed rgba(130, 170, 255, 0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+
+        .drag-token {
+            width: 100px;
+            height: 60px;
+            background: #82aaff;
+            color: #000;
+            font-weight: 700;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            user-select: none;
+            z-index: 10;
+        }
+
+        .target-zone {
+            width: 140px;
+            height: 90px;
+            background: rgba(130, 170, 255, 0.08);
+            border: 2px dashed #82aaff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #82aaff;
+            font-weight: 600;
+
+            &.zone-hover {
+                background: rgba(195, 232, 141, 0.2);
+                border-color: #c3e88d;
+                color: #c3e88d;
+            }
+        }
+    }
+}`,
+    },
 ];
 
 /**

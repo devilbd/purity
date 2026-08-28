@@ -37,7 +37,7 @@ export function droppable(options: DroppableOptions) {
  */
 export function findDropTarget(x: number, y: number, draggedEl: HTMLElement) {
     for (const item of droppables) {
-        if (item.element === draggedEl) continue;
+        if (!item.element || !item.element.isConnected || item.element === draggedEl) continue;
         const rect = item.element.getBoundingClientRect();
         if (
             x >= rect.left &&
