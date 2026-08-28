@@ -246,13 +246,20 @@
                 padding: 16px 10px 16px 14px;
                 background: var(--pn-bg-lighter);
                 color: var(--pn-fg-gutter);
-                font-family: var(--font-mono, monospace);
-                font-size: 12.5px;
-                line-height: 1.55;
+                font-family: 'Adwaita Mono', 'Fira Code', var(--font-mono, monospace);
+                font-size: 13px;
+                line-height: 20px;
                 text-align: right;
                 user-select: none;
                 border-right: 1px solid var(--pn-border);
                 min-width: 38px;
+                overflow: hidden;
+                box-sizing: border-box;
+
+                .line-num {
+                    height: 20px;
+                    line-height: 20px;
+                }
             }
 
             .editor-layer-container {
@@ -272,12 +279,19 @@
                     padding: 16px;
                     border: none;
                     box-sizing: border-box;
-                    font-family: var(--font-mono, monospace);
-                    font-size: 13px;
-                    line-height: 1.6;
-                    tab-size: 2;
-                    white-space: pre;
-                    word-wrap: normal;
+                    font-family: 'Adwaita Mono', 'Fira Code', var(--font-mono, monospace) !important;
+                    font-size: 13px !important;
+                    line-height: 20px !important;
+                    letter-spacing: 0 !important;
+                    word-spacing: 0 !important;
+                    tab-size: 2 !important;
+                    -moz-tab-size: 2 !important;
+                    font-variant-ligatures: none !important;
+                    font-feature-settings: "liga" 0, "calt" 0 !important;
+                    white-space: pre !important;
+                    word-wrap: normal !important;
+                    word-break: normal !important;
+                    overflow-wrap: normal !important;
                 }
 
                 .highlight-layer {
@@ -288,16 +302,26 @@
                     z-index: 1;
 
                     code {
-                        font-family: inherit;
-                        font-size: inherit;
-                        line-height: inherit;
+                        font-family: inherit !important;
+                        font-size: inherit !important;
+                        line-height: inherit !important;
+                        letter-spacing: inherit !important;
+                        word-spacing: inherit !important;
+                        tab-size: inherit !important;
+                        -moz-tab-size: inherit !important;
+                        white-space: inherit !important;
                         display: block;
+                        padding: 0 !important;
+                        margin: 0 !important;
+                        border: none !important;
+                        background: transparent !important;
                     }
                 }
 
                 .code-textarea {
-                    background: transparent;
-                    color: transparent;
+                    background: transparent !important;
+                    color: transparent !important;
+                    -webkit-text-fill-color: transparent !important;
                     caret-color: var(--pn-yellow);
                     z-index: 2;
                     resize: none;
@@ -326,8 +350,14 @@
                     }
 
                     &::selection {
-                        background: rgba(113, 124, 180, 0.35);
-                        color: transparent;
+                        background: rgba(130, 170, 255, 0.32) !important;
+                        color: transparent !important;
+                        -webkit-text-fill-color: transparent !important;
+                    }
+
+                    &::-moz-selection {
+                        background: rgba(130, 170, 255, 0.32) !important;
+                        color: transparent !important;
                     }
                 }
             }
@@ -339,7 +369,7 @@
         .token.doctype,
         .token.cdata {
             color: var(--pn-fg-subtle);
-            font-style: italic;
+            font-style: normal;
         }
 
         .token.punctuation {

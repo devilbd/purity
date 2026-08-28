@@ -13,6 +13,7 @@ import '@pages/directive-sample/directive-sample.component';
 import '@pages/pipe-sample/pipe-sample.component';
 import '@pages/for-sample/for-sample.component';
 import '@pages/if-sample/if-sample.component';
+import '@pages/virtual-for-sample/virtual-for-sample.component';
 import '@pages/date-time-picker-sample/date-time-picker-sample.component';
 import '@pages/analogue-clock-sample/analogue-clock-sample.component';
 import '@pages/radial-context-menu-sample/radial-context-menu-sample.component';
@@ -34,6 +35,7 @@ import type { FormsValidationComponent } from '@pages/forms-validation/forms-val
 import type { PipeSampleComponent } from '@pages/pipe-sample/pipe-sample.component';
 import type { ForSampleComponent } from '@pages/for-sample/for-sample.component';
 import type { IfSampleComponent } from '@pages/if-sample/if-sample.component';
+import type { VirtualForSampleComponent } from '@pages/virtual-for-sample/virtual-for-sample.component';
 import type { ModalSampleComponent } from '@pages/modal-sample/modal-sample.component';
 import type { LoaderComponent } from '@components/loader/loader.component';
 import type { NotificationComponent } from '@components/notification/notification.component';
@@ -73,6 +75,9 @@ export class DemoComponent {
 
     @ViewChild('#if-sample')
     ifSample?: IfSampleComponent | null;
+
+    @ViewChild('#virtual-for-sample')
+    virtualForSample?: VirtualForSampleComponent | null;
 
     @ViewChild('#date-time-picker-sample')
     dateTimePickerSample?: DateTimePickerSampleComponent | null;

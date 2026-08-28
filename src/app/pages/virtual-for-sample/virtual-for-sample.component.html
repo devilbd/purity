@@ -1,0 +1,244 @@
+<div class="window virtual-sample-root">
+    <!-- Header -->
+    <div class="virtual-header">
+        <div class="header-main">
+            <h4>⚡ High-Performance Virtualized Repeater (<code>virtual-for</code>)</h4>
+            <p class="virtual-desc">
+                Renders massive arrays (up to <strong>100,000+ items</strong>) at 60fps by maintaining only ~20–30 live DOM nodes in the active viewport with precise indexed tracking:
+            </p>
+        </div>
+        <div if="isLoaded()" class="header-actions">
+            <span class="count-badge">Dataset: {{datasetSize()}} items</span>
+            <button
+                type="button"
+                class="button-cancel btn-sm"
+                onclick="unloadSample()"
+                title="Unload sample and free dataset memory"
+            >
+                ⏹️ Unload
+            </button>
+        </div>
+    </div>
+
+    <!-- INITIAL UNINITIALIZED STATE -->
+    <div if="!isLoaded()" class="sample-section uninitialized-section">
+        <div class="uninitialized-box">
+            <div class="uninitialized-info">
+                <strong>⚡ On-Demand Virtualized Initialization</strong>
+                <p>The 100,000-record dataset is uninitialized by default. Click below to generate the dataset and launch the 60fps GPU-accelerated virtual scroller:</p>
+            </div>
+            <div class="btn-group">
+                <button
+                    type="button"
+                    class="button-primary initialize-btn"
+                    onclick="initializeSample(100000)"
+                >
+                    🚀 Initialize 100,000 Records
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary initialize-btn"
+                    onclick="initializeSample(10000)"
+                >
+                    ⚡ Load 10,000
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary initialize-btn"
+                    onclick="initializeSample(1000)"
+                >
+                    ⚡ Load 1,000
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVE LOADED CONTENT -->
+    <div if="isLoaded()" class="sample-section active-section">
+        <!-- Scale Selector & HUD Metrics Bar -->
+        <div class="controls-bar">
+            <!-- Dataset Scale Selector -->
+            <div class="scale-group">
+                <span class="ctrl-label">Scale:</span>
+                <div class="scale-buttons">
+                    <button
+                        type="button"
+                        class="scale-btn {{datasetSize() === 1000 ? 'active' : ''}}"
+                        onclick="loadDataset(1000)"
+                    >
+                        1,000
+                    </button>
+                    <button
+                        type="button"
+                        class="scale-btn {{datasetSize() === 10000 ? 'active' : ''}}"
+                        onclick="loadDataset(10000)"
+                    >
+                        10,000
+                    </button>
+                    <button
+                        type="button"
+                        class="scale-btn {{datasetSize() === 50000 ? 'active' : ''}}"
+                        onclick="loadDataset(50000)"
+                    >
+                        50,000
+                    </button>
+                    <button
+                        type="button"
+                        class="scale-btn scale-max {{datasetSize() === 100000 ? 'active' : ''}}"
+                        onclick="loadDataset(100000)"
+                    >
+                        🚀 100,000
+                    </button>
+                </div>
+            </div>
+
+            <!-- Compact Live HUD Metrics -->
+            <div class="hud-metrics">
+                <div class="hud-item">
+                    <span class="hud-lbl">Memory:</span>
+                    <strong class="hud-val text-primary">{{datasetSize()}}</strong>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-lbl">Filtered:</span>
+                    <strong class="hud-val text-accent">{{filteredItems().length}}</strong>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-lbl">Live DOM:</span>
+                    <strong class="hud-val text-success">{{activeDomNodes()}} nodes</strong>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-lbl">Range:</span>
+                    <strong class="hud-val text-info">{{visibleRangeText()}}</strong>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-lbl">Latency:</span>
+                    <strong class="hud-val text-warn">{{renderTimeMs()}}ms</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter & Jump Toolbar -->
+        <div class="virtual-toolbar">
+            <div class="search-wrap">
+                <input
+                    id="virtual-search-input"
+                    type="text"
+                    class="input-primary search-input"
+                    placeholder="Search 100k items (e.g. 'Security', 'Vance', 'TXN-050000')..."
+                    oninput="onSearchInput(this)"
+                />
+                <button
+                    type="button"
+                    class="clear-btn {{searchQuery() ? 'visible' : ''}}"
+                    onclick="clearSearch()"
+                    title="Clear search"
+                >
+                    ✕
+                </button>
+            </div>
+
+            <div class="jump-wrap">
+                <span class="ctrl-label">Jump:</span>
+                <input
+                    id="jump-idx-input"
+                    type="number"
+                    min="0"
+                    max="{{datasetSize() - 1}}"
+                    value="{{jumpIndexInput()}}"
+                    class="input-primary jump-input"
+                    oninput="onJumpInput(this)"
+                    onkeydown="if (event.key === 'Enter') jumpToSpecifiedIndex('center')"
+                />
+                <button
+                    type="button"
+                    class="button-primary jump-go-btn"
+                    onclick="jumpToSpecifiedIndex('center')"
+                >
+                    Go
+                </button>
+                <div class="jump-chips">
+                    <button type="button" class="chip-btn" onclick="jumpToStart()">#0 Top</button>
+                    <button type="button" class="chip-btn" onclick="jumpToFraction(0.25)">#25k</button>
+                    <button type="button" class="chip-btn" onclick="jumpToFraction(0.50)">#50k</button>
+                    <button type="button" class="chip-btn" onclick="jumpToFraction(0.75)">#75k</button>
+                    <button type="button" class="chip-btn" onclick="jumpToEnd()">#End</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Virtualized List Container -->
+        <div class="virtual-list-frame">
+            <div
+                virtual-for="let item, index of filteredItems; itemHeight: 46; buffer: 8; height: 380px; scrollIndex: jumpTarget"
+                class="virtual-row {{item.isFavorite ? 'is-fav' : ''}}"
+                onclick="selectRecord(item)"
+            >
+                <div class="cell-idx">
+                    <span class="idx-badge">#{{index + 1}}</span>
+                </div>
+                <div class="cell-id">
+                    <span class="id-tag">{{item.id}}</span>
+                </div>
+                <div class="cell-main">
+                    <strong class="title-text">{{item.title}}</strong>
+                    <span class="user-text">{{item.user}}</span>
+                </div>
+                <div class="cell-cat">
+                    <span class="cat-pill cat-{{item.category}}">{{item.category}}</span>
+                </div>
+                <div class="cell-status">
+                    <span class="status-dot dot-{{item.status}}"></span>
+                    <span class="status-lbl">{{item.status}}</span>
+                </div>
+                <div class="cell-amount">
+                    <span class="amt-val">{{item.amount}}</span>
+                </div>
+                <div class="cell-actions">
+                    <span class="time-lbl">{{item.timestamp}}</span>
+                    <button
+                        type="button"
+                        class="fav-btn {{item.isFavorite ? 'active' : ''}}"
+                        title="Toggle Favorite"
+                        onclick="toggleFavorite(index, event)"
+                    >
+                        {{item.isFavorite ? '★' : '☆'}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Selected Record Detail Preview Footer -->
+        <div if="selectedRecord()" class="selected-detail-card">
+            <div class="detail-head">
+                <strong>📋 Selected Record: <code>{{selectedRecord().id}}</code></strong>
+                <button type="button" class="button-cancel btn-xs" onclick="clearSelection()">✕</button>
+            </div>
+            <div class="detail-grid">
+                <div class="detail-col">
+                    <span class="col-lbl">Position</span>
+                    <strong>#{{selectedRecord().index + 1}} (Index {{selectedRecord().index}})</strong>
+                </div>
+                <div class="detail-col">
+                    <span class="col-lbl">Operation</span>
+                    <strong>{{selectedRecord().title}}</strong>
+                </div>
+                <div class="detail-col">
+                    <span class="col-lbl">Operator</span>
+                    <strong>{{selectedRecord().user}}</strong>
+                </div>
+                <div class="detail-col">
+                    <span class="col-lbl">Category</span>
+                    <span class="cat-pill cat-{{selectedRecord().category}}">{{selectedRecord().category}}</span>
+                </div>
+                <div class="detail-col">
+                    <span class="col-lbl">Status</span>
+                    <strong>{{selectedRecord().status}}</strong>
+                </div>
+                <div class="detail-col">
+                    <span class="col-lbl">Amount</span>
+                    <strong class="text-success">{{selectedRecord().amount}}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

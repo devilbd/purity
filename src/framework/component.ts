@@ -2,6 +2,9 @@ import { effect } from './core';
 import { bindDirectives } from './directive';
 import { bindValidators } from './validator';
 import { executePipe } from './pipe';
+import { bindVirtualFor, hasVirtualForAttribute, getVirtualForAttribute } from './virtual-for';
+
+export { bindVirtualFor, hasVirtualForAttribute, getVirtualForAttribute };
 
 export interface ComponentOptions {
     selector?: string;
@@ -297,7 +300,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         if (isInsideNestedComponent(el, rootEl)) return false;
         let p = el.parentElement;
         while (p && p !== rootEl) {
-            if (isStructuralConditional(p) || hasForAttribute(p)) {
+            if (isStructuralConditional(p) || hasForAttribute(p) || hasVirtualForAttribute(p)) {
                 return false;
             }
             p = p.parentElement;
@@ -423,15 +426,18 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         });
     }
 
-    // 2. Process structural `for` loops inside rootEl
+    // 2. Process high-performance Virtualized For repeaters (`virtual-for`) inside rootEl
+    bindVirtualFor(rootEl, context, componentInstance, bindTemplateTree, evaluateValue, isInsideNestedComponent);
+
+    // 3. Process structural standard `for` loops inside rootEl
     const allForElements = Array.from(rootEl.querySelectorAll('*')).filter(
-        (el): el is HTMLElement => el instanceof HTMLElement && hasForAttribute(el),
+        (el): el is HTMLElement => el instanceof HTMLElement && hasForAttribute(el) && !hasVirtualForAttribute(el),
     );
     const topLevelForElements = allForElements.filter((el) => {
         if (isInsideNestedComponent(el, rootEl)) return false;
         let p = el.parentElement;
         while (p && p !== rootEl) {
-            if (hasForAttribute(p) || isStructuralConditional(p)) {
+            if (hasForAttribute(p) || isStructuralConditional(p) || hasVirtualForAttribute(p)) {
                 return false;
             }
             p = p.parentElement;
@@ -482,6 +488,8 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 
             if (!anchor.parentNode) return;
 
+            const fragment = document.createDocumentFragment();
+
             list.forEach((item, index) => {
                 const clone = templateEl.cloneNode(true) as HTMLElement;
                 const itemContext = Object.assign(Object.create(context), {
@@ -494,12 +502,14 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     __host: componentInstance || (context instanceof Element ? context : (context as any)?.__host),
                 });
 
-                anchor.parentNode?.insertBefore(clone, anchor);
-                currentNodes.push(clone);
-
                 // Recursively bind the cloned subtree with item context
                 bindTemplateTree(clone, itemContext, componentInstance);
+
+                fragment.appendChild(clone);
+                currentNodes.push(clone);
             });
+
+            anchor.parentNode?.insertBefore(fragment, anchor);
         });
     }
 

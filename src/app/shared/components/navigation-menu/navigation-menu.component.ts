@@ -60,6 +60,7 @@ export class NavigationMenuComponent {
                     { name: 'Signal Router', image: '🗺️', data: { hash: '#router-sample' } },
                     { name: 'Conditionals (if)', image: '🔀', data: { hash: '#if-sample' } },
                     { name: 'Array Repeater', image: '🔁', data: { hash: '#for-sample' } },
+                    { name: 'Virtual Scroll (100k)', image: '⚡', data: { hash: '#virtual-for-sample' } },
                     { name: 'Transform Pipes', image: '🏷️', data: { hash: '#pipe-sample' } },
                     { name: 'DOM Directives', image: '🎯', data: { hash: '#directive-sample' } },
                     { name: 'Form Validation', image: '📋', data: { hash: '#forms-validation' } },

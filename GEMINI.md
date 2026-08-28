@@ -196,6 +196,22 @@ Purity features a synchronous reactive primitives engine:
   </div>
   ```
 
+* **High-Performance Virtualized Repeater (`virtual-for="let item, index of items; itemHeight: 48; buffer: 8; height: 420px; scrollIndex: jumpSignal"`)**:
+  Purity includes a dedicated GPU-accelerated virtual scrolling engine for massive datasets (1,000 to 100,000+ items). It renders only the visible viewport slice (~20–30 nodes) with overscan buffering, absolute GPU transforms, phantom scroll height simulation, batched `DocumentFragment` insertion, declarative `scrollIndex` reactive signal binding, zero layout thrashing, and sub-millisecond updates:
+
+  ```html
+  <div class="virtual-container">
+      <div
+          virtual-for="let txn, index of transactions; itemHeight: 52; buffer: 6; height: 440px; scrollIndex: jumpTarget"
+          class="txn-card"
+      >
+          <span>#{{index + 1}} ({{txn.id}})</span>
+          <strong>{{txn.title}}</strong>
+          <span class="amount">{{txn.amount}}</span>
+      </div>
+  </div>
+  ```
+
 * **Structural Conditional Directives (`if="expr"`, `else-if="expr"`, `else`)**:
   Components support declarative multi-branch conditional rendering with lazy compilation and deferred execution. Falsy branches are completely excluded from the live DOM and will **not build, compile, or execute bindings or child component lifecycles** until their condition evaluates to truthy:
 

@@ -159,3 +159,4 @@ export * from './pipe';
 export * from './bootstrap';
 export * from './http';
 export * from './router';
+export * from './virtual-for';

@@ -750,6 +750,187 @@ export class PlaygroundDemoComponent {
 }`,
     },
     {
+        id: 'virtual-scroll',
+        name: '⚡ Virtualized Repeater (100k Items)',
+        description: 'Ultra-high performance virtualized scrolling for massive datasets with 60fps GPU rendering and indexed positions.',
+        ts: `import { Component, signal, computed } from '@purity/core';
+
+interface UserRecord {
+    id: string;
+    index: number;
+    name: string;
+    role: string;
+    balance: string;
+}
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    itemCount = signal(50000);
+    searchQuery = signal('');
+    jumpIndex = signal(0);
+    
+    // Generate large dataset on startup
+    users = signal<UserRecord[]>(
+        Array.from({ length: 50000 }, (_, i) => ({
+            id: \`USR-\${String(i + 1).padStart(6, '0')}\`,
+            index: i,
+            name: \`User \${i + 1}\`,
+            role: i % 4 === 0 ? 'Admin' : i % 3 === 0 ? 'Developer' : 'Member',
+            balance: \`$\${((i * 19.3) % 4000 + 10).toFixed(2)}\`,
+        }))
+    );
+
+    filteredUsers = computed(() => {
+        const q = this.searchQuery().toLowerCase().trim();
+        const all = this.users();
+        if (!q) return all;
+        return all.filter(u => u.name.toLowerCase().includes(q) || u.id.toLowerCase().includes(q) || u.role.toLowerCase().includes(q));
+    });
+
+    onSearch(input: HTMLInputElement) {
+        this.searchQuery.set(input.value);
+    }
+
+    jumpTo(index: number) {
+        this.jumpIndex.set(index);
+    }
+}`,
+        html: `<div class="virtual-demo window">
+    <div class="header">
+        <h3>⚡ Virtualized List (<code>{{filteredUsers().length}} items</code>)</h3>
+        <p>Renders only ~20 visible DOM nodes in the viewport with smooth 60fps scrolling.</p>
+    </div>
+
+    <!-- Quick Jump Toolbar -->
+    <div class="toolbar">
+        <input
+            type="text"
+            class="input-primary search-box"
+            placeholder="Search records..."
+            oninput="onSearch(this)"
+        />
+        <div class="jump-btns">
+            <button type="button" class="button-primary btn-sm" onclick="jumpTo(0)">Top #0</button>
+            <button type="button" class="button-primary btn-sm" onclick="jumpTo(10000)">#10,000</button>
+            <button type="button" class="button-primary btn-sm" onclick="jumpTo(25000)">#25,000</button>
+            <button type="button" class="button-primary btn-sm" onclick="jumpTo(49999)">End #50k</button>
+        </div>
+    </div>
+
+    <!-- Virtualized Scroll Viewport -->
+    <div class="virtual-container">
+        <div
+            virtual-for="let user, index of filteredUsers; itemHeight: 48; buffer: 6; height: 340px; scrollIndex: jumpIndex"
+            class="user-row"
+        >
+            <span class="idx-pill">#{{index + 1}}</span>
+            <span class="uid">{{user.id}}</span>
+            <strong class="name">{{user.name}}</strong>
+            <span class="role role-{{user.role}}">{{user.role}}</span>
+            <span class="balance">{{user.balance}}</span>
+        </div>
+    </div>
+</div>`,
+        scss: `.virtual-demo {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: #232635;
+    border: 1px solid rgba(130, 170, 255, 0.2);
+    border-radius: 12px;
+    color: #eeffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+    .header {
+        h3 { margin: 0; color: #82aaff; code { color: #ffcb6b; font-size: 14px; } }
+        p { margin: 4px 0 0 0; font-size: 13px; color: #8f93a2; }
+    }
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+
+        .search-box {
+            flex: 1 1 200px;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .jump-btns {
+            display: flex;
+            gap: 6px;
+
+            .btn-sm {
+                padding: 4px 10px;
+                font-size: 11.5px;
+            }
+        }
+    }
+
+    .virtual-container {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        background: #1b1e2b;
+        overflow: hidden;
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            box-sizing: border-box;
+
+            &:hover { background: rgba(255, 255, 255, 0.04); }
+
+            .idx-pill {
+                font-size: 11px;
+                font-family: monospace;
+                padding: 2px 6px;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 4px;
+                color: #a6accd;
+            }
+
+            .uid {
+                font-size: 12px;
+                font-family: monospace;
+                color: #82aaff;
+            }
+
+            .name {
+                flex: 1;
+                font-size: 13.5px;
+            }
+
+            .role {
+                font-size: 11px;
+                font-weight: 700;
+                padding: 2px 8px;
+                border-radius: 12px;
+
+                &.role-Admin { background: rgba(255, 83, 112, 0.15); color: #ff5370; }
+                &.role-Developer { background: rgba(130, 170, 255, 0.15); color: #82aaff; }
+                &.role-Member { background: rgba(195, 232, 141, 0.15); color: #c3e88d; }
+            }
+
+            .balance {
+                font-family: monospace;
+                font-weight: 700;
+                font-size: 13px;
+                color: #ffcb6b;
+            }
+        }
+    }
+}`,
+    },
+    {
         id: 'routing',
         name: '🗺️ Signal Router & Layout',
         description: 'Client-side routing with <router-layout>, dynamic parameters (:id), and reactive state.',
@@ -1099,6 +1280,20 @@ export class PlaygroundComponent {
                     this.loadSnippet(e.detail);
                 }
             });
+
+            // Bind continuous scroll lock on textarea
+            setTimeout(() => {
+                const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+                const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
+                if (textarea) {
+                    const sync = () => this.onScroll(textarea);
+                    textarea.addEventListener('scroll', sync, { passive: true });
+                    textarea.addEventListener('input', sync, { passive: true });
+                    textarea.addEventListener('select', sync, { passive: true });
+                    textarea.addEventListener('mouseup', sync, { passive: true });
+                    textarea.addEventListener('keyup', sync, { passive: true });
+                }
+            }, 50);
         }
     }
 
@@ -1113,6 +1308,12 @@ export class PlaygroundComponent {
 
     setTab(tab: 'ts' | 'html' | 'scss') {
         this.activeTab.set(tab);
+        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
+        if (textarea) {
+            textarea.scrollTop = 0;
+            textarea.scrollLeft = 0;
+        }
         this.updateHighlight();
     }
 
@@ -1139,6 +1340,12 @@ export class PlaygroundComponent {
         this.tsCode.set(preset.ts);
         this.htmlCode.set(preset.html);
         this.scssCode.set(preset.scss);
+        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
+        if (textarea) {
+            textarea.scrollTop = 0;
+            textarea.scrollLeft = 0;
+        }
         this.updateHighlight();
         this.runCompile();
     }
@@ -1216,13 +1423,24 @@ export class PlaygroundComponent {
         const code = this.currentCode || '';
         const highlighted = grammar ? Prism.highlight(code, grammar, lang) : code;
         codeEl.innerHTML = highlighted + (code.endsWith('\n') ? ' ' : '');
+
+        // Preserve and re-synchronize scroll position after updating innerHTML
+        const textarea = root.querySelector?.('.code-textarea') as HTMLTextAreaElement | null;
+        if (textarea) {
+            this.onScroll(textarea);
+        }
     }
 
     onScroll(textarea: HTMLTextAreaElement) {
-        const pre = document.querySelector('.highlight-layer') as HTMLElement;
+        const root: HTMLElement = (this as any).nodeType === 1 ? (this as any) : document.body;
+        const pre = root.querySelector?.('.highlight-layer') || document.querySelector('.highlight-layer');
         if (pre) {
             pre.scrollTop = textarea.scrollTop;
             pre.scrollLeft = textarea.scrollLeft;
+        }
+        const lineNums = root.querySelector?.('.line-numbers') || document.querySelector('.line-numbers');
+        if (lineNums) {
+            lineNums.scrollTop = textarea.scrollTop;
         }
     }
 

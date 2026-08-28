@@ -611,11 +611,52 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 15. Slot Content Projection -->
+        <!-- 15. Virtualized For Repeater -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>15. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                    <h4>15. ⚡ High-Performance Virtualized Repeater (<code>virtual-for</code>)</h4>
+                    <p>Render massive datasets (up to <strong>100,000+ items</strong>) at 60fps with fixed or dynamic row heights and precise indexed tracking:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('virtualScroll')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. HTML Template: High-Performance Virtual Scroll Viewport --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"viewport-container"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;div</span>
+        <span class="attr">virtual-for</span>=<span class="str">"let item, index of transactions; itemHeight: 48; buffer: 8; height: 400px"</span>
+        <span class="attr">class</span>=<span class="str">"transaction-row"</span>
+    <span class="tag">&gt;</span>
+        <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"idx"</span><span class="tag">&gt;</span>#<span class="expr">{{index + 1}}</span><span class="tag">&lt;/span&gt;</span>
+        <span class="tag">&lt;strong&gt;</span><span class="expr">{{item.title}}</span><span class="tag">&lt;/strong&gt;</span>
+        <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"badge"</span><span class="tag">&gt;</span><span class="expr">{{item.status}}</span><span class="tag">&lt;/span&gt;</span>
+        <span class="tag">&lt;span</span> <span class="attr">class</span>=<span class="str">"amount"</span><span class="tag">&gt;</span><span class="expr">{{item.amount}}</span><span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: 100k Reactive Dataset --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'app-transactions'</span>, templateUrl: <span class="str">'./transactions.html'</span> })
+<span class="kw">export class</span> <span class="typ">TransactionsComponent</span> {
+    transactions = <span class="fn">signal</span>(<span class="typ">Array</span>.<span class="fn">from</span>({ length: 100000 }, (_, i) =&gt; ({
+        id: <span class="str">`TXN-${i + 1}`</span>,
+        title: <span class="str">`Operation #${i + 1}`</span>,
+        status: <span class="str">'completed'</span>,
+        amount: <span class="str">`$${(i * 12.5).toFixed(2)}`</span>,
+    })));
+}</code></pre>
+        </div>
+
+        <!-- 16. Slot Content Projection -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>16. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
                     <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
                 </div>
                 <button
@@ -646,11 +687,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 16. Theming & Modular SCSS -->
+        <!-- 17. Theming & Modular SCSS -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>16. 🎨 GNOME Adwaita Theming &amp; Modular SCSS Design System</h4>
+                    <h4>17. 🎨 GNOME Adwaita Theming &amp; Modular SCSS Design System</h4>
                     <p>Translucent glassmorphism, refined corner radii, subtle specular borders, and GNOME cubic bezier animations with Dark and Light themes:</p>
                 </div>
                 <button
@@ -679,11 +720,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 17. Date & Time Picker Component -->
+        <!-- 18. Date & Time Picker Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>17. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
+                    <h4>18. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
                     <p>Full calendar view, year navigation, 24-hour time wheel scrolling, smart viewport auto-placement, date ranges, and custom pipe formatting:</p>
                 </div>
                 <button
@@ -715,11 +756,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 18. Circular Radial Context Menu -->
+        <!-- 19. Circular Radial Context Menu -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>18. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
+                    <h4>19. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
                     <p>Circular context menu with pie segments, SVG icons, submenus, dynamic placement, and keyboard/outside-click dismissal:</p>
                 </div>
                 <button
@@ -753,11 +794,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 19. Right-Click Context Menu Delegation -->
+        <!-- 20. Right-Click Context Menu Delegation -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>19. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
+                    <h4>20. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
                     <p>Single-source-of-truth right-click delegation binding radial menu activation across any matching DOM selector:</p>
                 </div>
                 <button
@@ -781,11 +822,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 20. Modal Dialogs -->
+        <!-- 21. Modal Dialogs -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>20. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                    <h4>21. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
                     <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, fixed viewport overlays, and <code>z-index: 1000</code>:</p>
                 </div>
                 <button
@@ -824,11 +865,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 21. Analogue Clock Widget -->
+        <!-- 22. Analogue Clock Widget -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>21. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
+                    <h4>22. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
                     <p>Native 2D Canvas clock with subpixel Retina scaling, frosted glass dial, 3D beveled hands, date window, smooth sweep vs quartz ticking, and multi-timezone support:</p>
                 </div>
                 <button
@@ -873,11 +914,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
             <span class="section-badge">Lifecycles &amp; Phases</span>
         </div>
 
-        <!-- 22. Component Mounting & Teardown Lifecycle -->
+        <!-- 23. Component Mounting & Teardown Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>22. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
+                    <h4>23. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
                     <p>Native Custom Elements v1 lifecycle flow from template projection and reactive binding to teardown:</p>
                 </div>
                 <button
@@ -932,11 +973,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 23. Custom Directive Lifecycle -->
+        <!-- 24. Custom Directive Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>23. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
+                    <h4>24. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
                     <p>Execution phases for attribute-level reactivity, signal tracking, and host DOM mutation observation:</p>
                 </div>
                 <button
@@ -988,11 +1029,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 24. Form Validation Lifecycle -->
+        <!-- 25. Form Validation Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>24. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
+                    <h4>25. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
                     <p>Decoupled validation pipeline with field binding, live evaluation, CSS state reflection, and submit lock:</p>
                 </div>
                 <button
@@ -1035,11 +1076,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 25. Application Bootstrapping Lifecycle -->
+        <!-- 26. Application Bootstrapping Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>25. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
+                    <h4>26. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
                     <p>End-to-end initialization sequence from environment tokens to root component mounting:</p>
                 </div>
                 <button
@@ -1076,11 +1117,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 });</code></pre>
         </div>
 
-        <!-- 26. Signal Routing & Layout Engine -->
+        <!-- 27. Signal Routing & Layout Engine -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>26. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
+                    <h4>27. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
                     <p>Fine-grained reactive routing, dynamic parameter tokens (<code>/users/:id</code>), automatic lifecycle mounting via <code>&lt;router-layout&gt;</code>, and declarative <code>routerLink</code> directive:</p>
                 </div>
                 <button

@@ -700,7 +700,28 @@ Purity provides native structural loop templates via `for="let item of items"` o
 
 ---
 
-### 15. 🔀 Structural Conditionals (`if="expr"`, `else-if="expr"`, `else`)
+### 15. ⚡ High-Performance Virtualized Repeater (`virtual-for`)
+
+Purity includes a dedicated GPU-accelerated virtual scrolling engine for massive datasets (1,000 to 100,000+ items). It renders only the visible viewport slice (~20–30 DOM nodes) with overscan buffering, absolute GPU transforms, phantom scroll height simulation, batched `DocumentFragment` insertion, declarative `scrollIndex` reactive signal binding, zero layout thrashing, and sub-millisecond signal updates:
+
+```html
+<!-- High-Performance 100k Virtualized Viewport with reactive scrollIndex -->
+<div class="viewport-container">
+    <div
+        virtual-for="let txn, index of transactions; itemHeight: 48; buffer: 8; height: 420px; scrollIndex: jumpTarget"
+        class="transaction-row"
+    >
+        <span class="idx">#{{index + 1}}</span>
+        <strong>{{txn.title}}</strong>
+        <span class="badge">{{txn.status}}</span>
+        <span class="amount">{{txn.amount}}</span>
+    </div>
+</div>
+```
+
+---
+
+### 16. 🔀 Structural Conditionals (`if="expr"`, `else-if="expr"`, `else`)
 
 Purity supports declarative structural conditionals with **lazy compilation and deferred execution**. When an `if` expression evaluates to falsy, its inner DOM subtree is completely excluded from the live document — text interpolations, directives, validators, and child Custom Component lifecycles will **not build or execute** until the condition evaluates to truthy:
 
@@ -719,7 +740,7 @@ Purity supports declarative structural conditionals with **lazy compilation and 
 
 ---
 
-### 16. 📦 Generic Components & Content Projection (`<slot>`)
+### 17. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 

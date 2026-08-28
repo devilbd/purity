@@ -1179,7 +1179,101 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
-    // 15. Content Projection (slot)
+    // 15. Virtualized For Repeater (virtual-for)
+    virtualScroll: {
+        id: 'virtual-scroll',
+        title: '⚡ Virtualized For Repeater (100k Items)',
+        ts: `import { Component, signal } from '@purity/core';
+
+interface DataRow {
+    id: string;
+    index: number;
+    title: string;
+    amount: string;
+}
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    // 50,000 dataset array
+    records = signal<DataRow[]>(
+        Array.from({ length: 50000 }, (_, i) => ({
+            id: \`TXN-\${String(i + 1).padStart(6, '0')}\`,
+            index: i,
+            title: \`Log Entry #\${i + 1}\`,
+            amount: \`$\${((i * 17.5) % 3000 + 5).toFixed(2)}\`,
+        }))
+    );
+
+    jumpToIndex(index: number) {
+        const container = document.querySelector('.virtual-container .p-virtual-scroll-container') as any;
+        if (container && typeof container.scrollToIndex === 'function') {
+            container.scrollToIndex(index, 'center');
+        }
+    }
+}`,
+        html: `<div class="virtual-card window">
+    <div class="card-header">
+        <h3>⚡ Virtualized List (<code>{{records().length}} items</code>)</h3>
+        <button type="button" class="button-primary" onclick="jumpToIndex(25000)">Jump to #25,000</button>
+    </div>
+
+    <!-- Virtual Viewport Container -->
+    <div class="virtual-container">
+        <div
+            virtual-for="let item, index of records; itemHeight: 46; buffer: 6; height: 320px"
+            class="record-row"
+        >
+            <span class="idx">#{{index + 1}}</span>
+            <span class="id-tag">{{item.id}}</span>
+            <strong class="title">{{item.title}}</strong>
+            <span class="amt">{{item.amount}}</span>
+        </div>
+    </div>
+</div>`,
+        scss: `.virtual-card {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #232635;
+    border: 1px solid rgba(130, 170, 255, 0.2);
+    border-radius: 12px;
+    color: #eeffff;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        h3 { margin: 0; color: #82aaff; code { color: #ffcb6b; } }
+    }
+
+    .virtual-container {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        background: #1b1e2b;
+        overflow: hidden;
+
+        .record-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+
+            &:hover { background: rgba(255, 255, 255, 0.04); }
+            .idx { font-family: monospace; font-size: 11px; color: #a6accd; }
+            .id-tag { font-family: monospace; font-size: 12px; color: #82aaff; }
+            .title { flex: 1; font-size: 13px; }
+            .amt { font-family: monospace; font-weight: 700; color: #57e389; font-size: 13px; }
+        }
+    }
+}`,
+    },
+
+    // 16. Content Projection (slot)
     slot: {
         id: 'slot',
         title: '📦 Content Projection with <slot>',
