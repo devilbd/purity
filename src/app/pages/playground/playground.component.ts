@@ -1351,8 +1351,8 @@ export class PlaygroundComponent {
     }
 
     onSaveSnippet() {
-        const defaultTitle = `Snippet #${this.savedPresets().length + 1} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
-        const title = window.prompt('Enter a title for your saved playground snippet:', defaultTitle);
+        const defaultTitle = `Draft #${this.savedPresets().length + 1} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+        const title = window.prompt('Enter a title for your saved playground draft:', defaultTitle);
         if (title === null) return; // User cancelled
         const cleanTitle = title.trim() || defaultTitle;
 
@@ -1360,7 +1360,7 @@ export class PlaygroundComponent {
         const newPreset: CodePreset = {
             id: newId,
             name: `💾 ${cleanTitle}`,
-            description: 'Custom snippet saved into local storage history.',
+            description: 'Custom draft saved into local storage history.',
             ts: this.tsCode(),
             html: this.htmlCode(),
             scss: this.scssCode(),
@@ -1380,7 +1380,7 @@ export class PlaygroundComponent {
             select.value = newId;
         }
 
-        this.notify.success('Saved to History', `Snippet "${cleanTitle}" saved to localStorage.`);
+        this.notify.success('Draft Saved', `Draft "${cleanTitle}" saved to localStorage.`);
     }
 
     onDeleteSnippet() {
@@ -1395,7 +1395,7 @@ export class PlaygroundComponent {
         this.savedPresets.set(updated);
         savePlaygroundHistory(updated);
 
-        this.notify.info('Snippet Deleted', `Removed "${custom.name}" from local history.`);
+        this.notify.info('Draft Deleted', `Removed "${custom.name}" from local history.`);
         this.onPresetSelect(PLAYGROUND_PRESETS[0].id);
 
         const select = document.querySelector('#preset-select') as HTMLSelectElement | null;

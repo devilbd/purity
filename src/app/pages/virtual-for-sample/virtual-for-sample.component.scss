@@ -14,6 +14,17 @@
         flex-wrap: wrap;
         gap: 8px;
 
+        @media (max-width: 640px) {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
         .header-main {
             h4 {
                 margin: 0;

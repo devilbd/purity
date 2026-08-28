@@ -9,32 +9,39 @@
         </div>
 
         <div class="preset-selector-group">
-            <label for="preset-select">Preset / History:</label>
-            <select
-                id="preset-select"
-                class="preset-select"
-                onchange="onPresetSelect(this.value)"
-            >
-                <option for="let p of allPresets" value="{{p.id}}">{{p.name}}</option>
-            </select>
+            <label for="preset-select" class="preset-label">Preset / History:</label>
+            <div class="preset-select-wrapper">
+                <select
+                    id="preset-select"
+                    class="preset-select"
+                    aria-label="Preset or Saved Draft"
+                    onchange="onPresetSelect(this.value)"
+                >
+                    <option for="let p of allPresets" value="{{p.id}}">{{p.name}}</option>
+                </select>
+            </div>
 
-            <button
-                type="button"
-                class="action-btn save-snippet-btn"
-                title="Save current code to browser localStorage history"
-                onclick="onSaveSnippet()"
-            >
-                💾 Save written...
-            </button>
+            <div class="preset-actions-group">
+                <button
+                    type="button"
+                    class="action-btn save-snippet-btn"
+                    title="Save current code to browser localStorage drafts"
+                    onclick="onSaveSnippet()"
+                >
+                    <span class="btn-icon">💾</span>
+                    <span class="btn-text">Save Draft</span>
+                </button>
 
-            <button
-                type="button"
-                class="action-btn delete-snippet-btn {{isCustomSelected ? 'visible' : 'hidden'}}"
-                title="Delete this custom snippet from localStorage"
-                onclick="onDeleteSnippet()"
-            >
-                🗑️ Delete
-            </button>
+                <button
+                    type="button"
+                    class="action-btn delete-snippet-btn {{isCustomSelected ? 'visible' : 'hidden'}}"
+                    title="Delete this custom draft from localStorage"
+                    onclick="onDeleteSnippet()"
+                >
+                    <span class="btn-icon">🗑️</span>
+                    <span class="btn-text">Delete</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -50,7 +57,7 @@
                         onclick="setTab('ts')"
                     >
                         <span class="tab-icon ts-icon">TS</span>
-                        app.component.ts
+                        <span class="tab-label">app.component.ts</span>
                     </button>
                     <button
                         type="button"
@@ -58,7 +65,7 @@
                         onclick="setTab('html')"
                     >
                         <span class="tab-icon html-icon">&lt;&gt;</span>
-                        template.html
+                        <span class="tab-label">template.html</span>
                     </button>
                     <button
                         type="button"
@@ -66,7 +73,7 @@
                         onclick="setTab('scss')"
                     >
                         <span class="tab-icon scss-icon">#</span>
-                        style.scss
+                        <span class="tab-label">style.scss</span>
                     </button>
                 </div>
 
@@ -77,7 +84,8 @@
                         title="Copy active code"
                         onclick="copyCode()"
                     >
-                        📋 Copy
+                        <span class="btn-icon">📋</span>
+                        <span class="btn-text">Copy</span>
                     </button>
                 </div>
             </div>
@@ -120,7 +128,8 @@
                         title="Recompile & Run"
                         onclick="runCompile()"
                     >
-                        ↻ Run
+                        <span class="btn-icon">↻</span>
+                        <span class="btn-text">Run</span>
                     </button>
                 </div>
             </div>

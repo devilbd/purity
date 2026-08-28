@@ -14,6 +14,12 @@
         flex-wrap: wrap;
         gap: 8px;
 
+        @media (max-width: 640px) {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
         h4 {
             margin: 0;
             font-size: 1.05rem;
@@ -55,6 +61,10 @@
         align-items: center;
         flex-wrap: wrap;
 
+        @media (max-width: 640px) {
+            gap: 6px;
+        }
+
         .http-btn {
             margin: 0;
             display: flex;
@@ -66,6 +76,14 @@
             border-radius: var(--radius-control);
             cursor: var(--cursor-pointer);
             @include button-hover-lift;
+
+            @media (max-width: 640px) {
+                flex: 1 1 calc(50% - 6px);
+                min-width: 130px;
+                justify-content: center;
+                padding: 7px 10px;
+                font-size: 12px;
+            }
 
             .method-tag {
                 padding: 2px 6px;
@@ -119,20 +137,28 @@
         border-radius: var(--radius-card);
         transition: border-color var(--transition-fast) ease;
 
+        @media (max-width: 640px) {
+            padding: 12px 10px;
+        }
+
         .card-title-area {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
 
             .card-icon {
                 font-size: 1.25rem;
+                line-height: 1.2;
+                margin-top: 2px;
+                flex-shrink: 0;
             }
 
             .title-details {
                 display: flex;
                 flex-direction: column;
-                gap: 4px;
+                gap: 6px;
                 flex: 1;
+                min-width: 0;
 
                 h5 {
                     margin: 0;
@@ -146,29 +172,76 @@
                     align-items: center;
                     gap: 8px;
                     flex-wrap: wrap;
+                    max-width: 100%;
+
+                    @media (max-width: 640px) {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 6px;
+                        width: 100%;
+                    }
 
                     .endpoint-badge {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
                         font-size: 11.5px;
                         font-family: var(--font-mono);
-                        padding: 3px 8px;
+                        padding: 4px 8px;
                         background: var(--gnome-input);
                         border: 1px solid var(--gnome-border-subtle);
                         border-radius: var(--radius-control);
                         color: var(--accent);
+                        max-width: 100%;
+                        box-sizing: border-box;
+                        word-break: break-all;
+                        overflow-wrap: anywhere;
+
+                        .endpoint-method {
+                            font-weight: 800;
+                            color: var(--text-main);
+                            background: var(--accent-subtle);
+                            padding: 1px 5px;
+                            border-radius: 3px;
+                            font-size: 10px;
+                            flex-shrink: 0;
+                        }
+
+                        .endpoint-url {
+                            word-break: break-all;
+                            overflow-wrap: anywhere;
+                            color: var(--accent);
+                        }
+
+                        @media (max-width: 640px) {
+                            width: 100%;
+                            font-size: 11px;
+                            padding: 4px 6px;
+                        }
                     }
 
                     .status-badge {
+                        display: inline-flex;
+                        align-items: center;
                         font-size: 11.5px;
                         font-family: var(--font-mono);
                         font-weight: 600;
-                        padding: 3px 8px;
+                        padding: 4px 8px;
                         background: var(--gnome-input);
                         border: 1px solid var(--gnome-border-subtle);
                         border-radius: var(--radius-control);
                         color: var(--gnome-success);
+                        max-width: 100%;
+                        box-sizing: border-box;
+                        word-break: break-all;
 
                         &.status-loading {
                             color: var(--accent);
+                        }
+
+                        @media (max-width: 640px) {
+                            font-size: 11px;
+                            padding: 3px 6px;
                         }
                     }
                 }
@@ -207,6 +280,11 @@
                     white-space: pre-wrap;
                     word-break: break-word;
                     @include custom-scrollbar;
+
+                    @media (max-width: 640px) {
+                        padding: 8px 10px;
+                        font-size: 11.5px;
+                    }
 
                     &.headers-pre {
                         max-height: 110px;

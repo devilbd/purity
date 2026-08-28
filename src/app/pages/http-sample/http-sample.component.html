@@ -72,7 +72,10 @@
             <div class="title-details">
                 <h5>Response Inspection</h5>
                 <div class="meta-row">
-                    <span class="endpoint-badge">{{requestMethod()}} {{requestUrl()}}</span>
+                    <span class="endpoint-badge">
+                        <span class="endpoint-method">{{requestMethod()}}</span>
+                        <span class="endpoint-url">{{requestUrl()}}</span>
+                    </span>
                     <span class="status-badge {{isRequestLoading() ? 'status-loading' : ''}}">Status: {{responseStatus()}}</span>
                 </div>
             </div>

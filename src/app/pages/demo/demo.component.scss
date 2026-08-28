@@ -10,6 +10,17 @@
     box-sizing: border-box;
     border-radius: var(--radius-window, 16px);
 
+    @media (max-width: 640px) {
+        padding: 16px 10px;
+        gap: 12px;
+        border-radius: 12px;
+
+        .flex-horizontal {
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+    }
+
     > * {
         margin: 0;
     }
