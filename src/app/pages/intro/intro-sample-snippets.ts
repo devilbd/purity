@@ -1059,7 +1059,127 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
-    // 14. Content Projection (slot)
+    // 14. Structural Conditionals
+    conditional: {
+        id: 'conditional',
+        title: '🔀 Structural Conditionals (if / else-if / else)',
+        ts: `import { Component, signal } from '@purity/core';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    isLoggedIn = signal(true);
+    userRole = signal<'admin' | 'editor' | 'viewer'>('admin');
+    unreadCount = signal(3);
+
+    toggleAuth() {
+        this.isLoggedIn.update(v => !v);
+    }
+
+    setRole(role: 'admin' | 'editor' | 'viewer') {
+        this.userRole.set(role);
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>🔀 Structural Conditionals (if / else-if / else)</h3>
+    <p>Falsy branches are excluded from the DOM and never compiled until active.</p>
+
+    <div class="auth-section">
+        <button type="button" class="button-primary" onclick="toggleAuth()">
+            {{isLoggedIn() ? '🚪 Logout' : '🔑 Sign In'}}
+        </button>
+
+        <div if="isLoggedIn()" class="auth-box auth-active">
+            <span class="badge badge-success">Authenticated</span>
+            <strong>Welcome back, Developer!</strong>
+            <span if="unreadCount() > 0" class="badge-alert">{{unreadCount()}} new notices</span>
+            <span else class="badge-muted">All caught up</span>
+        </div>
+        <div else class="auth-box auth-inactive">
+            <span class="badge badge-warn">Guest</span>
+            <span>You are currently browsing as a guest.</span>
+        </div>
+    </div>
+
+    <div if="isLoggedIn()" class="role-section">
+        <label>Select Permission Tier:</label>
+        <div class="btn-group">
+            <button type="button" class="button-primary {{userRole() === 'admin' ? 'active' : ''}}" onclick="setRole('admin')">Admin</button>
+            <button type="button" class="button-primary {{userRole() === 'editor' ? 'active' : ''}}" onclick="setRole('editor')">Editor</button>
+            <button type="button" class="button-primary {{userRole() === 'viewer' ? 'active' : ''}}" onclick="setRole('viewer')">Viewer</button>
+        </div>
+
+        <div if="userRole() === 'admin'" class="role-panel panel-admin">
+            🛡️ <strong>Admin Console:</strong> Full root privileges & database access.
+        </div>
+        <div else-if="userRole() === 'editor'" class="role-panel panel-editor">
+            ✏️ <strong>Editor Studio:</strong> Can publish, modify, and draft articles.
+        </div>
+        <div else class="role-panel panel-viewer">
+            👁️ <strong>Viewer Portal:</strong> Read-only access to published content.
+        </div>
+    </div>
+</div>`,
+        scss: `.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #232635;
+    border-radius: 12px;
+    color: #eeffff;
+
+    h3 { margin: 0; color: #82aaff; }
+    p { margin: 0; font-size: 13px; color: #8f93a2; }
+
+    .auth-section, .role-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+        background: #1b1e2b;
+        border-radius: 8px;
+    }
+
+    .auth-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 6px;
+
+        &.auth-active { background: rgba(195, 232, 141, 0.1); border: 1px solid rgba(195, 232, 141, 0.3); }
+        &.auth-inactive { background: rgba(255, 203, 107, 0.1); border: 1px dashed rgba(255, 203, 107, 0.3); }
+    }
+
+    .badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        &.badge-success { background: #c3e88d; color: #1b1e2b; }
+        &.badge-warn { background: #ffcb6b; color: #1b1e2b; }
+    }
+
+    .badge-alert { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #ff5370; color: #ffffff; }
+    .badge-muted { font-size: 11px; color: #676e95; }
+
+    .btn-group { display: flex; gap: 8px; }
+
+    .role-panel {
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 13.5px;
+        &.panel-admin { background: rgba(130, 170, 255, 0.12); border-left: 4px solid #82aaff; }
+        &.panel-editor { background: rgba(255, 203, 107, 0.12); border-left: 4px solid #ffcb6b; }
+        &.panel-viewer { background: rgba(195, 232, 141, 0.12); border-left: 4px solid #c3e88d; }
+    }
+}`,
+    },
+
+    // 15. Content Projection (slot)
     slot: {
         id: 'slot',
         title: '📦 Content Projection with <slot>',

@@ -35,8 +35,10 @@ export const signal = <T>(initialValue: T): Signal<T> => {
     return getter;
 };
 
-export const effect = (fn: Function) => {
+export const effect = (fn: Function): (() => void) => {
+    let active = true;
     const execute = () => {
+        if (!active) return;
         context.push(execute);
         try {
             fn();
@@ -45,6 +47,9 @@ export const effect = (fn: Function) => {
         }
     };
     execute();
+    return () => {
+        active = false;
+    };
 };
 
 /**

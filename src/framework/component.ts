@@ -200,20 +200,240 @@ export function isInsideNestedComponent(node: Node, rootEl: HTMLElement): boolea
     return false;
 }
 
+export interface ConditionalBranch {
+    type: 'if' | 'else-if' | 'else';
+    expr: string;
+    templateEl: HTMLElement;
+}
+
+const CONDITIONAL_ATTRS = [
+    'if', '*if', 'p-if', 'pif', 'pIf',
+    'else-if', 'elseif', '*else-if', '*elseif', 'p-else-if', 'pElseIf', 'p-elseif', 'pElseif',
+    'else', '*else', 'p-else', 'pElse', 'pelse',
+];
+
+export function getIfAttribute(el: Element): string | null {
+    return (
+        el.getAttribute('if') ??
+        el.getAttribute('*if') ??
+        el.getAttribute('p-if') ??
+        el.getAttribute('pif') ??
+        el.getAttribute('pIf')
+    );
+}
+
+export function getElseIfAttribute(el: Element): string | null {
+    return (
+        el.getAttribute('else-if') ??
+        el.getAttribute('elseif') ??
+        el.getAttribute('*else-if') ??
+        el.getAttribute('*elseif') ??
+        el.getAttribute('p-else-if') ??
+        el.getAttribute('pElseIf') ??
+        el.getAttribute('p-elseif') ??
+        el.getAttribute('pElseif')
+    );
+}
+
+export function hasElseAttribute(el: Element): boolean {
+    return (
+        el.hasAttribute('else') ||
+        el.hasAttribute('*else') ||
+        el.hasAttribute('p-else') ||
+        el.hasAttribute('pElse') ||
+        el.hasAttribute('pelse')
+    );
+}
+
+export function isStructuralConditional(el: Element): boolean {
+    return getIfAttribute(el) !== null || getElseIfAttribute(el) !== null || hasElseAttribute(el);
+}
+
+const FOR_ATTRS = ['for', '*for', 'p-for', 'pfor', 'pFor'];
+
+export function getForAttribute(el: Element): string | null {
+    return (
+        el.getAttribute('for') ??
+        el.getAttribute('*for') ??
+        el.getAttribute('p-for') ??
+        el.getAttribute('pfor') ??
+        el.getAttribute('pFor')
+    );
+}
+
+export function hasForAttribute(el: Element): boolean {
+    return getForAttribute(el) !== null;
+}
+
+function removeForAttributes(el: Element): void {
+    for (const attr of FOR_ATTRS) {
+        if (el.hasAttribute(attr)) {
+            el.removeAttribute(attr);
+        }
+    }
+}
+
+function removeConditionalAttributes(el: Element): void {
+    for (const attr of CONDITIONAL_ATTRS) {
+        if (el.hasAttribute(attr)) {
+            el.removeAttribute(attr);
+        }
+    }
+}
+
 /**
- * Recursively binds structural for loops, text interpolations, attribute bindings,
- * directives, and validators across a DOM subtree with a specific context.
+ * Recursively binds structural conditionals (if / else-if / else), for loops,
+ * text interpolations, attribute bindings, directives, and validators across
+ * a DOM subtree with a specific context.
  */
 function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: any) {
     if (!rootEl) return;
 
-    // 1. Process structural `for` loops inside rootEl
-    const allForElements = Array.from(rootEl.querySelectorAll('[for]'));
+    // 1. Process structural conditional directives (`if`, `else-if`, `else`) inside rootEl
+    const candidateIfElements = Array.from(rootEl.querySelectorAll('*')).filter((el): el is HTMLElement => {
+        if (!(el instanceof HTMLElement)) return false;
+        if (getIfAttribute(el) === null) return false;
+        if (el.closest('[data-no-bind]')) return false;
+        if (isInsideNestedComponent(el, rootEl)) return false;
+        let p = el.parentElement;
+        while (p && p !== rootEl) {
+            if (isStructuralConditional(p) || hasForAttribute(p)) {
+                return false;
+            }
+            p = p.parentElement;
+        }
+        return true;
+    });
+
+    const consumedConditionalElements = new Set<Element>();
+
+    for (const el of candidateIfElements) {
+        if (consumedConditionalElements.has(el)) continue;
+        if (!el.parentNode) continue;
+
+        const parent = el.parentNode;
+        const ifExpr = getIfAttribute(el)!;
+        const branches: ConditionalBranch[] = [];
+
+        // Branch 0: 'if'
+        const ifTemplate = el.cloneNode(true) as HTMLElement;
+        removeConditionalAttributes(ifTemplate);
+        branches.push({
+            type: 'if',
+            expr: ifExpr,
+            templateEl: ifTemplate,
+        });
+        consumedConditionalElements.add(el);
+
+        // Look ahead at sibling elements for connected else-if and else branches
+        const siblingElementsToRemove: HTMLElement[] = [el];
+        let next = el.nextElementSibling;
+        while (next && next instanceof HTMLElement) {
+            if (isInsideNestedComponent(next, rootEl)) break;
+            const elseIfExpr = getElseIfAttribute(next);
+            if (elseIfExpr !== null) {
+                const elseIfTemplate = next.cloneNode(true) as HTMLElement;
+                removeConditionalAttributes(elseIfTemplate);
+                branches.push({
+                    type: 'else-if',
+                    expr: elseIfExpr,
+                    templateEl: elseIfTemplate,
+                });
+                consumedConditionalElements.add(next);
+                siblingElementsToRemove.push(next);
+                next = next.nextElementSibling;
+                continue;
+            }
+
+            if (hasElseAttribute(next)) {
+                const elseTemplate = next.cloneNode(true) as HTMLElement;
+                removeConditionalAttributes(elseTemplate);
+                branches.push({
+                    type: 'else',
+                    expr: 'true',
+                    templateEl: elseTemplate,
+                });
+                consumedConditionalElements.add(next);
+                siblingElementsToRemove.push(next);
+                break;
+            }
+
+            break;
+        }
+
+        // Insert anchor bookmarks at the location of `el`
+        const startAnchor = document.createComment(`if-start: ${ifExpr}`);
+        const endAnchor = document.createComment(`if-end`);
+        parent.insertBefore(startAnchor, el);
+        parent.insertBefore(endAnchor, el);
+
+        // Remove all branch DOM elements from the active document tree
+        for (const item of siblingElementsToRemove) {
+            if (item.parentNode) {
+                item.parentNode.removeChild(item);
+            }
+        }
+
+        let currentRenderedIndex = -1;
+
+        effect(() => {
+            let matchedIndex = -1;
+
+            for (let i = 0; i < branches.length; i++) {
+                const branch = branches[i];
+                if (branch.type === 'else') {
+                    matchedIndex = i;
+                    break;
+                }
+
+                const rawVal = evaluateValue(branch.expr, context);
+                const isTruthy =
+                    rawVal !== false &&
+                    rawVal !== 0 &&
+                    rawVal !== '' &&
+                    rawVal !== null &&
+                    rawVal !== undefined;
+
+                if (isTruthy) {
+                    matchedIndex = i;
+                    break;
+                }
+            }
+
+            if (matchedIndex === currentRenderedIndex) {
+                return;
+            }
+
+            // Clean up previous rendered nodes between startAnchor and endAnchor
+            while (startAnchor.nextSibling && startAnchor.nextSibling !== endAnchor) {
+                const nodeToRemove = startAnchor.nextSibling;
+                nodeToRemove.parentNode?.removeChild(nodeToRemove);
+            }
+
+            currentRenderedIndex = matchedIndex;
+
+            if (matchedIndex !== -1 && endAnchor.parentNode) {
+                const matchedBranch = branches[matchedIndex];
+                const clone = matchedBranch.templateEl.cloneNode(true) as HTMLElement;
+                endAnchor.parentNode.insertBefore(clone, endAnchor);
+
+                // Recursively build, compile, and bind the cloned subtree with the active context
+                bindTemplateTree(clone, context, componentInstance);
+            }
+        });
+    }
+
+    // 2. Process structural `for` loops inside rootEl
+    const allForElements = Array.from(rootEl.querySelectorAll('*')).filter(
+        (el): el is HTMLElement => el instanceof HTMLElement && hasForAttribute(el),
+    );
     const topLevelForElements = allForElements.filter((el) => {
         if (isInsideNestedComponent(el, rootEl)) return false;
         let p = el.parentElement;
         while (p && p !== rootEl) {
-            if (p.hasAttribute('for')) return false;
+            if (hasForAttribute(p) || isStructuralConditional(p)) {
+                return false;
+            }
             p = p.parentElement;
         }
         return true;
@@ -223,7 +443,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         if (!(el instanceof HTMLElement)) continue;
         if (el.closest('[data-no-bind]')) continue;
 
-        const forAttr = el.getAttribute('for');
+        const forAttr = getForAttribute(el);
         if (!forAttr) continue;
 
         // Matches: let item of items, let item, index of items, let (item, i) of items, item of items
@@ -243,7 +463,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
         parent.insertBefore(anchor, el);
 
         const templateEl = el.cloneNode(true) as HTMLElement;
-        templateEl.removeAttribute('for');
+        removeForAttributes(templateEl);
         parent.removeChild(el);
 
         let currentNodes: HTMLElement[] = [];

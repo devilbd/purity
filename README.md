@@ -700,7 +700,26 @@ Purity provides native structural loop templates via `for="let item of items"` o
 
 ---
 
-### 15. 📦 Generic Components & Content Projection (`<slot>`)
+### 15. 🔀 Structural Conditionals (`if="expr"`, `else-if="expr"`, `else`)
+
+Purity supports declarative structural conditionals with **lazy compilation and deferred execution**. When an `if` expression evaluates to falsy, its inner DOM subtree is completely excluded from the live document — text interpolations, directives, validators, and child Custom Component lifecycles will **not build or execute** until the condition evaluates to truthy:
+
+```html
+<!-- Multi-branch Conditional Hierarchy -->
+<div if="activeTab() === 'dashboard'" class="tab-panel">
+    <dashboard-view></dashboard-view>
+</div>
+<div else-if="activeTab() === 'analytics'" class="tab-panel">
+    <analytics-view></analytics-view>
+</div>
+<div else class="tab-panel">
+    <p>Please select a tab above to continue.</p>
+</div>
+```
+
+---
+
+### 16. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 

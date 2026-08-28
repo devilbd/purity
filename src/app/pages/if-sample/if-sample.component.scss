@@ -1,0 +1,289 @@
+@use '@styles' as *;
+
+.if-sample-root {
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 0;
+
+    .if-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        h4 {
+            margin: 0;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent-shadow);
+        }
+    }
+
+    .if-desc {
+        margin: 0;
+        font-size: 13px;
+        color: var(--text-secondary);
+
+        code {
+            color: var(--accent);
+            background: var(--accent-subtle);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+    }
+
+    .sample-section {
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-control, 6px);
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            strong {
+                font-size: 13px;
+                color: var(--text-main);
+            }
+
+            .btn-group {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .toggle-btn {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+
+            .role-selector {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+
+                button {
+                    font-size: 12px;
+                    padding: 4px 10px;
+                    opacity: 0.7;
+
+                    &.active {
+                        opacity: 1;
+                        border-color: var(--accent);
+                        box-shadow: 0 0 0 1px var(--accent);
+                    }
+                }
+            }
+        }
+    }
+
+    .conditional-card, .conditional-card-empty {
+        padding: 12px 14px;
+        border-radius: var(--radius-control, 6px);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-counter {
+            font-family: var(--font-mono, monospace);
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 700;
+        }
+    }
+
+    .conditional-card {
+        background: var(--gnome-window);
+        border: 1px solid var(--gnome-border-subtle);
+    }
+
+    .conditional-card-empty {
+        background: var(--gnome-input);
+        border: 1px dashed var(--gnome-border-subtle);
+        opacity: 0.8;
+    }
+
+    .pill {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 4px;
+        width: fit-content;
+
+        &.pill-success {
+            background: var(--gnome-success-bg);
+            color: var(--gnome-success);
+            border: 1px solid var(--gnome-success);
+        }
+
+        &.pill-warn {
+            background: var(--gnome-warn-bg);
+            color: var(--gnome-warn);
+            border: 1px solid var(--gnome-warn);
+        }
+    }
+
+    .clock-mount-wrapper, .custom-mount-wrapper {
+        padding: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: var(--gnome-window);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-control, 6px);
+    }
+
+    .role-display {
+        .role-card {
+            padding: 14px 16px;
+            border-radius: var(--radius-control, 6px);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+            background: var(--gnome-window);
+            border: 1px solid var(--gnome-border-subtle);
+
+            .role-badge {
+                position: absolute;
+                top: 10px;
+                right: 12px;
+                font-size: 10.5px;
+                font-weight: 700;
+                padding: 2px 8px;
+                border-radius: var(--radius-pill);
+                background: var(--accent-subtle);
+                color: var(--accent);
+                border: 1px solid var(--accent-shadow);
+            }
+
+            h5 {
+                margin: 0;
+                font-size: 14px;
+                color: var(--text-main);
+            }
+
+            p {
+                margin: 0;
+                font-size: 12.5px;
+                color: var(--text-secondary);
+            }
+
+            &.role-admin {
+                border-left: 4px solid var(--accent);
+            }
+
+            &.role-moderator {
+                border-left: 4px solid var(--gnome-warn);
+            }
+
+            &.role-member {
+                border-left: 4px solid var(--gnome-success);
+            }
+
+            &.role-guest {
+                border-left: 4px solid var(--text-secondary);
+            }
+        }
+    }
+
+    .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .task-row {
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            background: var(--gnome-window);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-control, 6px);
+
+            .task-meta {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+
+                .task-title {
+                    font-size: 13px;
+                    color: var(--text-main);
+
+                    &.completed-text {
+                        text-decoration: line-through;
+                        opacity: 0.6;
+                    }
+                }
+
+                .tag-priority {
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    padding: 1px 6px;
+                    border-radius: 4px;
+                    background: var(--gnome-danger-bg);
+                    color: var(--gnome-danger);
+                    border: 1px solid var(--gnome-danger);
+                }
+
+                .tag-normal {
+                    font-size: 10.5px;
+                    padding: 1px 6px;
+                    border-radius: 4px;
+                    background: var(--gnome-input);
+                    color: var(--text-secondary);
+                    border: 1px solid var(--gnome-border-subtle);
+                }
+            }
+
+            .task-actions {
+                .task-toggle-btn {
+                    font-size: 11px;
+                    padding: 3px 8px;
+
+                    &.is-done {
+                        background: var(--gnome-success-bg);
+                        color: var(--gnome-success);
+                        border-color: var(--gnome-success);
+                    }
+                }
+            }
+        }
+    }
+}

@@ -196,6 +196,22 @@ Purity features a synchronous reactive primitives engine:
   </div>
   ```
 
+* **Structural Conditional Directives (`if="expr"`, `else-if="expr"`, `else`)**:
+  Components support declarative multi-branch conditional rendering with lazy compilation and deferred execution. Falsy branches are completely excluded from the live DOM and will **not build, compile, or execute bindings or child component lifecycles** until their condition evaluates to truthy:
+
+  ```html
+  <!-- Multi-branch conditional hierarchy -->
+  <div if="userRole() === 'admin'" class="admin-panel">
+      <admin-controls></admin-controls>
+  </div>
+  <div else-if="userRole() === 'moderator'" class="moderator-panel">
+      <mod-tools></mod-tools>
+  </div>
+  <div else class="guest-panel">
+      <p>Please log in as an administrator.</p>
+  </div>
+  ```
+
 * **`<slot>` Content Projection**:
   Components can define `<slot></slot>` tags in their template. Any nested HTML elements, components, or text passed into the custom element are automatically projected into the slot during initialization, while retaining reactive bindings.
 

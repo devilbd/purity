@@ -566,6 +566,190 @@ export class PlaygroundDemoComponent {
 }`,
     },
     {
+        id: 'conditional',
+        name: '🔀 Structural Conditionals (if/else)',
+        description: 'Lazy template compilation and multi-branch condition evaluation with if, else-if, and else.',
+        ts: `import { Component, signal } from '@purity/core';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    isLoggedIn = signal(true);
+    userRole = signal<'admin' | 'editor' | 'viewer'>('admin');
+    unreadCount = signal(3);
+
+    toggleAuth() {
+        this.isLoggedIn.update(v => !v);
+    }
+
+    setRole(role: 'admin' | 'editor' | 'viewer') {
+        this.userRole.set(role);
+    }
+
+    addNotification() {
+        this.unreadCount.update(c => c + 1);
+    }
+
+    clearNotifications() {
+        this.unreadCount.set(0);
+    }
+}`,
+        html: `<div class="conditional-demo window">
+    <h3>🔀 Structural Conditionals (<code>if</code> / <code>else-if</code> / <code>else</code>)</h3>
+    <p>Falsy branches are completely excluded from the DOM and never compiled until active.</p>
+
+    <!-- 1. Authentication State -->
+    <div class="card-section">
+        <button type="button" class="button-primary" onclick="toggleAuth()">
+            {{isLoggedIn() ? '🚪 Logout' : '🔑 Sign In'}}
+        </button>
+
+        <div if="isLoggedIn()" class="auth-box auth-active">
+            <span class="badge badge-success">Authenticated</span>
+            <strong>Welcome back, Developer!</strong>
+            <span if="unreadCount() > 0" class="badge-alert">{{unreadCount()}} new notices</span>
+            <span else class="badge-muted">All caught up</span>
+        </div>
+        <div else class="auth-box auth-inactive">
+            <span class="badge badge-warn">Guest</span>
+            <span>You are currently browsing as a guest.</span>
+        </div>
+    </div>
+
+    <!-- 2. Multi-branch Role Selector -->
+    <div if="isLoggedIn()" class="card-section">
+        <label>Select Permission Tier:</label>
+        <div class="btn-group">
+            <button type="button" class="button-primary {{userRole() === 'admin' ? 'active' : ''}}" onclick="setRole('admin')">Admin</button>
+            <button type="button" class="button-primary {{userRole() === 'editor' ? 'active' : ''}}" onclick="setRole('editor')">Editor</button>
+            <button type="button" class="button-primary {{userRole() === 'viewer' ? 'active' : ''}}" onclick="setRole('viewer')">Viewer</button>
+        </div>
+
+        <div if="userRole() === 'admin'" class="role-panel panel-admin">
+            🛡️ <strong>Admin Console:</strong> Full root privileges & database access.
+        </div>
+        <div else-if="userRole() === 'editor'" class="role-panel panel-editor">
+            ✏️ <strong>Editor Studio:</strong> Can publish, modify, and draft articles.
+        </div>
+        <div else class="role-panel panel-viewer">
+            👁️ <strong>Viewer Portal:</strong> Read-only access to published content.
+        </div>
+    </div>
+</div>`,
+        scss: `.conditional-demo {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #232635;
+    border: 1px solid rgba(130, 170, 255, 0.2);
+    border-radius: 12px;
+    color: #eeffff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+    h3 {
+        margin: 0;
+        color: #82aaff;
+    }
+
+    p {
+        margin: 0;
+        font-size: 13px;
+        color: #8f93a2;
+    }
+
+    .card-section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 16px;
+        background: #1b1e2b;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+    }
+
+    .auth-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 6px;
+
+        &.auth-active {
+            background: rgba(195, 232, 141, 0.1);
+            border: 1px solid rgba(195, 232, 141, 0.3);
+        }
+
+        &.auth-inactive {
+            background: rgba(255, 203, 107, 0.1);
+            border: 1px dashed rgba(255, 203, 107, 0.3);
+        }
+    }
+
+    .badge {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+
+        &.badge-success {
+            background: #c3e88d;
+            color: #1b1e2b;
+        }
+
+        &.badge-warn {
+            background: #ffcb6b;
+            color: #1b1e2b;
+        }
+    }
+
+    .badge-alert {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: #ff5370;
+        color: #ffffff;
+    }
+
+    .badge-muted {
+        font-size: 11px;
+        color: #676e95;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 8px;
+
+        button.active {
+            box-shadow: 0 0 0 2px #82aaff;
+        }
+    }
+
+    .role-panel {
+        padding: 12px 14px;
+        border-radius: 6px;
+        font-size: 13.5px;
+
+        &.panel-admin {
+            background: rgba(130, 170, 255, 0.12);
+            border-left: 4px solid #82aaff;
+        }
+
+        &.panel-editor {
+            background: rgba(255, 203, 107, 0.12);
+            border-left: 4px solid #ffcb6b;
+        }
+
+        &.panel-viewer {
+            background: rgba(195, 232, 141, 0.12);
+            border-left: 4px solid #c3e88d;
+        }
+    }
+}`,
+    },
+    {
         id: 'routing',
         name: '🗺️ Signal Router & Layout',
         description: 'Client-side routing with <router-layout>, dynamic parameters (:id), and reactive state.',

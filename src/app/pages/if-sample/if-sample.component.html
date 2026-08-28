@@ -1,0 +1,173 @@
+<div class="window if-sample-root">
+    <div class="if-header">
+        <h4>🔀 Structural Conditional Engine (<code>if="..."</code>, <code>else-if="..."</code>, <code>else</code>)</h4>
+        <span class="status-badge">Lazy Compilation & Deferred Execution</span>
+    </div>
+    <p class="if-desc">
+        Demonstrating declarative structural conditional branching with <code>if="..."</code>, <code>else-if="..."</code>, and <code>else</code>.
+        Falsy branches are <strong>not compiled, evaluated, or attached to the DOM</strong> until their condition becomes truthy.
+    </p>
+
+    <!-- 1. Basic Boolean Toggle -->
+    <div class="sample-section window">
+        <div class="section-title">
+            <strong>1. Basic Boolean Toggle & Lazy Compilation</strong>
+            <button
+                type="button"
+                class="button-primary toggle-btn"
+                onclick="toggleSimpleBox()"
+            >
+                Toggle Card (Active: {{showSimpleBox()}})
+            </button>
+        </div>
+
+        <div if="showSimpleBox()" class="conditional-card window">
+            <div class="card-head">
+                <span class="pill pill-success">✔ Active DOM Node</span>
+                <span class="card-counter">Local Counter: {{counter()}}</span>
+            </div>
+            <p>This DOM subtree and its reactive bindings only exist in the live DOM when <code>showSimpleBox()</code> is truthy.</p>
+            <div class="card-actions">
+                <button type="button" class="button-primary" onclick="incrementCounter()">
+                    ➕ Increment ({{counter()}})
+                </button>
+            </div>
+        </div>
+        <div else class="conditional-card-empty window">
+            <span class="pill pill-warn">∅ Unmounted</span>
+            <p>The card above has been completely removed from the DOM and its template execution is dormant.</p>
+        </div>
+    </div>
+
+    <!-- 2. Child Web Component Wrapping -->
+    <div class="sample-section window">
+        <div class="section-title">
+            <strong>2. Conditional Child Component Mounting</strong>
+            <div class="btn-group">
+                <button
+                    type="button"
+                    class="button-primary toggle-btn"
+                    onclick="toggleClock()"
+                >
+                    {{showClock() ? 'Hide Analogue Clock' : 'Mount Analogue Clock'}}
+                </button>
+                <button
+                    type="button"
+                    class="button-primary toggle-btn"
+                    onclick="toggleCustom()"
+                >
+                    {{showCustom() ? 'Hide Custom Component' : 'Mount Custom Component'}}
+                </button>
+            </div>
+        </div>
+
+        <div if="showClock()" class="clock-mount-wrapper window">
+            <analogue-clock></analogue-clock>
+        </div>
+
+        <div if="showCustom()" class="custom-mount-wrapper window">
+            <custom-component id="ifSampleCustomComponent" name="ConditionalCustom"></custom-component>
+        </div>
+    </div>
+
+    <!-- 3. Multi-Branch if / else-if / else -->
+    <div class="sample-section window">
+        <div class="section-title">
+            <strong>3. Multi-Branch Tab/Role Switcher (<code>if</code> / <code>else-if</code> / <code>else</code>)</strong>
+            <div class="role-selector">
+                <button
+                    type="button"
+                    class="button-primary {{activeRole() === 'admin' ? 'active' : ''}}"
+                    onclick="setRole('admin')"
+                >
+                    🛡️ Admin
+                </button>
+                <button
+                    type="button"
+                    class="button-primary {{activeRole() === 'moderator' ? 'active' : ''}}"
+                    onclick="setRole('moderator')"
+                >
+                    ⚖️ Moderator
+                </button>
+                <button
+                    type="button"
+                    class="button-primary {{activeRole() === 'member' ? 'active' : ''}}"
+                    onclick="setRole('member')"
+                >
+                    👤 Member
+                </button>
+                <button
+                    type="button"
+                    class="button-primary {{activeRole() === 'guest' ? 'active' : ''}}"
+                    onclick="setRole('guest')"
+                >
+                    🌐 Guest
+                </button>
+            </div>
+        </div>
+
+        <div class="role-display">
+            <!-- Branch 1: Admin -->
+            <div if="activeRole() === 'admin'" class="role-card role-admin window">
+                <div class="role-badge">Administrator Access</div>
+                <h5>🛡️ Superuser Controls</h5>
+                <p>Full read/write permissions, database management, and user role modification granted.</p>
+            </div>
+
+            <!-- Branch 2: Moderator -->
+            <div else-if="activeRole() === 'moderator'" class="role-card role-moderator window">
+                <div class="role-badge">Moderator Access</div>
+                <h5>⚖️ Content Review Panel</h5>
+                <p>Can inspect flagged items, manage comments, and review security logs.</p>
+            </div>
+
+            <!-- Branch 3: Member -->
+            <div else-if="activeRole() === 'member'" class="role-card role-member window">
+                <div class="role-badge">Member Access</div>
+                <h5>👤 Standard Member Workspace</h5>
+                <p>Standard access to personal documents, workspace projects, and collaborative editing.</p>
+            </div>
+
+            <!-- Branch 4: Fallback / Else -->
+            <div else class="role-card role-guest window">
+                <div class="role-badge">Guest Session</div>
+                <h5>🌐 Read-Only Anonymous Visitor</h5>
+                <p>Please sign in to unlock personalized features and administrative actions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Structural Loops with Nested Conditionals -->
+    <div class="sample-section window">
+        <div class="section-title">
+            <strong>4. Array Repeater (<code>for</code>) with Nested Conditionals (<code>if</code> / <code>else</code>)</strong>
+            <button
+                type="button"
+                class="button-primary toggle-btn"
+                onclick="togglePriorityFilter()"
+            >
+                {{onlyHighPriority() ? 'Show All Tasks' : 'Filter: High Priority Only'}}
+            </button>
+        </div>
+
+        <div class="task-list">
+            <div for="let task of filteredTasks" class="task-row window">
+                <div class="task-meta">
+                    <span if="task.isHighPriority" class="tag-priority">🔥 High Priority</span>
+                    <span else class="tag-normal">Standard</span>
+                    <span class="task-title {{task.isCompleted ? 'completed-text' : ''}}">{{task.title}}</span>
+                </div>
+                <div class="task-actions">
+                    <button
+                        type="button"
+                        class="button-primary task-toggle-btn {{task.isCompleted ? 'is-done' : ''}}"
+                        onclick="toggleTaskStatus(task.id)"
+                    >
+                        <span if="task.isCompleted">✔ Completed</span>
+                        <span else>⏳ Pending</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

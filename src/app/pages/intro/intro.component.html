@@ -574,11 +574,48 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 14. Slot Content Projection -->
+        <!-- 14. Structural Conditionals -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>14. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                    <h4>14. 🔀 Structural Conditionals (<code>if="..."</code>, <code>else-if="..."</code>, <code>else</code>)</h4>
+                    <p>Declarative structural conditional branching with lazy compilation, zero unnecessary DOM overhead, and reactive unmounting:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('conditional')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. HTML Template: Multi-branch Conditionals &amp; Component Wrapping --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">if</span>=<span class="str">"isLoggedIn()"</span> <span class="attr">class</span>=<span class="str">"dashboard-panel"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>Welcome, <span class="expr">{{user().name}}</span>!<span class="tag">&lt;/h3&gt;</span>
+
+    <span class="cmt">&lt;!-- Multi-branch sibling conditionals --&gt;</span>
+    <span class="tag">&lt;admin-panel</span> <span class="attr">if</span>=<span class="str">"user().role === 'admin'"</span><span class="tag">&gt;&lt;/admin-panel&gt;</span>
+    <span class="tag">&lt;moderator-panel</span> <span class="attr">else-if</span>=<span class="str">"user().role === 'moderator'"</span><span class="tag">&gt;&lt;/moderator-panel&gt;</span>
+    <span class="tag">&lt;member-panel</span> <span class="attr">else</span><span class="tag">&gt;&lt;/member-panel&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">else</span> <span class="attr">class</span>=<span class="str">"login-prompt"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;p&gt;</span>Please authenticate to continue.<span class="tag">&lt;/p&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: Signal-driven conditions --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'app-dashboard'</span>, templateUrl: <span class="str">'./dashboard.html'</span> })
+<span class="kw">export class</span> <span class="typ">DashboardComponent</span> {
+    isLoggedIn = <span class="fn">signal</span>(<span class="kw">true</span>);
+    user = <span class="fn">signal</span>({ name: <span class="str">'Dana Scully'</span>, role: <span class="str">'admin'</span> });
+}</code></pre>
+        </div>
+
+        <!-- 15. Slot Content Projection -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>15. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
                     <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
                 </div>
                 <button
@@ -609,11 +646,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 15. Theming & Modular SCSS -->
+        <!-- 16. Theming & Modular SCSS -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>15. 🎨 GNOME Adwaita Theming &amp; Modular SCSS Design System</h4>
+                    <h4>16. 🎨 GNOME Adwaita Theming &amp; Modular SCSS Design System</h4>
                     <p>Translucent glassmorphism, refined corner radii, subtle specular borders, and GNOME cubic bezier animations with Dark and Light themes:</p>
                 </div>
                 <button
@@ -642,11 +679,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 16. Date & Time Picker Component -->
+        <!-- 17. Date & Time Picker Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>16. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
+                    <h4>17. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
                     <p>Full calendar view, year navigation, 24-hour time wheel scrolling, smart viewport auto-placement, date ranges, and custom pipe formatting:</p>
                 </div>
                 <button
@@ -678,11 +715,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 17. Circular Radial Context Menu -->
+        <!-- 18. Circular Radial Context Menu -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>17. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
+                    <h4>18. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
                     <p>Circular context menu with pie segments, SVG icons, submenus, dynamic placement, and keyboard/outside-click dismissal:</p>
                 </div>
                 <button
@@ -716,11 +753,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 18. Right-Click Context Menu Delegation -->
+        <!-- 19. Right-Click Context Menu Delegation -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>18. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
+                    <h4>19. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
                     <p>Single-source-of-truth right-click delegation binding radial menu activation across any matching DOM selector:</p>
                 </div>
                 <button
@@ -744,11 +781,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 19. Modal Dialogs -->
+        <!-- 20. Modal Dialogs -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>19. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                    <h4>20. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
                     <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, fixed viewport overlays, and <code>z-index: 1000</code>:</p>
                 </div>
                 <button
@@ -787,11 +824,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 20. Analogue Clock Widget -->
+        <!-- 21. Analogue Clock Widget -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>20. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
+                    <h4>21. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
                     <p>Native 2D Canvas clock with subpixel Retina scaling, frosted glass dial, 3D beveled hands, date window, smooth sweep vs quartz ticking, and multi-timezone support:</p>
                 </div>
                 <button
@@ -836,11 +873,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
             <span class="section-badge">Lifecycles &amp; Phases</span>
         </div>
 
-        <!-- 21. Component Mounting & Teardown Lifecycle -->
+        <!-- 22. Component Mounting & Teardown Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>21. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
+                    <h4>22. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
                     <p>Native Custom Elements v1 lifecycle flow from template projection and reactive binding to teardown:</p>
                 </div>
                 <button
@@ -895,11 +932,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 22. Custom Directive Lifecycle -->
+        <!-- 23. Custom Directive Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>22. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
+                    <h4>23. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
                     <p>Execution phases for attribute-level reactivity, signal tracking, and host DOM mutation observation:</p>
                 </div>
                 <button
@@ -951,11 +988,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 23. Form Validation Lifecycle -->
+        <!-- 24. Form Validation Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>23. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
+                    <h4>24. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
                     <p>Decoupled validation pipeline with field binding, live evaluation, CSS state reflection, and submit lock:</p>
                 </div>
                 <button
@@ -998,11 +1035,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 24. Application Bootstrapping Lifecycle -->
+        <!-- 25. Application Bootstrapping Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>24. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
+                    <h4>25. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
                     <p>End-to-end initialization sequence from environment tokens to root component mounting:</p>
                 </div>
                 <button
@@ -1039,11 +1076,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 });</code></pre>
         </div>
 
-        <!-- 25. Signal Routing & Layout Engine -->
+        <!-- 26. Signal Routing & Layout Engine -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>25. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
+                    <h4>26. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
                     <p>Fine-grained reactive routing, dynamic parameter tokens (<code>/users/:id</code>), automatic lifecycle mounting via <code>&lt;router-layout&gt;</code>, and declarative <code>routerLink</code> directive:</p>
                 </div>
                 <button

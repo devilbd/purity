@@ -58,8 +58,9 @@ export class NavigationMenuComponent {
                 children: [
                     { name: 'Signals & State', image: '🔄', data: { hash: '#component1' } },
                     { name: 'Signal Router', image: '🗺️', data: { hash: '#router-sample' } },
-                    { name: 'Transform Pipes', image: '🔀', data: { hash: '#pipe-sample' } },
+                    { name: 'Conditionals (if)', image: '🔀', data: { hash: '#if-sample' } },
                     { name: 'Array Repeater', image: '🔁', data: { hash: '#for-sample' } },
+                    { name: 'Transform Pipes', image: '🏷️', data: { hash: '#pipe-sample' } },
                     { name: 'DOM Directives', image: '🎯', data: { hash: '#directive-sample' } },
                     { name: 'Form Validation', image: '📋', data: { hash: '#forms-validation' } },
                     { name: 'HTTP Client', image: '🌐', data: { hash: '#http-sample' } },
