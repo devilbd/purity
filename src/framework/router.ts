@@ -2,6 +2,7 @@ import { signal, effect, type Signal } from './core';
 import { container, Injectable, type Token, type Constructor } from './di';
 import { BaseDirective, Directive } from './directive';
 import { Component } from './component';
+import type { SeoConfig } from './seo';
 
 export type CanActivateFn = (
     route: Route,
@@ -20,6 +21,7 @@ export interface Route {
     component?: Constructor | string;
     redirectTo?: string;
     title?: string | ((params: RouteParams) => string);
+    seo?: SeoConfig | ((params: RouteParams, data: RouteData) => SeoConfig);
     canActivate?: Array<CanActivateFn | Token>;
     data?: RouteData;
     children?: Route[];
@@ -339,10 +341,31 @@ export class Router {
             }
         }
 
-        // 6. Update document title if configured
-        if (typeof document !== 'undefined' && route.title) {
-            const title = typeof route.title === 'function' ? route.title(params) : route.title;
-            document.title = title;
+        // 6. Update document title and SEO metadata if configured
+        if (typeof document !== 'undefined') {
+            let seoService: any = null;
+            try {
+                seoService = container.resolve('SeoService');
+            } catch {
+                // SeoService not yet registered in DI container
+            }
+
+            const rawSeo = route.seo || route.data?.seo;
+            if (rawSeo) {
+                const seoConfig: SeoConfig = typeof rawSeo === 'function' ? rawSeo(params, route.data || {}) : rawSeo;
+                if (seoService) {
+                    seoService.setSeo(seoConfig);
+                } else if (seoConfig.title) {
+                    document.title = seoConfig.title;
+                }
+            } else if (route.title) {
+                const title = typeof route.title === 'function' ? route.title(params) : route.title;
+                if (seoService) {
+                    seoService.setTitle(title);
+                } else {
+                    document.title = title;
+                }
+            }
         }
 
         // 7. Scroll restoration

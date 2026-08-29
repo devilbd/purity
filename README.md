@@ -45,6 +45,7 @@
 - 🎮 **Interactive Live Playground (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, and SCSS with instant in-browser compilation, Hot Reload, dynamic multi-component execution, and persistent `localStorage` snippet history ("Save written...").
 - 🧭 **Draggable Floating Navigation Menu (`<navigation-menu>`)**: Floating draggable orb with GNOME 50 glassmorphic styling, hover drag handle, and integrated radial context menu for app-wide section and subsection navigation.
 - 🗺️ **Signal Router & Layout Engine (`router.ts`, `<router-layout>`)**: Native type-safe routing engine supporting dynamic parameters (`:id`), query strings (`?tab=...`), route guards (`canActivate`), programmatic navigation (`Router.navigate`), `<router-layout>` subview host, and `routerLink` directive with automated `.active-link` state management.
+- 🔎 **SEO & Head Metadata Engine (`SeoService`, `MetaService`)**: Dynamic `<title>`, `<meta>` tags, OpenGraph social sharing cards, Twitter Cards, Schema.org JSON-LD structured data, crawler-friendly noscript fallbacks, XML sitemaps, robots directives, and automated Router SEO synchronization for SPAs.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
 
@@ -80,10 +81,12 @@ npm install
 purity/
 ├── public/                      # Static assets served at root
 │   ├── cursors/                 # KDE Plasma Breeze scalable vector cursors (91 SVGs)
-│   └── purity_logo.png          # Purity framework logo
+│   ├── purity_logo.png          # Purity framework logo
+│   ├── robots.txt               # Search engine crawler directives & sitemap reference
+│   └── sitemap.xml              # XML sitemap conforming to sitemaps.org protocol
 ├── scripts/                     # Automation & deployment scripts
 │   └── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
-├── index.html                   # HTML entry point mounting <app-component>
+├── index.html                   # HTML entry point mounting <app-component> with rich SEO & JSON-LD
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
 ├── .env.example                 # Environment variables reference template
@@ -114,6 +117,7 @@ purity/
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   ├── router.ts            # Signal Router, <router-layout>, routerLink directive, and route guards
+    │   ├── seo.ts               # SeoService, MetaService, OpenGraph, Twitter, Schema.org JSON-LD
     │   └── common.ts            # Shared framework exports
     ├── environments/            # Build configuration & environment profiles
     │   ├── environment.interface.ts # Environment configuration contract
@@ -568,7 +572,52 @@ export const appRoutes: Route[] = [
 
 ---
 
-### 10. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
+### 10. 🔎 SEO & Head Metadata Subsystem (`seo.ts`, `SeoService`)
+
+Purity provides a fine-grained, reactive SEO and head metadata engine designed for SPAs with static content:
+
+- **`SeoService` / `MetaService` (`@Injectable('SeoService')`)**:
+  - `setTitle(title, options?)`: Updates `<title>` and synchronizes `meta[name="title"]`, `og:title`, and `twitter:title`.
+  - `setDescription(description)`: Updates primary description, OpenGraph description, and Twitter description.
+  - `setKeywords(keywords)`: Updates `<meta name="keywords">`.
+  - `setCanonicalUrl(url)`: Updates or injects `<link rel="canonical">` and `og:url` / `twitter:url`.
+  - `setRobots(options)`: Configures indexing (`index, follow, max-image-preview:large, max-snippet:-1`).
+  - `setOpenGraph(og)`: Sets full OpenGraph tags (`title`, `description`, `image`, `type`, `siteName`, `locale`).
+  - `setTwitterCard(twitter)`: Sets Twitter Card tags (`card`, `site`, `creator`, `title`, `description`, `image`).
+  - `setJsonLd(schema, id?)`: Dynamic Schema.org JSON-LD structured data script injection.
+  - `setSeo(config)`: Batch updates full SEO metadata for a route or component.
+
+#### Example Usage in Component:
+
+```typescript
+import { Component, inject, SeoService } from '@purity/core';
+
+@Component({ selector: 'my-feature-view' })
+export class MyFeatureViewComponent {
+    private seo = inject(SeoService);
+
+    protected onInit() {
+        this.seo.setSeo({
+            title: 'Feature Showcase - Purity Framework',
+            description: 'Explore native signals, custom elements, and DI.',
+            canonical: 'https://purity-world.dev/feature',
+            og: {
+                title: 'Feature Showcase',
+                image: 'https://purity-world.dev/purity_logo.png',
+            },
+            jsonLd: {
+                '@context': 'https://schema.org',
+                '@type': 'WebPage',
+                name: 'Feature Showcase',
+            },
+        });
+    }
+}
+```
+
+---
+
+### 11. 🚀 Application Bootstrapping & Environment Profiles (`bootstrap.ts`, `environments/`)
 
 Purity provides a clean `bootstrapApplication()` initialization API that binds environment profiles, registers custom service providers and interceptors, configures application routes, and mounts root Web Components:
 
@@ -610,7 +659,7 @@ bootstrapApplication(AppComponent, {
 
 ## 🧩 UI Web Components, Templating & Views
 
-### 11. 🧩 Native Web Components (`@Component` Decorator)
+### 12. 🧩 Native Web Components (`@Component` Decorator)
 
 Standard TypeScript classes decorated with `@Component` are transformed into native Custom Elements with synchronous template inlining and full lifecycle hooks:
 
@@ -645,7 +694,7 @@ export class CustomComponent {
 
 ---
 
-### 12. 🔍 Child View & Component Queries (`@ViewChild`)
+### 13. 🔍 Child View & Component Queries (`@ViewChild`)
 
 Use the `@ViewChild()` decorator to query child DOM elements and child components. When the selector is omitted, the framework implicitly infers candidate selectors from the property name in kebab-case (`<my-component>`, `#my-component`, `<my>`, `#my`). An explicit selector is optional and only needed when disambiguating between multiple instances:
 
@@ -680,7 +729,7 @@ export class DemoComponent {
 
 ---
 
-### 13. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
+### 14. 📄 Handlebars Template Interpolation & Pipes (`{{ expression | pipe }}`)
 
 Purity supports declarative `{{ expression | pipe }}` template interpolations. Text nodes, element attributes, and pipe arguments automatically bind to signals and re-render fine-grained when signal dependencies change. The engine preserves `<pre>` documentation snippets and `[data-no-bind]` blocks while fully binding dynamic expressions inside standalone `<code>` tags:
 
@@ -714,7 +763,7 @@ export class UserCardComponent {
 
 ---
 
-### 14. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+### 15. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
 
 Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
 
@@ -737,7 +786,7 @@ Purity provides native structural loop templates via `for="let item of items"` o
 
 ---
 
-### 15. ⚡ High-Performance Virtualized Repeater (`virtual-for`)
+### 16. ⚡ High-Performance Virtualized Repeater (`virtual-for`)
 
 Purity includes a dedicated GPU-accelerated virtual scrolling engine for massive datasets (1,000 to 100,000+ items). It renders only the visible viewport slice (~20–30 DOM nodes) with overscan buffering, absolute GPU transforms, phantom scroll height simulation, batched `DocumentFragment` insertion, declarative `scrollIndex` reactive signal binding, zero layout thrashing, and sub-millisecond signal updates:
 
@@ -758,7 +807,7 @@ Purity includes a dedicated GPU-accelerated virtual scrolling engine for massive
 
 ---
 
-### 16. 🔀 Structural Conditionals (`if="expr"`, `else-if="expr"`, `else`)
+### 17. 🔀 Structural Conditionals (`if="expr"`, `else-if="expr"`, `else`)
 
 Purity supports declarative structural conditionals with **lazy compilation and deferred execution**. When an `if` expression evaluates to falsy, its inner DOM subtree is completely excluded from the live document — text interpolations, directives, validators, and child Custom Component lifecycles will **not build or execute** until the condition evaluates to truthy:
 
@@ -777,7 +826,7 @@ Purity supports declarative structural conditionals with **lazy compilation and 
 
 ---
 
-### 17. 📦 Generic Components & Content Projection (`<slot>`)
+### 18. 📦 Generic Components & Content Projection (`<slot>`)
 
 Purity components support native `<slot>` content projection. Any child elements, text, or nested components passed between the tags of a custom element are dynamically projected into the component's template:
 
@@ -803,7 +852,7 @@ Purity components support native `<slot>` content projection. Any child elements
 
 ---
 
-### 16. 🪟 Modal Dialogs (`<modal-view>`)
+### 19. 🪟 Modal Dialogs (`<modal-view>`)
 
 Reusable dialog components with `open()`, `close()`, `maximize()`, `position: absolute`, and `document.body` prepending with `z-index: 1000`:
 
@@ -842,7 +891,7 @@ export class ModalViewComponent {
 
 ---
 
-### 17. ⏳ Reactive HTTP & UI Loader Component (`<loader-component>`)
+### 20. ⏳ Reactive HTTP & UI Loader Component (`<loader-component>`)
 
 Purity provides a lightweight, reactive inline loader custom element styled with GNOME 50 glassmorphism, accent SVG track animation, and automated Breeze loading cursor coordination:
 
@@ -888,7 +937,7 @@ export class LoaderComponent {
 
 ---
 
-### 18. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
+### 21. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
 Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
@@ -903,7 +952,7 @@ Purity includes a full-featured, reactive Date & Time Picker custom element styl
 
 ---
 
-### 19. 🎯 Radial Context Menu System (`<radial-context-menu>`)
+### 22. 🎯 Radial Context Menu System (`<radial-context-menu>`)
 
 Purity provides a native circular radial context menu component with glassmorphic GNOME Adwaita styling, dynamic polygon segment calculation, recursive multi-level submenus, center button breadcrumb navigation, real-time telemetry state signals, and single-source-of-truth right-click delegation via `setSelector()`:
 
@@ -917,7 +966,7 @@ Purity provides a native circular radial context menu component with glassmorphi
 
 ---
 
-### 20. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
+### 23. ⏱️ Analogue Clock Widget (`<analogue-clock>`, `@widgets/*`)
 
 Purity includes a high-precision 2D Canvas analogue clock widget in `src/app/shared/widgets/analogue-clock/`, designed in GNOME Adwaita Dark and Light aesthetics:
 

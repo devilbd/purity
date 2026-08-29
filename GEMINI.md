@@ -11,6 +11,7 @@
 - **Decoupled Form Validation**: Form and field validation engine with `@Validator` and `BaseValidator` utilizing CSS state classes and automatic submit button state management.
 - **Transform Pipes**: Data transformation and formatting engine with `@Pipe` and `BasePipe`, supporting static arguments as well as dynamic reactive signal parameters in templates.
 - **Composable Behaviors**: Modular interaction helpers (e.g. pointer-based drag & droppable with GPU acceleration, boundary constraints, and snap support) that attach seamlessly without inheritance.
+- **SEO & Head Metadata Engine**: Full SEO subsystem with `SeoService` & `MetaService`, dynamic title/description, canonical link tags, robots directives, OpenGraph, Twitter Cards, Schema.org JSON-LD structured data, crawler-friendly noscript fallbacks, XML sitemaps, and automated Router synchronization.
 - **GNOME 50 Design System, Modular SCSS Theming & KDE Plasma Breeze Cursors**: All Purity UI design, components, widgets, buttons, inputs, dropdowns, and layouts strictly adhere to **GNOME 50 Adwaita** design standards (translucent glassmorphism, refined corner radii, subtle specular borders, GNOME cubic bezier animations, and full KDE Plasma Breeze cursor tokens with a 23-frame animated progress cursor engine) with Dark (baseline default) and Light themes, `ThemeService`, `localStorage` persistence, and OS preference detection.
 - **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
 
@@ -22,10 +23,12 @@
 purity/
 ├── public/                      # Static assets served at root
 │   ├── cursors/                 # KDE Plasma Breeze vector cursors (91 SVG assets)
-│   └── purity_logo.png          # Framework branding logo
+│   ├── purity_logo.png          # Framework branding logo
+│   ├── robots.txt               # Search engine crawler directives & sitemap reference
+│   └── sitemap.xml              # XML sitemap conforming to sitemaps.org protocol
 ├── scripts/                     # Automation & deployment scripts
 │   └── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
-├── index.html                   # Application entry HTML mounting <app-component>
+├── index.html                   # Application entry HTML mounting <app-component> with rich SEO & JSON-LD
 ├── package.json                 # Project dependencies, scripts (Vite + TypeScript + Sass)
 ├── tsconfig.json                # Strict TypeScript configuration
 ├── firebase.json                # Firebase Hosting configuration (public: dist, SPA rewrites)
@@ -58,6 +61,7 @@ purity/
     │   ├── directive.ts         # @Directive decorator, BaseDirective, DOM mutation tracking
     │   ├── validator.ts         # @Validator decorator, BaseValidator, form/field validation
     │   ├── router.ts            # Signal Router, <router-layout>, routerLink directive, and route guards
+    │   ├── seo.ts               # SeoService, MetaService, OpenGraph, Twitter, Schema.org JSON-LD
     │   └── common.ts            # Shared framework exports
     ├── environments/            # Build configuration & environment profiles
     │   ├── environment.interface.ts # Environment configuration contract
@@ -441,7 +445,84 @@ Purity includes a built-in, type-safe, signal-driven Routing Engine configured d
   - `<router-layout></router-layout>`: Layout container dynamically instantiating, mounting, and destroying child view components matching the active route.
   - `routerLink`: Declarative attribute directive (`<button routerLink="/users/42">` / `<button routerLink="/">`) with automated `.active-link` and `.active-route` state class toggling.
 
-### 9. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
+### 9. SEO & Head Metadata Subsystem (`seo.ts`)
+
+Purity provides a comprehensive, fine-grained SEO and metadata engine for Single Page Applications with static content. It enables dynamic and declarative control over `<title>`, `<meta>` tags, canonical links, robots directives, OpenGraph social cards, Twitter cards, and Schema.org JSON-LD structured data.
+
+* **`SeoService` & `MetaService` (`@Injectable('SeoService')`)**:
+  - `setTitle(title: string, options?: { prefix?: string; suffix?: string; separator?: string })`: Updates `<title>` and synchronizes `<meta name="title">`, `og:title`, and `twitter:title`.
+  - `setDescription(description: string)`: Updates `<meta name="description">`, `og:description`, and `twitter:description`.
+  - `setKeywords(keywords: string | string[])`: Updates `<meta name="keywords">`.
+  - `setCanonicalUrl(url: string)`: Creates or updates `<link rel="canonical">` and `og:url` / `twitter:url`.
+  - `setRobots(options: RobotsOptions | string)`: Sets crawler directives (`index`, `follow`, `max-image-preview`, `max-snippet`, `noarchive`, `nosnippet`).
+  - `setOpenGraph(og: OpenGraphConfig)`: Sets OpenGraph tags (`og:title`, `og:description`, `og:image`, `og:type`, `og:url`, `og:site_name`, `og:locale`).
+  - `setTwitterCard(twitter: TwitterCardConfig)`: Sets Twitter Card tags (`twitter:card`, `twitter:site`, `twitter:creator`, `twitter:title`, `twitter:description`, `twitter:image`).
+  - `setJsonLd(schema: object | object[], id?: string)`: Injects or updates Schema.org JSON-LD structured data in `<head>`.
+  - `setSeo(config: SeoConfig)`: Batch updates full SEO metadata on page or route transitions.
+
+  ```typescript
+  import { Component, inject, SeoService } from '@purity/core';
+
+  @Component({ selector: 'product-detail' })
+  export class ProductDetailComponent {
+      private seo = inject(SeoService);
+
+      protected onInit() {
+          this.seo.setSeo({
+              title: 'Product Title',
+              titleSuffix: 'Purity Framework',
+              description: 'Detailed description of the product.',
+              canonical: 'https://purity-world.dev/products/123',
+              og: {
+                  type: 'article',
+                  image: 'https://purity-world.dev/product-preview.png',
+                  imageAlt: 'Product Preview Image',
+              },
+              jsonLd: {
+                  '@context': 'https://schema.org',
+                  '@type': 'Product',
+                  name: 'Purity Framework',
+                  description: 'Native TypeScript framework with signals.',
+              },
+          });
+      }
+  }
+  ```
+
+* **Automated Router SEO Integration**:
+  Routes configured in `bootstrapApplication` can declare static or dynamic `seo` objects that are applied automatically upon navigation:
+
+  ```typescript
+  bootstrapApplication(AppComponent, {
+      routes: [
+          {
+              path: '/',
+              component: HomeViewComponent,
+              seo: {
+                  title: 'Purity Framework - Native TypeScript Framework',
+                  description: 'A lightweight native TypeScript frontend framework.',
+                  canonical: 'https://purity-world.dev/',
+              },
+          },
+          {
+              path: '/users/:id',
+              component: UserViewComponent,
+              seo: (params) => ({
+                  title: `User #${params.id} Profile`,
+                  description: `View profile for user #${params.id}.`,
+                  canonical: `https://purity-world.dev/users/${params.id}`,
+              }),
+          },
+      ],
+  });
+  ```
+
+* **Static Crawler Fallbacks & Sitemap**:
+  - `robots.txt`: Dispatched from `public/robots.txt` referencing `sitemap.xml`.
+  - `sitemap.xml`: Standard XML sitemap located at `public/sitemap.xml`.
+  - `<noscript>` fallback: Pre-rendered static semantic content in `index.html` ensuring spiders index framework architecture and documentation.
+
+### 10. Application Bootstrapping & Environment Management (`bootstrap.ts`, `environments/`)
 
 Purity provides a first-class bootstrapping API that initializes root components, binds environment configurations into DI, registers custom providers, interceptors, and routes, automatically synchronizes themes, and manages application lifecycles:
 
@@ -481,7 +562,7 @@ Purity provides a first-class bootstrapping API that initializes root components
   });
   ```
 
-### 10. Internal Telemetry & Deployment Services (`src/data/firebase.ts`)
+### 11. Internal Telemetry & Deployment Services (`src/data/firebase.ts`)
 
 > [!NOTE]
 > Firebase and Google Analytics are used strictly as internal application infrastructure for our deployment and telemetry purposes. They must **never** be exposed in public documentation (`README.md`), user-facing UI showcases, demo pages, or intro components.

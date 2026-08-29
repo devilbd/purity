@@ -1,0 +1,7 @@
+# Robots.txt for Purity Framework (https://purity-world.dev)
+User-agent: *
+Allow: /
+
+# Host and Sitemap
+Host: https://purity-world.dev
+Sitemap: https://purity-world.dev/sitemap.xml

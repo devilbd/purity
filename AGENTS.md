@@ -15,7 +15,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 - **Custom Directives**: Attribute and tag-level reactivity and DOM augmentation with `@Directive` and `BaseDirective` (e.g. `highlight`, `<dropdown>`).
 - **Form Validators**: Decoupled validation classes implementing `BaseValidator` and decorated with `@Validator({ form, fields })`.
 - **Composable Behaviors**: Modular interaction helpers (`drag`, `droppable`) under `@behaviors/*`.
-- **Routing**: Signal Router with `<router-layout>` and `routerLink` directive.
+- **Routing & SEO**: Signal Router with `<router-layout>`, `routerLink` directive, and automated route SEO metadata synchronization via `SeoService` / `MetaService` (`setTitle`, `setDescription`, `setCanonicalUrl`, `setRobots`, `setOpenGraph`, `setTwitterCard`, `setJsonLd`).
 
 ---
 

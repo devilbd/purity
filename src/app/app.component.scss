@@ -10,6 +10,14 @@
     box-sizing: border-box;
 }
 
+.app-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg, 16px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
 header-component,
 intro-component,
 playground-view,

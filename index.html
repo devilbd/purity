@@ -3,46 +3,99 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
         <!-- Primary Meta Tags -->
-        <title>..::: Purity :::..</title>
-        <meta name="title" content="..::: Purity :::.." />
+        <title>Purity Framework - Lightweight Native TypeScript Frontend Framework with Signals &amp; Web Components</title>
+        <meta name="title" content="Purity Framework - Lightweight Native TypeScript Frontend Framework with Signals &amp; Web Components" />
         <meta
             name="description"
-            content="A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components."
+            content="A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptors, and GNOME Adwaita design system."
+        />
+        <meta
+            name="keywords"
+            content="purity framework, typescript framework, web components, custom elements, signals, reactive programming, gnome adwaita, frontend framework, zero dependencies, vite"
         />
         <meta name="author" content="Vladimir Parchev" />
         <link rel="canonical" href="https://purity-world.dev/" />
 
+        <!-- Search Engine Directives -->
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+        <meta name="bingbot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
+        <!-- Theme Color for Dark & Light Modes -->
+        <meta name="theme-color" content="#242424" media="(prefers-color-scheme: dark)" />
+        <meta name="theme-color" content="#f6f6f6" media="(prefers-color-scheme: light)" />
+
         <!-- Open Graph / Facebook / LinkedIn / Discord / WhatsApp -->
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://purity-world.dev/" />
-        <meta property="og:title" content="..::: Purity :::.." />
+        <meta property="og:site_name" content="Purity" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:title" content="Purity Framework - Lightweight Native TypeScript Frontend Framework" />
         <meta
             property="og:description"
-            content="A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components."
+            content="A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptors, and GNOME Adwaita theming."
         />
         <meta property="og:image" content="https://purity-world.dev/purity_logo.png" />
         <meta property="og:image:secure_url" content="https://purity-world.dev/purity_logo.png" />
         <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="190" />
         <meta property="og:image:height" content="190" />
-        <meta property="og:image:alt" content="Purity Logo" />
-        <meta property="og:site_name" content="Purity" />
+        <meta property="og:image:alt" content="Purity Framework Logo" />
 
         <!-- Twitter / X -->
         <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@purity_dev" />
+        <meta name="twitter:creator" content="@parchev" />
         <meta name="twitter:url" content="https://purity-world.dev/" />
-        <meta name="twitter:title" content="..::: Purity :::.." />
+        <meta name="twitter:title" content="Purity Framework - Lightweight Native TypeScript Frontend Framework" />
         <meta
             name="twitter:description"
-            content="A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components."
+            content="A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, and GNOME Adwaita theming."
         />
         <meta name="twitter:image" content="https://purity-world.dev/purity_logo.png" />
-        <meta name="twitter:image:alt" content="Purity Logo" />
+        <meta name="twitter:image:alt" content="Purity Framework Logo" />
 
         <!-- Favicon and App Icons -->
         <link rel="icon" type="image/png" href="/purity_logo.png" />
         <link rel="apple-touch-icon" href="/purity_logo.png" />
+
+        <!-- Schema.org JSON-LD Structured Data -->
+        <script type="application/ld+json" id="purity-jsonld-schema">
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "WebSite",
+                    "@id": "https://purity-world.dev/#website",
+                    "url": "https://purity-world.dev/",
+                    "name": "Purity Framework",
+                    "description": "A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components.",
+                    "inLanguage": "en-US"
+                },
+                {
+                    "@type": "SoftwareApplication",
+                    "@id": "https://purity-world.dev/#software",
+                    "name": "Purity Framework",
+                    "applicationCategory": "DeveloperApplication",
+                    "operatingSystem": "All modern web browsers",
+                    "offers": {
+                        "@type": "Offer",
+                        "price": "0",
+                        "priceCurrency": "USD"
+                    },
+                    "description": "Lightweight, native TypeScript frontend framework built on Custom Elements v1, synchronous signals, and Dependency Injection.",
+                    "softwareVersion": "1.0.0",
+                    "author": {
+                        "@type": "Person",
+                        "name": "Vladimir Parchev"
+                    },
+                    "codeRepository": "https://github.com/devilbd/purity"
+                }
+            ]
+        }
+        </script>
 
         <!-- Google Tag (gtag.js) (GA4) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-VK790J8H7J"></script>
@@ -58,6 +111,24 @@
         </script>
     </head>
     <body>
+        <noscript>
+            <div style="padding: 2rem; font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto; color: #242424; background: #fdfdfd;">
+                <h1>Purity Framework</h1>
+                <p><strong>A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptors, and GNOME Adwaita design system.</strong></p>
+                <h2>Key Architectural Features</h2>
+                <ul>
+                    <li><strong>Fine-Grained Reactivity:</strong> Synchronous signals (<code>signal</code>), computed derivations (<code>computed</code>), and effects (<code>effect</code>) with automatic dependency tracking.</li>
+                    <li><strong>Native Web Components:</strong> Plain classes transformed into Custom Elements v1 with synchronous compile-time template inlining.</li>
+                    <li><strong>Dependency Injection:</strong> First-class DI container with <code>@Injectable</code> and <code>inject()</code> resolution.</li>
+                    <li><strong>HTTP Client &amp; Interceptors:</strong> Type-safe HTTP service with centralized request/response interceptors.</li>
+                    <li><strong>Transform Pipes:</strong> Handlebars template transformations with static and reactive dynamic parameters.</li>
+                    <li><strong>Decoupled Form Validation:</strong> Declarative form and field validators with CSS state class management.</li>
+                    <li><strong>Virtualized Repeater:</strong> High-performance GPU-accelerated rendering for datasets up to 100,000+ items.</li>
+                    <li><strong>GNOME 50 Adwaita Design System:</strong> Glassmorphic surfaces, specular borders, and KDE Plasma Breeze vector cursors.</li>
+                </ul>
+                <p>For complete source code and interactive documentation, visit the <a href="https://github.com/devilbd/purity">GitHub Repository</a>.</p>
+            </div>
+        </noscript>
         <app-component></app-component>
         <script type="module" src="/src/main.ts"></script>
     </body>
