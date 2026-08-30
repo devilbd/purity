@@ -37,15 +37,15 @@
             property="og:description"
             content="A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptors, and GNOME Adwaita theming."
         />
-        <meta property="og:image" content="https://purity-world.dev/purity_logo.png" />
-        <meta property="og:image:secure_url" content="https://purity-world.dev/purity_logo.png" />
+        <meta property="og:image" content="https://purity-world.dev/og-image.png" />
+        <meta property="og:image:secure_url" content="https://purity-world.dev/og-image.png" />
         <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:width" content="190" />
-        <meta property="og:image:height" content="190" />
-        <meta property="og:image:alt" content="Purity Framework Logo" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Purity Framework - Lightweight Native TypeScript Frontend Framework" />
 
         <!-- Twitter / X -->
-        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@purity_dev" />
         <meta name="twitter:creator" content="@parchev" />
         <meta name="twitter:url" content="https://purity-world.dev/" />
@@ -54,12 +54,20 @@
             name="twitter:description"
             content="A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, and GNOME Adwaita theming."
         />
-        <meta name="twitter:image" content="https://purity-world.dev/purity_logo.png" />
-        <meta name="twitter:image:alt" content="Purity Framework Logo" />
+        <meta name="twitter:image" content="https://purity-world.dev/og-image.png" />
+        <meta name="twitter:image:alt" content="Purity Framework - Lightweight Native TypeScript Frontend Framework" />
 
-        <!-- Favicon and App Icons -->
-        <link rel="icon" type="image/png" href="/purity_logo.png" />
-        <link rel="apple-touch-icon" href="/purity_logo.png" />
+        <!-- Favicon and App Icons (Google Search, Modern Browsers, iOS, and PWA Standards) -->
+        <link rel="icon" href="/favicon.ico" sizes="48x48" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+        <link rel="icon" type="image/png" sizes="144x144" href="/favicon-144x144.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
 
         <!-- Schema.org JSON-LD Structured Data -->
         <script type="application/ld+json" id="purity-jsonld-schema">
@@ -72,7 +80,18 @@
                     "url": "https://purity-world.dev/",
                     "name": "Purity Framework",
                     "description": "A lightweight, native TypeScript frontend framework powered by fine-grained signals and native Web Components.",
-                    "inLanguage": "en-US"
+                    "inLanguage": "en-US",
+                    "publisher": {
+                        "@type": "Organization",
+                        "name": "Purity Framework",
+                        "url": "https://purity-world.dev/",
+                        "logo": {
+                            "@type": "ImageObject",
+                            "url": "https://purity-world.dev/favicon-512x512.png",
+                            "width": 512,
+                            "height": 512
+                        }
+                    }
                 },
                 {
                     "@type": "SoftwareApplication",

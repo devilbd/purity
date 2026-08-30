@@ -23,7 +23,17 @@
 purity/
 ├── public/                      # Static assets served at root
 │   ├── cursors/                 # KDE Plasma Breeze vector cursors (91 SVG assets)
-│   ├── purity_logo.png          # Framework branding logo
+│   ├── favicon.ico              # Multi-resolution legacy & Google fallback icon (16, 32, 48, 64, 128, 256)
+│   ├── favicon.svg              # Scalable vector SVG favicon
+│   ├── favicon-48x48.png        # Google Search 1x standard favicon (48x48)
+│   ├── favicon-96x96.png        # Google Search 2x retina favicon (96x96)
+│   ├── favicon-144x144.png      # Google Search 3x high-DPI favicon (144x144)
+│   ├── favicon-192x192.png      # Google Search 4x & Web App Manifest standard favicon (192x192)
+│   ├── favicon-512x512.png      # High-res PWA icon & Schema.org Knowledge Graph logo (512x512)
+│   ├── apple-touch-icon.png     # Apple iOS Safari touch icon (180x180)
+│   ├── og-image.png             # High-resolution OpenGraph / Twitter Card preview banner (1200x630)
+│   ├── site.webmanifest         # Web App Manifest conforming to PWA standards
+│   ├── purity_logo.png          # Framework branding logo (190x190)
 │   ├── robots.txt               # Search engine crawler directives & sitemap reference
 │   └── sitemap.xml              # XML sitemap conforming to sitemaps.org protocol
 ├── scripts/                     # Automation & deployment scripts
