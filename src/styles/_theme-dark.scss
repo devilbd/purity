@@ -67,6 +67,12 @@
     --dp-border: var(--gnome-border);
     --dp-shadow: var(--shadow-popup);
 
+    /* Dropdown Specific Tokens */
+    --dropdown-bg: rgba(30, 30, 34, 0.96);
+    --dropdown-blur-bg: rgba(28, 28, 34, 0.90);
+    --dropdown-border: var(--gnome-border);
+    --dropdown-shadow: var(--shadow-popup);
+
     /* Radial Context Menu Specific Tokens */
     --radial-bg: rgba(30, 30, 30, 0.92);
     --radial-blur-bg: rgba(30, 30, 30, 0.75);

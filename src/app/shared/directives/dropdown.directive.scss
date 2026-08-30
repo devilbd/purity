@@ -116,13 +116,12 @@ dropdown,
     padding: 6px;
     box-sizing: border-box;
 
-    background: var(--gnome-surface-solid, #242424);
-    background: var(--gnome-surface);
-    backdrop-filter: var(--blur-effect);
-    -webkit-backdrop-filter: var(--blur-effect);
-    border: 1px solid var(--gnome-border);
+    background: var(--dropdown-bg, rgba(30, 30, 34, 0.96));
+    backdrop-filter: var(--blur-heavy);
+    -webkit-backdrop-filter: var(--blur-heavy);
+    border: 1px solid var(--dropdown-border, var(--gnome-border));
     border-radius: var(--radius-card, 12px);
-    box-shadow: var(--shadow-popup);
+    box-shadow: var(--dropdown-shadow, var(--shadow-popup));
     color: var(--text-main);
     font-family: var(--font-main);
 
@@ -284,9 +283,9 @@ dropdown,
 body[data-theme='light'] .p-dropdown-body,
 [data-theme='light'] .p-dropdown-body,
 html[data-theme='light'] .p-dropdown-body {
-    background: var(--gnome-surface);
-    border-color: var(--gnome-border);
-    box-shadow: var(--shadow-popup);
+    background: var(--dropdown-bg, rgba(255, 255, 255, 0.96));
+    border-color: var(--dropdown-border, var(--gnome-border));
+    box-shadow: var(--dropdown-shadow, var(--shadow-popup));
 
     li,
     a,
