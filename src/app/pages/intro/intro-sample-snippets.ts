@@ -77,7 +77,7 @@ export class PlaygroundDemoComponent {
     <div class="actions-row">
         <button type="button" class="button-primary" onclick="increment()">+1 Increment</button>
         <button type="button" class="button-secondary" onclick="decrement()">-1 Decrement</button>
-        <button type="button" class="button-cancel" onclick="reset()">Reset</button>
+        <button type="button" class="button-secondary" onclick="reset()">Reset</button>
     </div>
 
     <div class="input-row">
@@ -92,17 +92,23 @@ export class PlaygroundDemoComponent {
         />
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    p { margin: 0; color: #a6accd; font-size: 13px; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0; color: var(--text-secondary); font-size: 13px; }
 
     .stat-grid {
         display: grid;
@@ -110,17 +116,22 @@ export class PlaygroundDemoComponent {
         gap: 10px;
 
         .stat-box {
-            background: #1b1e2b;
-            padding: 12px;
-            border-radius: 8px;
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            padding: 14px;
+            border-radius: var(--radius-card, 12px);
             display: flex;
             flex-direction: column;
             gap: 4px;
 
-            .stat-label { font-size: 11px; color: #676e95; text-transform: uppercase; }
-            .stat-value { font-size: 20px; font-weight: 700; color: #eeffff; }
+            .stat-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+            .stat-value { font-size: 20px; font-weight: 700; color: var(--text-main); }
 
-            &.highlight .stat-value { color: #c3e88d; }
+            &.highlight {
+                background: var(--accent-subtle);
+                border-color: var(--accent);
+                .stat-value { color: var(--accent); }
+            }
         }
     }
 
@@ -132,10 +143,10 @@ export class PlaygroundDemoComponent {
         .pill-badge {
             font-size: 11px;
             padding: 4px 10px;
-            border-radius: 999px;
-            background: rgba(130, 170, 255, 0.15);
-            color: #82aaff;
-            border: 1px solid rgba(130, 170, 255, 0.3);
+            border-radius: var(--radius-pill, 999px);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
             font-weight: 600;
         }
     }
@@ -211,42 +222,49 @@ export class PlaygroundDemoComponent {
     <div class="actions-row">
         <button type="button" class="button-primary" onclick="onLogin('Alice Smith')">Login as Alice</button>
         <button type="button" class="button-primary" onclick="onLogin('Bob Johnson')">Login as Bob</button>
-        <button type="button" class="button-cancel" onclick="onLogout()">Logout</button>
+        <button type="button" class="button-secondary" onclick="onLogout()">Logout</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
 
     .user-status-card {
         display: flex;
         align-items: center;
         gap: 14px;
         padding: 16px;
-        background: #1b1e2b;
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
 
         .status-indicator {
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            background: #ff5370;
+            background: var(--accent-red, #f66151);
 
             &.active {
-                background: #c3e88d;
-                box-shadow: 0 0 10px rgba(195, 232, 141, 0.5);
+                background: var(--accent-green, #57e389);
+                box-shadow: 0 0 10px rgba(87, 227, 137, 0.5);
             }
         }
 
-        h4 { margin: 0; color: #eeffff; }
-        p { margin: 2px 0 0 0; color: #a6accd; font-size: 13px; }
+        h4 { margin: 0; color: var(--text-main); }
+        p { margin: 2px 0 0 0; color: var(--text-secondary); font-size: 13px; }
     }
 
     .actions-row {
@@ -314,36 +332,43 @@ export class PlaygroundDemoComponent {
         </div>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
     .actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .result-box {
         padding: 16px;
-        background: #1b1e2b;
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
         min-height: 80px;
 
         .visible { display: block; }
         .hidden { display: none; }
 
         .todo-details {
-            h4 { margin: 0 0 8px 0; color: #eeffff; }
+            h4 { margin: 0 0 8px 0; color: var(--text-main); }
             .badge {
                 padding: 4px 10px;
-                border-radius: 999px;
+                border-radius: var(--radius-pill, 999px);
                 font-size: 12px;
                 font-weight: 700;
-                &.done { background: rgba(195, 232, 141, 0.2); color: #c3e88d; }
-                &.pending { background: rgba(255, 203, 107, 0.2); color: #ffcb6b; }
+                &.done { background: rgba(87, 227, 137, 0.18); color: var(--accent-green, #57e389); }
+                &.pending { background: rgba(248, 228, 92, 0.18); color: var(--accent-yellow, #f8e45c); }
             }
         }
     }
@@ -386,24 +411,33 @@ export class PlaygroundDemoComponent {
         </button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    p { margin: 0; color: #a6accd; font-size: 13px; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0; color: var(--text-secondary); font-size: 13px; }
 
     .theme-status {
         padding: 14px;
-        background: #1b1e2b;
-        border-radius: 8px;
-        strong { color: #82aaff; }
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+        strong { color: var(--accent); }
     }
+
+    .actions-row { display: flex; gap: 10px; }
 }`,
     },
 
@@ -448,27 +482,33 @@ export class PlaygroundDemoComponent {
         <button type="button" class="button-primary btn-info" onclick="showInfo()">ℹ Info Toast</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    p { margin: 0; color: #a6accd; font-size: 13px; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0; color: var(--text-secondary); font-size: 13px; }
 
     .actions-row {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
 
-        .btn-success { background: #2ec27e; color: #fff; }
-        .btn-error { background: #ed333b; color: #fff; }
-        .btn-warn { background: #e5a50a; color: #000; }
-        .btn-info { background: #3584e4; color: #fff; }
+        .btn-success { background: var(--gnome-success, #2ec27e); color: #fff; }
+        .btn-error { background: var(--gnome-error, #ed333b); color: #fff; }
+        .btn-warn { background: var(--gnome-warn, #e5a50a); color: #000; }
+        .btn-info { background: var(--gnome-info, #3584e4); color: #fff; }
     }
 }`,
     },
@@ -516,27 +556,34 @@ export class PlaygroundDemoComponent {
         <button type="button" class="button-primary" onclick="setCurrency('GBP', '£')">GBP (£)</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
 
     .result-box {
         padding: 16px;
-        background: #1b1e2b;
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
         display: flex;
         align-items: center;
         gap: 12px;
 
-        .label { color: #a6accd; }
-        .output { font-size: 22px; font-weight: 800; color: #c3e88d; }
+        .label { color: var(--text-secondary); font-weight: 600; }
+        .output { font-size: 22px; font-weight: 800; color: var(--accent-green, #57e389); font-family: var(--font-mono, monospace); }
     }
 
     .actions-row { display: flex; gap: 10px; }
@@ -595,13 +642,19 @@ export class PlaygroundDemoComponent {
         <button type="submit" class="button-primary submit-btn">Create Account</button>
     </form>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 16px 0; color: #82aaff; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 16px 0; color: var(--text-main); font-size: 1.25rem; }
 
     form {
         display: flex;
@@ -612,12 +665,12 @@ export class PlaygroundDemoComponent {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            label { font-size: 12px; color: #a6accd; }
+            label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
             input { width: 100%; box-sizing: border-box; }
         }
 
-        .is-valid { border-color: #2ec27e !important; box-shadow: 0 0 0 2px rgba(46, 194, 126, 0.25); }
-        .is-invalid { border-color: #ed333b !important; box-shadow: 0 0 0 2px rgba(237, 51, 59, 0.25); }
+        .is-valid { border-color: var(--gnome-success, #2ec27e) !important; box-shadow: 0 0 0 2px rgba(46, 194, 126, 0.25); }
+        .is-invalid { border-color: var(--gnome-error, #ed333b) !important; box-shadow: 0 0 0 2px rgba(237, 51, 59, 0.25); }
 
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     }
@@ -666,34 +719,42 @@ export class PlaygroundDemoComponent {
         </button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
 
     .directive-box {
         padding: 24px;
         text-align: center;
-        background: #1b1e2b;
-        border-radius: 8px;
-        border: 2px solid rgba(130, 170, 255, 0.2);
+        background: var(--gnome-card);
+        border-radius: var(--radius-card, 12px);
+        border: 2px solid var(--gnome-border-subtle);
         font-weight: 700;
-        color: #82aaff;
+        color: var(--accent);
         transition: all 0.3s ease;
 
         &.pulse-active {
-            border-color: #c3e88d;
-            color: #c3e88d;
-            box-shadow: 0 0 20px rgba(195, 232, 141, 0.4);
+            border-color: var(--accent-green, #57e389);
+            color: var(--accent-green, #57e389);
+            box-shadow: 0 0 20px rgba(87, 227, 137, 0.4);
             transform: scale(1.02);
         }
     }
+
+    .actions-row { display: flex; gap: 10px; }
 }`,
     },
 
@@ -767,15 +828,17 @@ export class PlaygroundDemoComponent {
         </div>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
-    background: rgba(30, 30, 34, 0.75);
-    backdrop-filter: blur(40px) saturate(160%);
-    -webkit-backdrop-filter: blur(40px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    color: #ffffff;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
     .header-row {
         display: flex;
@@ -788,24 +851,23 @@ export class PlaygroundDemoComponent {
             margin: 0;
             font-size: 18px;
             font-weight: 700;
-            color: #79c0ff;
-            letter-spacing: -0.2px;
+            color: var(--text-main);
         }
 
         .badge-pill {
             padding: 3px 10px;
             font-size: 11px;
             font-weight: 600;
-            border-radius: 999px;
-            background: rgba(53, 132, 228, 0.18);
-            color: #79c0ff;
-            border: 1px solid rgba(53, 132, 228, 0.35);
+            border-radius: var(--radius-pill, 999px);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
         }
     }
 
     p {
         margin: 0 0 18px 0;
-        color: #9a9996;
+        color: var(--text-secondary);
         font-size: 13.5px;
         line-height: 1.4;
     }
@@ -813,184 +875,58 @@ export class PlaygroundDemoComponent {
     .arena {
         position: relative;
         height: 240px;
-        background: radial-gradient(circle at 20% 30%, rgba(53, 132, 228, 0.12), transparent 50%),
-                    radial-gradient(circle at 80% 70%, rgba(145, 65, 172, 0.12), transparent 50%),
-                    rgba(18, 20, 28, 0.7);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.06);
+        background: var(--gnome-card);
+        border-radius: var(--radius-card, 12px);
+        border: 1px solid var(--gnome-border-subtle);
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 24px 28px;
         overflow: hidden;
 
-        &::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 24px 24px;
-            pointer-events: none;
-        }
-
         .drag-token {
             position: relative;
             width: 148px;
             height: 76px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(53, 132, 228, 0.92) 0%, rgba(98, 160, 234, 0.82) 45%, rgba(53, 132, 228, 0.95) 100%);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-control, 8px);
+            background: var(--accent);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 24px rgba(53, 132, 228, 0.38),
-                        0 3px 8px rgba(0, 0, 0, 0.35),
-                        inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
-                        inset 0 -1px 2px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--shadow-popup);
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 0 14px;
-            cursor: grab;
+            cursor: var(--cursor-grab, grab);
             user-select: none;
             touch-action: none;
             z-index: 10;
-            transition: box-shadow 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
-                        border-color 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
-                        filter 0.2s ease;
 
-            .token-sheen {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 48%;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0.08) 75%, transparent 100%);
-                border-radius: 11px 11px 0 0;
-                pointer-events: none;
-            }
-
-            .token-icon {
-                font-size: 24px;
-                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-                flex-shrink: 0;
-            }
-
-            .token-content {
-                display: flex;
-                flex-direction: column;
-                gap: 1px;
-                flex: 1;
-                min-width: 0;
-
-                .token-title {
-                    font-size: 13.5px;
-                    font-weight: 700;
-                    color: #ffffff;
-                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-                .token-sub {
-                    font-size: 10.5px;
-                    font-weight: 500;
-                    color: rgba(255, 255, 255, 0.82);
-                    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-                }
-            }
-
-            .grip-dots {
-                display: flex;
-                flex-direction: column;
-                gap: 3px;
-                opacity: 0.65;
-                span {
-                    width: 3px;
-                    height: 3px;
-                    background: #ffffff;
-                    border-radius: 50%;
-                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-                }
-            }
-
-            &:hover:not(.is-dragging) {
-                box-shadow: 0 12px 32px rgba(53, 132, 228, 0.5),
-                            0 4px 12px rgba(0, 0, 0, 0.35),
-                            inset 0 1px 2px rgba(255, 255, 255, 0.8);
-                border-color: rgba(255, 255, 255, 0.55);
-                filter: brightness(1.05);
-            }
-
-            &.is-dragging {
-                cursor: grabbing !important;
-                box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55),
-                            0 0 35px rgba(53, 132, 228, 0.65),
-                            inset 0 1px 2px rgba(255, 255, 255, 0.85);
-                border-color: rgba(255, 255, 255, 0.65);
-                filter: brightness(1.12);
-                z-index: 100;
-            }
-
-            &.is-dropped {
-                background: linear-gradient(135deg, rgba(46, 194, 126, 0.95) 0%, rgba(87, 227, 137, 0.85) 50%, rgba(46, 194, 126, 0.95) 100%);
-                box-shadow: 0 10px 30px rgba(46, 194, 126, 0.45),
-                            inset 0 1px 2px rgba(255, 255, 255, 0.75);
-                border-color: rgba(255, 255, 255, 0.55);
-            }
+            .token-icon { font-size: 24px; }
+            .token-title { font-size: 13.5px; font-weight: 700; color: #ffffff; }
+            .token-sub { font-size: 10.5px; color: rgba(255, 255, 255, 0.8); }
         }
 
         .target-zone {
-            position: relative;
-            width: 154px;
-            height: 100px;
-            background: rgba(53, 132, 228, 0.06);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 2px dashed rgba(53, 132, 228, 0.4);
-            border-radius: 14px;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25),
-                        0 4px 16px rgba(0, 0, 0, 0.15);
+            width: 148px;
+            height: 80px;
+            border-radius: var(--radius-control, 8px);
+            border: 2px dashed var(--accent);
+            background: var(--accent-subtle);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 3px;
-            color: #79c0ff;
-            transition: all 0.24s cubic-bezier(0.25, 0.8, 0.25, 1);
+            gap: 2px;
+            color: var(--accent);
 
-            .target-icon {
-                font-size: 22px;
-                filter: drop-shadow(0 2px 6px rgba(53, 132, 228, 0.35));
-            }
-
-            .target-label {
-                font-size: 13px;
-                font-weight: 700;
-                letter-spacing: 0.1px;
-            }
-
-            .target-hint {
-                font-size: 10.5px;
-                font-weight: 500;
-                opacity: 0.75;
-            }
+            .target-icon { font-size: 22px; }
+            .target-label { font-size: 12px; font-weight: 700; }
+            .target-hint { font-size: 10px; opacity: 0.8; }
 
             &.zone-hover {
-                background: rgba(46, 194, 126, 0.16) !important;
-                border: 2px dashed #2ec27e !important;
-                color: #2ec27e !important;
-                box-shadow: 0 0 35px rgba(46, 194, 126, 0.35),
-                            inset 0 0 20px rgba(46, 194, 126, 0.2) !important;
-                transform: scale(1.03);
-
-                .target-icon {
-                    filter: drop-shadow(0 0 12px rgba(46, 194, 126, 0.6));
-                }
+                background: rgba(87, 227, 137, 0.2);
+                border-color: var(--accent-green, #57e389);
+                color: var(--accent-green, #57e389);
             }
         }
     }
@@ -1026,23 +962,30 @@ export class PlaygroundDemoComponent {}`,
     
     <user-badge-widget></user-badge-widget>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 6px 0; color: #82aaff; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 6px 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0 0 16px 0; color: var(--text-secondary); font-size: 13px; }
 
     .badge-box {
         display: flex;
         align-items: center;
-        gap: 14px;
+        justify-content: space-between;
         padding: 16px;
-        background: #1b1e2b;
-        border-radius: 8px;
-        color: #ffcb6b;
-        strong { font-size: 18px; color: #c3e88d; }
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+        strong { font-size: 18px; color: var(--accent-green, #57e389); }
     }
 }`,
     },
@@ -1098,19 +1041,25 @@ export class PlaygroundDemoComponent {
         <span>Active: <strong>{{selected()}}</strong></span>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    .badge { padding: 6px 12px; background: rgba(130, 170, 255, 0.15); border-radius: 6px; color: #82aaff; display: inline-block; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    .badge { padding: 6px 12px; background: var(--accent-subtle); border-radius: var(--radius-pill, 999px); color: var(--accent); display: inline-block; font-weight: 600; }
     .actions-row { display: flex; gap: 10px; }
-    .result-box { padding: 12px; background: #1b1e2b; border-radius: 6px; strong { color: #c3e88d; } }
+    .result-box { padding: 12px 16px; background: var(--gnome-card); border: 1px solid var(--gnome-border-subtle); border-radius: var(--radius-card, 12px); strong { color: var(--accent-green, #57e389); } }
 }`,
     },
 
@@ -1148,17 +1097,23 @@ export class PlaygroundDemoComponent {
         <button class="button-primary" onclick="updateRole('Systems Engineer')">Systems Engineer</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    .info-block { padding: 14px; background: #1b1e2b; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; strong { color: #82aaff; } }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    .info-block { padding: 14px; background: var(--gnome-card); border: 1px solid var(--gnome-border-subtle); border-radius: var(--radius-card, 12px); display: flex; flex-direction: column; gap: 6px; strong { color: var(--accent); } }
     .actions-row { display: flex; gap: 10px; }
 }`,
     },
@@ -1217,16 +1172,22 @@ export class PlaygroundDemoComponent {
         <button type="button" class="button-primary" onclick="addTask('Ship Purity v1.0.0')">+ Add Task</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
 
     .task-list {
         display: flex;
@@ -1238,15 +1199,17 @@ export class PlaygroundDemoComponent {
             align-items: center;
             gap: 12px;
             padding: 10px 14px;
-            background: #1b1e2b;
-            border-radius: 8px;
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-control, 8px);
 
-            .index { color: #676e95; font-size: 12px; }
-            .title { flex: 1; color: #eeffff; }
+            .index { color: var(--accent); font-size: 12px; font-weight: 700; }
+            .title { flex: 1; color: var(--text-main); }
 
             &.done .title {
                 text-decoration: line-through;
-                color: #676e95;
+                color: var(--text-secondary);
+                opacity: 0.6;
             }
         }
     }
@@ -1300,9 +1263,9 @@ export class PlaygroundDemoComponent {
     <div if="isLoggedIn()" class="role-section">
         <label>Select Permission Tier:</label>
         <div class="btn-group">
-            <button type="button" class="button-primary {{userRole() === 'admin' ? 'active' : ''}}" onclick="setRole('admin')">Admin</button>
-            <button type="button" class="button-primary {{userRole() === 'editor' ? 'active' : ''}}" onclick="setRole('editor')">Editor</button>
-            <button type="button" class="button-primary {{userRole() === 'viewer' ? 'active' : ''}}" onclick="setRole('viewer')">Viewer</button>
+            <button type="button" class="button-secondary {{userRole() === 'admin' ? 'active' : ''}}" onclick="setRole('admin')">Admin</button>
+            <button type="button" class="button-secondary {{userRole() === 'editor' ? 'active' : ''}}" onclick="setRole('editor')">Editor</button>
+            <button type="button" class="button-secondary {{userRole() === 'viewer' ? 'active' : ''}}" onclick="setRole('viewer')">Viewer</button>
         </div>
 
         <div if="userRole() === 'admin'" class="role-panel panel-admin">
@@ -1316,25 +1279,32 @@ export class PlaygroundDemoComponent {
         </div>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    p { margin: 0; font-size: 13px; color: #8f93a2; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0; font-size: 13px; color: var(--text-secondary); }
 
     .auth-section, .role-section {
         display: flex;
         flex-direction: column;
         gap: 10px;
         padding: 14px;
-        background: #1b1e2b;
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
     }
 
     .auth-box {
@@ -1342,33 +1312,33 @@ export class PlaygroundDemoComponent {
         align-items: center;
         gap: 10px;
         padding: 10px 12px;
-        border-radius: 6px;
+        border-radius: var(--radius-control, 8px);
 
-        &.auth-active { background: rgba(195, 232, 141, 0.1); border: 1px solid rgba(195, 232, 141, 0.3); }
-        &.auth-inactive { background: rgba(255, 203, 107, 0.1); border: 1px dashed rgba(255, 203, 107, 0.3); }
+        &.auth-active { background: rgba(87, 227, 137, 0.1); border: 1px solid var(--accent-green, #57e389); }
+        &.auth-inactive { background: rgba(248, 228, 92, 0.1); border: 1px dashed var(--accent-yellow, #f8e45c); }
     }
 
     .badge {
         font-size: 11px;
         font-weight: 700;
         padding: 2px 8px;
-        border-radius: 4px;
-        &.badge-success { background: #c3e88d; color: #1b1e2b; }
-        &.badge-warn { background: #ffcb6b; color: #1b1e2b; }
+        border-radius: var(--radius-pill, 999px);
+        &.badge-success { background: var(--accent-green, #57e389); color: #000; }
+        &.badge-warn { background: var(--accent-yellow, #f8e45c); color: #000; }
     }
 
-    .badge-alert { font-size: 11px; padding: 2px 8px; border-radius: 12px; background: #ff5370; color: #ffffff; }
-    .badge-muted { font-size: 11px; color: #676e95; }
+    .badge-alert { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-pill, 999px); background: var(--accent-red, #f66151); color: #ffffff; }
+    .badge-muted { font-size: 11px; color: var(--text-secondary); }
 
-    .btn-group { display: flex; gap: 8px; }
+    .btn-group { display: flex; gap: 8px; button.active { background: var(--accent); color: #fff; border-color: var(--accent); } }
 
     .role-panel {
         padding: 12px 14px;
-        border-radius: 6px;
+        border-radius: var(--radius-control, 8px);
         font-size: 13.5px;
-        &.panel-admin { background: rgba(130, 170, 255, 0.12); border-left: 4px solid #82aaff; }
-        &.panel-editor { background: rgba(255, 203, 107, 0.12); border-left: 4px solid #ffcb6b; }
-        &.panel-viewer { background: rgba(195, 232, 141, 0.12); border-left: 4px solid #c3e88d; }
+        &.panel-admin { background: rgba(246, 97, 81, 0.12); border-left: 4px solid var(--accent-red, #f66151); }
+        &.panel-editor { background: rgba(248, 228, 92, 0.12); border-left: 4px solid var(--accent-yellow, #f8e45c); }
+        &.panel-viewer { background: var(--accent-subtle); border-left: 4px solid var(--accent); }
     }
 }`,
     },
@@ -1427,27 +1397,32 @@ export class PlaygroundDemoComponent {
         </div>
     </div>
 </div>`,
-        scss: `.virtual-card {
+        scss: `@use '@styles' as *;
+
+.virtual-card {
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: #232635;
-    border: 1px solid rgba(130, 170, 255, 0.2);
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
     .card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        h3 { margin: 0; color: #82aaff; code { color: #ffcb6b; } }
+        h3 { margin: 0; color: var(--text-main); code { color: var(--accent); } }
     }
 
     .virtual-container {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 8px;
-        background: #1b1e2b;
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+        background: var(--gnome-card);
         overflow: hidden;
 
         .record-row {
@@ -1455,13 +1430,13 @@ export class PlaygroundDemoComponent {
             align-items: center;
             gap: 12px;
             padding: 0 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--gnome-border-subtle);
 
             &:hover { background: rgba(255, 255, 255, 0.04); }
-            .idx { font-family: monospace; font-size: 11px; color: #a6accd; }
-            .id-tag { font-family: monospace; font-size: 12px; color: #82aaff; }
-            .title { flex: 1; font-size: 13px; }
-            .amt { font-family: monospace; font-weight: 700; color: #57e389; font-size: 13px; }
+            .idx { font-family: var(--font-mono, monospace); font-size: 11px; color: var(--text-secondary); }
+            .id-tag { font-family: var(--font-mono, monospace); font-size: 12px; color: var(--accent); }
+            .title { flex: 1; font-size: 13px; color: var(--text-main); }
+            .amt { font-family: var(--font-mono, monospace); font-weight: 700; color: var(--accent-green, #57e389); font-size: 13px; }
         }
     }
 }`,
@@ -1498,37 +1473,43 @@ export class PlaygroundDemoComponent {}`,
         </div>
     </card-container>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 16px 0; color: #82aaff; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 16px 0; color: var(--text-main); font-size: 1.25rem; }
 
     .card-frame {
-        border: 1px solid rgba(130, 170, 255, 0.3);
-        border-radius: 8px;
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
         overflow: hidden;
 
         .card-header {
-            background: #1b1e2b;
+            background: var(--accent-subtle);
             padding: 10px 16px;
             font-weight: 700;
-            color: #82aaff;
-            border-bottom: 1px solid rgba(130, 170, 255, 0.2);
+            color: var(--accent);
+            border-bottom: 1px solid var(--gnome-border-subtle);
         }
 
         .card-body {
             padding: 16px;
-            background: #292d3e;
-            color: #eeffff;
+            background: var(--gnome-card);
+            color: var(--text-main);
         }
     }
 }`,
     },
 
-    // 15. Theming
+    // 17. Theming
     theming: {
         id: 'theming',
         title: '🎨 Modular SCSS Theming & GNOME Adwaita',
@@ -1566,22 +1547,28 @@ export class PlaygroundDemoComponent {
         <button class="button-secondary" onclick="setLight()">☀️ Light Palette</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
-    .theme-box { padding: 14px; background: #1b1e2b; border-radius: 8px; strong { color: #c3e88d; } }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    .theme-box { padding: 14px; background: var(--gnome-card); border: 1px solid var(--gnome-border-subtle); border-radius: var(--radius-card, 12px); strong { color: var(--accent-green, #57e389); } }
     .actions-row { display: flex; gap: 10px; }
 }`,
     },
 
-    // 16. Date Time Picker
+    // 18. Date Time Picker
     'date-time-picker': {
         id: 'date-time-picker',
         title: '📅 Date & Time Picker Component',
@@ -1610,14 +1597,20 @@ export class PlaygroundDemoComponent {
         <date-time-picker></date-time-picker>
     </div>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 6px 0; color: #82aaff; }
-    p { margin: 0 0 16px 0; color: #a6accd; font-size: 13px; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 6px 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0 0 16px 0; color: var(--text-secondary); font-size: 13px; }
 
     .picker-container {
         display: flex;
@@ -1627,7 +1620,7 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
-    // 17. Radial Menu
+    // 19. Radial Menu
     'radial-menu': {
         id: 'radial-menu',
         title: '🎯 Radial Context Menu (Lucide Vectors & Emojis)',
@@ -1656,29 +1649,36 @@ export class PlaygroundDemoComponent {
 
     <radial-context-menu></radial-context-menu>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
-    min-height: 240px;
-    cursor: pointer;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 6px 0; color: #82aaff; }
-    p { margin: 0 0 16px 0; color: #a6accd; font-size: 13px; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+    min-height: 240px;
+    cursor: var(--cursor-pointer);
+
+    h3 { margin: 0 0 6px 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0 0 16px 0; color: var(--text-secondary); font-size: 13px; }
 
     .click-hint {
         padding: 40px 20px;
-        border: 2px dashed rgba(130, 170, 255, 0.3);
-        border-radius: 8px;
+        border: 2px dashed var(--accent);
+        border-radius: var(--radius-card, 12px);
+        background: var(--accent-subtle);
         text-align: center;
-        color: #82aaff;
+        color: var(--accent);
         font-weight: 600;
     }
 }`,
     },
 
-    // 18. Context Menu Delegation
+    // 20. Context Menu Delegation
     'context-menu-delegation': {
         id: 'context-menu-delegation',
         title: '🎯 Single-Source Context Menu Delegation (setSelector)',
@@ -1707,28 +1707,35 @@ export class PlaygroundDemoComponent {
 
     <radial-context-menu></radial-context-menu>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 6px 0; color: #82aaff; }
-    p { margin: 0 0 16px 0; color: #a6accd; font-size: 13px; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 6px 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0 0 16px 0; color: var(--text-secondary); font-size: 13px; }
 
     .arena-box {
         padding: 40px;
-        background: #1b1e2b;
-        border: 2px solid #82aaff;
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 2px solid var(--accent);
+        border-radius: var(--radius-card, 12px);
         text-align: center;
         font-weight: 700;
-        color: #82aaff;
+        color: var(--accent);
+        cursor: var(--cursor-pointer);
     }
 }`,
     },
 
-    // 19. Modal Dialog
+    // 21. Modal Dialog
     modal: {
         id: 'modal',
         title: '🪟 Modal Dialog System (<modal-view>)',
@@ -1762,23 +1769,29 @@ export class PlaygroundDemoComponent {
         </div>
     </modal-view>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 6px 0; color: #82aaff; }
-    p { margin: 0 0 16px 0; color: #a6accd; font-size: 13px; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 6px 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0 0 16px 0; color: var(--text-secondary); font-size: 13px; }
 
     .dialog-content {
-        h4 { margin: 0 0 8px 0; color: #82aaff; }
-        p { margin: 0; color: #eeffff; }
+        h4 { margin: 0 0 8px 0; color: var(--accent); }
+        p { margin: 0; color: var(--text-main); }
     }
 }`,
     },
 
-    // 20. Clock
+    // 22. Clock
     clock: {
         id: 'clock',
         title: '⏱️ Analogue Clock Widget (<analogue-clock>)',
@@ -1815,17 +1828,23 @@ export class PlaygroundDemoComponent {
         <button type="button" class="button-secondary" onclick="setTimezone('UTC')">UTC</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
 
     .clock-display {
         width: 220px;
@@ -1841,7 +1860,7 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
-    // 21. Component Lifecycle
+    // 23. Component Lifecycle
     'component-lifecycle': {
         id: 'component-lifecycle',
         title: '🧩 Web Component Lifecycle Phases',
@@ -1866,7 +1885,7 @@ export class PlaygroundDemoComponent {
     log(msg: string) {
         this.lifecycleLog.update(logs => [...logs, \`[\${new Date().toLocaleTimeString()}] \${msg}\`]);
     }
-}`,
+} `,
         html: `<div class="sample-card window">
     <h3>🧩 Web Component Lifecycle Phases</h3>
     
@@ -1878,32 +1897,41 @@ export class PlaygroundDemoComponent {
         <button class="button-primary" onclick="log('User triggered state mutation')">+ Add Custom Log Event</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
 
     .log-box {
         padding: 14px;
-        background: #1b1e2b;
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
         display: flex;
         flex-direction: column;
         gap: 6px;
-        font-family: monospace;
+        font-family: var(--font-mono, monospace);
         font-size: 12.5px;
-        color: #c3e88d;
+        color: var(--accent-green, #57e389);
     }
+
+    .actions-row { display: flex; gap: 10px; }
 }`,
     },
 
-    // 22. Directive Lifecycle
+    // 24. Directive Lifecycle
     'directive-lifecycle': {
         id: 'directive-lifecycle',
         title: '🏷️ Custom Directive Lifecycle',
@@ -1913,17 +1941,13 @@ export class PlaygroundDemoComponent {
 export class TrackerDirective extends BaseDirective {
     onInit() {
         console.log('[Directive] onInit() - Attached to element.');
-        this.element.style.padding = '12px';
-        this.element.style.borderRadius = '8px';
-        this.element.style.background = '#1b1e2b';
+        this.element.classList.add('tracker-host');
         this.onChanges(this.value);
     }
 
     onChanges(newValue: any) {
         console.log('[Directive] onChanges() ->', newValue);
-        this.element.style.borderColor = newValue ? '#c3e88d' : '#ff5370';
-        this.element.style.borderWidth = '2px';
-        this.element.style.borderStyle = 'solid';
+        this.element.classList.toggle('tracker-active', !!newValue);
     }
 
     onDestroy() {
@@ -1945,29 +1969,51 @@ export class PlaygroundDemoComponent {
         html: `<div class="sample-card window">
     <h3>🏷️ Custom Directive Lifecycle</h3>
 
-    <div [tracker]="active()">
-        <span>Directive Host (Status: {{active() ? 'ACTIVE' : 'INACTIVE'}})</span>
+    <div [tracker]="active()" class="tracker-card">
+        <span>Directive Host (Status: <strong>{{active() ? 'ACTIVE' : 'INACTIVE'}}</strong>)</span>
     </div>
 
     <div class="actions-row">
         <button class="button-primary" onclick="toggle()">Toggle Directive State</button>
     </div>
 </div>`,
-        scss: `.sample-card {
+        scss: `@use '@styles' as *;
+
+.sample-card {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
-    h3 { margin: 0; color: #82aaff; }
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+
+    .tracker-card {
+        padding: 16px;
+        background: var(--gnome-card);
+        border: 2px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+        text-align: center;
+        color: var(--text-main);
+        transition: all 0.25s ease;
+
+        &.tracker-active {
+            border-color: var(--accent-green, #57e389);
+            strong { color: var(--accent-green, #57e389); }
+        }
+    }
+
     .actions-row { display: flex; gap: 10px; }
 }`,
     },
 
-    // 23. Validator Lifecycle
+    // 25. Validator Lifecycle
     'validator-lifecycle': {
         id: 'validator-lifecycle',
         title: '📋 Form Validator Lifecycle & Pipeline',
@@ -2006,13 +2052,19 @@ export class PlaygroundDemoComponent {
         <button type="submit" class="button-primary submit-btn">Submit PIN</button>
     </form>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 16px 0; color: #82aaff; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 16px 0; color: var(--text-main); font-size: 1.25rem; }
 
     form {
         display: flex;
@@ -2023,16 +2075,16 @@ export class PlaygroundDemoComponent {
             display: flex;
             flex-direction: column;
             gap: 4px;
-            label { font-size: 12px; color: #a6accd; }
+            label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
         }
 
-        .is-valid { border-color: #2ec27e !important; }
-        .is-invalid { border-color: #ed333b !important; }
+        .is-valid { border-color: var(--gnome-success, #2ec27e) !important; }
+        .is-invalid { border-color: var(--gnome-error, #ed333b) !important; }
     }
 }`,
     },
 
-    // 24. Bootstrap Lifecycle
+    // 26. Bootstrap Lifecycle
     'bootstrap-lifecycle': {
         id: 'bootstrap-lifecycle',
         title: '🚀 Application Bootstrapping Lifecycle',
@@ -2062,13 +2114,19 @@ export class PlaygroundDemoComponent {
         </div>
     </div>
 </div>`,
-        scss: `.sample-card {
-    padding: 24px;
-    background: #232635;
-    border-radius: 12px;
-    color: #eeffff;
+        scss: `@use '@styles' as *;
 
-    h3 { margin: 0 0 16px 0; color: #82aaff; }
+.sample-card {
+    padding: 24px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0 0 16px 0; color: var(--text-main); font-size: 1.25rem; }
 
     .phases-list {
         display: flex;
@@ -2080,16 +2138,17 @@ export class PlaygroundDemoComponent {
             align-items: center;
             gap: 10px;
             padding: 10px 14px;
-            background: #1b1e2b;
-            border-radius: 6px;
-            span { color: #c3e88d; font-weight: 800; }
-            p { margin: 0; color: #eeffff; font-size: 13px; }
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-control, 8px);
+            span { color: var(--accent-green, #57e389); font-weight: 800; }
+            p { margin: 0; color: var(--text-main); font-size: 13px; }
         }
     }
 }`,
     },
 
-    // 25. Signal Routing & Layout Engine
+    // 27. Signal Routing & Layout Engine
     router: {
         id: 'router',
         title: '🗺️ Signal Router & Layout Engine',
@@ -2156,13 +2215,13 @@ export class PlaygroundDemoComponent {
 
     <!-- Navigation Tabs -->
     <div class="nav-toolbar">
-        <button type="button" class="nav-btn {{router.path() === '/' ? 'active' : ''}}" onclick="goTo('/')">
+        <button type="button" class="button-secondary nav-btn {{router.path() === '/' ? 'active' : ''}}" onclick="goTo('/')">
             🏠 Home
         </button>
-        <button type="button" class="nav-btn {{router.path() === '/users/alice' ? 'active' : ''}}" onclick="goTo('/users/alice')">
+        <button type="button" class="button-secondary nav-btn {{router.path() === '/users/alice' ? 'active' : ''}}" onclick="goTo('/users/alice')">
             👤 Alice
         </button>
-        <button type="button" class="nav-btn {{router.path() === '/users/bob' ? 'active' : ''}}" onclick="goTo('/users/bob')">
+        <button type="button" class="button-secondary nav-btn {{router.path() === '/users/bob' ? 'active' : ''}}" onclick="goTo('/users/bob')">
             👤 Bob
         </button>
     </div>
@@ -2177,16 +2236,20 @@ export class PlaygroundDemoComponent {
         <span>Active Path: <code>{{router.path()}}</code></span>
     </div>
 </div>`,
-        scss: `.router-playground-demo {
+        scss: `@use '@styles' as *;
+
+.router-playground-demo {
     padding: 24px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    background: #232635;
-    border: 1px solid rgba(130, 170, 255, 0.2);
-    border-radius: 12px;
-    color: #eeffff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
 
     .demo-header {
         display: flex;
@@ -2196,17 +2259,17 @@ export class PlaygroundDemoComponent {
 
         h3 {
             margin: 0;
-            color: #82aaff;
-            font-size: 18px;
+            color: var(--text-main);
+            font-size: 1.25rem;
         }
 
         .url-chip {
             padding: 4px 10px;
-            background: #1b1e2b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-pill, 999px);
             font-size: 12px;
-            code { color: #c3e88d; font-weight: 600; }
+            code { color: var(--accent-green, #57e389); font-weight: 600; }
         }
     }
 
@@ -2216,35 +2279,19 @@ export class PlaygroundDemoComponent {
         flex-wrap: wrap;
 
         .nav-btn {
-            padding: 6px 14px;
-            font-size: 13px;
-            font-weight: 500;
-            background: #1b1e2b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #eeffff;
-            cursor: pointer;
-            transition: all 0.2s ease;
-
-            &:hover {
-                background: #292d3e;
-                border-color: rgba(130, 170, 255, 0.4);
-            }
-
             &.active {
-                background: #82aaff;
-                color: #1b1e2b;
-                font-weight: 700;
-                border-color: #82aaff;
+                background: var(--accent);
+                color: #ffffff;
+                border-color: var(--accent);
             }
         }
     }
 
     .layout-viewport {
         padding: 16px;
-        background: #1b1e2b;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
         min-height: 110px;
 
         .view-card {
@@ -2254,25 +2301,25 @@ export class PlaygroundDemoComponent {
 
             h4 {
                 margin: 0;
-                color: #c3e88d;
+                color: var(--accent);
                 font-size: 15px;
-                code { color: #ffcb6b; }
+                code { color: var(--accent-yellow, #f8e45c); }
             }
 
             p {
                 margin: 0;
                 font-size: 13px;
-                color: #a6accd;
-                code { color: #82aaff; }
+                color: var(--text-secondary);
+                code { color: var(--accent); }
             }
 
             .pill-badge {
                 align-self: flex-start;
                 padding: 3px 8px;
-                background: rgba(195, 232, 141, 0.15);
-                border: 1px solid rgba(195, 232, 141, 0.3);
-                color: #c3e88d;
-                border-radius: 6px;
+                background: var(--accent-subtle);
+                border: 1px solid var(--accent);
+                color: var(--accent);
+                border-radius: var(--radius-pill, 999px);
                 font-size: 11px;
                 font-weight: 600;
             }
@@ -2281,8 +2328,8 @@ export class PlaygroundDemoComponent {
 
     .signal-inspector-bar {
         font-size: 12px;
-        color: #a6accd;
-        code { color: #ffcb6b; }
+        color: var(--text-secondary);
+        code { color: var(--accent-yellow, #f8e45c); font-family: var(--font-mono, monospace); }
     }
 }`,
     },

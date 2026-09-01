@@ -12,6 +12,77 @@ export interface CodePreset {
 
 export const PLAYGROUND_PRESETS: CodePreset[] = [
     {
+        id: 'empty-starter',
+        name: '✨ Empty Starter',
+        description: 'Bare-bones blank template for starting a new component from scratch.',
+        ts: `import { Component } from '@purity/core';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {}`,
+        html: `<div class="empty-card window">
+    <div class="header">
+        <span class="badge">✨ Blank Starter</span>
+        <h2>Empty Component</h2>
+        <p>Start writing your component here.</p>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.empty-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
+
+    .header {
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            margin: 0 0 6px 0;
+            font-size: 1.35rem;
+            color: var(--text-main);
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+    }
+}`,
+        spec: `import { describe, it, expect } from 'vitest';
+
+describe('PlaygroundDemoComponent', () => {
+    it('should instantiate component', () => {
+        const component = new PlaygroundDemoComponent();
+        expect(component).toBeDefined();
+    });
+});`,
+    },
+    {
         id: 'loader-async',
         name: '⏳ Dynamic Components & Loader',
         description: 'Multi-component architecture, dynamic sub-components, and <loader-component>.',
@@ -51,56 +122,87 @@ export class PlaygroundDemoComponent {
 })
 export class TestDemoComponent {}`,
         html: `<div class="user-select-card window">
-    <h3>👤 Select User Profile</h3>
+    <div class="card-header">
+        <span class="badge">⏳ Multi-Component</span>
+        <h3>👤 Select User Profile</h3>
+        <p>Dynamic sub-components and loading states with Purity signals.</p>
+    </div>
     
-    <!-- Purity UI Loader Component (Implicitly resolved by @ViewChild) -->
+    <!-- Purity UI Loader Component -->
     <loader-component></loader-component>
 
-    <!-- Dynamic Sub-Component (Implicitly resolved by @ViewChild) -->
+    <!-- Dynamic Sub-Component -->
     <test-demo-component></test-demo-component>
 
     <div class="user-list">
-        <div for="let user of users" class="user-item">
-            <button
-                type="button"
-                class="button-secondary user-btn"
-                onclick="onSelectUser(event, user)"
-            >
-                Select {{user}}
-            </button>
-        </div>
+        <button
+            for="let user of users"
+            type="button"
+            class="button-secondary user-btn"
+            onclick="onSelectUser(event, user)"
+        >
+            <span>Select Profile:</span>
+            <strong>{{user}}</strong>
+        </button>
     </div>
 
     <div class="selected-result">
         <span>Active User: <strong>{{selectedUser() || 'None selected'}}</strong></span>
     </div>
 </div>`,
-        scss: `.user-select-card {
-    padding: 24px;
+        scss: `@use '@styles' as *;
+
+.user-select-card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    background: #232635;
-    border: 1px solid rgba(130, 170, 255, 0.2);
-    border-radius: 12px;
-    color: #eeffff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    gap: 18px;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
 
-    h3 {
-        margin: 0;
-        color: #82aaff;
+    .card-header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
+        h3 {
+            margin: 0 0 4px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
     }
 
     .test-badge {
         display: inline-flex;
         align-items: center;
         padding: 6px 12px;
-        background: rgba(130, 170, 255, 0.15);
-        border: 1px dashed rgba(130, 170, 255, 0.4);
-        border-radius: 8px;
+        background: var(--accent-subtle);
+        border: 1px dashed var(--accent);
+        border-radius: var(--radius-control, 8px);
         font-size: 12px;
         font-weight: 600;
-        color: #82aaff;
+        color: var(--accent);
     }
 
     .user-list {
@@ -110,32 +212,27 @@ export class TestDemoComponent {}`,
     }
 
     .user-btn {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 14px;
+        border-radius: var(--radius-control, 8px);
         width: 100%;
         text-align: left;
-        padding: 10px 14px;
-        border-radius: 8px;
-        background: #292d3e;
-        color: #eeffff;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-            background: #32374d;
-            border-color: #82aaff;
-            transform: translateX(4px);
-        }
+        font-size: 13px;
     }
 
     .selected-result {
         padding: 12px 16px;
-        background: #292d3e;
-        border-radius: 8px;
-        border-left: 4px solid #82aaff;
-        font-size: 14px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-left: 4px solid var(--accent);
+        border-radius: var(--radius-control, 8px);
+        font-size: 13.5px;
+        color: var(--text-secondary);
 
         strong {
-            color: #c3e88d;
+            color: var(--accent-green, #57e389);
         }
     }
 }`,
@@ -201,8 +298,11 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="counter-card window">
-    <h2>⚡ Fine-Grained Reactive Counter</h2>
-    <p class="subtitle">Updates with sub-microsecond synchronous precision without Virtual DOM.</p>
+    <div class="card-header">
+        <span class="badge">⚡ Signals & Computed</span>
+        <h2>Fine-Grained Reactive Counter</h2>
+        <p class="subtitle">Sub-microsecond synchronous updates without Virtual DOM diffing.</p>
+    </div>
 
     <div class="display-grid">
         <div class="stat-box primary">
@@ -210,7 +310,7 @@ export class PlaygroundDemoComponent {
             <span class="stat-value {{isNegative() ? 'negative' : ''}}">{{count()}}</span>
         </div>
         <div class="stat-box">
-            <span class="stat-label">Double (Computed)</span>
+            <span class="stat-label">2x Double</span>
             <span class="stat-value">{{doubleCount()}}</span>
         </div>
         <div class="stat-box">
@@ -224,40 +324,61 @@ export class PlaygroundDemoComponent {
     <!-- Step Controller -->
     <div class="step-selector">
         <span class="step-label">Step Size:</span>
-        <button type="button" class="step-btn {{step() === 1 ? 'active' : ''}}" onclick="setStep(1)">1x</button>
-        <button type="button" class="step-btn {{step() === 5 ? 'active' : ''}}" onclick="setStep(5)">5x</button>
-        <button type="button" class="step-btn {{step() === 10 ? 'active' : ''}}" onclick="setStep(10)">10x</button>
+        <div class="step-buttons">
+            <button type="button" class="button-secondary {{step() === 1 ? 'active' : ''}}" onclick="setStep(1)">1x</button>
+            <button type="button" class="button-secondary {{step() === 5 ? 'active' : ''}}" onclick="setStep(5)">5x</button>
+            <button type="button" class="button-secondary {{step() === 10 ? 'active' : ''}}" onclick="setStep(10)">10x</button>
+        </div>
     </div>
 
     <!-- Action Buttons -->
     <div class="button-group">
-        <button type="button" class="action-btn dec-btn" onclick="decrement()">- Decrement</button>
-        <button type="button" class="action-btn reset-btn" onclick="reset()">Reset</button>
-        <button type="button" class="action-btn inc-btn" onclick="increment()">+ Increment</button>
+        <button type="button" class="button-secondary" onclick="decrement()">- Decrement</button>
+        <button type="button" class="button-secondary" onclick="reset()">Reset</button>
+        <button type="button" class="button-primary" onclick="increment()">+ Increment</button>
     </div>
 </div>`,
-        scss: `.counter-card {
-    padding: 24px;
+        scss: `@use '@styles' as *;
+
+.counter-card {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    background: #232635;
-    border: 1px solid rgba(199, 146, 234, 0.25);
-    border-radius: 12px;
-    color: #eeffff;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
 
-    h2 {
-        margin: 0;
-        font-size: 1.35rem;
-        color: #c792ea;
-    }
+    .card-header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
+        }
 
-    .subtitle {
-        margin: 0;
-        font-size: 13px;
-        color: #89ddff;
-        opacity: 0.8;
+        h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.35rem;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
     }
 
     .display-grid {
@@ -271,46 +392,47 @@ export class PlaygroundDemoComponent {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 14px;
-        background: #292d3e;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
+        padding: 14px 10px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
         gap: 6px;
 
         &.primary {
-            border-color: rgba(199, 146, 234, 0.4);
-            background: rgba(199, 146, 234, 0.08);
+            background: var(--accent-subtle);
+            border-color: var(--accent);
         }
 
         .stat-label {
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #89ddff;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+            font-weight: 600;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            color: #c792ea;
+            color: var(--text-main);
 
             &.negative {
-                color: #ff5370;
+                color: var(--accent-red, #f66151);
             }
 
             &.badge {
                 font-size: 12px;
-                padding: 4px 10px;
-                border-radius: 999px;
+                padding: 3px 10px;
+                border-radius: var(--radius-pill, 999px);
 
                 &.even {
-                    background: rgba(195, 232, 141, 0.2);
-                    color: #c3e88d;
+                    background: rgba(87, 227, 137, 0.18);
+                    color: var(--accent-green, #57e389);
                 }
 
                 &.odd {
-                    background: rgba(255, 203, 107, 0.2);
-                    color: #ffcb6b;
+                    background: rgba(248, 228, 92, 0.18);
+                    color: var(--accent-yellow, #f8e45c);
                 }
             }
         }
@@ -319,27 +441,32 @@ export class PlaygroundDemoComponent {
     .step-selector {
         display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 14px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-control, 8px);
 
         .step-label {
-            font-size: 13px;
-            color: #89ddff;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
 
-        .step-btn {
-            padding: 4px 12px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: #292d3e;
-            color: #eeffff;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
+        .step-buttons {
+            display: flex;
+            gap: 6px;
 
-            &.active {
-                background: #c792ea;
-                color: #1a1a24;
-                border-color: #c792ea;
+            button {
+                padding: 4px 12px;
+                font-size: 12px;
+
+                &.active {
+                    background: var(--accent);
+                    color: #ffffff;
+                    border-color: var(--accent);
+                }
             }
         }
     }
@@ -348,35 +475,8 @@ export class PlaygroundDemoComponent {
         display: flex;
         gap: 10px;
 
-        .action-btn {
+        button {
             flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: transform 0.15s ease;
-
-            &:active {
-                transform: scale(0.97);
-            }
-
-            &.inc-btn {
-                background: #c792ea;
-                color: #1a1a24;
-            }
-
-            &.dec-btn {
-                background: #292d3e;
-                color: #eeffff;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-
-            &.reset-btn {
-                background: transparent;
-                color: #89ddff;
-                border: 1px dashed rgba(137, 221, 255, 0.4);
-            }
         }
     }
 }`,
@@ -475,78 +575,118 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="pipe-card window">
-    <h2>🚰 Transform Pipes Demo</h2>
-
-    <div class="pipe-row">
-        <span class="label">Original Name:</span>
-        <span class="val">{{productName()}}</span>
+    <div class="card-header">
+        <span class="badge">🚰 Data Transformation</span>
+        <h2>Transform Pipes Demo</h2>
+        <p class="subtitle">Dynamic Handlebars pipes with reactive template expressions.</p>
     </div>
 
-    <div class="pipe-row">
-        <span class="label">Uppercase Pipe:</span>
-        <span class="val highlight">{{productName() | uppercase}}</span>
-    </div>
+    <div class="pipe-rows">
+        <div class="pipe-row">
+            <span class="label">Original Name:</span>
+            <span class="val">{{productName()}}</span>
+        </div>
 
-    <div class="pipe-row">
-        <span class="label">Truncate Pipe:</span>
-        <span class="val">{{productName() | truncate: 18 : ' →'}}</span>
-    </div>
+        <div class="pipe-row">
+            <span class="label">Uppercase Pipe:</span>
+            <span class="val highlight">{{productName() | uppercase}}</span>
+        </div>
 
-    <div class="pipe-row">
-        <span class="label">Formatted Price:</span>
-        <span class="val price">{{price() | currency: currencySymbol() : 2}}</span>
+        <div class="pipe-row">
+            <span class="label">Truncate Pipe:</span>
+            <span class="val">{{productName() | truncate: 18 : ' →'}}</span>
+        </div>
+
+        <div class="pipe-row">
+            <span class="label">Formatted Price:</span>
+            <span class="val price">{{price() | currency: currencySymbol() : 2}}</span>
+        </div>
     </div>
 
     <!-- Currency Switcher -->
     <div class="currency-actions">
-        <button type="button" class="curr-btn {{currencySymbol() === '$' ? 'active' : ''}}" onclick="setDollar()">$ USD</button>
-        <button type="button" class="curr-btn {{currencySymbol() === '€' ? 'active' : ''}}" onclick="setEuro()">€ EUR</button>
-        <button type="button" class="curr-btn {{currencySymbol() === '¥' ? 'active' : ''}}" onclick="setYen()">¥ JPY</button>
+        <button type="button" class="button-secondary {{currencySymbol() === '$' ? 'active' : ''}}" onclick="setDollar()">$ USD</button>
+        <button type="button" class="button-secondary {{currencySymbol() === '€' ? 'active' : ''}}" onclick="setEuro()">€ EUR</button>
+        <button type="button" class="button-secondary {{currencySymbol() === '¥' ? 'active' : ''}}" onclick="setYen()">¥ JPY</button>
     </div>
 </div>`,
-        scss: `.pipe-card {
-    padding: 24px;
+        scss: `@use '@styles' as *;
+
+.pipe-card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    background: #232635;
-    border: 1px solid rgba(247, 140, 108, 0.25);
-    border-radius: 12px;
-    color: #eeffff;
+    gap: 18px;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
 
-    h2 {
-        margin: 0;
-        color: #f78c6c;
-        font-size: 1.3rem;
-    }
-
-    .pipe-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 14px;
-        background: #292d3e;
-        border-radius: 8px;
-        font-size: 13px;
-
-        .label {
-            color: #89ddff;
-            font-weight: 600;
+    .card-header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
         }
 
-        .val {
-            color: #eeffff;
-            font-family: monospace;
+        h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+        }
 
-            &.highlight {
-                color: #c3e88d;
-                font-weight: 700;
+        .subtitle {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+    }
+
+    .pipe-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .pipe-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-control, 8px);
+            font-size: 13px;
+
+            .label {
+                color: var(--text-secondary);
+                font-weight: 600;
             }
 
-            &.price {
-                color: #ffcb6b;
-                font-size: 16px;
-                font-weight: 700;
+            .val {
+                color: var(--text-main);
+                font-family: var(--font-mono, monospace);
+
+                &.highlight {
+                    color: var(--accent);
+                    font-weight: 700;
+                }
+
+                &.price {
+                    color: var(--accent-green, #57e389);
+                    font-size: 15px;
+                    font-weight: 700;
+                }
             }
         }
     }
@@ -554,22 +694,14 @@ export class PlaygroundDemoComponent {
     .currency-actions {
         display: flex;
         gap: 8px;
-        margin-top: 4px;
 
-        .curr-btn {
+        button {
             flex: 1;
-            padding: 8px;
-            background: #292d3e;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-            color: #eeffff;
-            cursor: pointer;
-            font-weight: 600;
 
             &.active {
-                background: #f78c6c;
-                color: #1a1a24;
-                border-color: #f78c6c;
+                background: var(--accent);
+                color: #ffffff;
+                border-color: var(--accent);
             }
         }
     }
@@ -662,7 +794,11 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="todo-card window">
-    <h2>📋 Structural Array Repeater (for)</h2>
+    <div class="card-header">
+        <span class="badge">🔁 Structural Loops</span>
+        <h2>Array Repeater (for)</h2>
+        <p class="subtitle">Declarative item iteration and reactive list management.</p>
+    </div>
 
     <!-- Input Add Bar -->
     <div class="input-bar">
@@ -685,20 +821,47 @@ export class PlaygroundDemoComponent {
         </div>
     </div>
 </div>`,
-        scss: `.todo-card {
-    padding: 24px;
+        scss: `@use '@styles' as *;
+
+.todo-card {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    background: #232635;
-    border: 1px solid rgba(137, 221, 255, 0.25);
-    border-radius: 12px;
-    color: #eeffff;
+    gap: 18px;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
 
-    h2 {
-        margin: 0;
-        color: #89ddff;
-        font-size: 1.3rem;
+    .card-header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
     }
 
     .input-bar {
@@ -707,26 +870,6 @@ export class PlaygroundDemoComponent {
 
         input {
             flex: 1;
-            padding: 10px 14px;
-            background: #292d3e;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            color: #eeffff;
-            outline: none;
-
-            &:focus {
-                border-color: #89ddff;
-            }
-        }
-
-        .add-btn {
-            padding: 10px 18px;
-            background: #89ddff;
-            color: #1a1a24;
-            font-weight: 700;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
         }
     }
 
@@ -741,9 +884,9 @@ export class PlaygroundDemoComponent {
         align-items: center;
         gap: 12px;
         padding: 10px 14px;
-        background: #292d3e;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-control, 8px);
         transition: all 0.2s ease;
 
         &.is-done {
@@ -751,29 +894,35 @@ export class PlaygroundDemoComponent {
 
             .task-title {
                 text-decoration: line-through;
-                color: #89ddff;
+                color: var(--text-secondary);
             }
         }
 
         .task-index {
             font-size: 11px;
             font-weight: 700;
-            color: #82aaff;
+            color: var(--accent);
         }
 
         .task-title {
             flex: 1;
-            cursor: pointer;
+            cursor: var(--cursor-pointer);
             font-size: 13.5px;
+            color: var(--text-main);
         }
 
         .delete-btn {
             background: transparent;
             border: none;
-            color: #ff5370;
-            cursor: pointer;
+            color: var(--accent-red, #f66151);
+            cursor: var(--cursor-pointer);
             font-size: 14px;
-            padding: 4px;
+            padding: 4px 8px;
+            border-radius: 4px;
+
+            &:hover {
+                background: rgba(246, 97, 81, 0.15);
+            }
         }
     }
 }`,
@@ -837,13 +986,17 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="auth-card window">
-    <h2>🔀 Structural Conditionals</h2>
+    <div class="card-header">
+        <span class="badge">🔀 Structural Branches</span>
+        <h2>Structural Conditionals</h2>
+        <p class="subtitle">Multi-branch conditional rendering with lazy DOM mount.</p>
+    </div>
 
     <!-- Role Switcher -->
     <div class="role-selector">
-        <button type="button" class="role-btn {{role() === 'admin' ? 'active' : ''}}" onclick="setRole('admin')">Admin</button>
-        <button type="button" class="role-btn {{role() === 'moderator' ? 'active' : ''}}" onclick="setRole('moderator')">Moderator</button>
-        <button type="button" class="role-btn {{role() === 'guest' ? 'active' : ''}}" onclick="setRole('guest')">Guest</button>
+        <button type="button" class="button-secondary {{role() === 'admin' ? 'active' : ''}}" onclick="setRole('admin')">Admin</button>
+        <button type="button" class="button-secondary {{role() === 'moderator' ? 'active' : ''}}" onclick="setRole('moderator')">Moderator</button>
+        <button type="button" class="button-secondary {{role() === 'guest' ? 'active' : ''}}" onclick="setRole('guest')">Guest</button>
     </div>
 
     <!-- Conditional Branches -->
@@ -860,50 +1013,71 @@ export class PlaygroundDemoComponent {
         <p>Read-only public view. Please log in for privileges.</p>
     </div>
 </div>`,
-        scss: `.auth-card {
-    padding: 24px;
+        scss: `@use '@styles' as *;
+
+.auth-card {
     display: flex;
     flex-direction: column;
     gap: 18px;
-    background: #232635;
-    border: 1px solid rgba(195, 232, 141, 0.25);
-    border-radius: 12px;
-    color: #eeffff;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
 
-    h2 {
-        margin: 0;
-        color: #c3e88d;
-        font-size: 1.3rem;
+    .card-header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+        }
+
+        .subtitle {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
     }
 
     .role-selector {
         display: flex;
         gap: 8px;
 
-        .role-btn {
+        button {
             flex: 1;
-            padding: 8px;
-            background: #292d3e;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 6px;
-            color: #eeffff;
-            cursor: pointer;
-            font-weight: 600;
 
             &.active {
-                background: #c3e88d;
-                color: #1a1a24;
-                border-color: #c3e88d;
+                background: var(--accent);
+                color: #ffffff;
+                border-color: var(--accent);
             }
         }
     }
 
     .panel {
         padding: 16px;
-        border-radius: 8px;
+        border-radius: var(--radius-card, 12px);
 
         h3 {
             margin: 0 0 6px 0;
+            font-size: 1.15rem;
         }
 
         p {
@@ -913,21 +1087,21 @@ export class PlaygroundDemoComponent {
         }
 
         &.admin-panel {
-            background: rgba(255, 83, 112, 0.15);
-            border: 1px solid rgba(255, 83, 112, 0.4);
-            color: #ff5370;
+            background: rgba(246, 97, 81, 0.12);
+            border: 1px solid rgba(246, 97, 81, 0.35);
+            color: var(--accent-red, #f66151);
         }
 
         &.mod-panel {
-            background: rgba(255, 203, 107, 0.15);
-            border: 1px solid rgba(255, 203, 107, 0.4);
-            color: #ffcb6b;
+            background: rgba(248, 228, 92, 0.12);
+            border: 1px solid rgba(248, 228, 92, 0.35);
+            color: var(--accent-yellow, #f8e45c);
         }
 
         &.guest-panel {
-            background: rgba(137, 221, 255, 0.15);
-            border: 1px solid rgba(137, 221, 255, 0.4);
-            color: #89ddff;
+            background: var(--accent-subtle);
+            border: 1px solid var(--accent);
+            color: var(--accent);
         }
     }
 }`,
@@ -988,10 +1162,11 @@ export class PlaygroundDemoComponent {
         this.lastActionLog.set('Selections reset to defaults');
     }
 }`,
-        html: `<div class="dropdown-demo-card">
+        html: `<div class="dropdown-demo-card window">
     <div class="demo-header">
-        <h3>🔽 Glassmorphic Dropdowns</h3>
-        <p class="demo-subtitle">Demonstrating declarative dropdown directives with keyboard navigation.</p>
+        <span class="badge">🔽 Directives</span>
+        <h3>Glassmorphic Dropdowns</h3>
+        <p class="demo-subtitle">Declarative dropdown directives with keyboard navigation.</p>
     </div>
 
     <div class="dropdowns-grid">
@@ -1053,27 +1228,46 @@ export class PlaygroundDemoComponent {
         </button>
     </div>
 </div>`,
-        scss: `.dropdown-demo-card {
+        scss: `@use '@styles' as *;
+
+.dropdown-demo-card {
     display: flex;
     flex-direction: column;
     gap: 18px;
     padding: 24px;
-    border-radius: 12px;
-    background: #232635;
-    border: 1px solid rgba(130, 170, 255, 0.2);
-    color: #eeffff;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
 
     .demo-header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
         h3 {
-            margin: 0 0 6px 0;
-            color: #82aaff;
+            margin: 0 0 4px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
         }
 
         .demo-subtitle {
             margin: 0;
             font-size: 13px;
-            color: #89ddff;
-            opacity: 0.8;
+            color: var(--text-secondary);
         }
     }
 
@@ -1090,7 +1284,7 @@ export class PlaygroundDemoComponent {
             .panel-label {
                 font-size: 12px;
                 font-weight: 600;
-                color: #89ddff;
+                color: var(--text-secondary);
             }
         }
     }
@@ -1100,9 +1294,9 @@ export class PlaygroundDemoComponent {
         flex-direction: column;
         gap: 8px;
         padding: 12px 16px;
-        border-radius: 8px;
-        background: #292d3e;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: var(--radius-card, 12px);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
 
         .status-row {
             display: flex;
@@ -1112,16 +1306,17 @@ export class PlaygroundDemoComponent {
 
             .status-key {
                 font-weight: 600;
-                color: #89ddff;
+                color: var(--text-secondary);
             }
 
             .status-pill {
-                color: #c3e88d;
+                color: var(--accent-green, #57e389);
                 font-weight: 700;
+                font-family: var(--font-mono, monospace);
             }
 
             .status-text {
-                color: #eeffff;
+                color: var(--text-main);
             }
         }
     }
@@ -1129,15 +1324,6 @@ export class PlaygroundDemoComponent {
     .demo-actions {
         display: flex;
         justify-content: flex-end;
-
-        button {
-            padding: 8px 16px;
-            background: #292d3e;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            color: #eeffff;
-            cursor: pointer;
-        }
     }
 }`,
         spec: `import { describe, it, expect, beforeEach } from 'vitest';

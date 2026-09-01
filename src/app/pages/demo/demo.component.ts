@@ -15,6 +15,7 @@ import '@pages/http-sample/http-sample.component';
 import '@pages/notification-sample/notification-sample.component';
 import '@pages/modal-sample/modal-sample.component';
 import '@pages/router-sample/router-sample.component';
+import '@pages/empty-sample/empty-sample.component';
 import '@components/loader/loader.component';
 
 @Component({

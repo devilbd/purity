@@ -44,6 +44,8 @@ import '@pipes/transform-sample.pipe';
 import { MyTransformPipe } from '@pipes/transform-sample.pipe';
 import '@validators/forms-validation.validator';
 import { FormsValidationValidator } from '@validators/forms-validation.validator';
+import '@pages/empty-sample/empty-sample.component';
+import { EmptySampleComponent } from '@pages/empty-sample/empty-sample.component';
 
 const PLAYGROUND_HISTORY_STORAGE_KEY = 'PURITY_PLAYGROUND_HISTORY';
 
@@ -628,6 +630,7 @@ export class PlaygroundComponent {
             DatePipe,
             MyTransformPipe,
             FormsValidationValidator,
+            EmptySampleComponent,
         };
     }
 
