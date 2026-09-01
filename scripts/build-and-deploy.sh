@@ -35,12 +35,12 @@ cd "$ROOT_DIR"
 
 TOTAL_START=$(get_time_ms)
 
-echo -e "\n${BOLD}${BLUE}====================================================${NC}"
-echo -e "${BOLD}${BLUE}     ..::: Purity :::.. Build & Deployment Engine    ${NC}"
-echo -e "${BOLD}${BLUE}====================================================${NC}\n"
+echo -e "\n${BOLD}${BLUE}================================================================${NC}"
+echo -e "${BOLD}${BLUE}     ..::: Purity :::.. Build, Test & Deployment Pipeline       ${NC}"
+echo -e "${BOLD}${BLUE}================================================================${NC}\n"
 
 # Step 1: Type-checking and Production Build
-echo -e "${BOLD}${YELLOW}[1/3] Compiling TypeScript & Building Production Bundle...${NC}"
+echo -e "${BOLD}${YELLOW}[1/4] Compiling TypeScript & Building Production Bundle...${NC}"
 BUILD_START=$(get_time_ms)
 if command -v bun >/dev/null 2>&1; then
     bun run build:prod
@@ -51,8 +51,20 @@ BUILD_END=$(get_time_ms)
 BUILD_DURATION=$((BUILD_END - BUILD_START))
 echo -e "${GREEN}✓ Production build completed in $(format_duration $BUILD_DURATION)${NC}"
 
-# Step 2: Verification
-echo -e "\n${BOLD}${YELLOW}[2/3] Verifying Production Distribution Directory...${NC}"
+# Step 2: Automated Unit & Component Test Suite
+echo -e "\n${BOLD}${YELLOW}[2/4] Running Automated Test Suite (*.spec.ts, *.test.ts)...${NC}"
+TEST_START=$(get_time_ms)
+if [ -f "$ROOT_DIR/scripts/run-tests.sh" ]; then
+    bash "$ROOT_DIR/scripts/run-tests.sh"
+else
+    npx vitest run --reporter=verbose
+fi
+TEST_END=$(get_time_ms)
+TEST_DURATION=$((TEST_END - TEST_START))
+echo -e "${GREEN}✓ Test suite execution completed in $(format_duration $TEST_DURATION)${NC}"
+
+# Step 3: Verification
+echo -e "\n${BOLD}${YELLOW}[3/4] Verifying Production Distribution Directory...${NC}"
 VERIFY_START=$(get_time_ms)
 if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then
     echo -e "${RED}❌ Build verification failed: dist/index.html not found!${NC}"
@@ -63,8 +75,8 @@ VERIFY_END=$(get_time_ms)
 VERIFY_DURATION=$((VERIFY_END - VERIFY_START))
 echo -e "${GREEN}✓ Output verified in dist/ (Total size: ${DIST_SIZE}) in $(format_duration $VERIFY_DURATION)${NC}"
 
-# Step 3: Deployment to Firebase
-echo -e "\n${BOLD}${YELLOW}[3/3] Deploying to Firebase Hosting...${NC}"
+# Step 4: Deployment to Firebase
+echo -e "\n${BOLD}${YELLOW}[4/4] Deploying to Firebase Hosting...${NC}"
 DEPLOY_START=$(get_time_ms)
 if [ $# -gt 0 ]; then
     # Pass user-specified flags (e.g. --only hosting, --project custom-id, etc.)
@@ -79,13 +91,14 @@ echo -e "${GREEN}✓ Deployment completed in $(format_duration $DEPLOY_DURATION)
 TOTAL_END=$(get_time_ms)
 TOTAL_DURATION=$((TOTAL_END - TOTAL_START))
 
-echo -e "\n${BOLD}${GREEN}====================================================${NC}"
-echo -e "${BOLD}${GREEN}   ✓ Build and Deployment Completed Successfully!   ${NC}"
-echo -e "${BOLD}${GREEN}====================================================${NC}"
-echo -e "${BOLD}${CYAN}📊 Execution Summary:${NC}"
+echo -e "\n${BOLD}${GREEN}================================================================${NC}"
+echo -e "${BOLD}${GREEN}   ✓ Build, Test & Deployment Pipeline Completed Successfully!  ${NC}"
+echo -e "${BOLD}${GREEN}================================================================${NC}"
+echo -e "${BOLD}${CYAN}📊 Pipeline Execution Summary:${NC}"
 echo -e "   • Production Build:  ${BOLD}$(format_duration $BUILD_DURATION)${NC}"
+echo -e "   • Test Suite:        ${BOLD}$(format_duration $TEST_DURATION)${NC}"
 echo -e "   • Verification:      ${BOLD}$(format_duration $VERIFY_DURATION)${NC}"
 echo -e "   • Firebase Deploy:   ${BOLD}$(format_duration $DEPLOY_DURATION)${NC}"
 echo -e "   ────────────────────────────────────────────────"
 echo -e "   ⏱️  ${BOLD}${YELLOW}Total Time Elapsed: $(format_duration $TOTAL_DURATION)${NC}"
-echo -e "${BOLD}${GREEN}====================================================${NC}\n"
+echo -e "${BOLD}${GREEN}================================================================${NC}\n"
