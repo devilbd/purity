@@ -115,7 +115,9 @@ purity/
             ├── behaviors/       # Composable DOM behaviors
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
             │   └── droppable/   # Drop target registration & hover/drop detection
-            ├── directives/      # Reusable DOM directives (e.g. dropdown, highlight)
+            ├── directives/      # Reusable DOM directives
+            │   ├── dropdown/    # <dropdown> / [dropdown] glassmorphic overlay menu directive
+            │   └── highlight/   # [highlight] reactive DOM highlight directive
             ├── interceptors/    # Centralized HTTP interceptor classes (@interceptors/*)
             │   ├── auth.interceptor.ts    # Centralized Bearer token auth interceptor
             │   └── logging.interceptor.ts # Centralized latency & status logging interceptor
@@ -168,6 +170,12 @@ Purity features a synchronous reactive primitives engine:
       console.log(`Current count: ${count()}, total: ${total()}`);
   });
   ```
+
+* **How Fine-Grained Reactive Dependency Tracking Works Under the Hood**:
+  - **Execution Context Stack (`context: Function[]`)**: Maintains a stack of currently running computations.
+  - **Subscription on Read**: When a signal getter is invoked (`count()`), it checks `context[context.length - 1]`. If an effect is running, that effect function is added to the signal's internal `subscriptions: Set<Function>`.
+  - **Synchronous Notification on Write**: When `.set()` or `.update()` is invoked, `Object.is()` prevents no-op runs, and every registered subscriber function executes immediately.
+  - **Atomic DOM Node Mutations**: During `bindTemplate()`, interpolations (`{{ expr }}`), dynamic attributes, structural conditionals (`if`), and loops (`for`) are wrapped in isolated, targeted `effect()` closures. When a signal updates, only the exact `Text` node `.nodeValue` or target DOM element is touched—with zero Virtual DOM diffing and zero component-level re-rendering.
 
 ### 2. Web Component Model (`component.ts`)
 
@@ -735,7 +743,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    ```typescript
    import '@pages/custom/custom.component';
    import '@pages/http-sample/http-sample.component';
-   import '@directives/highlight.directive';
+   import '@directives/highlight/highlight.directive';
    import '@pipes/transform-sample.pipe';
    import '@validators/forms-validation.validator';
    ```

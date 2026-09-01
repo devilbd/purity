@@ -143,7 +143,7 @@ purity/
         ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
-            ├── directives/      # Reusable DOM directives (e.g. dropdown, highlight)
+            ├── directives/      # Reusable DOM directives (dropdown, highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
             ├── widgets/         # Rich standalone widgets (analogue-clock)
@@ -182,6 +182,27 @@ effect(() => {
     console.log(`Calculated total: ${total()} | Is Even: ${isEven()}`);
 });
 ```
+
+#### 🔍 How Fine-Grained Reactive Dependency Tracking Works Under the Hood
+
+Purity operates **without a Virtual DOM** and **without component-wide re-renders**. Updates are handled with sub-microsecond precision through synchronous dependency tracking:
+
+1. **Global Execution Context Stack (`context: Function[]`)**:
+   The framework maintains a private stack of currently executing reactive computations (`effect` or `computed`).
+
+2. **Automatic Subscription on Read**:
+   When a signal getter is evaluated (e.g., `count()`), it inspects the top of the execution stack. If an effect is running, that effect's runner function is automatically registered into the signal's private `subscriptions: Set<Function>`.
+
+3. **Synchronous Notification on Write**:
+   When `.set(newValue)` or `.update(fn)` is called:
+   - It performs an `Object.is(oldValue, newValue)` equality check to eliminate redundant updates.
+   - It updates the internal value and synchronously executes each function in its `subscriptions` Set.
+
+4. **Atomic DOM Node Updates**:
+   During template compilation (`bindTemplate`), Purity compiles reactive expressions into isolated `effect()` closures targeted at specific DOM nodes:
+   - **Text Nodes (`{{ count() }}`)**: Purity isolates dynamic Handlebars interpolations into dedicated native `Text` nodes. When `count.set()` runs, only that single `Text.nodeValue` changes in the DOM. Surrounding HTML elements and parent components are never re-evaluated.
+   - **Dynamic Attributes (`class="{{ status() }}"`, `disabled="{{ isDisabled() }}"`)**: Only the specific attribute on that HTML element is updated.
+   - **Structural Directives (`if="expr"`, `for="let item of items"`)**: Targeted effects mount, unmount, or repeat only the affected DOM slice via comment anchors and `DocumentFragment` insertion.
 
 ---
 
@@ -1156,7 +1177,7 @@ bootstrapApplication(RootComponent, options)
    import '@pages/custom/custom.component';
    import '@pages/http-sample/http-sample.component';
    import '@widgets/analogue-clock/analogue-clock.component';
-   import '@directives/highlight.directive';
+   import '@directives/highlight/highlight.directive';
    import '@pipes/transform-sample.pipe';
    import '@validators/forms-validation.validator';
    ```

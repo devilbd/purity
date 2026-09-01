@@ -1,5 +1,5 @@
 import { Component, signal } from '@purity/core';
-import '@directives/highlight.directive';
+import '@directives/highlight/highlight.directive';
 import './directive-sample.component.scss';
 
 @Component({

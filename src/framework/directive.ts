@@ -76,6 +76,16 @@ export abstract class BaseDirective implements DirectiveLifecycle {
     value?: any;
     context?: any;
 
+    constructor(element?: HTMLElement, value?: any, context?: any) {
+        if (element) this.element = element;
+        if (value !== undefined) this.value = value;
+        if (context !== undefined) this.context = context;
+    }
+
+    destroy(): void {
+        this.onDestroy?.();
+    }
+
     onInit?(): void;
     onChanges?(value: any, oldValue?: any): void;
     onDOMChange?(record: MutationRecord | Event): void;

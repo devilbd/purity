@@ -15,8 +15,9 @@ export class HighlightDirective extends BaseDirective {
     }
 
     onDOMChange(recordOrEvent: MutationRecord | Event) {
-        if (recordOrEvent instanceof MutationRecord) {
-            if (recordOrEvent.attributeName === 'highlight' || recordOrEvent.attributeName === '[highlight]') {
+        if ('attributeName' in recordOrEvent || (typeof MutationRecord !== 'undefined' && recordOrEvent instanceof MutationRecord)) {
+            const attrName = (recordOrEvent as any).attributeName;
+            if (attrName === 'highlight' || attrName === '[highlight]') {
                 const newColor = this.element.getAttribute('highlight') || this.element.getAttribute('[highlight]');
                 if (newColor && newColor !== this.value) {
                     this.onChanges(newColor);

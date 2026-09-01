@@ -27,10 +27,10 @@ import '@widgets/analogue-clock/analogue-clock.component';
 import { AnalogueClockComponent } from '@widgets/analogue-clock/analogue-clock.component';
 
 // Directives, Pipes & Validators
-import '@directives/highlight.directive';
-import { HighlightDirective } from '@directives/highlight.directive';
-import '@directives/dropdown.directive';
-import { DropdownDirective } from '@directives/dropdown.directive';
+import '@directives/highlight/highlight.directive';
+import { HighlightDirective } from '@directives/highlight/highlight.directive';
+import '@directives/dropdown/dropdown.directive';
+import { DropdownDirective } from '@directives/dropdown/dropdown.directive';
 import '@pipes/uppercase.pipe';
 import { UppercasePipe } from '@pipes/uppercase.pipe';
 import '@pipes/date.pipe';
