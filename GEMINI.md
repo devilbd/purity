@@ -108,6 +108,7 @@ purity/
         │   ├── notification-sample/ # <notification-sample> interactive showcase for toast notifications & positions
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
         │   ├── playground/      # <playground-view> in-browser live editor, test runner, compiler & localStorage history (GNOME 50 / Palenight)
+        │   ├── popover-sample/  # <popover-sample> anchored popover showcase with directional collision detection
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
         │   ├── router-sample/   # <router-sample> interactive router showcase with <router-layout> and signal inspector
         │   └── virtual-for-sample/ # <virtual-for-sample> high-performance 100k virtual scroll repeater showcase
@@ -131,6 +132,7 @@ purity/
                 ├── modal/       # <modal-view> dialog component with open/close/maximize & z-index: 1000
                 ├── navigation-menu/ # <navigation-menu> draggable floating radial navigation menu
                 ├── notification/ # <notification-component> multi-position reactive toast notifications
+                ├── popover/     # <popover> / <popover-component> anchored popover with viewport collision auto-flipping
                 └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
 ```
 

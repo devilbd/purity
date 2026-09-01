@@ -1,0 +1,109 @@
+@use '@styles' as *;
+
+:host {
+    display: none;
+}
+
+.purity-popover-portal {
+    position: fixed;
+    z-index: 1050;
+    top: -9999px;
+    left: -9999px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--transition-fast, 0.18s) cubic-bezier(0.25, 0.8, 0.25, 1),
+                transform var(--transition-fast, 0.18s) cubic-bezier(0.25, 0.8, 0.25, 1),
+                visibility var(--transition-fast, 0.18s);
+    transform: scale(0.96);
+    box-sizing: border-box;
+
+    &.is-open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: scale(1);
+    }
+
+    .popover-surface {
+        position: relative;
+        background: var(--gnome-surface);
+        border: 1px solid var(--gnome-border);
+        border-radius: var(--radius-card, 12px);
+        backdrop-filter: var(--blur-effect);
+        -webkit-backdrop-filter: var(--blur-effect);
+        box-shadow: var(--shadow-popup);
+        padding: 14px 18px;
+        color: var(--text-main);
+        min-width: 140px;
+        max-width: 320px;
+        font-size: 13.5px;
+        line-height: 1.45;
+        box-sizing: border-box;
+
+        h1, h2, h3, h4, h5, h6 {
+            margin: 0 0 6px 0;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 12.5px;
+        }
+    }
+
+    .popover-arrow {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: var(--gnome-surface);
+        border: 1px solid var(--gnome-border);
+        transform: rotate(45deg);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    /* Directional arrow positioning */
+    &.pos-top {
+        .popover-arrow {
+            bottom: -5px;
+            left: 50%;
+            margin-left: -5px;
+            border-top: none;
+            border-left: none;
+        }
+    }
+
+    &.pos-bottom {
+        .popover-arrow {
+            top: -5px;
+            left: 50%;
+            margin-left: -5px;
+            border-bottom: none;
+            border-right: none;
+        }
+    }
+
+    &.pos-left {
+        .popover-arrow {
+            right: -5px;
+            top: 50%;
+            margin-top: -5px;
+            border-left: none;
+            border-bottom: none;
+        }
+    }
+
+    &.pos-right {
+        .popover-arrow {
+            left: -5px;
+            top: 50%;
+            margin-top: -5px;
+            border-right: none;
+            border-top: none;
+        }
+    }
+}

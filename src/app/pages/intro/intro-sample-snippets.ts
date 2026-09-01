@@ -2333,6 +2333,155 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+
+    // 28. Popover Floating Overlays & Anchoring
+    popover: {
+        id: 'popover',
+        title: '💬 Popover Component & Viewport Collision Detection',
+        ts: `import { Component, signal, ViewChild } from '@purity/core';
+import '@components/popover/popover.component';
+import type { PopoverComponent } from '@components/popover/popover.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#manualPopover')
+    private manualPopover?: PopoverComponent | null;
+
+    triggerCount = signal<number>(0);
+
+    openManual() {
+        this.manualPopover?.open('#manual-anchor');
+        this.triggerCount.update(c => c + 1);
+    }
+
+    closeManual() {
+        this.manualPopover?.close();
+    }
+
+    toggleManual() {
+        this.manualPopover?.toggle('#manual-anchor');
+        this.triggerCount.update(c => c + 1);
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>💬 Popover Component &amp; Anchoring</h3>
+    <p>Hover triggers and programmatic controls with boundary collision flipping.</p>
+
+    <!-- Directional Hover Grid -->
+    <div class="directional-grid">
+        <div id="intro-popover-top" class="target-box">
+            <span>⬆️ Top Target</span>
+        </div>
+        <div id="intro-popover-right" class="target-box">
+            <span>➡️ Right Target</span>
+        </div>
+        <div id="dom-with-popover" class="target-box">
+            <span>⬇️ Bottom Target</span>
+        </div>
+        <div id="intro-popover-left" class="target-box">
+            <span>⬅️ Left Target</span>
+        </div>
+    </div>
+
+    <!-- Programmatic Controls -->
+    <div class="actions-row">
+        <div id="manual-anchor" class="manual-target">
+            <span>🎯 Target Anchor</span>
+        </div>
+        <button type="button" class="button-primary" onclick="openManual()">Open Popover</button>
+        <button type="button" class="button-secondary" onclick="toggleManual()">Toggle Popover</button>
+        <button type="button" class="button-secondary" onclick="closeManual()">Close</button>
+    </div>
+
+    <!-- Popover Declarations -->
+    <popover target-for="'#intro-popover-top'" position="top">
+        <h4>Top Popover</h4>
+        <p>Positioned on top with boundary checking.</p>
+    </popover>
+
+    <popover target-for="'#dom-with-popover'" position="bottom">
+        <h4>Bottom Popover</h4>
+        <div>I am popover body with rich content.</div>
+    </popover>
+
+    <popover target-for="'#intro-popover-left'" position="left">
+        <h4>Left Popover</h4>
+        <p>Positioned on left edge.</p>
+    </popover>
+
+    <popover target-for="'#intro-popover-right'" position="right">
+        <h4>Right Popover</h4>
+        <p>Positioned on right edge.</p>
+    </popover>
+
+    <popover id="manualPopover" target-for="'#manual-anchor'" position="bottom">
+        <h4>⚡ Programmatic Popover</h4>
+        <p>Triggered via @ViewChild method call.</p>
+    </popover>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0; font-size: 13px; color: var(--text-secondary); }
+
+    .directional-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+
+        .target-box {
+            padding: 14px 10px;
+            background: var(--gnome-card);
+            border: 1px dashed var(--accent);
+            border-radius: var(--radius-control, 8px);
+            text-align: center;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: var(--cursor-pointer);
+            transition: all var(--transition-fast, 0.18s) ease;
+
+            &:hover {
+                background: var(--accent-subtle);
+                border-style: solid;
+            }
+        }
+    }
+
+    .actions-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+
+        .manual-target {
+            padding: 8px 14px;
+            background: var(--accent-subtle);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-control, 8px);
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+    }
+}`,
+    },
 };
 
 export function getIntroSampleSnippet(sampleId: string): IntroSampleSnippet | null {

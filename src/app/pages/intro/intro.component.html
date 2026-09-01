@@ -1165,6 +1165,45 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
     }
 }</code></pre>
         </div>
+        <!-- 28. Popover Component & Anchored Overlays -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>28. 💬 Popover Component (<code>&lt;popover&gt;</code> / <code>PopoverComponent</code>)</h4>
+                    <p>Declarative and programmatic popovers anchored to DOM selectors with viewport boundary collision detection, directional arrows, and <code>&lt;slot&gt;</code> content projection:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('popover')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. HTML Template: Anchored popover with target selector &amp; slot content --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">id</span>=<span class="str">"dom-with-popover"</span> <span class="attr">class</span>=<span class="str">"target-box"</span><span class="tag">&gt;</span>I have popover<span class="tag">&lt;/div&gt;</span>
+
+<span class="tag">&lt;popover</span> <span class="attr">target-for</span>=<span class="str">"'#dom-with-popover'"</span> <span class="attr">position</span>=<span class="str">"bottom"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h3&gt;</span>I am popover<span class="tag">&lt;/h3&gt;</span>
+    <span class="tag">&lt;div&gt;</span>Popover body content projected via slot.<span class="tag">&lt;/div&gt;</span>
+<span class="tag">&lt;/popover&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: Programmatic Control via @ViewChild --&gt;</span>
+<span class="dec">@Component</span>({ selector: <span class="str">'my-view'</span>, templateUrl: <span class="str">'./my-view.html'</span> })
+<span class="kw">export class</span> <span class="typ">MyViewComponent</span> {
+    <span class="dec">@ViewChild</span>()
+    <span class="kw">private</span> popover?: <span class="typ">PopoverComponent</span> | <span class="kw">null</span>;
+
+    <span class="fn">openPopover</span>() {
+        <span class="kw">this</span>.popover?.<span class="fn">open</span>(<span class="str">'#dom-with-popover'</span>);
+    }
+
+    <span class="fn">closePopover</span>() {
+        <span class="kw">this</span>.popover?.<span class="fn">close</span>();
+    }
+}</code></pre>
+        </div>
     </div>
 
     <!-- Bottom CTA Button -->

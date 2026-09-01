@@ -1361,4 +1361,249 @@ describe('Dropdown Directive Demo Spec', () => {
     });
 });`,
     },
+    {
+        id: 'popover',
+        name: '💬 Interactive Popover & Anchoring',
+        description: 'Floating popover anchored to DOM targets with viewport collision detection.',
+        ts: `import { Component, signal, ViewChild } from '@purity/core';
+import '@components/popover/popover.component';
+import type { PopoverComponent } from '@components/popover/popover.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#manualPopover')
+    private manualPopover?: PopoverComponent | null;
+
+    triggerCount = signal(0);
+    currentPosition = signal<'top' | 'bottom' | 'left' | 'right'>('bottom');
+
+    openManual() {
+        this.manualPopover?.open('#manual-anchor');
+        this.triggerCount.update(c => c + 1);
+    }
+
+    closeManual() {
+        this.manualPopover?.close();
+    }
+
+    toggleManual() {
+        this.manualPopover?.toggle('#manual-anchor');
+        this.triggerCount.update(c => c + 1);
+    }
+
+    setPosition(pos: 'top' | 'bottom' | 'left' | 'right') {
+        this.currentPosition.set(pos);
+        this.manualPopover?.setPosition(pos);
+    }
+}`,
+        html: `<div class="popover-playground window">
+    <div class="header">
+        <span class="badge">💬 Floating Popovers</span>
+        <h2>Popover Anchoring &amp; Collisions</h2>
+        <p>Hover triggers and programmatic controls with automatic boundary flipping.</p>
+    </div>
+
+    <!-- Directional Hover Triggers -->
+    <div class="section">
+        <label class="label">Directional Hover Targets:</label>
+        <div class="grid">
+            <div id="demo-target-top" class="target-box">
+                <span>⬆️ Hover Top</span>
+            </div>
+            <div id="demo-target-right" class="target-box">
+                <span>➡️ Hover Right</span>
+            </div>
+            <div id="dom-with-popover" class="target-box">
+                <span>⬇️ Hover Bottom</span>
+            </div>
+            <div id="demo-target-left" class="target-box">
+                <span>⬅️ Hover Left</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programmatic Controls -->
+    <div class="section">
+        <label class="label">Programmatic Control via @ViewChild:</label>
+        <div class="control-row">
+            <div id="manual-anchor" class="anchor-badge">
+                <span>🎯 Anchor Target</span>
+            </div>
+            <div class="actions">
+                <button type="button" class="button-primary" onclick="openManual()">Open</button>
+                <button type="button" class="button-secondary" onclick="toggleManual()">Toggle</button>
+                <button type="button" class="button-secondary" onclick="closeManual()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popover Declarations -->
+    <popover target-for="'#demo-target-top'" position="top">
+        <h3>Top Popover</h3>
+        <p>Anchored to top with boundary checks.</p>
+    </popover>
+
+    <popover target-for="'#dom-with-popover'" position="bottom">
+        <h3>Bottom Popover</h3>
+        <div>I am popover body with rich content.</div>
+    </popover>
+
+    <popover target-for="'#demo-target-left'" position="left">
+        <h3>Left Popover</h3>
+        <p>Anchored to left with GNOME 50 glassmorphism.</p>
+    </popover>
+
+    <popover target-for="'#demo-target-right'" position="right">
+        <h3>Right Popover</h3>
+        <p>Anchored to right with automatic clamping.</p>
+    </popover>
+
+    <popover id="manualPopover" target-for="'#manual-anchor'" position="bottom">
+        <h3>⚡ Programmatic Popover</h3>
+        <p>Opened and closed via component methods.</p>
+    </popover>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.popover-playground {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 24px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    box-shadow: var(--shadow-popup);
+    max-width: 540px;
+    margin: 0 auto;
+    color: var(--text-main);
+
+    .header {
+        .badge {
+            display: inline-flex;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill, 999px);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            margin: 0 0 4px 0;
+            font-size: 1.3rem;
+            color: var(--text-main);
+        }
+
+        p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+    }
+
+    .section {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 14px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+
+        .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+
+            .target-box {
+                padding: 14px;
+                background: rgba(0, 0, 0, 0.15);
+                border: 1px dashed var(--accent);
+                border-radius: var(--radius-control, 8px);
+                text-align: center;
+                cursor: var(--cursor-pointer);
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-main);
+                transition: all var(--transition-fast, 0.18s) ease;
+
+                &:hover {
+                    background: var(--accent-subtle);
+                    border-style: solid;
+                }
+            }
+        }
+
+        .control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+
+            .anchor-badge {
+                padding: 8px 14px;
+                background: var(--accent-subtle);
+                border: 1px solid var(--accent);
+                border-radius: var(--radius-control, 8px);
+                font-size: 12.5px;
+                color: var(--accent);
+                font-weight: 600;
+            }
+
+            .actions {
+                display: flex;
+                gap: 6px;
+            }
+        }
+    }
+}`,
+        spec: `import { describe, it, expect, beforeEach } from 'vitest';
+
+describe('Popover Component Spec', () => {
+    let component: PlaygroundDemoComponent;
+
+    beforeEach(() => {
+        component = new PlaygroundDemoComponent();
+    });
+
+    it('should initialize trigger count to 0 and position to bottom', () => {
+        expect(component.triggerCount()).toBe(0);
+        expect(component.currentPosition()).toBe('bottom');
+    });
+
+    it('should update state on manual open and toggle', () => {
+        component.openManual();
+        expect(component.triggerCount()).toBe(1);
+
+        component.toggleManual();
+        expect(component.triggerCount()).toBe(2);
+
+        component.closeManual();
+    });
+
+    it('should update position setting', () => {
+        component.setPosition('top');
+        expect(component.currentPosition()).toBe('top');
+
+        component.setPosition('right');
+        expect(component.currentPosition()).toBe('right');
+    });
+});`,
+    },
 ];

@@ -74,6 +74,7 @@ export class NavigationMenuComponent {
                 children: [
                     { name: 'Date Time Picker', image: '📅', data: { hash: '#date-time-picker-sample' } },
                     { name: 'Modal Dialog', image: '🪟', data: { hash: '#modal-sample' } },
+                    { name: 'Popover Anchoring', image: '💬', data: { hash: '#popover-sample' } },
                     { name: 'Toast Notify', image: '🔔', data: { hash: '#notification-sample' } },
                     { name: 'Radial Menu', image: '🔘', data: { hash: '#radial-context-menu-sample' } },
                     { name: 'Async Loader', image: '⏳', data: { hash: '#app-loader' } },

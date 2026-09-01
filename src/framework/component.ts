@@ -1073,9 +1073,15 @@ function applyViewChild(target: any, propertyKey: string, explicitSelector?: str
 export const ChildView = ViewChild;
 
 export const defineComponent = (name: string, component: any) => {
-    if (!customElements.get(name)) {
-        customElements.define(name, component);
+    if (typeof customElements === 'undefined') return;
+    const validName = name.includes('-') ? name : `${name}-component`;
+    if (!customElements.get(validName)) {
+        try {
+            customElements.define(validName, component);
+        } catch (err) {
+            console.error(`Failed to define custom element ${validName}:`, err);
+        }
     } else {
-        console.error(`Component ${name} is already defined`);
+        console.error(`Component ${validName} is already defined`);
     }
 };

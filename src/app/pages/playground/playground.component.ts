@@ -26,6 +26,8 @@ import '@components/date-time-picker/date-time-picker.component';
 import { DateTimePickerComponent } from '@components/date-time-picker/date-time-picker.component';
 import '@components/radial-context-menu/radial-context-menu.component';
 import { RadialContextMenuComponent } from '@components/radial-context-menu/radial-context-menu.component';
+import '@components/popover/popover.component';
+import { PopoverComponent } from '@components/popover/popover.component';
 
 // Standalone Widgets
 import '@widgets/analogue-clock/analogue-clock.component';
@@ -694,6 +696,7 @@ export class PlaygroundComponent {
             MyTransformPipe,
             FormsValidationValidator,
             EmptySampleComponent,
+            PopoverComponent,
         };
     }
 

@@ -1,0 +1,98 @@
+<div class="popover-sample-root window">
+    <div class="sample-header">
+        <span class="sample-badge">💬 Anchored Floating Overlays</span>
+        <h3>Popover Component (&lt;popover&gt;)</h3>
+        <p class="sample-description">
+            Declarative and programmatic popovers anchored to DOM selectors with viewport boundary collision detection, directional arrows, and <code>&lt;slot&gt;</code> content projection.
+        </p>
+    </div>
+
+    <!-- Directional Hover Grid -->
+    <div class="sample-section">
+        <div class="section-title">
+            <strong>1. Directional Hover Triggers:</strong>
+        </div>
+
+        <div class="directional-grid">
+            <div class="target-card" id="popover-target-top">
+                <span class="target-icon">⬆️</span>
+                <strong>Top Anchored</strong>
+                <p>Hover me for Top popover</p>
+            </div>
+
+            <div class="target-card" id="popover-target-right">
+                <span class="target-icon">➡️</span>
+                <strong>Right Anchored</strong>
+                <p>Hover me for Right popover</p>
+            </div>
+
+            <div class="target-card" id="dom-with-popover">
+                <span class="target-icon">⬇️</span>
+                <strong>Bottom Anchored</strong>
+                <p>Hover me for Bottom popover</p>
+            </div>
+
+            <div class="target-card" id="popover-target-left">
+                <span class="target-icon">⬅️</span>
+                <strong>Left Anchored</strong>
+                <p>Hover me for Left popover</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programmatic Controls & ViewChild Anchor -->
+    <div class="sample-section">
+        <div class="section-title">
+            <strong>2. Programmatic Controls via @ViewChild:</strong>
+        </div>
+
+        <div class="manual-anchor-row">
+            <div id="manual-anchor-target" class="manual-target">
+                <span>🎯 Target DOM Anchor: <code>#manual-anchor-target</code></span>
+            </div>
+
+            <div class="button-group">
+                <button type="button" class="button-primary" onclick="openProgrammatic()">
+                    ▶ Open Popover
+                </button>
+                <button type="button" class="button-secondary" onclick="toggleProgrammatic()">
+                    🔄 Toggle Popover
+                </button>
+                <button type="button" class="button-secondary" onclick="closeProgrammatic()">
+                    ✕ Close Popover
+                </button>
+            </div>
+        </div>
+
+        <div class="status-readout">
+            <span class="status-label">Telemetry:</span>
+            <span class="status-val">{{lastActionLog()}} (Actions: {{popoverTriggerCount()}})</span>
+        </div>
+    </div>
+
+    <!-- Popover Custom Element Declarations -->
+    <popover target-for="'#popover-target-top'" position="top">
+        <h4>⬆️ Top Popover</h4>
+        <p>Anchored to the top of the element with collision flipping.</p>
+    </popover>
+
+    <popover target-for="'#dom-with-popover'" position="bottom">
+        <h4>⬇️ Bottom Popover</h4>
+        <div>I am popover body with rich content projected via slot.</div>
+    </popover>
+
+    <popover target-for="'#popover-target-left'" position="left">
+        <h4>⬅️ Left Popover</h4>
+        <p>Positioned to the left edge with automatic boundary clamping.</p>
+    </popover>
+
+    <popover target-for="'#popover-target-right'" position="right">
+        <h4>➡️ Right Popover</h4>
+        <p>Positioned to the right edge with GNOME 50 glassmorphic blur.</p>
+    </popover>
+
+    <popover id="programmaticPopover" target-for="'#manual-anchor-target'" position="bottom">
+        <h4>⚡ Programmatic Control</h4>
+        <p>Triggered directly through <code>@ViewChild()</code> method execution.</p>
+    </popover>
+</div>

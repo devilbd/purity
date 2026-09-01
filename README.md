@@ -39,6 +39,7 @@
 - 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
 - 🖱️ **KDE Plasma Breeze Cursor System**: Complete cursor hierarchy using vector SVG cursors from KDE Plasma (`breeze_cursors`), including a 23-frame animated progress spinner cursor (`var(--cursor-progress)`) automatically synchronized with HTTP requests and reactive UI loaders.
 - 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 💬 **Popover & Anchored Tooltips (`<popover>`)**: Anchored popover system with position attributes (`top`, `bottom`, `left`, `right`), smart viewport boundary collision detection with auto-flipping and coordinate clamping, directional specular arrows, hover `mouseenter`/`mouseleave` interaction with smooth debounced transition, programmatic `@ViewChild()` controls (`open()`, `close()`, `toggle()`), `<slot>` content projection, and GNOME 50 translucent glassmorphism.
 - 🔽 **Declarative Custom Dropdowns (`<dropdown>`)**: Native dropdown directive and component engine with inline consumer template projection (`<ul>`, `<li>`), parent component event scoping (`onclick`), fixed dynamic positioning, `document.body` teleportation at `z-index: 10000`, and GNOME 50 frosted glassmorphism.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
 - ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
@@ -140,14 +141,14 @@ purity/
         │   ├── cursors/         # Scalable vector cursor assets (91 SVGs)
         │   ├── mono/            # Adwaita Mono font
         │   └── radial-context-menu/ # Radial menu icon SVGs
-        ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
+        ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, popover-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (dropdown, highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
             ├── widgets/         # Rich standalone widgets (analogue-clock)
-            └── components/      # Reusable UI Web Components (modal, loader, notification, date-time-picker, radial-context-menu, navigation-menu)
+            └── components/      # Reusable UI Web Components (modal, loader, notification, popover, date-time-picker, radial-context-menu, navigation-menu)
 ```
 
 ---
@@ -1029,6 +1030,54 @@ export class DashboardViewComponent {
         this.clock?.smoothSeconds.set(true);
         this.clock?.showNumbers.set(true);
         this.clock?.showDateBadge.set(true);
+    }
+```
+
+---
+
+### 24. 💬 Popover Component (`<popover>`, `PopoverComponent`)
+
+Purity includes a native, anchored Popover component with smart viewport boundary collision detection, directional arrows, `<slot>` content projection, and programmatic control via `@ViewChild`:
+
+* **Target Anchoring**: Binds to any DOM element via the `target-for` attribute (`target-for="'#my-target'"` or `target-for="#my-target"`).
+* **Directional Placement**: Supports `position="top" | "bottom" | "left" | "right"` (defaults to `'bottom'`).
+* **Viewport Boundary Collision Detection & Auto-Flipping**: Automatically measures target and popover bounding client rects. If the popover would exceed the viewport edge, it automatically flips between `bottom` ↔ `top` or `left` ↔ `right` and clamps within safe viewport margins.
+* **Directional Specular Arrow**: Renders a 45° specular arrow indicator matching the effective applied direction.
+* **Mouse Hover Interaction**: Automatically displays on target `mouseenter` and smoothly hides on `mouseleave` with a short debounced close timer allowing pointer movement onto the popover surface.
+* **Direct Body Portal Attachment**: Teleports floating overlays to `document.body` at `z-index: 1050` to prevent parent `overflow: hidden` clipping.
+* **Programmatic API via `@ViewChild`**: Provides `open()`, `close()`, `toggle()`, `setPosition()`, and `setTargetFor()` methods.
+
+#### Basic Usage Example:
+
+```html
+<!-- 1. HTML Template: Anchored Popover with Slot Content -->
+<div id="dom-with-popover" class="target-card">
+    <span>Hover me for popover</span>
+</div>
+
+<popover target-for="'#dom-with-popover'" position="bottom">
+    <h3>I am popover</h3>
+    <div>Popover body content projected via slot.</div>
+</popover>
+```
+
+```typescript
+// 2. Component Class: Programmatic Control via @ViewChild
+import { Component, ViewChild } from '@purity/core';
+import '@components/popover/popover.component';
+import type { PopoverComponent } from '@components/popover/popover.component';
+
+@Component({ selector: 'my-view', templateUrl: './my-view.html' })
+export class MyViewComponent {
+    @ViewChild()
+    private popover?: PopoverComponent | null;
+
+    openPopover() {
+        this.popover?.open('#dom-with-popover');
+    }
+
+    closePopover() {
+        this.popover?.close();
     }
 }
 ```
