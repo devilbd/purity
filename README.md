@@ -69,6 +69,9 @@ npm install
 | `npm run build` | Runs TypeScript type checks (`tsc`) and builds the production bundle with Vite |
 | `npm run build:dev` | Builds the application using development environment profile |
 | `npm run build:prod` | Builds the application using production environment profile |
+| `npm test` | Runs the full Vitest unit test suite (`vitest run`) |
+| `npm run test:watch` | Starts interactive Vitest watcher for active development |
+| `npm run test:detailed` | Executes `scripts/run-tests.sh` with test discovery and detailed telemetry |
 | `npm run preview` | Serves the production build locally for testing |
 | `npm run build:deploy` / `npm run deploy` | Runs `scripts/build-and-deploy.sh` to compile, verify, and deploy to Firebase |
 | `npm run deploy:hosting` | Runs `scripts/build-and-deploy.sh --only hosting` |
@@ -85,10 +88,12 @@ purity/
 │   ├── robots.txt               # Search engine crawler directives & sitemap reference
 │   └── sitemap.xml              # XML sitemap conforming to sitemaps.org protocol
 ├── scripts/                     # Automation & deployment scripts
-│   └── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
+│   ├── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
+│   └── run-tests.sh             # High-resolution test discovery, telemetry & execution runner
 ├── index.html                   # HTML entry point mounting <app-component> with rich SEO & JSON-LD
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration
+├── vitest.config.ts             # Vitest configuration (happy-dom, decorator transpile, path aliases)
 ├── .env.example                 # Environment variables reference template
 ├── .antigravityrules            # Antigravity agent rules & architectural constraints
 ├── .cursorrules                 # Cursor agent rules & architectural constraints
@@ -1189,6 +1194,55 @@ bootstrapApplication(RootComponent, options)
 
 6. **Strict TypeScript**:
    - The project uses strict compiler options (`"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`).
+
+---
+
+## 🧪 Automated Testing Engine (Vitest & happy-dom)
+
+Purity includes a dedicated unit testing setup built on top of **Vitest** and **happy-dom**, providing native Custom Elements v1 simulation, synchronous signal evaluation, decorator transpilation, and template inlining:
+
+### Available Test Commands
+
+| Command | Purpose |
+|---|---|
+| `npm test` | Executes the full test suite once (`vitest run`) |
+| `npm run test:watch` | Starts Vitest in interactive watch mode for real-time TDD |
+| `npm run test:detailed` | Executes `scripts/run-tests.sh` with test discovery metrics, environment verification, and per-test execution telemetry |
+
+### Writing Component Tests
+
+Tests are colocated directly adjacent to source files using the `*.spec.ts` naming convention:
+
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { LoaderComponent } from './loader.component';
+
+describe('LoaderComponent', () => {
+    let element: HTMLElement;
+    let loader: LoaderComponent;
+
+    beforeEach(() => {
+        element = document.createElement('loader-component');
+        document.body.appendChild(element);
+        loader = element as unknown as LoaderComponent;
+    });
+
+    afterEach(() => {
+        element.remove();
+    });
+
+    it('should initialize with default values', () => {
+        expect(loader.isLoading()).toBe(false);
+        expect(loader.message()).toBe('Loading...');
+    });
+
+    it('should update reactive state on show()', () => {
+        loader.show('Fetching records...');
+        expect(loader.isLoading()).toBe(true);
+        expect(loader.message()).toBe('Fetching records...');
+    });
+});
+```
 
 ---
 

@@ -43,9 +43,16 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 
 ## 4. Testing Framework & Conventions
 
-- **Framework**: **Vitest**.
-- **Test Colocation**: `*.spec.ts` or `*.test.ts` placed adjacent to source files or in `__tests__/` directories.
-- **Coverage Focus**: Synchronous signal reactivity, custom element lifecycle, pipe transformations, validator logic, and HTTP interceptor pipelines.
+- **Framework**: **Vitest** paired with **happy-dom** (native Custom Elements v1 and DOM API simulation).
+- **Configuration & Runner**:
+  - `vitest.config.ts`: Integrates Vite decorator transpilation and template inlining (`?raw`).
+  - `scripts/run-tests.sh`: High-resolution test discovery, telemetry, and execution script.
+- **Commands**:
+  - `npm test`: Executes the test suite once (`vitest run`).
+  - `npm run test:watch`: Runs tests interactively in watch mode (`vitest`).
+  - `npm run test:detailed`: Runs `scripts/run-tests.sh` with discovery and detailed reporting.
+- **Test Colocation**: `*.spec.ts` or `*.test.ts` placed directly adjacent to source files.
+- **Coverage Focus**: Synchronous signal reactivity, custom element lifecycle (`connectedCallback`, `onInit`, `onDestroy`), slot content projection, pipe transformations, validator logic, and HTTP interceptor pipelines.
 
 ---
 

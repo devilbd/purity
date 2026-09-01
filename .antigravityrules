@@ -137,10 +137,15 @@ import '@validators/my-feature.validator';
 
 ## 4. Testing Framework & Conventions
 
-- **Testing Framework**: **Vitest** (Node / JSDOM / Happy-DOM environment).
-- **Test Placement**: Colocated alongside the source file or in a `__tests__/` directory adjacent to the unit under test:
-  - Example: `src/app/shared/pipes/__tests__/format-date.pipe.spec.ts`
-  - Example: `src/framework/__tests__/signal.spec.ts`
+- **Testing Framework**: **Vitest** with **happy-dom** (native Custom Elements v1 & DOM simulation).
+- **Configuration & Runner**:
+  - `vitest.config.ts`: Merges Vite configuration with happy-dom and decorator transpilation.
+  - `scripts/run-tests.sh`: High-resolution test discovery, per-test duration telemetry, and summary runner.
+- **Commands**:
+  - `npm test`: Runs the test suite once (`vitest run`).
+  - `npm run test:watch`: Runs tests interactively in watch mode (`vitest`).
+  - `npm run test:detailed`: Runs `scripts/run-tests.sh` with discovery and detailed reporting.
+- **Test Placement**: Colocated directly alongside the source file (e.g. `loader.component.spec.ts`).
 - **File Naming**: `*.spec.ts` or `*.test.ts`.
 - **Testing Guidelines**:
   - **Reactivity**: Test synchronous signal reads, `.set()`, `.update()`, computed derivations, and effect trigger tracking.

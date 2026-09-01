@@ -36,10 +36,12 @@ purity/
 │   ├── robots.txt               # Search engine crawler directives & sitemap reference
 │   └── sitemap.xml              # XML sitemap conforming to sitemaps.org protocol
 ├── scripts/                     # Automation & deployment scripts
-│   └── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
+│   ├── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
+│   └── run-tests.sh             # High-resolution test discovery, telemetry & execution runner
 ├── index.html                   # Application entry HTML mounting <app-component> with rich SEO & JSON-LD
 ├── package.json                 # Project dependencies, scripts (Vite + TypeScript + Sass)
 ├── tsconfig.json                # Strict TypeScript configuration
+├── vitest.config.ts             # Vitest configuration (happy-dom, decorator transpile, path aliases)
 ├── firebase.json                # Firebase Hosting configuration (public: dist, SPA rewrites)
 ├── .firebaserc                  # Firebase project ID mapping
 ├── .env.example                 # Environment variables reference template
@@ -817,6 +819,56 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
 | `npm run build` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
 | `npm run build:dev` | Runs TypeScript compiler (`tsc`) and Vite development bundle |
 | `npm run build:prod` | Runs TypeScript compiler (`tsc`) and Vite production bundle |
+| `npm test` | Runs all Vitest test suites (`vitest run`) |
+| `npm run test:watch` | Starts interactive Vitest watcher for active development |
+| `npm run test:detailed` | Executes `scripts/run-tests.sh` with discovery metrics and verbose telemetry |
 | `npm run preview` | Previews the production build locally |
 | `npm run build:deploy` / `npm run deploy` | Executes `scripts/build-and-deploy.sh` to compile, verify, and deploy to Firebase Hosting |
 | `npm run deploy:hosting` | Executes `scripts/build-and-deploy.sh --only hosting` |
+
+---
+
+## 🧪 Unit Testing Architecture (`vitest.config.ts`, `scripts/run-tests.sh`)
+
+Purity integrates **Vitest** with the **`happy-dom`** environment to test native Web Components (Custom Elements v1), synchronous reactive signals, Dependency Injection services, transform pipes, validators, and HTTP interceptor pipelines with zero build lag.
+
+### Configuration & Tooling
+- **`vitest.config.ts`**: Merges standard Vite configuration with `happy-dom` test environment, enabling Vite's `decoratorsPlugin` to transparently transpile class decorators (`@Component`, `@Injectable`, `@ViewChild`) and synchronously inline HTML templates via `?raw` imports.
+- **`scripts/run-tests.sh`**: High-resolution test runner featuring test suite discovery across `src/`, environment verification (Node.js, Vitest, DOM), per-test execution duration metrics, and ANSI-styled summary reporting.
+
+### Test Colocation Standard
+Unit tests are colocated adjacent to source files using `*.spec.ts` or `*.test.ts`:
+```
+src/app/shared/components/
+├── loader/
+│   ├── loader.component.ts
+│   ├── loader.component.html
+│   ├── loader.component.scss
+│   └── loader.component.spec.ts
+```
+
+### Component Testing Pattern
+```typescript
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { LoaderComponent } from './loader.component';
+
+describe('LoaderComponent', () => {
+    let element: HTMLElement;
+    let component: LoaderComponent;
+
+    beforeEach(() => {
+        element = document.createElement('loader-component');
+        document.body.appendChild(element);
+        component = element as unknown as LoaderComponent;
+    });
+
+    afterEach(() => {
+        element.remove();
+    });
+
+    it('should initialize with default states', () => {
+        expect(component.isLoading()).toBe(false);
+        expect(component.message()).toBe('Loading...');
+    });
+});
+```

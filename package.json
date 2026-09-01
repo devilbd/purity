@@ -9,15 +9,20 @@
     "build:dev": "tsc && vite build --mode development",
     "build:prod": "tsc && vite build --mode production",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:detailed": "bash scripts/run-tests.sh",
     "deploy": "bash scripts/build-and-deploy.sh",
     "deploy:hosting": "bash scripts/build-and-deploy.sh --only hosting",
     "build:deploy": "bash scripts/build-and-deploy.sh"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.6",
+    "happy-dom": "^20.12.0",
     "sass": "^1.103.1",
     "typescript": "^7.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "prismjs": "^1.30.0",

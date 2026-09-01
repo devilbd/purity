@@ -17,7 +17,12 @@ export class ThemeService {
     private applyInitialTheme(): void {
         if (typeof window === 'undefined') return;
 
-        const savedTheme = localStorage.getItem('purity-theme') as AppTheme | null;
+        let savedTheme: AppTheme | null = null;
+        try {
+            savedTheme = window.localStorage?.getItem('purity-theme') as AppTheme | null;
+        } catch {
+            // Ignore storage access errors
+        }
         const activeTheme: AppTheme = savedTheme === 'light' ? 'light' : 'dark';
         this.applyTheme(activeTheme, Boolean(savedTheme));
     }
@@ -43,7 +48,7 @@ export class ThemeService {
 
         if (persist) {
             try {
-                localStorage.setItem('purity-theme', theme);
+                window.localStorage?.setItem('purity-theme', theme);
             } catch {
                 // Ignore storage quota or security errors
             }
