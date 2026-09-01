@@ -29,8 +29,8 @@ dropdown,
         border-radius: var(--radius-control, 8px);
         border: 1px solid var(--gnome-border);
         background-color: var(--gnome-input);
-        backdrop-filter: var(--blur-subtle);
         -webkit-backdrop-filter: var(--blur-subtle);
+        backdrop-filter: var(--blur-subtle);
         color: var(--text-main);
         font-family: var(--font-main);
         font-size: var(--font-size-sm, 13.5px);
@@ -117,8 +117,8 @@ dropdown,
     box-sizing: border-box;
 
     background: var(--dropdown-bg, rgba(30, 30, 34, 0.96));
-    backdrop-filter: var(--blur-heavy);
     -webkit-backdrop-filter: var(--blur-heavy);
+    backdrop-filter: var(--blur-heavy);
     border: 1px solid var(--dropdown-border, var(--gnome-border));
     border-radius: var(--radius-card, 12px);
     box-shadow: var(--dropdown-shadow, var(--shadow-popup));

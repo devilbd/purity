@@ -15,8 +15,8 @@ date-time-picker, :host {
 /* 1. The Trigger Button (GNOME Input/Pill Button Style) */
 .picker-toggle {
     background: var(--gnome-input);
-    backdrop-filter: var(--blur-subtle);
     -webkit-backdrop-filter: var(--blur-subtle);
+    backdrop-filter: var(--blur-subtle);
     border: 1px solid var(--gnome-border);
     color: var(--dp-text-main, var(--text-main));
     padding: 8px 16px;
@@ -63,8 +63,8 @@ date-time-picker, :host {
     z-index: 9999;
     width: 290px;
     background: var(--dp-surface-bg);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     border: 1px solid var(--dp-border);
     border-radius: var(--radius-window);
     padding: 16px;
@@ -98,8 +98,8 @@ date-time-picker, :host {
 
     &.blur-enabled {
         background: var(--dp-surface-blur-bg) !important;
-        backdrop-filter: var(--blur-heavy) !important;
         -webkit-backdrop-filter: var(--blur-heavy) !important;
+        backdrop-filter: var(--blur-heavy) !important;
     }
 }
 
@@ -295,8 +295,8 @@ date-time-picker, :host {
     width: 100%;
     height: 100%;
     background: var(--gnome-surface);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     border-radius: var(--radius-control);
     padding: 8px 4px;
     box-sizing: border-box;
@@ -306,8 +306,8 @@ date-time-picker, :host {
 
     .blur-enabled & {
         background: var(--dp-surface-blur-bg) !important;
-        backdrop-filter: var(--blur-heavy) !important;
         -webkit-backdrop-filter: var(--blur-heavy) !important;
+        backdrop-filter: var(--blur-heavy) !important;
     }
 
     &.is-hidden {

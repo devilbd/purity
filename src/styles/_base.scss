@@ -177,8 +177,8 @@ body.http-loading,
     @extend .window-base;
 
     background: var(--gnome-surface);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
 
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window);
@@ -250,8 +250,8 @@ body.http-loading,
 .button-secondary {
     @extend .button-base;
     background-color: var(--gnome-card);
-    backdrop-filter: var(--blur-subtle);
     -webkit-backdrop-filter: var(--blur-subtle);
+    backdrop-filter: var(--blur-subtle);
     border: 1px solid var(--gnome-border);
     color: var(--text-main);
     font-family: var(--font-main);
@@ -353,8 +353,8 @@ body.http-loading,
     @extend .base-input;
 
     background-color: var(--gnome-input);
-    backdrop-filter: var(--blur-subtle);
     -webkit-backdrop-filter: var(--blur-subtle);
+    backdrop-filter: var(--blur-subtle);
 
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-control);
@@ -391,8 +391,8 @@ select,
     display: inline-flex;
     align-items: center;
     background-color: var(--gnome-input);
-    backdrop-filter: var(--blur-subtle);
     -webkit-backdrop-filter: var(--blur-subtle);
+    backdrop-filter: var(--blur-subtle);
 
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-control);

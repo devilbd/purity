@@ -4,8 +4,8 @@
 
 @mixin glass-surface($bg: var(--gnome-surface), $blur: var(--blur-effect), $border: var(--gnome-border)) {
     background: $bg;
-    backdrop-filter: $blur;
     -webkit-backdrop-filter: $blur;
+    backdrop-filter: $blur;
     border: 1px solid $border;
 }
 

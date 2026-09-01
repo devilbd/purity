@@ -30,8 +30,8 @@
         background: var(--popover-bg, var(--gnome-surface));
         border: 1px solid var(--popover-border, var(--gnome-border));
         border-radius: var(--radius-card, 12px);
-        backdrop-filter: var(--blur-effect);
         -webkit-backdrop-filter: var(--blur-effect);
+        backdrop-filter: var(--blur-effect);
         box-shadow: var(--popover-shadow, var(--shadow-popup));
         padding: 14px 18px;
         color: var(--text-main);

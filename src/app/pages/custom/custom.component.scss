@@ -6,8 +6,8 @@
     gap: 12px;
     padding: 20px;
     background: var(--gnome-surface);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
     box-shadow: var(--shadow-deep);

@@ -13,8 +13,8 @@ modal-view {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;

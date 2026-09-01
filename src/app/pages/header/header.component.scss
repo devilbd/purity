@@ -132,8 +132,8 @@
     padding: 6px 14px;
     border-radius: var(--radius-pill, 999px);
     background: var(--gnome-input, rgba(255, 255, 255, 0.08));
-    backdrop-filter: var(--blur-subtle);
     -webkit-backdrop-filter: var(--blur-subtle);
+    backdrop-filter: var(--blur-subtle);
     border: 1px solid var(--gnome-border);
     color: var(--text-main);
     cursor: var(--cursor-pointer);

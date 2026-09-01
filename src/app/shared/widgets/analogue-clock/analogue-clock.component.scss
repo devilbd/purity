@@ -18,8 +18,8 @@ analogue-clock {
     padding: 24px;
     border-radius: var(--radius-card);
     background: var(--gnome-surface);
-    backdrop-filter: var(--blur-window);
     -webkit-backdrop-filter: var(--blur-window);
+    backdrop-filter: var(--blur-window);
     border: 1px solid var(--gnome-border);
     box-shadow: var(--shadow-popup);
     transition: all var(--transition-normal) var(--ease-gnome);
@@ -90,8 +90,8 @@ analogue-clock {
         font-weight: 600;
         color: var(--accent);
         background: var(--accent-subtle);
-        backdrop-filter: var(--blur-subtle);
         -webkit-backdrop-filter: var(--blur-subtle);
+        backdrop-filter: var(--blur-subtle);
         padding: 4px 12px;
         border-radius: var(--radius-pill, 999px);
         border: 1px solid var(--accent-shadow);
@@ -242,8 +242,8 @@ analogue-clock {
             border-radius: var(--radius-control, 8px);
             border: 1px solid var(--gnome-border);
             background-color: var(--gnome-card);
-            backdrop-filter: var(--blur-subtle);
             -webkit-backdrop-filter: var(--blur-subtle);
+            backdrop-filter: var(--blur-subtle);
             color: var(--text-main);
             box-shadow: var(--shadow-control);
 

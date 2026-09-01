@@ -59,8 +59,8 @@ navigation-menu {
     text-transform: uppercase;
     color: var(--text-secondary);
     background: var(--gnome-surface);
-    backdrop-filter: var(--blur-subtle);
     -webkit-backdrop-filter: var(--blur-subtle);
+    backdrop-filter: var(--blur-subtle);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-pill, 999px);
     box-shadow: var(--shadow-popup);
@@ -102,8 +102,8 @@ navigation-menu {
     align-items: center;
     justify-content: center;
     background: radial-gradient(circle at 35% 25%, rgba(53, 132, 228, 0.42), rgba(36, 36, 36, 0.95) 75%);
-    backdrop-filter: var(--blur-window);
     -webkit-backdrop-filter: var(--blur-window);
+    backdrop-filter: var(--blur-window);
     border: 1.5px solid rgba(255, 255, 255, 0.22);
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3), 0 0 16px var(--accent-shadow);
     cursor: var(--cursor-pointer);

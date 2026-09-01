@@ -102,8 +102,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -235,8 +235,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -342,8 +342,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -421,8 +421,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -492,8 +492,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -566,8 +566,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -649,8 +649,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -729,8 +729,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -835,8 +835,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -969,8 +969,8 @@ export class PlaygroundDemoComponent {}`,
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1051,8 +1051,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1107,8 +1107,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1182,8 +1182,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1289,8 +1289,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1407,8 +1407,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1480,8 +1480,8 @@ export class PlaygroundDemoComponent {}`,
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1557,8 +1557,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1604,8 +1604,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1656,8 +1656,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
     min-height: 240px;
@@ -1714,8 +1714,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1776,8 +1776,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1839,8 +1839,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1907,8 +1907,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -1987,8 +1987,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -2059,8 +2059,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -2121,8 +2121,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -2246,8 +2246,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
@@ -2432,8 +2432,8 @@ export class PlaygroundDemoComponent {
     background: var(--gnome-surface);
     border: 1px solid var(--gnome-border);
     border-radius: var(--radius-window, 16px);
-    backdrop-filter: var(--blur-effect);
     -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
     box-shadow: var(--shadow-popup);
     color: var(--text-main);
 
