@@ -27,12 +27,12 @@
 
     .popover-surface {
         position: relative;
-        background: var(--gnome-surface);
-        border: 1px solid var(--gnome-border);
+        background: var(--popover-bg, var(--gnome-surface));
+        border: 1px solid var(--popover-border, var(--gnome-border));
         border-radius: var(--radius-card, 12px);
         backdrop-filter: var(--blur-effect);
         -webkit-backdrop-filter: var(--blur-effect);
-        box-shadow: var(--shadow-popup);
+        box-shadow: var(--popover-shadow, var(--shadow-popup));
         padding: 14px 18px;
         color: var(--text-main);
         min-width: 140px;
@@ -46,32 +46,35 @@
             color: var(--text-main);
             font-size: 14px;
             font-weight: 700;
+            letter-spacing: -0.01em;
         }
 
-        p {
+        p, div {
             margin: 0;
             color: var(--text-secondary);
             font-size: 12.5px;
+            line-height: 1.4;
         }
     }
 
     .popover-arrow {
         position: absolute;
-        width: 10px;
-        height: 10px;
-        background: var(--gnome-surface);
-        border: 1px solid var(--gnome-border);
+        width: 12px;
+        height: 12px;
+        background: var(--popover-bg, var(--gnome-surface));
+        border: 1px solid var(--popover-border, var(--gnome-border));
         transform: rotate(45deg);
-        z-index: -1;
+        z-index: 1;
         pointer-events: none;
+        box-sizing: border-box;
     }
 
     /* Directional arrow positioning */
     &.pos-top {
         .popover-arrow {
-            bottom: -5px;
+            bottom: -6px;
             left: 50%;
-            margin-left: -5px;
+            margin-left: -6px;
             border-top: none;
             border-left: none;
         }
@@ -79,9 +82,9 @@
 
     &.pos-bottom {
         .popover-arrow {
-            top: -5px;
+            top: -6px;
             left: 50%;
-            margin-left: -5px;
+            margin-left: -6px;
             border-bottom: none;
             border-right: none;
         }
@@ -89,9 +92,9 @@
 
     &.pos-left {
         .popover-arrow {
-            right: -5px;
+            right: -6px;
             top: 50%;
-            margin-top: -5px;
+            margin-top: -6px;
             border-left: none;
             border-bottom: none;
         }
@@ -99,11 +102,12 @@
 
     &.pos-right {
         .popover-arrow {
-            left: -5px;
+            left: -6px;
             top: 50%;
-            margin-top: -5px;
+            margin-top: -6px;
             border-right: none;
             border-top: none;
         }
     }
 }
+

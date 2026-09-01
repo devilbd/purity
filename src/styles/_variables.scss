@@ -37,9 +37,9 @@
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
     /* Glassmorphism Blur Filters */
-    --blur-subtle: blur(12px) saturate(140%);
-    --blur-effect: blur(40px) saturate(160%);
-    --blur-heavy: blur(50px) saturate(180%);
+    --blur-subtle: blur(10px) saturate(150%);
+    --blur-effect: blur(20px) saturate(175%);
+    --blur-heavy: blur(32px) saturate(190%);
 
     /* Breeze Cursor Theme Tokens */
     --cursor-default: url('/cursors/default.svg') 4 4, default;

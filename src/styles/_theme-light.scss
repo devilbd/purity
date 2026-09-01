@@ -5,10 +5,10 @@
 @mixin theme-light-variables {
     /* Surfaces & Glassmorphism */
     --gnome-bg: #f6f5f4;
-    --gnome-surface: rgba(255, 255, 255, 0.75);
+    --gnome-surface: rgba(255, 255, 255, 0.84);
     --gnome-surface-solid: #ffffff;
-    --gnome-header: rgba(255, 255, 255, 0.88);
-    --gnome-card: rgba(0, 0, 0, 0.035);
+    --gnome-header: rgba(255, 255, 255, 0.92);
+    --gnome-card: rgba(0, 0, 0, 0.04);
     --gnome-hover: rgba(0, 0, 0, 0.06);
     --gnome-active: rgba(0, 0, 0, 0.1);
     --gnome-subtle: rgba(0, 0, 0, 0.02);
@@ -20,8 +20,8 @@
     --select-chevron-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231c71d8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
     /* Borders & Lines */
-    --gnome-border: rgba(0, 0, 0, 0.12);
-    --gnome-border-subtle: rgba(0, 0, 0, 0.06);
+    --gnome-border: rgba(0, 0, 0, 0.16);
+    --gnome-border-subtle: rgba(0, 0, 0, 0.09);
     --gnome-border-focus: rgba(28, 113, 216, 0.7);
 
     /* Typography & Text */
@@ -50,7 +50,7 @@
 
     /* Shadows */
     --shadow-deep: 0 16px 40px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-    --shadow-popup: 0 16px 40px rgba(0, 0, 0, 0.16), 0 2px 10px rgba(0, 0, 0, 0.06), inset 0 1px rgba(255, 255, 255, 0.8);
+    --shadow-popup: 0 16px 40px rgba(0, 0, 0, 0.14), 0 2px 10px rgba(0, 0, 0, 0.08), inset 0 1px rgba(255, 255, 255, 0.9);
     --shadow-control: 0 2px 6px rgba(0, 0, 0, 0.06), inset 0 1px rgba(255, 255, 255, 0.6);
 
     /* Global Dynamic Wallpaper */
@@ -72,6 +72,12 @@
     --dropdown-blur-bg: rgba(255, 255, 255, 0.90);
     --dropdown-border: var(--gnome-border);
     --dropdown-shadow: var(--shadow-popup);
+
+    /* Popover Specific Tokens */
+    --popover-bg: rgba(255, 255, 255, 0.96);
+    --popover-blur-bg: rgba(255, 255, 255, 0.92);
+    --popover-border: rgba(0, 0, 0, 0.18);
+    --popover-shadow: 0 16px 38px rgba(0, 0, 0, 0.18), 0 4px 14px rgba(0, 0, 0, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
 
     /* Radial Context Menu Specific Tokens */
     --radial-bg: rgba(255, 255, 255, 0.94);

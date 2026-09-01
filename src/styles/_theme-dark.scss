@@ -5,10 +5,10 @@
 @mixin theme-dark-variables {
     /* Surfaces & Glassmorphism */
     --gnome-bg: #1e1e1e;
-    --gnome-surface: rgba(45, 45, 45, 0.45);
+    --gnome-surface: rgba(34, 34, 40, 0.72);
     --gnome-surface-solid: #242424;
-    --gnome-header: rgba(36, 36, 36, 0.85);
-    --gnome-card: rgba(255, 255, 255, 0.05);
+    --gnome-header: rgba(30, 30, 36, 0.88);
+    --gnome-card: rgba(255, 255, 255, 0.06);
     --gnome-hover: rgba(255, 255, 255, 0.12);
     --gnome-active: rgba(255, 255, 255, 0.18);
     --gnome-subtle: rgba(255, 255, 255, 0.03);
@@ -20,8 +20,8 @@
     --select-chevron-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%233584e4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
     /* Borders & Lines */
-    --gnome-border: rgba(255, 255, 255, 0.12);
-    --gnome-border-subtle: rgba(255, 255, 255, 0.07);
+    --gnome-border: rgba(255, 255, 255, 0.14);
+    --gnome-border-subtle: rgba(255, 255, 255, 0.08);
     --gnome-border-focus: rgba(53, 132, 228, 0.6);
 
     /* Typography & Text */
@@ -72,6 +72,12 @@
     --dropdown-blur-bg: rgba(28, 28, 34, 0.90);
     --dropdown-border: var(--gnome-border);
     --dropdown-shadow: var(--shadow-popup);
+
+    /* Popover Specific Tokens */
+    --popover-bg: rgba(30, 30, 36, 0.92);
+    --popover-blur-bg: rgba(28, 28, 34, 0.85);
+    --popover-border: rgba(255, 255, 255, 0.16);
+    --popover-shadow: 0 16px 42px rgba(0, 0, 0, 0.7), 0 4px 14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
     /* Radial Context Menu Specific Tokens */
     --radial-bg: rgba(30, 30, 30, 0.92);

@@ -1532,7 +1532,7 @@ export class PlaygroundDemoComponent {
 
             .target-box {
                 padding: 14px;
-                background: rgba(0, 0, 0, 0.15);
+                background: var(--gnome-input, rgba(0, 0, 0, 0.06));
                 border: 1px dashed var(--accent);
                 border-radius: var(--radius-control, 8px);
                 text-align: center;
