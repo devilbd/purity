@@ -78,6 +78,14 @@
                         <span class="tab-icon scss-icon">#</span>
                         <span class="tab-label">style.scss</span>
                     </button>
+                    <button
+                        type="button"
+                        class="editor-tab spec-tab {{activeTab() === 'spec' ? 'active' : ''}}"
+                        onclick="setTab('spec')"
+                    >
+                        <span class="tab-icon spec-icon">🧪</span>
+                        <span class="tab-label">tests.spec.ts</span>
+                    </button>
                 </div>
 
                 <div class="editor-actions">
@@ -99,7 +107,7 @@
                     <div for="let num of lineNumbers" class="line-num">{{num}}</div>
                 </div>
                 <div class="editor-layer-container">
-                    <pre class="highlight-layer" aria-hidden="true"><code id="highlight-code" class="language-{{activeTab()}}"></code></pre>
+                    <pre class="highlight-layer" aria-hidden="true"><code id="highlight-code" class="language-{{activeTab() === 'spec' ? 'typescript' : activeTab()}}"></code></pre>
                     <textarea
                         class="code-textarea"
                         value="{{currentCode}}"
@@ -115,17 +123,39 @@
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Live Result Preview Pane -->
+        <!-- RIGHT COLUMN: Live Result & Tests Preview Pane -->
         <div class="playground-preview-pane">
             <div class="preview-browser-header">
-                <div class="preview-title">
-                    <span>🖥️ Live Preview</span>
+                <!-- Preview Mode Tabs -->
+                <div class="preview-tabs">
+                    <button
+                        type="button"
+                        class="preview-tab-btn {{activePreviewTab() === 'preview' ? 'active' : ''}}"
+                        onclick="setPreviewTab('preview')"
+                    >
+                        <span class="tab-icon">🖥️</span>
+                        <span class="tab-text">Live Preview</span>
+                    </button>
+                    <button
+                        type="button"
+                        class="preview-tab-btn {{activePreviewTab() === 'tests' ? 'active' : ''}}"
+                        onclick="setPreviewTab('tests')"
+                    >
+                        <span class="tab-icon">🧪</span>
+                        <span class="tab-text">Test Results</span>
+                        <span if="testResults() !== null" class="tab-counter {{testResults().status === 'passed' ? 'badge-pass' : 'badge-fail'}}">
+                            {{testResults().passedCount}}/{{testResults().totalTests}}
+                        </span>
+                    </button>
                 </div>
+
                 <div class="preview-actions">
                     <span class="status-badge {{isError() ? 'status-error' : 'status-live'}}">
                         {{statusMessage()}}
                     </span>
+
                     <button
+                        if="activePreviewTab() === 'preview'"
                         type="button"
                         class="action-btn run-btn"
                         title="Recompile & Run"
@@ -134,18 +164,103 @@
                         <span class="btn-icon">↻</span>
                         <span class="btn-text">Run</span>
                     </button>
+
+                    <button
+                        if="activePreviewTab() === 'tests'"
+                        type="button"
+                        class="action-btn test-run-btn {{isTesting() ? 'loading' : ''}}"
+                        title="Run in-browser tests"
+                        onclick="runTests()"
+                    >
+                        <span class="btn-icon">▶</span>
+                        <span class="btn-text">{{isTesting() ? 'Running...' : 'Run Tests'}}</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Error Banner -->
-            <div class="error-banner {{isError() ? 'visible' : ''}}">
-                <strong>⚠ Compilation Error:</strong>
-                <span>{{errorMessage()}}</span>
+            <!-- LIVE PREVIEW VIEW -->
+            <div if="activePreviewTab() === 'preview'" class="preview-content-wrapper">
+                <!-- Error Banner -->
+                <div class="error-banner {{isError() ? 'visible' : ''}}">
+                    <strong>⚠ Compilation Error:</strong>
+                    <span>{{errorMessage()}}</span>
+                </div>
+
+                <!-- Live Output Canvas -->
+                <div id="playground-preview-canvas" class="preview-canvas">
+                    <!-- Live Custom Element mounts here dynamically -->
+                </div>
             </div>
 
-            <!-- Live Output Canvas -->
-            <div id="playground-preview-canvas" class="preview-canvas">
-                <!-- Live Custom Element mounts here dynamically -->
+            <!-- IN-BROWSER TEST RESULTS VIEW -->
+            <div else class="test-results-view">
+                <div if="testResults() === null && !isTesting()" class="test-empty-state">
+                    <div class="empty-icon">🧪</div>
+                    <h3>In-Browser Unit Test Runner</h3>
+                    <p>Click "Run Tests" to execute this component's unit test suite in real-time.</p>
+                    <button type="button" class="button-primary run-tests-cta" onclick="runTests()">
+                        ▶ Run Tests Suite
+                    </button>
+                </div>
+
+                <div if="isTesting()" class="test-loading-state">
+                    <div class="spinner"></div>
+                    <p>Executing test suites in client sandbox...</p>
+                </div>
+
+                <div if="testResults() !== null && !isTesting()" class="test-summary-dashboard">
+                    <!-- Test Results Metric Banner -->
+                    <div class="test-metrics-bar {{testResults().status === 'passed' ? 'metrics-pass' : 'metrics-fail'}}">
+                        <div class="metric-main">
+                            <span class="metric-icon">{{testResults().status === 'passed' ? '✔' : '✖'}}</span>
+                            <span class="metric-title">
+                                {{testResults().status === 'passed' ? 'All Tests Passed' : 'Tests Failed'}}
+                            </span>
+                        </div>
+                        <div class="metric-stats">
+                            <span class="stat-pill pass">{{testResults().passedCount}} Passed</span>
+                            <span if="testResults().failedCount > 0" class="stat-pill fail">{{testResults().failedCount}} Failed</span>
+                            <span class="stat-pill duration">⏱ {{testResults().totalDurationMs}}ms</span>
+                        </div>
+                    </div>
+
+                    <!-- Test Suites & Cases List -->
+                    <div class="test-suites-container">
+                        <div for="let suite of testResults().suites" class="test-suite-card">
+                            <div class="suite-header">
+                                <span class="suite-title">📁 {{suite.name}}</span>
+                                <span class="suite-meta">
+                                    {{suite.passedCount}}/{{suite.tests.length}} passed • {{suite.durationMs}}ms
+                                </span>
+                            </div>
+
+                            <div class="suite-tests-list">
+                                <div for="let test of suite.tests" class="test-case-row {{test.status}}">
+                                    <div class="test-case-header">
+                                        <span class="test-status-indicator">{{test.status === 'passed' ? '✓' : '✗'}}</span>
+                                        <span class="test-name">{{test.name}}</span>
+                                        <span class="test-time">{{test.durationMs}}ms</span>
+                                    </div>
+
+                                    <!-- Error details box for failed tests -->
+                                    <div if="test.status === 'failed' && test.error" class="test-error-box">
+                                        <div class="error-msg">{{test.error.message}}</div>
+                                        <div if="test.error.expected !== undefined" class="diff-view">
+                                            <div class="diff-row expected">
+                                                <span class="diff-tag">Expected:</span>
+                                                <code>{{test.error.expected}}</code>
+                                            </div>
+                                            <div class="diff-row received">
+                                                <span class="diff-tag">Received:</span>
+                                                <code>{{test.error.received}}</code>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

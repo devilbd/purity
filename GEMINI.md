@@ -107,7 +107,7 @@ purity/
         │   ├── modal-sample/    # <modal-sample> interactive showcase for modal dialog system
         │   ├── notification-sample/ # <notification-sample> interactive showcase for toast notifications & positions
         │   ├── pipe-sample/     # <pipe-sample> demonstrating handlebars pipe transformations
-        │   ├── playground/      # <playground-view> in-browser live editor, compiler & localStorage history (GNOME 50 / Palenight)
+        │   ├── playground/      # <playground-view> in-browser live editor, test runner, compiler & localStorage history (GNOME 50 / Palenight)
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
         │   ├── router-sample/   # <router-sample> interactive router showcase with <router-layout> and signal inspector
         │   └── virtual-for-sample/ # <virtual-for-sample> high-performance 100k virtual scroll repeater showcase
