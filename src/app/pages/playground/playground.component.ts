@@ -499,32 +499,95 @@ export class PlaygroundComponent {
         this.runCompile();
     }
 
+    private normalizePresetName(name: string): string {
+        return name
+            .replace(/^💾\s*/, '')
+            .replace(/^[\p{Emoji}\p{Extended_Pictographic}\s]+/u, '')
+            .trim()
+            .toLowerCase();
+    }
+
     onSaveSnippet() {
-        const defaultTitle = `Draft #${this.savedPresets().length + 1} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
-        const title = window.prompt('Enter a title for your saved playground draft:', defaultTitle);
+        const currentCustom = this.savedPresets().find(p => p.id === this.selectedPresetId());
+        const defaultTitle = currentCustom
+            ? currentCustom.name.replace(/^💾\s*/, '').trim()
+            : `Draft #${this.savedPresets().length + 1} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+
+        const title = window.prompt('Enter a title for your saved playground preset:', defaultTitle);
         if (title === null) return; // User cancelled
         const cleanTitle = title.trim() || defaultTitle;
+        const normalizedInput = this.normalizePresetName(cleanTitle);
 
-        const newId = `custom-${Date.now()}`;
-        const newPreset: CodePreset = {
-            id: newId,
-            name: `💾 ${cleanTitle}`,
-            description: 'Custom draft saved into local storage history.',
-            ts: this.tsCode(),
-            html: this.htmlCode(),
-            scss: this.scssCode(),
-            spec: this.specCode(),
-            isCustom: true,
-            createdAt: Date.now(),
-        };
+        // 1. Default presets cannot be overridden
+        const matchesDefault = PLAYGROUND_PRESETS.some(p => {
+            return (
+                p.name.trim().toLowerCase() === cleanTitle.toLowerCase() ||
+                this.normalizePresetName(p.name) === normalizedInput ||
+                p.id.toLowerCase() === cleanTitle.toLowerCase()
+            );
+        });
 
-        const updated = [newPreset, ...this.savedPresets()];
-        this.savedPresets.set(updated);
-        savePlaygroundHistory(updated);
+        if (matchesDefault) {
+            this.notify.warn(
+                'Cannot Override Built-in',
+                `"${cleanTitle}" is a default framework preset and cannot be overridden. Please choose a different name.`
+            );
+            return;
+        }
 
-        this.selectedPresetId.set(newId);
+        // 2. Check if a custom preset with this name already exists -> Override it
+        const existingIndex = this.savedPresets().findIndex(p => {
+            return (
+                p.name.trim().toLowerCase() === cleanTitle.toLowerCase() ||
+                p.name.trim().toLowerCase() === `💾 ${cleanTitle}`.toLowerCase() ||
+                this.normalizePresetName(p.name) === normalizedInput
+            );
+        });
 
-        this.notify.success('Draft Saved', `Draft "${cleanTitle}" saved to localStorage.`);
+        const displayName = cleanTitle.startsWith('💾') ? cleanTitle : `💾 ${cleanTitle}`;
+
+        if (existingIndex !== -1) {
+            const existingPreset = this.savedPresets()[existingIndex];
+            const updatedPreset: CodePreset = {
+                ...existingPreset,
+                name: displayName,
+                description: 'Custom draft saved into local storage history.',
+                ts: this.tsCode(),
+                html: this.htmlCode(),
+                scss: this.scssCode(),
+                spec: this.specCode(),
+                isCustom: true,
+                createdAt: Date.now(),
+            };
+
+            const updated = [...this.savedPresets()];
+            updated[existingIndex] = updatedPreset;
+            this.savedPresets.set(updated);
+            savePlaygroundHistory(updated);
+
+            this.selectedPresetId.set(existingPreset.id);
+            this.notify.success('Preset Overridden', `Preset "${cleanTitle}" was overridden with current changes.`);
+        } else {
+            const newId = `custom-${Date.now()}`;
+            const newPreset: CodePreset = {
+                id: newId,
+                name: displayName,
+                description: 'Custom draft saved into local storage history.',
+                ts: this.tsCode(),
+                html: this.htmlCode(),
+                scss: this.scssCode(),
+                spec: this.specCode(),
+                isCustom: true,
+                createdAt: Date.now(),
+            };
+
+            const updated = [newPreset, ...this.savedPresets()];
+            this.savedPresets.set(updated);
+            savePlaygroundHistory(updated);
+
+            this.selectedPresetId.set(newId);
+            this.notify.success('Preset Saved', `Preset "${cleanTitle}" saved to localStorage.`);
+        }
     }
 
     onDeleteSnippet() {
