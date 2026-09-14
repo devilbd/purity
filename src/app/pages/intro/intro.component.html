@@ -3,7 +3,7 @@
         <div class="intro-title-area">
             <h2 class="intro-title">About Purity Framework</h2>
             <p class="intro-tagline">
-                A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptor pipelines, and GNOME Adwaita theming.
+                A lightweight, native TypeScript frontend framework powered by fine-grained signals, native Web Components, Dependency Injection, HTTP interceptor pipelines, and Adwaita theming.
             </p>
         </div>
         <div class="intro-actions">
@@ -171,12 +171,85 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 4. Application Bootstrapping & Theme Engine -->
+        <!-- 4. Theme Setup & Reactive Switching -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>4. 🚀 Application Bootstrapping &amp; Theme Engine (<code>bootstrap.ts</code>, <code>ThemeService</code>)</h4>
-                    <p>Initialize application root, wire DI providers &amp; interceptors, and automatically synchronize GNOME Adwaita Dark/Light themes:</p>
+                    <h4>4. 🌓 Theme Setup &amp; Reactive Switching (<code>ThemeService</code>, SCSS)</h4>
+                    <p>Setup theme CSS variables in SCSS and switch themes dynamically within any component via <code>ThemeService</code>:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('theme-switching')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="cmt">/* 1. SCSS Theme Setup (_themes.scss): Simple CSS variables for Dark &amp; Light themes */</span>
+<span class="cmt">/* Base Dark Theme on :root and [data-theme='dark'] */</span>
+<span class="tag">:root</span>, <span class="tag">[data-theme='dark']</span> {
+    <span class="attr">--gnome-surface</span>: <span class="str">rgba(36, 36, 36, 0.88)</span>;
+    <span class="attr">--gnome-card</span>: <span class="str">rgba(46, 46, 46, 0.75)</span>;
+    <span class="attr">--gnome-border</span>: <span class="str">rgba(255, 255, 255, 0.12)</span>;
+    <span class="attr">--text-main</span>: <span class="str">#ffffff</span>;
+    <span class="attr">--text-secondary</span>: <span class="str">#9a9996</span>;
+    <span class="attr">--accent</span>: <span class="str">#3584e4</span>;
+    <span class="attr">color-scheme</span>: <span class="str">dark</span>;
+}
+
+<span class="cmt">/* Light Theme overrides activated dynamically by ThemeService */</span>
+<span class="tag">[data-theme='light']</span> {
+    <span class="attr">--gnome-surface</span>: <span class="str">rgba(255, 255, 255, 0.88)</span>;
+    <span class="attr">--gnome-card</span>: <span class="str">rgba(240, 240, 242, 0.75)</span>;
+    <span class="attr">--gnome-border</span>: <span class="str">rgba(0, 0, 0, 0.10)</span>;
+    <span class="attr">--text-main</span>: <span class="str">#1e1e1e</span>;
+    <span class="attr">--text-secondary</span>: <span class="str">#5e5c64</span>;
+    <span class="attr">--accent</span>: <span class="str">#1c71d8</span>;
+    <span class="attr">color-scheme</span>: <span class="str">light</span>;
+}
+
+<span class="cmt">&lt;!-- 2. HTML Template: Button invoking theme change and displaying active state --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"theme-box window"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;span&gt;</span>Active Theme: {{isDark() ? '🌙 Dark' : '☀️ Light'}}<span class="tag">&lt;/span&gt;</span>
+    <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">class</span>=<span class="str">"button-primary"</span> <span class="attr">onclick</span>=<span class="str">"toggleTheme()"</span><span class="tag">&gt;</span>
+        Toggle Theme
+    <span class="tag">&lt;/button&gt;</span>
+<span class="tag">&lt;/div&gt;</span>
+
+<span class="cmt">/* 3. Component TypeScript: Inject ThemeService and switch themes */</span>
+<span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> { <span class="typ">ThemeService</span> } <span class="kw">from</span> <span class="str">'@data/theme.service'</span>;
+
+<span class="dec">@Component</span>({ selector: <span class="str">'theme-toggle'</span>, templateUrl: <span class="str">'./theme-toggle.html'</span> })
+<span class="kw">export class</span> <span class="typ">ThemeToggleComponent</span> {
+    <span class="kw">private</span> themeService = <span class="fn">inject</span>(<span class="typ">ThemeService</span>);
+
+    <span class="fn">isDark</span>() {
+        <span class="kw">return</span> <span class="kw">this</span>.themeService.<span class="fn">isDark</span>();
+    }
+
+    <span class="fn">toggleTheme</span>() {
+        <span class="kw">this</span>.themeService.<span class="fn">toggleTheme</span>(); <span class="cmt">// Switches between 'dark' and 'light'</span>
+    }
+
+    <span class="fn">setDark</span>() {
+        <span class="kw">this</span>.themeService.<span class="fn">setTheme</span>(<span class="str">'dark'</span>);
+    }
+
+    <span class="fn">setLight</span>() {
+        <span class="kw">this</span>.themeService.<span class="fn">setTheme</span>(<span class="str">'light'</span>);
+    }
+}</code></pre>
+        </div>
+
+        <!-- 5. Application Bootstrapping & Theme Engine -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>5. 🚀 Application Bootstrapping &amp; Theme Engine (<code>bootstrap.ts</code>, <code>ThemeService</code>)</h4>
+                    <p>Initialize application root, wire DI providers &amp; interceptors, and automatically synchronize Dark/Light themes:</p>
                 </div>
                 <button
                     type="button"
@@ -204,11 +277,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 });</code></pre>
         </div>
 
-        <!-- 5. Reactive NotifyService -->
+        <!-- 6. Reactive NotifyService -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>5. 🔔 Reactive Toast Notification Service (<code>NotifyService</code>)</h4>
+                    <h4>6. 🔔 Reactive Toast Notification Service (<code>NotifyService</code>)</h4>
                     <p>Injectable service exposing multi-variant notification dispatchers (<code>success</code>, <code>error</code>, <code>warn</code>, <code>info</code>) with positioning and auto-dismiss timeouts:</p>
                 </div>
                 <button
@@ -247,11 +320,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 6. Transform Pipes -->
+        <!-- 7. Transform Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>6. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
+                    <h4>7. ⚡ Transform Pipes &amp; Dynamic Parameters (<code>pipe.ts</code>)</h4>
                     <p>Classes decorated with <code>@Pipe</code> transform template values and accept reactive signals as dynamic parameters:</p>
                 </div>
                 <button
@@ -281,11 +354,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;div&gt;</span><span class="expr">{{ count() | myTransformPipe: true }}</span><span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 7. Form Validation -->
+        <!-- 8. Form Validation -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>7. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
+                    <h4>8. 📋 Decoupled Form Validation Engine (<code>validator.ts</code>)</h4>
                     <p>Decorators decoupling validation logic, tracking field states, applying CSS classes, and toggling submit button states:</p>
                 </div>
                 <button
@@ -320,11 +393,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 8. Custom Directives -->
+        <!-- 9. Custom Directives -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>8. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
+                    <h4>9. 🏷️ Reactive Custom Directives (<code>directive.ts</code>)</h4>
                     <p>Attribute-level reactivity and DOM augmentation with <code>@Directive</code> and <code>BaseDirective</code>:</p>
                 </div>
                 <button
@@ -357,11 +430,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 9. Composable Behaviors -->
+        <!-- 10. Composable Behaviors -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>9. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
+                    <h4>10. 🎯 Composable Behaviors: Drag &amp; Droppable (<code>behaviors/</code>)</h4>
                     <p>Pointer-based drag interactions with GPU acceleration (<code>translate3d</code>), boundary constraints, and center snapping:</p>
                 </div>
                 <button
@@ -404,11 +477,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
             <span class="section-badge">Components &amp; Views</span>
         </div>
 
-        <!-- 10. Web Components -->
+        <!-- 11. Web Components -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>10. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
+                    <h4>11. 🧩 Native Web Components (<code>@Component</code> Decorator)</h4>
                     <p>Plain classes transformed into Custom Elements with automatic template inlining, signal bindings, and lifecycle hooks:</p>
                 </div>
                 <button
@@ -448,11 +521,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 11. ViewChild Queries -->
+        <!-- 12. ViewChild Queries -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>11. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
+                    <h4>12. 🔍 Child View &amp; Component Queries (<code>@ViewChild</code>)</h4>
                     <p>Property decorator that queries child elements or custom components implicitly by property name, with optional explicit selectors for disambiguation:</p>
                 </div>
                 <button
@@ -492,11 +565,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 12. Handlebars Interpolation & Pipes -->
+        <!-- 13. Handlebars Interpolation & Pipes -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>12. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
+                    <h4>13. 📄 Handlebars Template Interpolation &amp; Pipes (<code>{{ expression | pipe }}</code>)</h4>
                     <p>Embed reactive signals and transform pipes directly into HTML templates. Expressions are compiled and cached in <code>expressionCache</code>, automatically re-rendering whenever dependent signals change:</p>
                 </div>
                 <button
@@ -533,11 +606,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 13. Structural Array Repeater -->
+        <!-- 14. Structural Array Repeater -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>13. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
+                    <h4>14. 🔁 Structural Array Repeater (<code>for="let obj of myArray"</code>)</h4>
                     <p>Repeat elements and components dynamically with object property access, index variables, and nested loops:</p>
                 </div>
                 <button
@@ -574,11 +647,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 14. Structural Conditionals -->
+        <!-- 15. Structural Conditionals -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>14. 🔀 Structural Conditionals (<code>if="..."</code>, <code>else-if="..."</code>, <code>else</code>)</h4>
+                    <h4>15. 🔀 Structural Conditionals (<code>if="..."</code>, <code>else-if="..."</code>, <code>else</code>)</h4>
                     <p>Declarative structural conditional branching with lazy compilation, zero unnecessary DOM overhead, and reactive unmounting:</p>
                 </div>
                 <button
@@ -611,11 +684,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 15. Virtualized For Repeater -->
+        <!-- 16. Virtualized For Repeater -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>15. ⚡ High-Performance Virtualized Repeater (<code>virtual-for</code>)</h4>
+                    <h4>16. ⚡ High-Performance Virtualized Repeater (<code>virtual-for</code>)</h4>
                     <p>Render massive datasets (up to <strong>100,000+ items</strong>) at 60fps with fixed or dynamic row heights and precise indexed tracking:</p>
                 </div>
                 <button
@@ -652,11 +725,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 16. Slot Content Projection -->
+        <!-- 17. Slot Content Projection -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>16. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
+                    <h4>17. 📦 Generic Components &amp; Content Projection (<code>&lt;slot&gt;</code>)</h4>
                     <p>Pass custom HTML markup, templates, and nested components directly between custom element tags with native slot projection:</p>
                 </div>
                 <button
@@ -687,12 +760,12 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 <span class="tag">&lt;/div&gt;</span></code></pre>
         </div>
 
-        <!-- 17. Theming & Modular SCSS -->
+        <!-- 18. Theming & Modular SCSS -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>17. 🎨 GNOME Adwaita Theming &amp; Modular SCSS Design System</h4>
-                    <p>Translucent glassmorphism, refined corner radii, subtle specular borders, and GNOME cubic bezier animations with Dark and Light themes:</p>
+                    <h4>18. 🎨 Adwaita Theming &amp; Modular SCSS Design System</h4>
+                    <p>Translucent glassmorphism, refined corner radii, subtle specular borders, and cubic bezier animations with Dark and Light themes:</p>
                 </div>
                 <button
                     type="button"
@@ -720,11 +793,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 18. Date & Time Picker Component -->
+        <!-- 19. Date & Time Picker Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>18. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
+                    <h4>19. 📅 Reactive Date &amp; Time Picker (<code>&lt;date-time-picker&gt;</code>)</h4>
                     <p>Full calendar view, year navigation, 24-hour time wheel scrolling, smart viewport auto-placement, date ranges, and custom pipe formatting:</p>
                 </div>
                 <button
@@ -756,11 +829,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 19. Circular Radial Context Menu -->
+        <!-- 20. Circular Radial Context Menu -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>19. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
+                    <h4>20. 🎯 Circular Radial Context Menu: Dual Assets (<code>&lt;radial-context-menu&gt;</code>)</h4>
                     <p>Circular context menu with pie segments, SVG icons, submenus, dynamic placement, and keyboard/outside-click dismissal:</p>
                 </div>
                 <button
@@ -794,11 +867,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 20. Right-Click Context Menu Delegation -->
+        <!-- 21. Right-Click Context Menu Delegation -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>20. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
+                    <h4>21. 🎯 Right-Click Context Menu Delegation (<code>setSelector()</code>)</h4>
                     <p>Single-source-of-truth right-click delegation binding radial menu activation across any matching DOM selector:</p>
                 </div>
                 <button
@@ -822,11 +895,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 21. Modal Dialogs -->
+        <!-- 22. Modal Dialogs -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>21. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
+                    <h4>22. 🪟 Modal Dialogs (<code>&lt;modal-view&gt;</code>)</h4>
                     <p>Reusable dialogs with <code>open()</code>, <code>close()</code>, <code>maximize()</code>, fixed viewport overlays, and <code>z-index: 1000</code>:</p>
                 </div>
                 <button
@@ -865,11 +938,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 22. Analogue Clock Widget -->
+        <!-- 23. Analogue Clock Widget -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>22. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
+                    <h4>23. ⏱️ Analogue Clock Widget (<code>&lt;analogue-clock&gt;</code>, <code>@widgets/*</code>)</h4>
                     <p>Native 2D Canvas clock with subpixel Retina scaling, frosted glass dial, 3D beveled hands, date window, smooth sweep vs quartz ticking, and multi-timezone support:</p>
                 </div>
                 <button
@@ -914,11 +987,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
             <span class="section-badge">Lifecycles &amp; Phases</span>
         </div>
 
-        <!-- 23. Component Mounting & Teardown Lifecycle -->
+        <!-- 24. Component Mounting & Teardown Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>23. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
+                    <h4>24. 🧩 Web Component Lifecycle Phases (<code>@Component</code>)</h4>
                     <p>Native Custom Elements v1 lifecycle flow from template projection and reactive binding to teardown:</p>
                 </div>
                 <button
@@ -973,11 +1046,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 24. Custom Directive Lifecycle -->
+        <!-- 25. Custom Directive Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>24. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
+                    <h4>25. 🏷️ Custom Directive Lifecycle (<code>@Directive</code>, <code>BaseDirective</code>)</h4>
                     <p>Execution phases for attribute-level reactivity, signal tracking, and host DOM mutation observation:</p>
                 </div>
                 <button
@@ -1029,11 +1102,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 25. Form Validation Lifecycle -->
+        <!-- 26. Form Validation Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>25. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
+                    <h4>26. 📋 Form Validator Lifecycle &amp; State Pipeline (<code>@Validator</code>)</h4>
                     <p>Decoupled validation pipeline with field binding, live evaluation, CSS state reflection, and submit lock:</p>
                 </div>
                 <button
@@ -1076,11 +1149,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 26. Application Bootstrapping Lifecycle -->
+        <!-- 27. Application Bootstrapping Lifecycle -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>26. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
+                    <h4>27. 🚀 Application Bootstrapping Lifecycle (<code>bootstrapApplication</code>)</h4>
                     <p>End-to-end initialization sequence from environment tokens to root component mounting:</p>
                 </div>
                 <button
@@ -1117,11 +1190,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 });</code></pre>
         </div>
 
-        <!-- 27. Signal Routing & Layout Engine -->
+        <!-- 28. Signal Routing & Layout Engine -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>27. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
+                    <h4>28. 🗺️ Signal Router &amp; Layout Engine (<code>router.ts</code>, <code>&lt;router-layout&gt;</code>, <code>routerLink</code>)</h4>
                     <p>Fine-grained reactive routing, dynamic parameter tokens (<code>/users/:id</code>), automatic lifecycle mounting via <code>&lt;router-layout&gt;</code>, and declarative <code>routerLink</code> directive:</p>
                 </div>
                 <button
@@ -1165,11 +1238,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
     }
 }</code></pre>
         </div>
-        <!-- 28. Popover Component & Anchored Overlays -->
+        <!-- 29. Popover Component & Anchored Overlays -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>28. 💬 Popover Component (<code>&lt;popover&gt;</code> / <code>PopoverComponent</code>)</h4>
+                    <h4>29. 💬 Popover Component (<code>&lt;popover&gt;</code> / <code>PopoverComponent</code>)</h4>
                     <p>Declarative and programmatic popovers anchored to DOM selectors with viewport boundary collision detection, directional arrows, and <code>&lt;slot&gt;</code> content projection:</p>
                 </div>
                 <button
@@ -1205,11 +1278,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 29. Switch Button Component -->
+        <!-- 30. Switch Button Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>29. 🎛️ Switch Button Component (<code>&lt;switch-button&gt;</code> / <code>SwitchButtonComponent</code>)</h4>
+                    <h4>30. 🎛️ Switch Button Component (<code>&lt;switch-button&gt;</code> / <code>SwitchButtonComponent</code>)</h4>
                     <p>Native Adwaita toggle switch with fine-grained reactivity, <code>&lt;slot&gt;</code> label projection, and exposed <code>switchOn()</code>, <code>switchOff()</code>, and <code>toggle()</code> methods:</p>
                 </div>
                 <button
@@ -1254,11 +1327,11 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 }</code></pre>
         </div>
 
-        <!-- 30. Expander Component -->
+        <!-- 31. Expander Component -->
         <div class="intro-sample-card">
             <div class="sample-header">
                 <div class="sample-title-box">
-                    <h4>30. ↕️ Expander Component (<code>&lt;expander&gt;</code> / <code>ExpanderComponent</code>)</h4>
+                    <h4>31. ↕️ Expander Component (<code>&lt;expander&gt;</code> / <code>ExpanderComponent</code>)</h4>
                     <p>Native Adwaita collapsible card with fine-grained reactivity, custom icon variants, and exposed <code>expand()</code>, <code>collapse()</code>, and <code>toggle()</code> methods:</p>
                 </div>
                 <button

@@ -375,7 +375,87 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
-    // 4. Bootstrap
+    // 4. Theme Switching
+    'theme-switching': {
+        id: 'theme-switching',
+        title: '🌓 Reactive Theme Switching & SCSS Setup',
+        ts: `import { Component, inject } from '@purity/core';
+import { ThemeService } from '@data/theme.service';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    private themeService = inject(ThemeService);
+
+    isDark() {
+        return this.themeService.isDark();
+    }
+
+    toggleTheme() {
+        this.themeService.toggleTheme();
+    }
+
+    setDark() {
+        this.themeService.setTheme('dark');
+    }
+
+    setLight() {
+        this.themeService.setTheme('light');
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>🌓 Theme Switching via ThemeService</h3>
+    <p>Themes are switched dynamically via ThemeService and reflected on [data-theme].</p>
+
+    <div class="theme-status">
+        <span>Active Theme: <strong>{{isDark() ? '🌙 Dark Mode' : '☀️ Light Mode'}}</strong></span>
+    </div>
+
+    <div class="actions-row">
+        <button type="button" class="button-primary" onclick="toggleTheme()">
+            toggleTheme()
+        </button>
+        <button type="button" class="button-secondary" onclick="setDark()">
+            setTheme('dark')
+        </button>
+        <button type="button" class="button-secondary" onclick="setLight()">
+            setTheme('light')
+        </button>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 { margin: 0; color: var(--text-main); font-size: 1.25rem; }
+    p { margin: 0; color: var(--text-secondary); font-size: 13px; }
+
+    .theme-status {
+        padding: 14px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+        strong { color: var(--accent); }
+    }
+
+    .actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
+}`,
+    },
+
+    // 5. Bootstrap
     bootstrap: {
         id: 'bootstrap',
         title: '🚀 Application Bootstrapping & Theme Engine',
