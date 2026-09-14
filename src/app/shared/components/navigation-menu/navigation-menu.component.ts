@@ -72,6 +72,7 @@ export class NavigationMenuComponent {
                 name: 'UI Components',
                 image: '🧩',
                 children: [
+                    { name: 'Expander', image: '↕️', data: { hash: '#expander-sample' } },
                     { name: 'Switch Button', image: '🎛️', data: { hash: '#switch-button-sample' } },
                     { name: 'Date Time Picker', image: '📅', data: { hash: '#date-time-picker-sample' } },
                     { name: 'Modal Dialog', image: '🪟', data: { hash: '#modal-sample' } },

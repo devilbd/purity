@@ -30,6 +30,8 @@ import '@components/popover/popover.component';
 import { PopoverComponent } from '@components/popover/popover.component';
 import '@components/switch-button/switch-button.component';
 import { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
+import '@components/expander/expander.component';
+import { ExpanderComponent } from '@components/expander/expander.component';
 
 // Standalone Widgets
 import '@widgets/analogue-clock/analogue-clock.component';
@@ -700,6 +702,7 @@ export class PlaygroundComponent {
             EmptySampleComponent,
             PopoverComponent,
             SwitchButtonComponent,
+            ExpanderComponent,
         };
     }
 

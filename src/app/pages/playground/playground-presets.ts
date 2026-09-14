@@ -1453,7 +1453,7 @@ export class PlaygroundDemoComponent {
 
     <popover target-for="'#demo-target-left'" position="left">
         <h3>Left Popover</h3>
-        <p>Anchored to left with GNOME 50 glassmorphism.</p>
+        <p>Anchored to left with glassmorphism.</p>
     </popover>
 
     <popover target-for="'#demo-target-right'" position="right">
@@ -1603,6 +1603,335 @@ describe('Popover Component Spec', () => {
 
         component.setPosition('right');
         expect(component.currentPosition()).toBe('right');
+    });
+});`,
+    },
+    {
+        id: 'switch-button',
+        name: '🎛️ Switch Button',
+        description: 'Native Adwaita switch button toggle component with fine-grained reactivity and methods.',
+        ts: `import { Component, signal, ViewChild } from '@purity/core';
+import '@components/switch-button/switch-button.component';
+import type { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#my-switch')
+    mySwitch?: SwitchButtonComponent | null;
+
+    lastAction = signal<string>('Ready');
+
+    get isSwitchOn(): boolean {
+        return this.mySwitch?.isOn() ?? false;
+    }
+
+    turnOn() {
+        this.mySwitch?.switchOn();
+        this.lastAction.set('switchOn() called via @ViewChild');
+    }
+
+    turnOff() {
+        this.mySwitch?.switchOff();
+        this.lastAction.set('switchOff() called via @ViewChild');
+    }
+
+    toggleState() {
+        this.mySwitch?.toggle();
+        this.lastAction.set('toggle() called via @ViewChild');
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>🎛️ Switch Button</h3>
+    <p>Fine-grained reactive switch button component with methods for switchOn, switchOff, toggle, and slotted label.</p>
+
+    <div class="switch-demo-box">
+        <switch-button id="my-switch">
+            I am switch button!
+        </switch-button>
+    </div>
+
+    <div class="state-badge-row">
+        <span class="pill-badge {{isSwitchOn ? 'active' : ''}}">
+            Status: {{isSwitchOn ? 'ON' : 'OFF'}}
+        </span>
+    </div>
+
+    <div class="actions-row">
+        <button type="button" class="button-primary" onclick="turnOn()">switchOn()</button>
+        <button type="button" class="button-secondary" onclick="turnOff()">switchOff()</button>
+        <button type="button" class="button-secondary" onclick="toggleState()">toggle()</button>
+    </div>
+
+    <hr class="divider" />
+
+    <h4>More Switch Examples</h4>
+    <div class="switches-grid">
+        <switch-button checked>Dark Theme</switch-button>
+        <switch-button checked>Desktop Notifications</switch-button>
+        <switch-button>Background Sync</switch-button>
+        <switch-button disabled>Biometric Authentication</switch-button>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    h3, h4 {
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+    }
+
+    .switch-demo-box {
+        padding: 20px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border);
+        border-radius: var(--radius-card);
+        display: flex;
+        align-items: center;
+    }
+
+    .state-badge-row {
+        display: flex;
+        align-items: center;
+
+        .pill-badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: var(--gnome-input);
+            color: var(--text-muted);
+            border: 1px solid var(--gnome-border-subtle);
+
+            &.active {
+                background: var(--gnome-success-bg);
+                color: var(--gnome-success);
+                border-color: rgba(46, 194, 126, 0.3);
+            }
+        }
+    }
+
+    .actions-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid var(--gnome-border-subtle);
+        margin: 8px 0;
+    }
+
+    .switches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+    }
+}`,
+        spec: `import { describe, it, expect, beforeEach } from 'vitest';
+
+describe('Switch Button Spec', () => {
+    let component: PlaygroundDemoComponent;
+
+    beforeEach(() => {
+        component = new PlaygroundDemoComponent();
+    });
+
+    it('should initialize lastAction to Ready', () => {
+        expect(component.lastAction()).toBe('Ready');
+    });
+
+    it('should update lastAction when turnOn is called', () => {
+        component.turnOn();
+        expect(component.lastAction()).toBe('switchOn() called via @ViewChild');
+    });
+
+    it('should update lastAction when turnOff is called', () => {
+        component.turnOff();
+        expect(component.lastAction()).toBe('switchOff() called via @ViewChild');
+    });
+
+    it('should update lastAction when toggleState is called', () => {
+        component.toggleState();
+        expect(component.lastAction()).toBe('toggle() called via @ViewChild');
+    });
+});`,
+    },
+    {
+        id: 'expander',
+        name: '↕️ Expander Component',
+        description: 'Native collapsible card with expand, collapse, toggle methods, and custom icon variant.',
+        ts: `import { Component, signal, ViewChild } from '@purity/core';
+import '@components/expander/expander.component';
+import type { ExpanderComponent } from '@components/expander/expander.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#basicExpander')
+    basicExpander?: ExpanderComponent | null;
+
+    @ViewChild('#iconExpander')
+    iconExpander?: ExpanderComponent | null;
+
+    lastAction = signal<string>('Ready');
+
+    toggleBasic() {
+        this.basicExpander?.toggle();
+        this.lastAction.set('Toggled basic expander');
+    }
+
+    expandBasic() {
+        this.basicExpander?.expand();
+        this.lastAction.set('Expanded basic expander');
+    }
+
+    collapseBasic() {
+        this.basicExpander?.collapse();
+        this.lastAction.set('Collapsed basic expander');
+    }
+
+    toggleIcon() {
+        this.iconExpander?.toggle();
+        this.lastAction.set('Toggled icon expander');
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>↕️ Expander Component</h3>
+    <p>Collapsible card with expand, collapse, toggle methods, fine-grained reactivity, and icon variants.</p>
+
+    <!-- Standard Expander Variant -->
+    <h4>Standard Variant</h4>
+    <expander id="basicExpander">
+        <div class="title">
+            Expander title
+        </div>
+        <div class="body">
+            Expander body.
+        </div>
+    </expander>
+
+    <div class="actions-row">
+        <button type="button" class="button-primary" onclick="expandBasic()">expand()</button>
+        <button type="button" class="button-secondary" onclick="collapseBasic()">collapse()</button>
+        <button type="button" class="button-secondary" onclick="toggleBasic()">toggle()</button>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Icon Expander Variant -->
+    <h4>Icon Variant</h4>
+    <expander id="iconExpander">
+        <div class="title">
+            <img class="{{expandOrCollapseIcon()}}" />
+            Expander title
+        </div>
+        <div class="body {{expandOrCollapseIcon()}}">
+            Expander body.
+        </div>
+    </expander>
+
+    <div class="actions-row">
+        <button type="button" class="button-secondary" onclick="toggleIcon()">toggle() Icon Expander</button>
+    </div>
+
+    <div class="state-badge-row">
+        <span class="pill-badge">Action: {{lastAction()}}</span>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    h3, h4 {
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+    }
+
+    expander {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .actions-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid var(--gnome-border-subtle);
+        margin: 8px 0;
+    }
+
+    .state-badge-row {
+        display: flex;
+        align-items: center;
+
+        .pill-badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: var(--gnome-input);
+            color: var(--text-muted);
+            border: 1px solid var(--gnome-border-subtle);
+        }
+    }
+}`,
+        spec: `import { describe, it, expect, beforeEach } from 'vitest';
+
+describe('Expander Component Spec', () => {
+    let component: PlaygroundDemoComponent;
+
+    beforeEach(() => {
+        component = new PlaygroundDemoComponent();
+    });
+
+    it('should initialize lastAction to Ready', () => {
+        expect(component.lastAction()).toBe('Ready');
+    });
+
+    it('should update lastAction when toggleBasic is called', () => {
+        component.toggleBasic();
+        expect(component.lastAction()).toBe('Toggled basic expander');
+    });
+
+    it('should update lastAction when expandBasic is called', () => {
+        component.expandBasic();
+        expect(component.lastAction()).toBe('Expanded basic expander');
+    });
+
+    it('should update lastAction when collapseBasic is called', () => {
+        component.collapseBasic();
+        expect(component.lastAction()).toBe('Collapsed basic expander');
     });
 });`,
     },

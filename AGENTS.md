@@ -30,6 +30,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 - **KDE Plasma Breeze Cursor System**:
   - `var(--cursor-default)`, `var(--cursor-pointer)`, `var(--cursor-text)`, `var(--cursor-grab)`, `var(--cursor-grabbing)`, `var(--cursor-not-allowed)`, `var(--cursor-progress)`.
 - **SCSS Architecture**: All styling must use `@use '@styles' as *;` and never use inline `style="..."` attributes.
+- **Internal Design Reference Only**: "GNOME 50" is strictly an internal design system reference known only between the developer and AI agents to guide styling. NEVER output or display the string "GNOME 50" in user-facing UI copy, templates, sample descriptions, or public-facing documentation. Publicly, describe the aesthetics as "Adwaita" or glassmorphic design tokens.
 
 ---
 

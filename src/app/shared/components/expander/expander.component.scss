@@ -1,0 +1,156 @@
+@use '@styles' as *;
+
+expander,
+expander-component,
+.purity-expander,
+[expander] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--gnome-card);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-card, 12px);
+    overflow: hidden;
+    transition:
+        background var(--transition-fast),
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    &:hover {
+        border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .title {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-sm, 10px);
+        padding: 12px 16px;
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.4;
+        color: var(--gnome-text-primary, #ffffff);
+        cursor: var(--cursor-pointer, pointer);
+        user-select: none;
+        outline: none;
+        transition:
+            background var(--transition-fast),
+            color var(--transition-fast);
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--accent, #3584e4);
+            outline-offset: -2px;
+        }
+
+        &:active {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        img,
+        .expand-icon,
+        .icon-expand,
+        .icon-collapse {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            object-fit: contain;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition-normal);
+        }
+    }
+
+    .body {
+        display: none;
+        padding: 14px 16px 16px 16px;
+        border-top: 1px solid var(--gnome-border);
+        font-size: 13.5px;
+        line-height: 1.5;
+        color: var(--gnome-text-secondary, rgba(255, 255, 255, 0.75));
+        cursor: var(--cursor-default, default);
+        animation: purity-expander-fade-in 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    &.is-expanded,
+    &[aria-expanded='true'] {
+        > .body,
+        .body {
+            display: block;
+        }
+    }
+
+    &.is-collapsed,
+    &[aria-expanded='false'] {
+        > .body,
+        .body {
+            display: none;
+        }
+    }
+}
+
+/* Theme Adaptive Expand & Collapse Icons (targeted strictly to img tags) */
+img.icon-expand,
+.title img.icon-expand {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233584e4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+img.icon-collapse,
+.title img.icon-collapse {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233584e4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='18 15 12 9 6 15'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+/* Light Mode Overrides */
+[data-theme='light'] {
+    expander,
+    expander-component,
+    .purity-expander,
+    [expander] {
+        &:hover {
+            border-color: rgba(0, 0, 0, 0.16);
+        }
+
+        .title {
+            color: var(--gnome-text-primary, #1c1c1c);
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.04);
+            }
+
+            &:active {
+                background: rgba(0, 0, 0, 0.07);
+            }
+        }
+
+        .body {
+            color: var(--gnome-text-secondary, rgba(0, 0, 0, 0.7));
+        }
+    }
+
+    img.icon-expand,
+    .title img.icon-expand {
+        content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231c71d8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    }
+
+    img.icon-collapse,
+    .title img.icon-collapse {
+        content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231c71d8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='18 15 12 9 6 15'%3E%3C/polyline%3E%3C/svg%3E");
+    }
+}
+
+@keyframes purity-expander-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

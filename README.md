@@ -38,14 +38,14 @@
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
 - 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
 - 🖱️ **KDE Plasma Breeze Cursor System**: Complete cursor hierarchy using vector SVG cursors from KDE Plasma (`breeze_cursors`), including a 23-frame animated progress spinner cursor (`var(--cursor-progress)`) automatically synchronized with HTTP requests and reactive UI loaders.
-- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
-- 💬 **Popover & Anchored Tooltips (`<popover>`)**: Anchored popover system with position attributes (`top`, `bottom`, `left`, `right`), smart viewport boundary collision detection with auto-flipping and coordinate clamping, directional specular arrows, hover `mouseenter`/`mouseleave` interaction with smooth debounced transition, programmatic `@ViewChild()` controls (`open()`, `close()`, `toggle()`), `<slot>` content projection, and GNOME 50 translucent glassmorphism.
-- 🎛️ **Switch Button (`<switch-button>`)**: Native Custom Element toggle switch styled strictly to GNOME 50 Adwaita specifications, featuring fine-grained synchronous reactivity (`isOn` / `checked`), slotted label projection, programmatic control methods (`switchOn()`, `switchOff()`, `toggle()`), full keyboard accessibility (`Enter`, `Space`), and KDE Breeze pointer cursors.
-- 🔽 **Declarative Custom Dropdowns (`<dropdown>`)**: Native dropdown directive and component engine with inline consumer template projection (`<ul>`, `<li>`), parent component event scoping (`onclick`), fixed dynamic positioning, `document.body` teleportation at `z-index: 10000`, and GNOME 50 frosted glassmorphism.
+- 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
+- 💬 **Popover & Anchored Tooltips (`<popover>`)**: Anchored popover system with position attributes (`top`, `bottom`, `left`, `right`), smart viewport boundary collision detection with auto-flipping and coordinate clamping, directional specular arrows, hover `mouseenter`/`mouseleave` interaction with smooth debounced transition, programmatic `@ViewChild()` controls (`open()`, `close()`, `toggle()`), `<slot>` content projection, and translucent glassmorphism.
+- 🎛️ **Switch Button (`<switch-button>`)**: Native Custom Element toggle switch styled strictly to Adwaita specifications, featuring fine-grained synchronous reactivity (`isOn` / `checked`), slotted label projection, programmatic control methods (`switchOn()`, `switchOff()`, `toggle()`), full keyboard accessibility (`Enter`, `Space`), and KDE Breeze pointer cursors.
+- 🔽 **Declarative Custom Dropdowns (`<dropdown>`)**: Native dropdown directive and component engine with inline consumer template projection (`<ul>`, `<li>`), parent component event scoping (`onclick`), fixed dynamic positioning, `document.body` teleportation at `z-index: 10000`, and frosted glassmorphism.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
 - ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
-- 🎮 **Interactive Live Playground & In-Browser Test Runner (`<playground-view>`)**: Split-pane live code editor (GNOME 50 / Palenight styling) for TypeScript, HTML, SCSS, and unit test suites (`tests.spec.ts`) with instant in-browser compilation, Hot Reload, client-side unit test runner (`describe`, `it`, `expect`, `vi.fn`), live pass/fail assertion telemetry, and persistent `localStorage` snippet history ("Save Draft").
-- 🧭 **Draggable Floating Navigation Menu (`<navigation-menu>`)**: Floating draggable orb with GNOME 50 glassmorphic styling, hover drag handle, and integrated radial context menu for app-wide section and subsection navigation.
+- 🎮 **Interactive Live Playground & In-Browser Test Runner (`<playground-view>`)**: Split-pane live code editor (Palenight styling) for TypeScript, HTML, SCSS, and unit test suites (`tests.spec.ts`) with instant in-browser compilation, Hot Reload, client-side unit test runner (`describe`, `it`, `expect`, `vi.fn`), live pass/fail assertion telemetry, and persistent `localStorage` snippet history ("Save Draft").
+- 🧭 **Draggable Floating Navigation Menu (`<navigation-menu>`)**: Floating draggable orb with glassmorphic styling, hover drag handle, and integrated radial context menu for app-wide section and subsection navigation.
 - 🗺️ **Signal Router & Layout Engine (`router.ts`, `<router-layout>`)**: Native type-safe routing engine supporting dynamic parameters (`:id`), query strings (`?tab=...`), route guards (`canActivate`), programmatic navigation (`Router.navigate`), `<router-layout>` subview host, and `routerLink` directive with automated `.active-link` state management.
 - 🔎 **SEO & Head Metadata Engine (`SeoService`, `MetaService`)**: Dynamic `<title>`, `<meta>` tags, OpenGraph social sharing cards, Twitter Cards, Schema.org JSON-LD structured data, crawler-friendly noscript fallbacks, XML sitemaps, robots directives, and automated Router SEO synchronization for SPAs.
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
@@ -505,7 +505,7 @@ Purity provides a native `<dropdown>` directive engine (`@Directive('dropdown')`
 
 - **Document Body Teleportation**: The dropdown popup body is automatically appended directly to `document.body` (`z-index: 10000; position: fixed`), preventing parent `overflow: hidden`, `backdrop-filter`, or stacking context clipping.
 - **Dynamic Positioning & Viewport Boundary Auto-Placement**: Automatically detects screen bounds to flip upward if near the viewport bottom and updates coordinates dynamically on window scroll and resize.
-- **GNOME 50 Design System**: Glassmorphic frosted blur (`backdrop-filter: var(--blur-effect)`), specular borders, smooth cubic-bezier transitions, and KDE Plasma Breeze cursors.
+- **Design System**: Glassmorphic frosted blur (`backdrop-filter: var(--blur-effect)`), specular borders, smooth cubic-bezier transitions, and KDE Plasma Breeze cursors.
 
 ---
 
@@ -921,7 +921,7 @@ export class ModalViewComponent {
 
 ### 20. ⏳ Reactive HTTP & UI Loader Component (`<loader-component>`)
 
-Purity provides a lightweight, reactive inline loader custom element styled with GNOME 50 glassmorphism, accent SVG track animation, and automated Breeze loading cursor coordination:
+Purity provides a lightweight, reactive inline loader custom element styled with translucent glassmorphism, accent SVG track animation, and automated Breeze loading cursor coordination:
 
 ```typescript
 import { Component, signal, effect, startLoadingCursor, stopLoadingCursor } from '@purity/core';
@@ -967,7 +967,7 @@ export class LoaderComponent {
 
 ### 21. 📅 Date & Time Picker Component (`<date-time-picker>`) & Date Pipe (`date`)
 
-Purity includes a full-featured, reactive Date & Time Picker custom element styled in GNOME 50 Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
+Purity includes a full-featured, reactive Date & Time Picker custom element styled in Adwaita Dark and Light aesthetics with glassmorphic blur effects, body overlay teleportation, and smart viewport-aware auto-placement:
 
 - **Reactivity & Signals**: State (`selectedDate`, `isOpen`, `viewDate`, `workingHours`, `workingMinutes`, `restrictions`, `enableBlur`) driven by fine-grained Purity signals.
 - **Direct Body Overlay Teleportation**: Dropdown overlay automatically attaches directly to `document.body` at `z-index: 9999`, rendering cleanly above all other cards, stacking contexts, and radial menus without clipping.
@@ -1087,13 +1087,13 @@ export class MyViewComponent {
 
 ### 25. 🎛️ Switch Button Component (`<switch-button>`, `SwitchButtonComponent`)
 
-Purity includes a native Custom Element toggle switch styled strictly to GNOME 50 Adwaita specifications with fine-grained reactivity, `<slot>` label projection, and programmatic control:
+Purity includes a native Custom Element toggle switch styled strictly to Adwaita specifications with fine-grained reactivity, `<slot>` label projection, and programmatic control:
 
 * **Fine-Grained Reactive State**: Exposes synchronous signal `isOn = signal<boolean>(false)` and alias `checked = this.isOn` for standard checkbox semantics.
 * **Programmatic Control Methods**: Exposes `switchOn()`, `switchOff()`, and `toggle()` methods directly on the component class and custom element host.
 * **Slotted Label Projection**: Supports custom label projection via standard `<slot>` elements (`<switch-button>I am switch button!</switch-button>`).
 * **Accessible Interaction**: Automatically reflects `role="switch"`, `tabindex="0"`, and `aria-checked="true|false"`, supporting pointer clicks, touch, and keyboard activation via `Space` and `Enter`.
-* **GNOME 50 Adwaita Aesthetics**: Specular borders, Adwaita blue active glow, smooth cubic-bezier transitions (`var(--ease-gnome)`), tactile press feedback, and KDE Plasma Breeze pointer cursor tokens for both Dark and Light themes.
+* **Adwaita Aesthetics**: Specular borders, Adwaita blue active glow, smooth cubic-bezier transitions (`var(--ease-gnome)`), tactile press feedback, and KDE Plasma Breeze pointer cursor tokens for both Dark and Light themes.
 
 #### Basic Usage Example:
 

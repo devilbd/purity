@@ -16,6 +16,7 @@
 - Corner Radii: Window (16px), Card (12px), Control (8px), Pill/Badge (999px).
 - Breeze Cursors: `var(--cursor-default)`, `var(--cursor-pointer)`, `var(--cursor-text)`, `var(--cursor-grab)`, `var(--cursor-grabbing)`, `var(--cursor-not-allowed)`, `var(--cursor-progress)`.
 - Styling: Modular SCSS (`@use '@styles' as *;`). Never use inline `style="..."` attributes.
+- **Internal Reference Only**: "GNOME 50" is strictly an internal design reference between developer and agents. Never expose "GNOME 50" in user-facing UI copy or public docs; describe publicly as "Adwaita" or glassmorphic design tokens.
 
 ## 3. TypeScript & Path Aliases
 - Strict mode: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"strict": true`.

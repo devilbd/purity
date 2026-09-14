@@ -1,0 +1,108 @@
+@use '@styles' as *;
+
+:host,
+expander-sample {
+    display: block;
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.expander-sample-root {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+    padding: var(--spacing-xl);
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window);
+    backdrop-filter: var(--blur-effect);
+    -webkit-backdrop-filter: var(--blur-effect);
+
+    .sample-header {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-xs);
+
+        h3 {
+            margin: 0;
+            font-size: var(--font-size-lg);
+            color: var(--text-main);
+        }
+
+        .sample-description {
+            margin: 0;
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+
+            code {
+                font-family: var(--font-mono);
+                background: var(--gnome-card);
+                padding: 2px 6px;
+                border-radius: 4px;
+                border: 1px solid var(--gnome-border-subtle);
+                color: var(--accent);
+            }
+        }
+    }
+
+    .demo-card {
+        padding: var(--spacing-lg);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border);
+        border-radius: var(--radius-card);
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-md);
+
+        .telemetry-bar {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            padding-top: var(--spacing-sm);
+            border-top: 1px solid var(--gnome-border-subtle);
+
+            .telemetry-label {
+                font-size: var(--font-size-xs);
+                color: var(--text-secondary);
+                font-weight: 500;
+            }
+
+            .status-pill {
+                font-size: var(--font-size-xs);
+                font-weight: 600;
+                padding: 4px 10px;
+                border-radius: var(--radius-pill);
+
+                &.status-on {
+                    background: var(--gnome-success-bg);
+                    color: var(--gnome-success);
+                    border: 1px solid rgba(46, 194, 126, 0.3);
+                }
+
+                &.status-off {
+                    background: var(--gnome-input);
+                    color: var(--text-muted);
+                    border: 1px solid var(--gnome-border-subtle);
+                }
+            }
+
+            .last-action {
+                font-size: var(--font-size-xs);
+                color: var(--text-secondary);
+                font-style: italic;
+            }
+        }
+    }
+
+    .button-group {
+        display: flex;
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+    }
+}

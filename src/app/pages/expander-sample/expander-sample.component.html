@@ -1,0 +1,51 @@
+<div class="expander-sample-root window">
+    <div class="sample-header">
+        <h3>Expander Component (&lt;expander&gt;)</h3>
+        <p class="sample-description">
+            Simple expander component with reactive <code>isExpanded</code> signal, <code>toggle()</code>, <code>expand()</code>, <code>collapse()</code> methods, and icon variant.
+        </p>
+    </div>
+
+    <div class="demo-card">
+        <!-- 1. Simple Expander -->
+        <expander id="basic-expander">
+            <div class="title">
+                Expander title
+            </div>
+            <div class="body">
+                Expander body.
+            </div>
+        </expander>
+
+        <!-- 2. Icon Variant -->
+        <expander id="icon-expander" onchange="onIconExpanderChange(event)">
+            <div class="title">
+                <img class="{{expandOrCollapseIcon()}}" />
+                Expander title
+            </div>
+            <div class="body {{expandOrCollapseIcon()}}">
+                Expander body.
+            </div>
+        </expander>
+
+        <div class="button-group">
+            <button type="button" class="button-primary" onclick="expand()">
+                ▶ expand()
+            </button>
+            <button type="button" class="button-secondary" onclick="collapse()">
+                ⏹ collapse()
+            </button>
+            <button type="button" class="button-secondary" onclick="toggle()">
+                🔄 toggle()
+            </button>
+        </div>
+
+        <div class="telemetry-bar">
+            <span class="telemetry-label">Signal State:</span>
+            <span class="status-pill {{isBasicExpanded ? 'status-on' : 'status-off'}}">
+                {{isBasicExpanded ? '● EXPANDED (true)' : '○ COLLAPSED (false)'}}
+            </span>
+            <span class="last-action">{{lastAction()}}</span>
+        </div>
+    </div>
+</div>

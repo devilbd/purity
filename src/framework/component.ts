@@ -14,6 +14,7 @@ export interface ComponentOptions {
 
 const templateCache = new Map<string, string>();
 const expressionCache = new Map<string, Function>();
+export const componentRegistry = new Map<string, any>();
 
 /**
  * Transforms template pipe expressions (e.g. `value | myPipe: true : arg2`)
@@ -195,7 +196,7 @@ export function isInsideNestedComponent(node: Node, rootEl: HTMLElement): boolea
             ? node.parentElement
             : (node as HTMLElement).parentElement;
     while (current && current !== rootEl) {
-        if (current.tagName && current.tagName.includes('-')) {
+        if (current.tagName && (current.tagName.includes('-') || componentRegistry.has(current.tagName.toLowerCase()))) {
             return true;
         }
         current = current.parentElement;
@@ -284,6 +285,53 @@ function removeConditionalAttributes(el: Element): void {
     }
 }
 
+export function mountComponentOnElement(el: HTMLElement, ComponentClass: any): void {
+    if ((el as any).initialized) return;
+
+    const activeTarget = (ComponentClass as any).__target || ComponentClass;
+    if (typeof activeTarget === 'function') {
+        const userInstance = new (activeTarget as any)();
+        const frameworkProtectedMethods = new Set([
+            'render',
+            'connectedCallback',
+            'disconnectedCallback',
+            'loadTemplate',
+            'bindTemplate',
+        ]);
+
+        const propKeys = [
+            ...Object.getOwnPropertyNames(userInstance),
+            ...Object.getOwnPropertySymbols(userInstance),
+        ];
+        for (const key of propKeys) {
+            const desc = Object.getOwnPropertyDescriptor(userInstance, key);
+            if (desc) {
+                if (
+                    typeof key === 'string' &&
+                    frameworkProtectedMethods.has(key) &&
+                    desc.value === undefined &&
+                    !desc.get &&
+                    !desc.set
+                ) {
+                    continue;
+                }
+                Object.defineProperty(el, key, desc);
+            }
+        }
+    }
+
+    const descriptors = Object.getOwnPropertyDescriptors(ComponentClass.prototype);
+    for (const [key, desc] of Object.entries(descriptors)) {
+        if (key !== 'constructor' && !(key in el)) {
+            Object.defineProperty(el, key, desc);
+        }
+    }
+
+    if (typeof (el as any).connectedCallback === 'function') {
+        (el as any).connectedCallback();
+    }
+}
+
 /**
  * Recursively binds structural conditionals (if / else-if / else), for loops,
  * text interpolations, attribute bindings, directives, and validators across
@@ -291,6 +339,26 @@ function removeConditionalAttributes(el: Element): void {
  */
 function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: any) {
     if (!rootEl) return;
+
+    // 0. Auto-mount components whose selector does not contain a hyphen (e.g. <expander>)
+    for (const [tag, ComponentClass] of componentRegistry.entries()) {
+        if (!tag.includes('-')) {
+            const matches: HTMLElement[] = [];
+            if (rootEl.tagName && rootEl.tagName.toLowerCase() === tag) {
+                matches.push(rootEl);
+            }
+            matches.push(...Array.from(rootEl.querySelectorAll<HTMLElement>(tag)));
+
+            for (const el of matches) {
+                if (el.hasAttribute('data-purity-mounted')) continue;
+                el.setAttribute('data-purity-mounted', 'true');
+
+                if (!(el as any).initialized) {
+                    mountComponentOnElement(el, ComponentClass);
+                }
+            }
+        }
+    }
 
     // 1. Process structural conditional directives (`if`, `else-if`, `else`) inside rootEl
     const candidateIfElements = Array.from(rootEl.querySelectorAll('*')).filter((el): el is HTMLElement => {
@@ -1074,7 +1142,12 @@ export const ChildView = ViewChild;
 
 export const defineComponent = (name: string, component: any) => {
     if (typeof customElements === 'undefined') return;
+    const lower = name.toLowerCase();
+    componentRegistry.set(lower, component);
     const validName = name.includes('-') ? name : `${name}-component`;
+    if (!name.includes('-')) {
+        componentRegistry.set(validName.toLowerCase(), component);
+    }
     if (!customElements.get(validName)) {
         try {
             customElements.define(validName, component);

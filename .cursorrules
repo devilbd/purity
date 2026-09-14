@@ -60,6 +60,9 @@ Every AI agent working in this repository MUST strictly adhere to the rules, con
 
 ## 2. Design System & Theming Mandate: GNOME 50 Adwaita & KDE Breeze Cursors
 
+> [!IMPORTANT]
+> **Internal Design Reference Only**: "GNOME 50" is strictly an internal design reference between the developer and AI agents to guide styling of the Purity framework. NEVER output or display the string "GNOME 50" in user-facing UI copy, templates, sample descriptions, or public documentation. Publicly, describe the aesthetics as "Adwaita" or glassmorphic design tokens.
+
 Every UI element, section, card, button, input, dialog, and widget MUST strictly adhere to the **GNOME 50 Adwaita** design system:
 
 ### Visual Aesthetics & Glassmorphism

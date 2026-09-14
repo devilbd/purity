@@ -93,7 +93,7 @@
     position: relative;
     z-index: 1;
 
-    /* GNOME 50 "Shiny" effect: Subtle gradient and accent glow */
+    /* Shiny effect: Subtle gradient and accent glow */
     background: linear-gradient(
         to bottom,
         var(--text-main) 0%,
@@ -124,7 +124,7 @@
     }
 }
 
-/* GNOME 50 Theme Switcher Pill Button */
+/* Theme Switcher Pill Button */
 .theme-toggle-btn {
     display: inline-flex;
     align-items: center;

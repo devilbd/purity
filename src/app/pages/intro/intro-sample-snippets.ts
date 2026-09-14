@@ -804,7 +804,7 @@ export class PlaygroundDemoComponent {
         html: `<div class="sample-card window">
     <div class="header-row">
         <h3>🎯 Composable Drag &amp; Drop Behaviors</h3>
-        <span class="badge-pill">GNOME 50 Glassmorphism</span>
+        <span class="badge-pill">Glassmorphism</span>
     </div>
     <p>Hardware-accelerated pointer interaction with boundary constraints and magnetic snap-to-center.</p>
 
@@ -2484,7 +2484,7 @@ export class PlaygroundDemoComponent {
     },
     'switch-button': {
         id: 'switch-button',
-        title: '🎛️ GNOME 50 Switch Button (<switch-button>)',
+        title: '🎛️ Switch Button (<switch-button>)',
         ts: `import { Component, signal, ViewChild } from '@purity/core';
 import '@components/switch-button/switch-button.component';
 import type { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
@@ -2519,7 +2519,7 @@ export class PlaygroundDemoComponent {
     }
 }`,
         html: `<div class="sample-card window">
-    <h3>🎛️ GNOME 50 Switch Button</h3>
+    <h3>🎛️ Switch Button</h3>
     <p>Fine-grained reactive switch button component with methods for switchOn, switchOff, toggle, and slotted label.</p>
 
     <div class="switch-demo-box">
@@ -2615,6 +2615,141 @@ export class PlaygroundDemoComponent {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 14px;
+    }
+}`,
+    },
+    'expander': {
+        id: 'expander',
+        title: '↕️ Expander Component (<expander>)',
+        ts: `import { Component, signal, ViewChild } from '@purity/core';
+import '@components/expander/expander.component';
+import type { ExpanderComponent } from '@components/expander/expander.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#basicExpander')
+    basicExpander?: ExpanderComponent | null;
+
+    @ViewChild('#iconExpander')
+    iconExpander?: ExpanderComponent | null;
+
+    lastAction = signal<string>('Ready');
+
+    toggleBasic() {
+        this.basicExpander?.toggle();
+        this.lastAction.set('Toggled basic expander');
+    }
+
+    expandBasic() {
+        this.basicExpander?.expand();
+        this.lastAction.set('Expanded basic expander');
+    }
+
+    collapseBasic() {
+        this.basicExpander?.collapse();
+        this.lastAction.set('Collapsed basic expander');
+    }
+
+    toggleIcon() {
+        this.iconExpander?.toggle();
+        this.lastAction.set('Toggled icon expander');
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>↕️ Expander Component</h3>
+    <p>Collapsible card with expand, collapse, toggle methods, fine-grained reactivity, and icon variants.</p>
+
+    <!-- Standard Expander Variant -->
+    <h4>Standard Variant</h4>
+    <expander id="basicExpander">
+        <div class="title">
+            Expander title
+        </div>
+        <div class="body">
+            Expander body.
+        </div>
+    </expander>
+
+    <div class="actions-row">
+        <button type="button" class="button-primary" onclick="expandBasic()">expand()</button>
+        <button type="button" class="button-secondary" onclick="collapseBasic()">collapse()</button>
+        <button type="button" class="button-secondary" onclick="toggleBasic()">toggle()</button>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- Icon Expander Variant -->
+    <h4>Icon Variant</h4>
+    <expander id="iconExpander">
+        <div class="title">
+            <img class="{{expandOrCollapseIcon()}}" />
+            Expander title
+        </div>
+        <div class="body {{expandOrCollapseIcon()}}">
+            Expander body.
+        </div>
+    </expander>
+
+    <div class="actions-row">
+        <button type="button" class="button-secondary" onclick="toggleIcon()">toggle() Icon Expander</button>
+    </div>
+
+    <div class="state-badge-row">
+        <span class="pill-badge">Action: {{lastAction()}}</span>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    h3, h4 {
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+    }
+
+    expander {
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    .actions-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid var(--gnome-border-subtle);
+        margin: 8px 0;
+    }
+
+    .state-badge-row {
+        display: flex;
+        align-items: center;
+
+        .pill-badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: var(--gnome-input);
+            color: var(--text-muted);
+            border: 1px solid var(--gnome-border-subtle);
+        }
     }
 }`,
     },
