@@ -40,6 +40,7 @@
 - 🖱️ **KDE Plasma Breeze Cursor System**: Complete cursor hierarchy using vector SVG cursors from KDE Plasma (`breeze_cursors`), including a 23-frame animated progress spinner cursor (`var(--cursor-progress)`) automatically synchronized with HTTP requests and reactive UI loaders.
 - 📅 **Date & Time Picker System (`<date-time-picker>`)**: Modern reactive calendar & 24h scrollable time picker in GNOME 50 Adwaita aesthetic, featuring smart viewport auto-placement, body teleportation at `z-index: 9999`, year submenu, date restrictions, glassmorphic blur, and `@Pipe('date')` integration.
 - 💬 **Popover & Anchored Tooltips (`<popover>`)**: Anchored popover system with position attributes (`top`, `bottom`, `left`, `right`), smart viewport boundary collision detection with auto-flipping and coordinate clamping, directional specular arrows, hover `mouseenter`/`mouseleave` interaction with smooth debounced transition, programmatic `@ViewChild()` controls (`open()`, `close()`, `toggle()`), `<slot>` content projection, and GNOME 50 translucent glassmorphism.
+- 🎛️ **Switch Button (`<switch-button>`)**: Native Custom Element toggle switch styled strictly to GNOME 50 Adwaita specifications, featuring fine-grained synchronous reactivity (`isOn` / `checked`), slotted label projection, programmatic control methods (`switchOn()`, `switchOff()`, `toggle()`), full keyboard accessibility (`Enter`, `Space`), and KDE Breeze pointer cursors.
 - 🔽 **Declarative Custom Dropdowns (`<dropdown>`)**: Native dropdown directive and component engine with inline consumer template projection (`<ul>`, `<li>`), parent component event scoping (`onclick`), fixed dynamic positioning, `document.body` teleportation at `z-index: 10000`, and GNOME 50 frosted glassmorphism.
 - 🎯 **Radial Context Menu (`<radial-context-menu>`)**: Glassmorphic circular context menu with dual representation usages (Unicode Emojis or Lucide SVG vector assets), dynamic polygon pie slices, multi-level nested submenus, center button navigation, real-time telemetry state signals, and single-source-of-truth right-click context menu delegation via `setSelector()`.
 - ⏱️ **Analogue Clock Widget (`<analogue-clock>`)**: Standalone 2D Canvas clock widget in GNOME Adwaita Dark and Light themes with Retina/HiDPI subpixel clarity, frosted glass dial, 3D beveled hands, date aperture, continuous 60/120fps smooth sweep vs precision quartz ticking, and multi-timezone support.
@@ -141,14 +142,14 @@ purity/
         │   ├── cursors/         # Scalable vector cursor assets (91 SVGs)
         │   ├── mono/            # Adwaita Mono font
         │   └── radial-context-menu/ # Radial menu icon SVGs
-        ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, popover-sample, radial-context-menu-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
+        ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, popover-sample, radial-context-menu-sample, switch-button-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
         └── shared/
             ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
             ├── directives/      # Reusable DOM directives (dropdown, highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)
             ├── widgets/         # Rich standalone widgets (analogue-clock)
-            └── components/      # Reusable UI Web Components (modal, loader, notification, popover, date-time-picker, radial-context-menu, navigation-menu)
+            └── components/      # Reusable UI Web Components (modal, loader, notification, popover, switch-button, date-time-picker, radial-context-menu, navigation-menu)
 ```
 
 ---
@@ -1078,6 +1079,56 @@ export class MyViewComponent {
 
     closePopover() {
         this.popover?.close();
+    }
+}
+```
+
+---
+
+### 25. 🎛️ Switch Button Component (`<switch-button>`, `SwitchButtonComponent`)
+
+Purity includes a native Custom Element toggle switch styled strictly to GNOME 50 Adwaita specifications with fine-grained reactivity, `<slot>` label projection, and programmatic control:
+
+* **Fine-Grained Reactive State**: Exposes synchronous signal `isOn = signal<boolean>(false)` and alias `checked = this.isOn` for standard checkbox semantics.
+* **Programmatic Control Methods**: Exposes `switchOn()`, `switchOff()`, and `toggle()` methods directly on the component class and custom element host.
+* **Slotted Label Projection**: Supports custom label projection via standard `<slot>` elements (`<switch-button>I am switch button!</switch-button>`).
+* **Accessible Interaction**: Automatically reflects `role="switch"`, `tabindex="0"`, and `aria-checked="true|false"`, supporting pointer clicks, touch, and keyboard activation via `Space` and `Enter`.
+* **GNOME 50 Adwaita Aesthetics**: Specular borders, Adwaita blue active glow, smooth cubic-bezier transitions (`var(--ease-gnome)`), tactile press feedback, and KDE Plasma Breeze pointer cursor tokens for both Dark and Light themes.
+
+#### Basic Usage Example:
+
+```html
+<!-- 1. HTML Template: Declarative Switch Button with Slotted Label -->
+<switch-button id="my-switch">
+    I am switch button!
+</switch-button>
+```
+
+```typescript
+// 2. Component Class: Programmatic Control via @ViewChild
+import { Component, ViewChild } from '@purity/core';
+import '@components/switch-button/switch-button.component';
+import type { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
+
+@Component({ selector: 'settings-view', templateUrl: './settings-view.html' })
+export class SettingsViewComponent {
+    @ViewChild('#my-switch')
+    private mySwitch?: SwitchButtonComponent | null;
+
+    turnOn() {
+        this.mySwitch?.switchOn();
+    }
+
+    turnOff() {
+        this.mySwitch?.switchOff();
+    }
+
+    toggle() {
+        this.mySwitch?.toggle();
+    }
+
+    checkState() {
+        console.log('Is switch ON:', this.mySwitch?.isOn());
     }
 }
 ```

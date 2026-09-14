@@ -111,6 +111,7 @@ purity/
         │   ├── popover-sample/  # <popover-sample> anchored popover showcase with directional collision detection
         │   ├── radial-context-menu-sample/ # <radial-context-menu-sample> dual-usage showcase for radial menu (Emoji & SVG)
         │   ├── router-sample/   # <router-sample> interactive router showcase with <router-layout> and signal inspector
+        │   ├── switch-button-sample/ # <switch-button-sample> interactive showcase for switch button toggle & methods
         │   └── virtual-for-sample/ # <virtual-for-sample> high-performance 100k virtual scroll repeater showcase
         └── shared/
             ├── behaviors/       # Composable DOM behaviors
@@ -133,7 +134,8 @@ purity/
                 ├── navigation-menu/ # <navigation-menu> draggable floating radial navigation menu
                 ├── notification/ # <notification-component> multi-position reactive toast notifications
                 ├── popover/     # <popover> / <popover-component> anchored popover with viewport collision auto-flipping
-                └── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
+                ├── radial-context-menu/ # <radial-context-menu> circular context menu with pie segments & submenus
+                └── switch-button/ # <switch-button> GNOME 50 toggle switch with signals & programmatic methods
 ```
 
 ---
