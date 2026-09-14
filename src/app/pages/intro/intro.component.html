@@ -1204,6 +1204,55 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
     }
 }</code></pre>
         </div>
+
+        <!-- 29. Switch Button Component -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>29. 🎛️ Switch Button Component (<code>&lt;switch-button&gt;</code> / <code>SwitchButtonComponent</code>)</h4>
+                    <p>Native GNOME 50 Adwaita toggle switch with fine-grained reactivity, <code>&lt;slot&gt;</code> label projection, and exposed <code>switchOn()</code>, <code>switchOff()</code>, and <code>toggle()</code> methods:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('switch-button')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="cmt">&lt;!-- 1. HTML Template: Declarative switch-button with slotted label --&gt;</span>
+<span class="tag">&lt;switch-button</span> <span class="attr">id</span>=<span class="str">"my-switch"</span><span class="tag">&gt;</span>
+    I am switch button!
+<span class="tag">&lt;/switch-button&gt;</span>
+
+<span class="cmt">&lt;!-- 2. Component Class: Programmatic methods &amp; reactive signal state --&gt;</span>
+<span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">ViewChild</span> } <span class="kw">from</span> <span class="str">'@purity/core'</span>;
+<span class="kw">import</span> <span class="str">'@components/switch-button/switch-button.component'</span>;
+<span class="kw">import type</span> { <span class="typ">SwitchButtonComponent</span> } <span class="kw">from</span> <span class="str">'@components/switch-button/switch-button.component'</span>;
+
+<span class="dec">@Component</span>({ selector: <span class="str">'my-settings-view'</span>, templateUrl: <span class="str">'./my-settings-view.html'</span> })
+<span class="kw">export class</span> <span class="typ">MySettingsViewComponent</span> {
+    <span class="dec">@ViewChild</span>(<span class="str">'#my-switch'</span>)
+    <span class="kw">private</span> mySwitch?: <span class="typ">SwitchButtonComponent</span> | <span class="kw">null</span>;
+
+    <span class="fn">turnOn</span>() {
+        <span class="kw">this</span>.mySwitch?.<span class="fn">switchOn</span>();
+    }
+
+    <span class="fn">turnOff</span>() {
+        <span class="kw">this</span>.mySwitch?.<span class="fn">switchOff</span>();
+    }
+
+    <span class="fn">toggleState</span>() {
+        <span class="kw">this</span>.mySwitch?.<span class="fn">toggle</span>();
+    }
+
+    <span class="fn">checkState</span>() {
+        console.<span class="fn">log</span>(<span class="str">'Switch state:'</span>, <span class="kw">this</span>.mySwitch?.isOn());
+    }
+}</code></pre>
+        </div>
     </div>
 
     <!-- Bottom CTA Button -->

@@ -1,0 +1,8 @@
+<div class="switch-container {{isOn() ? 'is-on' : 'is-off'}} {{disabled() ? 'is-disabled' : ''}}">
+    <div class="switch-track" aria-hidden="true">
+        <div class="switch-thumb"></div>
+    </div>
+    <span class="switch-label">
+        <slot></slot>
+    </span>
+</div>

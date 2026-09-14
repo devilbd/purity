@@ -2482,6 +2482,148 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+    'switch-button': {
+        id: 'switch-button',
+        title: '🎛️ GNOME 50 Switch Button (<switch-button>)',
+        ts: `import { Component, signal, ViewChild } from '@purity/core';
+import '@components/switch-button/switch-button.component';
+import type { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    @ViewChild('#my-switch')
+    mySwitch?: SwitchButtonComponent | null;
+
+    switchState = signal<boolean>(false);
+
+    protected onInit() {
+        const host = this as unknown as HTMLElement;
+        const sw = host.querySelector('#my-switch');
+        if (sw) {
+            sw.addEventListener('change', (e: any) => {
+                this.switchState.set(e.detail?.checked ?? false);
+            });
+        }
+    }
+
+    turnOn() {
+        this.mySwitch?.switchOn();
+        this.switchState.set(this.mySwitch?.isOn() ?? true);
+    }
+
+    turnOff() {
+        this.mySwitch?.switchOff();
+        this.switchState.set(this.mySwitch?.isOn() ?? false);
+    }
+
+    toggleState() {
+        this.mySwitch?.toggle();
+        this.switchState.set(this.mySwitch?.isOn() ?? !this.switchState());
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>🎛️ GNOME 50 Switch Button</h3>
+    <p>Fine-grained reactive switch button component with methods for switchOn, switchOff, toggle, and slotted label.</p>
+
+    <div class="switch-demo-box">
+        <switch-button id="my-switch">
+            I am switch button!
+        </switch-button>
+    </div>
+
+    <div class="state-badge-row">
+        <span class="pill-badge {{switchState() ? 'active' : ''}}">
+            Status: {{switchState() ? 'ON' : 'OFF'}}
+        </span>
+    </div>
+
+    <div class="actions-row">
+        <button type="button" class="button-primary" onclick="turnOn()">switchOn()</button>
+        <button type="button" class="button-secondary" onclick="turnOff()">switchOff()</button>
+        <button type="button" class="button-secondary" onclick="toggleState()">toggle()</button>
+    </div>
+
+    <hr class="divider" />
+
+    <h4>More Switch Examples</h4>
+    <div class="switches-grid">
+        <switch-button checked>Dark Theme</switch-button>
+        <switch-button checked>Desktop Notifications</switch-button>
+        <switch-button>Background Sync</switch-button>
+        <switch-button disabled>Biometric Authentication</switch-button>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    h3, h4 {
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    p {
+        margin: 0;
+        font-size: var(--font-size-sm);
+        color: var(--text-secondary);
+    }
+
+    .switch-demo-box {
+        padding: 20px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border);
+        border-radius: var(--radius-card);
+        display: flex;
+        align-items: center;
+    }
+
+    .state-badge-row {
+        display: flex;
+        align-items: center;
+
+        .pill-badge {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: var(--gnome-input);
+            color: var(--text-muted);
+            border: 1px solid var(--gnome-border-subtle);
+
+            &.active {
+                background: var(--gnome-success-bg);
+                color: var(--gnome-success);
+                border-color: rgba(46, 194, 126, 0.3);
+            }
+        }
+    }
+
+    .actions-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .divider {
+        border: none;
+        border-top: 1px solid var(--gnome-border-subtle);
+        margin: 8px 0;
+    }
+
+    .switches-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+    }
+}`,
+    },
 };
 
 export function getIntroSampleSnippet(sampleId: string): IntroSampleSnippet | null {

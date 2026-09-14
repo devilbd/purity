@@ -1,0 +1,127 @@
+@use '@styles' as *;
+
+/* ==========================================================================
+   Purity Design System - GNOME 50 Adwaita Switch Button Component
+   ========================================================================== */
+
+:host,
+switch-button {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    outline: none;
+    cursor: var(--cursor-pointer);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    border-radius: var(--radius-pill);
+    transition: opacity var(--transition-fast) var(--ease-gnome);
+
+    &:focus-visible {
+        box-shadow: 0 0 0 2px var(--gnome-border-focus);
+    }
+
+    &.is-disabled,
+    &[disabled] {
+        cursor: var(--cursor-not-allowed);
+        opacity: 0.5;
+        pointer-events: none;
+    }
+}
+
+.switch-container {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: inherit;
+
+    &.is-disabled {
+        cursor: var(--cursor-not-allowed);
+    }
+}
+
+.switch-track {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 46px;
+    height: 26px;
+    border-radius: var(--radius-pill);
+    background: var(--gnome-input);
+    border: 1px solid var(--gnome-border);
+    box-sizing: border-box;
+    cursor: inherit;
+    transition:
+        background-color var(--transition-normal) var(--ease-gnome),
+        border-color var(--transition-normal) var(--ease-gnome),
+        box-shadow var(--transition-normal) var(--ease-gnome);
+
+    &:hover {
+        border-color: var(--gnome-border-focus);
+        background: var(--gnome-input-hover);
+    }
+}
+
+.switch-thumb {
+    position: absolute;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.28),
+        0 1px 2px rgba(0, 0, 0, 0.16);
+    transition:
+        transform var(--transition-normal) var(--ease-gnome),
+        width var(--transition-fast) var(--ease-gnome),
+        background-color var(--transition-fast) var(--ease-gnome),
+        box-shadow var(--transition-fast) var(--ease-gnome);
+    transform: translateX(0);
+}
+
+/* Active / Press feedback */
+:host(:active:not(.is-disabled)) .switch-thumb,
+switch-button:active:not(.is-disabled) .switch-thumb {
+    width: 21px;
+}
+
+/* ON State */
+.switch-container.is-on,
+:host(.is-on) .switch-container {
+    .switch-track {
+        background: var(--accent);
+        border-color: var(--accent-hover);
+        box-shadow: 0 0 10px var(--accent-shadow);
+
+        &:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-active);
+        }
+    }
+
+    .switch-thumb {
+        transform: translateX(20px);
+        background: #ffffff;
+    }
+}
+
+:host(:active:not(.is-disabled).is-on) .switch-thumb,
+switch-button:active:not(.is-disabled).is-on .switch-thumb {
+    transform: translateX(17px);
+    width: 21px;
+}
+
+.switch-label {
+    font-family: var(--font-main);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    color: var(--text-main);
+    line-height: 1.4;
+    cursor: inherit;
+    transition: color var(--transition-fast) var(--ease-gnome);
+
+    &:empty {
+        display: none;
+    }
+}

@@ -81,6 +81,27 @@ describe('NavigationMenuComponent', () => {
         demoWindow.remove();
     });
 
+    it('should navigate to switch-button-sample and auto-expand demo container', () => {
+        const demoWindow = document.createElement('div');
+        demoWindow.id = 'demo-window';
+        demoWindow.className = 'demo-hidden';
+        document.body.appendChild(demoWindow);
+
+        const switchTarget = document.createElement('div');
+        switchTarget.id = 'switch-button-sample';
+        demoWindow.appendChild(switchTarget);
+
+        navMenu.handleNavigate({
+            name: 'Switch Button',
+            data: { hash: '#switch-button-sample' },
+        });
+
+        expect(demoWindow.classList.contains('demo-visible')).toBe(true);
+        expect(demoWindow.classList.contains('demo-hidden')).toBe(false);
+
+        demoWindow.remove();
+    });
+
     it('should handle onOrbClick without radial menu gracefully', () => {
         const mockEvent = {
             stopPropagation: vi.fn(),

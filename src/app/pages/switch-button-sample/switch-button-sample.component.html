@@ -1,0 +1,80 @@
+<div class="switch-sample-root window">
+    <div class="sample-header">
+        <h3>Switch Button Component (&lt;switch-button&gt;)</h3>
+        <p class="sample-description">
+            Native Custom Element toggle switch styled strictly to GNOME 50 Adwaita specifications.
+            Features synchronous signals, <code>&lt;slot&gt;</code> label projection, and exposed <code>switchOn()</code>, <code>switchOff()</code>, and <code>toggle()</code> methods.
+        </p>
+    </div>
+
+    <!-- 1. Standard Slotted Presentation -->
+    <div class="sample-section">
+        <div class="section-title">
+            <strong>1. Component Presentation &amp; Slotted Label:</strong>
+        </div>
+
+        <div class="demo-card">
+            <div class="switch-row">
+                <switch-button id="demo-main-switch">
+                    I am switch button!
+                </switch-button>
+            </div>
+            <div class="telemetry-bar">
+                <span class="telemetry-label">Main Switch Signal State:</span>
+                <span class="status-pill {{mainSwitchState() ? 'status-on' : 'status-off'}}">
+                    {{mainSwitchState() ? '● ON (true)' : '○ OFF (false)'}}
+                </span>
+                <span class="last-action">{{lastActionLog()}}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Programmatic Controls via @ViewChild -->
+    <div class="sample-section">
+        <div class="section-title">
+            <strong>2. Programmatic Controls via @ViewChild:</strong>
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="button-primary" onclick="onProgrammaticSwitchOn()">
+                ▶ switchOn()
+            </button>
+            <button type="button" class="button-secondary" onclick="onProgrammaticSwitchOff()">
+                ⏹ switchOff()
+            </button>
+            <button type="button" class="button-secondary" onclick="onProgrammaticToggle()">
+                🔄 toggle()
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. Configurations & Features -->
+    <div class="sample-section">
+        <div class="section-title">
+            <strong>3. Feature Preferences &amp; States:</strong>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <switch-button checked>
+                    Push Notifications
+                </switch-button>
+            </div>
+            <div class="feature-item">
+                <switch-button checked>
+                    Hardware Acceleration
+                </switch-button>
+            </div>
+            <div class="feature-item">
+                <switch-button>
+                    Auto-Save Drafts
+                </switch-button>
+            </div>
+            <div class="feature-item">
+                <switch-button disabled>
+                    Enterprise SSO (Disabled)
+                </switch-button>
+            </div>
+        </div>
+    </div>
+</div>

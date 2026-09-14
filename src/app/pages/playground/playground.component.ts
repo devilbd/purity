@@ -28,6 +28,8 @@ import '@components/radial-context-menu/radial-context-menu.component';
 import { RadialContextMenuComponent } from '@components/radial-context-menu/radial-context-menu.component';
 import '@components/popover/popover.component';
 import { PopoverComponent } from '@components/popover/popover.component';
+import '@components/switch-button/switch-button.component';
+import { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
 
 // Standalone Widgets
 import '@widgets/analogue-clock/analogue-clock.component';
@@ -697,6 +699,7 @@ export class PlaygroundComponent {
             FormsValidationValidator,
             EmptySampleComponent,
             PopoverComponent,
+            SwitchButtonComponent,
         };
     }
 
