@@ -2497,31 +2497,25 @@ export class PlaygroundDemoComponent {
     @ViewChild('#my-switch')
     mySwitch?: SwitchButtonComponent | null;
 
-    switchState = signal<boolean>(false);
+    lastAction = signal<string>('Ready');
 
-    protected onInit() {
-        const host = this as unknown as HTMLElement;
-        const sw = host.querySelector('#my-switch');
-        if (sw) {
-            sw.addEventListener('change', (e: any) => {
-                this.switchState.set(e.detail?.checked ?? false);
-            });
-        }
+    get isSwitchOn(): boolean {
+        return this.mySwitch?.isOn() ?? false;
     }
 
     turnOn() {
         this.mySwitch?.switchOn();
-        this.switchState.set(this.mySwitch?.isOn() ?? true);
+        this.lastAction.set('switchOn() called via @ViewChild');
     }
 
     turnOff() {
         this.mySwitch?.switchOff();
-        this.switchState.set(this.mySwitch?.isOn() ?? false);
+        this.lastAction.set('switchOff() called via @ViewChild');
     }
 
     toggleState() {
         this.mySwitch?.toggle();
-        this.switchState.set(this.mySwitch?.isOn() ?? !this.switchState());
+        this.lastAction.set('toggle() called via @ViewChild');
     }
 }`,
         html: `<div class="sample-card window">
@@ -2535,8 +2529,8 @@ export class PlaygroundDemoComponent {
     </div>
 
     <div class="state-badge-row">
-        <span class="pill-badge {{switchState() ? 'active' : ''}}">
-            Status: {{switchState() ? 'ON' : 'OFF'}}
+        <span class="pill-badge {{isSwitchOn ? 'active' : ''}}">
+            Status: {{isSwitchOn ? 'ON' : 'OFF'}}
         </span>
     </div>
 

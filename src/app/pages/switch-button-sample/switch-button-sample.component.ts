@@ -9,41 +9,26 @@ import type { SwitchButtonComponent } from '@components/switch-button/switch-but
 })
 export class SwitchButtonSampleComponent {
     @ViewChild('#demo-main-switch')
-    private mainSwitch?: SwitchButtonComponent | null;
+    public mainSwitch?: SwitchButtonComponent | null;
 
-    public mainSwitchState = signal<boolean>(false);
-    public lastActionLog = signal<string>('Ready. Click switch directly or use programmatic buttons.');
+    public lastAction = signal<string>('Ready. Click switch directly or use @ViewChild controls.');
 
-    protected onInit(): void {
-        const host = this as unknown as HTMLElement;
-        const mainEl = host.querySelector?.('#demo-main-switch');
-        if (mainEl) {
-            mainEl.addEventListener('change', (e: any) => {
-                const checked = e.detail?.checked ?? false;
-                this.mainSwitchState.set(checked);
-                this.lastActionLog.set(`User interacted with switch: state is now ${checked ? 'ON' : 'OFF'}`);
-            });
-        }
+    public get isSwitchOn(): boolean {
+        return this.mainSwitch?.isOn() ?? false;
     }
 
-    public onProgrammaticSwitchOn(): void {
-        const sw = this.mainSwitch || (typeof document !== 'undefined' ? (document.querySelector('#demo-main-switch') as any) : null);
-        sw?.switchOn();
-        this.mainSwitchState.set(sw?.isOn ? sw.isOn() : true);
-        this.lastActionLog.set('Programmatic switchOn() invoked via @ViewChild');
+    public switchOn(): void {
+        this.mainSwitch?.switchOn();
+        this.lastAction.set('switchOn() invoked via @ViewChild');
     }
 
-    public onProgrammaticSwitchOff(): void {
-        const sw = this.mainSwitch || (typeof document !== 'undefined' ? (document.querySelector('#demo-main-switch') as any) : null);
-        sw?.switchOff();
-        this.mainSwitchState.set(sw?.isOn ? sw.isOn() : false);
-        this.lastActionLog.set('Programmatic switchOff() invoked via @ViewChild');
+    public switchOff(): void {
+        this.mainSwitch?.switchOff();
+        this.lastAction.set('switchOff() invoked via @ViewChild');
     }
 
-    public onProgrammaticToggle(): void {
-        const sw = this.mainSwitch || (typeof document !== 'undefined' ? (document.querySelector('#demo-main-switch') as any) : null);
-        sw?.toggle();
-        this.mainSwitchState.set(sw?.isOn ? sw.isOn() : !this.mainSwitchState());
-        this.lastActionLog.set('Programmatic toggle() invoked via @ViewChild');
+    public toggle(): void {
+        this.mainSwitch?.toggle();
+        this.lastAction.set('toggle() invoked via @ViewChild');
     }
 }

@@ -21,10 +21,10 @@
             </div>
             <div class="telemetry-bar">
                 <span class="telemetry-label">Main Switch Signal State:</span>
-                <span class="status-pill {{mainSwitchState() ? 'status-on' : 'status-off'}}">
-                    {{mainSwitchState() ? '● ON (true)' : '○ OFF (false)'}}
+                <span class="status-pill {{isSwitchOn ? 'status-on' : 'status-off'}}">
+                    {{isSwitchOn ? '● ON (true)' : '○ OFF (false)'}}
                 </span>
-                <span class="last-action">{{lastActionLog()}}</span>
+                <span class="last-action">{{lastAction()}}</span>
             </div>
         </div>
     </div>
@@ -36,19 +36,19 @@
         </div>
 
         <div class="button-group">
-            <button type="button" class="button-primary" onclick="onProgrammaticSwitchOn()">
+            <button type="button" class="button-primary" onclick="switchOn()">
                 ▶ switchOn()
             </button>
-            <button type="button" class="button-secondary" onclick="onProgrammaticSwitchOff()">
+            <button type="button" class="button-secondary" onclick="switchOff()">
                 ⏹ switchOff()
             </button>
-            <button type="button" class="button-secondary" onclick="onProgrammaticToggle()">
+            <button type="button" class="button-secondary" onclick="toggle()">
                 🔄 toggle()
             </button>
         </div>
     </div>
 
-    <!-- 3. Configurations & Features -->
+    <!-- 3. Features & States -->
     <div class="sample-section">
         <div class="section-title">
             <strong>3. Feature Preferences &amp; States:</strong>
