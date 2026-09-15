@@ -98,7 +98,6 @@ purity/
 ├── vitest.config.ts             # Vitest configuration (happy-dom, decorator transpile, path aliases)
 ├── .env.example                 # Environment variables reference template
 ├── .antigravityrules            # Antigravity agent rules & architectural constraints
-├── .cursorrules                 # Cursor agent rules & architectural constraints
 ├── AGENTS.md                    # Multi-agent guidelines & architectural rules
 ├── vite.config.ts               # Vite configuration & decorator / template inlining plugin
 ├── README.md                    # Project documentation (this file)
