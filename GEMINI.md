@@ -174,6 +174,18 @@ Purity features a synchronous reactive primitives engine:
   });
   ```
 
+* **`untrack<T>(fn: () => T): T`**:
+  Executes a function without capturing any signal dependencies in the currently executing reactive context (`effect` or `computed`). Essential for DOM attribute synchronization, event side-effects, and preventing circular reactive loops:
+  ```typescript
+  effect(() => {
+      const active = isActive(); // Tracked dependency
+      untrack(() => {
+          // Accessing signals here does NOT subscribe the outer effect
+          syncState(childComponent.isOn());
+      });
+  });
+  ```
+
 * **How Fine-Grained Reactive Dependency Tracking Works Under the Hood**:
   - **Execution Context Stack (`context: Function[]`)**: Maintains a stack of currently running computations.
   - **Subscription on Read**: When a signal getter is invoked (`count()`), it checks `context[context.length - 1]`. If an effect is running, that effect function is added to the signal's internal `subscriptions: Set<Function>`.
@@ -212,7 +224,7 @@ Purity features a synchronous reactive primitives engine:
   }
   ```
 
-* **Structural Array Repeater (`for="let obj of myArray"`)**:
+* **Structural Array Repeater (`for="let obj of myArray"`) & Custom Component Interoperability**:
   Components support declarative structural loop templates with `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically creates scoped item contexts, tracks array signals reactively, supports nested loops, and seamlessly updates on array mutations (`.update()`, `.set()`):
 
   ```html
@@ -225,6 +237,13 @@ Purity features a synchronous reactive primitives engine:
       </div>
   </div>
   ```
+
+  **Full Custom Component Interoperability**:
+  Purity components seamlessly interoperate with structural repeaters both **directly on the custom element tag** (e.g. `<expander for="let item of items">`) and **nested within repeated subtrees** (e.g. `<div for="let obj of members"><switch-button ...><expander>...</expander></div>`):
+  - **Context Proxy Chaining (`createComponentContext`)**: Child components mounted within repeaters receive an intelligent context proxy that exposes their own instance methods and properties while delegating `<slot>` interpolations, expressions, and event handlers to the repeated row context (`item`, `index`, `$first`, `$last`, parent methods).
+  - **Safe Signal Attribute Synchronization (`syncComponentProperty`)**: Attribute updates bound to component signals (e.g. `checked="{{ obj.status === 'active' }}"`, `is-expanded="{{ item.isOpen }}"`, `is-open="{{ modal.open }}"`, `is-loading="{{ proc.busy }}"`, `value="{{ item.date }}"`) detect underlying Purity signals and invoke `.set(value)` rather than overwriting signals with primitive values.
+  - **Untracked Attribute Side-Effects (`untrack`)**: Attribute synchronization and component signal checks run inside `untrack()` closures, preventing downstream component property reads from becoming reactive dependencies of parent template expressions and avoiding circular re-render cascades.
+  - **DOM Mount Idempotency Guard (`data-purity-mounted="true"`)**: Ensures elements in the active DOM are mounted only once, avoids duplicate lifecycle executions, and automatically cleans up clone mount markers so newly spawned repeater rows mount fresh instances cleanly.
 
 * **High-Performance Virtualized Repeater (`virtual-for="let item, index of items; itemHeight: 48; buffer: 8; height: 420px; scrollIndex: jumpSignal"`)**:
   Purity includes a dedicated GPU-accelerated virtual scrolling engine for massive datasets (1,000 to 100,000+ items). It renders only the visible viewport slice (~20–30 nodes) with overscan buffering, absolute GPU transforms, phantom scroll height simulation, batched `DocumentFragment` insertion, declarative `scrollIndex` reactive signal binding, zero layout thrashing, and sub-millisecond updates:
@@ -856,6 +875,8 @@ src/app/shared/components/
 │   ├── loader.component.html
 │   ├── loader.component.scss
 │   └── loader.component.spec.ts
+src/framework/
+└── component-repeater.spec.ts # Dedicated suite for direct & nested component repeaters
 ```
 
 ### Component Testing Pattern

@@ -24,7 +24,7 @@
 ### Key Highlights
 
 - ⚡ **Zero Heavy Runtime Dependencies**: Pure TypeScript and Web APIs bundled with Vite.
-- 🔄 **Fine-Grained Reactivity**: Synchronous `signal`, `computed`, and `effect` primitives with automated dependency tracking and sub-microsecond updates.
+- 🔄 **Fine-Grained Reactivity**: Synchronous `signal`, `computed`, `effect`, and `untrack` primitives with automated dependency tracking and sub-microsecond updates.
 - 💉 **First-Class Dependency Injection**: Built-in DI container with `@Injectable` decorator and `inject()` token resolution.
 - 🌐 **Native HTTP Client & Interceptors**: Injectable `HttpClient` service with full HTTP methods (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`), composable onion-model request/response interceptors, typed models (`HttpRequest`, `HttpResponse`, `HttpErrorResponse`), header/query helpers (`HttpHeaders`, `HttpParams`), and reactive signal resource bindings (`createResource`).
 - ⚡ **Transform Pipes**: Reusable formatting classes with `@Pipe` and `BasePipe`, supporting static arguments and dynamic reactive signal parameters in templates (`{{ val | myPipe: isDynamicSignal() }}`).
@@ -34,7 +34,7 @@
 - 🧩 **Native Web Components**: Standard classes decorated with `@Component` transformed into Custom Elements with automatic template inlining and lifecycle management.
 - 🔍 **Child View Queries (`@ViewChild`)**: Automatic child element and component querying by CSS selector with fallback resolution for teleported/body-prepended elements.
 - 📄 **Handlebars Template Interpolation & Pipes**: Reactive `{{ expression | pipe }}` handlebars syntax with compiled expression caching (`expressionCache`). Standalone `<code>` tags evaluate signal expressions dynamically while `<pre>` blocks preserve unparsed code snippets.
-- 🔁 **Structural Array Repeater**: Loop template engine (`for="let obj of myArray"` or `for="let obj, index of myArray"`) with scoped item contexts, property binding, index tracking, and nested loop support.
+- 🔁 **Structural Array Repeater & Custom Component Interoperability**: Loop template engine (`for="let obj of myArray"` and `virtual-for`) with scoped item contexts, property binding, index tracking, nested loop support, and seamless Custom Element interoperability (direct and nested) with context proxy chaining, safe signal attribute synchronization, and untracked side-effects.
 - 📦 **Content Projection (`<slot>`)**: Native slot transclusion allowing consumer templates to project custom HTML and nested components.
 - 🌓 **Modular SCSS Theming & Light/Dark Theme Support**: First-class theme engine (`_theme-dark.scss` as baseline default, `_theme-light.scss`, `ThemeService`) with automatic `localStorage` persistence, OS `prefers-color-scheme` synchronization, high-contrast code snippet tokens, and header switch toggle.
 - 🖱️ **KDE Plasma Breeze Cursor System**: Complete cursor hierarchy using vector SVG cursors from KDE Plasma (`breeze_cursors`), including a 23-frame animated progress spinner cursor (`var(--cursor-progress)`) automatically synchronized with HTTP requests and reactive UI loaders.
@@ -160,7 +160,7 @@ purity/
 Purity features a synchronous reactivity engine with automated dependency tracking and sub-microsecond updates:
 
 ```typescript
-import { signal, effect, computed } from '@purity/core';
+import { signal, effect, computed, untrack } from '@purity/core';
 
 // 1. Create typed reactive signals
 const count = signal<number>(5);
@@ -181,6 +181,15 @@ count.update(n => n + 1); // 11 -> total() automatically becomes 22
 // 5. Effects automatically register signal/computed dependencies and re-run synchronously
 effect(() => {
     console.log(`Calculated total: ${total()} | Is Even: ${isEven()}`);
+});
+
+// 6. untrack() executes logic without subscribing the active effect to read signals
+effect(() => {
+    const isReady = isEven(); // Tracked dependency
+    untrack(() => {
+        // Reads here will NOT re-trigger this effect when count changes
+        console.log('Untracked count inspection:', count());
+    });
 });
 ```
 
@@ -790,7 +799,7 @@ export class UserCardComponent {
 
 ---
 
-### 15. 🔁 Structural Array Repeater (`for="let obj of myArray"`)
+### 15. 🔁 Structural Array Repeater (`for="let obj of myArray"`) & Component Interoperability
 
 Purity provides native structural loop templates via `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically establishes scoped item evaluation contexts, tracks array signals reactively, supports nested loops, and seamlessly updates DOM nodes on array mutations (`.update()`, `.set()`):
 
@@ -810,6 +819,52 @@ Purity provides native structural loop templates via `for="let item of items"` o
     </div>
 </div>
 ```
+
+#### 🧩 Custom Component Interoperability in Repeaters
+
+All Purity Web Components (`<expander>`, `<switch-button>`, `<date-time-picker>`, `<analogue-clock>`, `<modal-view>`, `<loader-component>`, `<popover>`) are fully interoperable with repeaters:
+
+1. **Components Nested Inside Repeater Rows**:
+   Child components nested inside a repeater row inherit the repeated item's context via proxy chaining (`createComponentContext`), project `<slot>` content bound to the repeated item (`{{ obj.bio }}`), and synchronize bound attributes safely to component signals:
+
+   ```html
+   <div for="let obj, index of members" class="member-card window">
+       <div class="member-header">
+           <strong>{{obj.name}}</strong>
+           <!-- Switch component bound to repeated item status -->
+           <switch-button
+               checked="{{obj.status === 'active'}}"
+               onchange="onToggleStatus(obj.id)"
+           ></switch-button>
+       </div>
+
+       <!-- Expander component with slot content projected in item context -->
+       <expander class="member-expander">
+           <div class="title">Details &amp; Skills</div>
+           <div class="body">
+               <p>{{obj.bio}}</p>
+               <div class="tags">
+                   <span for="let tag of obj.tags" class="badge">{{tag}}</span>
+               </div>
+           </div>
+       </expander>
+   </div>
+   ```
+
+2. **Direct Component Repeating (`<expander for="let obj of members">`)**:
+   Repeater directives can be declared directly on Custom Element host tags:
+
+   ```html
+   <!-- Direct component repeater -->
+   <expander for="let obj, idx of members" class="member-expander">
+       <div class="title">#{{idx + 1}}: {{obj.name}} — {{obj.role}}</div>
+       <div class="body">{{obj.bio}}</div>
+   </expander>
+   ```
+
+3. **Safe Signal Synchronization & Untracked Side-Effects**:
+   - Attribute updates bound to component signals (such as `checked`, `is-expanded`, `is-open`, `is-loading`, `value`) invoke `.set()` on the component's existing reactive signal instance rather than overwriting the signal reference with primitive types.
+   - Attribute binding execution is isolated inside `untrack()` closures, ensuring child component signal reads do not inadvertently become reactive dependencies of the parent's template expressions.
 
 ---
 

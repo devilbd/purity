@@ -8,8 +8,8 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 
 ## 1. Architectural Principles
 
-- **Framework**: Purity is a native TypeScript framework built on Custom Elements v1, fine-grained synchronous signals (`signal`, `computed`, `effect`), and Dependency Injection (`@Injectable`, `inject`).
-- **Component Model**: Plain classes decorated with `@Component({ selector, templateUrl })` with compile-time template inlining (`?raw`), `<slot>` content projection, structural iteration (`for="let item of items"` and `virtual-for`), and structural conditionals (`if`, `else-if`, `else`).
+- **Framework**: Purity is a native TypeScript framework built on Custom Elements v1, fine-grained synchronous signals (`signal`, `computed`, `effect`, `untrack`), and Dependency Injection (`@Injectable`, `inject`).
+- **Component Model & Structural Repeaters**: Plain classes decorated with `@Component({ selector, templateUrl })` with compile-time template inlining (`?raw`), `<slot>` content projection, structural iteration (`for="let item of items"` and `virtual-for`), and structural conditionals (`if`, `else-if`, `else`). Structural repeaters fully interoperate with custom Web Components (both direct `<expander for="...">` and nested within repeated templates) via context proxy chaining (`createComponentContext`), safe signal attribute synchronization (`syncComponentProperty`), untracked attribute side-effects (`untrack`), and internal DOM mount guards (`data-purity-mounted`).
 - **HTTP Client**: `HttpClient` service consuming centralized class-based interceptors (`HttpInterceptor`) under `@interceptors/*` and driving the KDE Plasma Breeze progress cursor engine.
 - **Transform Pipes**: Reusable data transformers implementing `BasePipe` and decorated with `@Pipe('name')` integrated into Handlebars expressions (`{{ val | pipe: arg1 }}`).
 - **Custom Directives**: Attribute and tag-level reactivity and DOM augmentation with `@Directive` and `BaseDirective` (e.g. `highlight`, `<dropdown>`).
@@ -53,7 +53,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
   - `npm run test:watch`: Runs tests interactively in watch mode (`vitest`).
   - `npm run test:detailed`: Runs `scripts/run-tests.sh` with discovery and detailed reporting.
 - **Test Colocation**: `*.spec.ts` or `*.test.ts` placed directly adjacent to source files.
-- **Coverage Focus**: Synchronous signal reactivity, custom element lifecycle (`connectedCallback`, `onInit`, `onDestroy`), slot content projection, pipe transformations, validator logic, and HTTP interceptor pipelines.
+- **Coverage Focus**: Synchronous signal reactivity (`untrack`, `effect`, `computed`), custom element lifecycle (`connectedCallback`, `onInit`, `onDestroy`), structural repeater component interoperability (`component-repeater.spec.ts`), slot content projection, pipe transformations, validator logic, and HTTP interceptor pipelines.
 
 ---
 
