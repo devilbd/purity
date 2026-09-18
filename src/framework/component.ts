@@ -1,4 +1,4 @@
-import { effect } from './core';
+import { effect, untrack } from './core';
 import { bindDirectives } from './directive';
 import { bindValidators } from './validator';
 import { executePipe } from './pipe';
@@ -333,32 +333,209 @@ export function mountComponentOnElement(el: HTMLElement, ComponentClass: any): v
 }
 
 /**
+ * Creates a reactive context chain for child components, resolving component properties
+ * and methods first, and delegating to parent/repeater context (item, index, parent methods) as fallback.
+ */
+export function createComponentContext(instance: any, parentContext?: any): any {
+    if (!parentContext) return instance;
+
+    return new Proxy(instance, {
+        get(target, prop, receiver) {
+            if (prop in target) {
+                const val = Reflect.get(target, prop, receiver);
+                return typeof val === 'function' ? val.bind(target) : val;
+            }
+            if (parentContext && prop in parentContext) {
+                const val = Reflect.get(parentContext, prop, parentContext);
+                return typeof val === 'function' ? val.bind(parentContext) : val;
+            }
+            return Reflect.get(target, prop, receiver);
+        },
+        has(target, prop) {
+            return prop in target || (parentContext && prop in parentContext);
+        },
+        set(target, prop, value, receiver) {
+            if (prop in target) {
+                return Reflect.set(target, prop, value, receiver);
+            }
+            if (parentContext && prop in parentContext) {
+                return Reflect.set(parentContext, prop, value, parentContext);
+            }
+            return Reflect.set(target, prop, value, receiver);
+        },
+    });
+}
+
+function kebabToCamel(str: string): string {
+    return str.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
+}
+
+function syncComponentProperty(el: HTMLElement, attrName: string, rawValue: string, isTruthy: boolean): void {
+    const camel = kebabToCamel(attrName);
+    const candidateKeys = new Set<string>([attrName, camel]);
+
+    // Add well-known semantic aliases
+    if (attrName === 'checked' || attrName === 'is-on' || attrName === 'ison') {
+        candidateKeys.add('isOn');
+        candidateKeys.add('checked');
+    }
+    if (attrName === 'expanded' || attrName === 'is-expanded' || attrName === 'isexpanded') {
+        candidateKeys.add('isExpanded');
+        candidateKeys.add('expanded');
+    }
+    if (attrName === 'value' || attrName === 'selected-date' || attrName === 'selecteddate') {
+        candidateKeys.add('selectedDate');
+        candidateKeys.add('value');
+    }
+    if (attrName === 'loading' || attrName === 'is-loading' || attrName === 'isloading') {
+        candidateKeys.add('isLoading');
+        candidateKeys.add('loading');
+    }
+    if (attrName === 'target' || attrName === 'target-for' || attrName === 'targetfor') {
+        candidateKeys.add('targetFor');
+        candidateKeys.add('target');
+    }
+    if (attrName === 'open' || attrName === 'is-open' || attrName === 'isopen') {
+        candidateKeys.add('isOpen');
+        candidateKeys.add('open');
+    }
+
+    for (const key of candidateKeys) {
+        if (!(key in el)) continue;
+
+        const prop = (el as any)[key];
+
+        // 1. Purity Signal: Call .set() to preserve signal instance
+        if (typeof prop === 'function' && typeof prop.set === 'function') {
+            try {
+                const currentVal = untrack(() => prop());
+                if (typeof currentVal === 'boolean') {
+                    prop.set(isTruthy);
+                } else if (typeof currentVal === 'number') {
+                    const n = parseFloat(rawValue);
+                    if (!isNaN(n)) prop.set(n);
+                } else if (currentVal instanceof Date || key.toLowerCase().includes('date')) {
+                    const d = new Date(rawValue);
+                    if (!isNaN(d.getTime())) prop.set(d);
+                } else {
+                    prop.set(rawValue);
+                }
+            } catch (_) {}
+            continue;
+        }
+
+        // 2. Property setter or writable property
+        try {
+            const protoDesc = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), key);
+            const ownDesc = Object.getOwnPropertyDescriptor(el, key);
+            const desc = protoDesc || ownDesc;
+
+            if (desc && desc.set) {
+                if (typeof (el as any)[key] === 'boolean') {
+                    desc.set.call(el, isTruthy);
+                } else {
+                    desc.set.call(el, rawValue);
+                }
+            } else if (desc && desc.writable) {
+                if (typeof prop === 'boolean') {
+                    (el as any)[key] = isTruthy;
+                } else {
+                    (el as any)[key] = rawValue;
+                }
+            }
+        } catch (_) {}
+    }
+}
+
+function applyBoundAttribute(el: HTMLElement, attrName: string, replaced: string): void {
+    const val = replaced.trim();
+    const isTruthy =
+        val !== '' &&
+        val !== 'false' &&
+        val !== 'null' &&
+        val !== 'undefined' &&
+        val !== '0';
+
+    if (attrName === 'class') {
+        el.className = replaced.trim();
+        return;
+    }
+
+    if (['disabled', 'checked', 'readonly', 'required', 'hidden', 'selected', 'open'].includes(attrName)) {
+        if (isTruthy) {
+            el.setAttribute(attrName, val || attrName);
+        } else {
+            el.removeAttribute(attrName);
+        }
+    } else {
+        if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && attrName === 'value') {
+            el.value = replaced;
+        }
+        el.setAttribute(attrName, replaced);
+    }
+
+    // Synchronize to component Signals and properties safely without destroying signal instances
+    syncComponentProperty(el, attrName, replaced, isTruthy);
+}
+
+function mountComponents(rootEl: HTMLElement, context: any) {
+    for (const [tag, ComponentClass] of componentRegistry.entries()) {
+        const matches: HTMLElement[] = [];
+        if (rootEl.tagName && rootEl.tagName.toLowerCase() === tag) {
+            matches.push(rootEl);
+        }
+        matches.push(...Array.from(rootEl.querySelectorAll<HTMLElement>(tag)));
+
+        for (const el of matches) {
+            if (el.closest('[data-no-bind]')) continue;
+            if (el !== rootEl && isInsideNestedComponent(el, rootEl)) continue;
+            if (hasForAttribute(el) || hasVirtualForAttribute(el) || isStructuralConditional(el)) continue;
+
+            let p = el.parentElement;
+            let isInsideStructural = false;
+            while (p && p !== rootEl) {
+                if (isStructuralConditional(p) || hasForAttribute(p) || hasVirtualForAttribute(p)) {
+                    isInsideStructural = true;
+                    break;
+                }
+                p = p.parentElement;
+            }
+            if (isInsideStructural) continue;
+
+            if (el.hasAttribute('data-purity-mounted')) continue;
+            el.setAttribute('data-purity-mounted', 'true');
+
+            (el as any).__parentContext = context;
+
+            if (!(el as any).initialized) {
+                mountComponentOnElement(el, ComponentClass);
+            }
+        }
+    }
+
+    // Assign parentContext to all child custom elements
+    const allCustomElements = Array.from(rootEl.querySelectorAll<HTMLElement>('*')).filter((el) => {
+        if (el === rootEl) return false;
+        if (el.closest('[data-no-bind]')) return false;
+        const tag = el.tagName.toLowerCase();
+        return tag.includes('-') || componentRegistry.has(tag);
+    });
+
+    for (const el of allCustomElements) {
+        if (el !== rootEl && isInsideNestedComponent(el, rootEl)) continue;
+        if (!(el as any).__parentContext) {
+            (el as any).__parentContext = context;
+        }
+    }
+}
+
+/**
  * Recursively binds structural conditionals (if / else-if / else), for loops,
  * text interpolations, attribute bindings, directives, and validators across
  * a DOM subtree with a specific context.
  */
 function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: any) {
     if (!rootEl) return;
-
-    // 0. Auto-mount components whose selector does not contain a hyphen (e.g. <expander>)
-    for (const [tag, ComponentClass] of componentRegistry.entries()) {
-        if (!tag.includes('-')) {
-            const matches: HTMLElement[] = [];
-            if (rootEl.tagName && rootEl.tagName.toLowerCase() === tag) {
-                matches.push(rootEl);
-            }
-            matches.push(...Array.from(rootEl.querySelectorAll<HTMLElement>(tag)));
-
-            for (const el of matches) {
-                if (el.hasAttribute('data-purity-mounted')) continue;
-                el.setAttribute('data-purity-mounted', 'true');
-
-                if (!(el as any).initialized) {
-                    mountComponentOnElement(el, ComponentClass);
-                }
-            }
-        }
-    }
 
     // 1. Process structural conditional directives (`if`, `else-if`, `else`) inside rootEl
     const candidateIfElements = Array.from(rootEl.querySelectorAll('*')).filter((el): el is HTMLElement => {
@@ -482,6 +659,11 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 
             const matchedBranch = branches[matchedIndex];
             const clone = matchedBranch.templateEl.cloneNode(true) as HTMLElement;
+            clone.removeAttribute('data-purity-mounted');
+            for (const child of Array.from(clone.querySelectorAll('[data-purity-mounted]'))) {
+                child.removeAttribute('data-purity-mounted');
+            }
+            (clone as any).__parentContext = context;
 
             bindTemplateTree(clone, context, componentInstance);
 
@@ -553,6 +735,11 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 
             list.forEach((item, index) => {
                 const clone = templateEl.cloneNode(true) as HTMLElement;
+                clone.removeAttribute('data-purity-mounted');
+                for (const child of Array.from(clone.querySelectorAll('[data-purity-mounted]'))) {
+                    child.removeAttribute('data-purity-mounted');
+                }
+
                 const itemContext = Object.assign(Object.create(context), {
                     [itemVar]: item,
                     [indexVar]: index,
@@ -562,6 +749,8 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     $last: index === list.length - 1,
                     __host: componentInstance || (context instanceof Element ? context : (context as any)?.__host),
                 });
+
+                (clone as any).__parentContext = itemContext;
 
                 // Recursively bind the cloned subtree with item context
                 bindTemplateTree(clone, itemContext, componentInstance);
@@ -573,6 +762,9 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
             anchor.parentNode?.insertBefore(fragment, anchor);
         });
     }
+
+    // 4. Auto-mount registered components inside active DOM
+    mountComponents(rootEl, context);
 
     // 4. Bind Text Node interpolations
     const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT);
@@ -667,7 +859,6 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     const listener = function (this: any, event: Event) {
                         return handlerFn.call(this, event, context, executePipe);
                     };
-                    (el as any)[attrName] = listener;
                     el.addEventListener(eventType, listener);
                     el.removeAttribute(attrName);
                 } catch (err) {
@@ -682,31 +873,9 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                         /\{\{\s*([\s\S]*?)\s*\}\}/g,
                         (_, expr) => evaluateExpression(expr.trim(), context),
                     );
-                    if (attrName === 'class') {
-                        el.className = replaced.trim();
-                    } else if (
-                        ['disabled', 'checked', 'readonly', 'required', 'hidden', 'selected', 'open'].includes(attrName)
-                    ) {
-                        const val = replaced.trim();
-                        const isTruthy =
-                            val !== '' &&
-                            val !== 'false' &&
-                            val !== 'null' &&
-                            val !== 'undefined' &&
-                            val !== '0';
-                        if (isTruthy) {
-                            el.setAttribute(attrName, val || attrName);
-                            (el as any)[attrName] = true;
-                        } else {
-                            el.removeAttribute(attrName);
-                            (el as any)[attrName] = false;
-                        }
-                    } else {
-                        if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && attrName === 'value') {
-                            el.value = replaced;
-                        }
-                        el.setAttribute(attrName, replaced);
-                    }
+                    untrack(() => {
+                        applyBoundAttribute(el, attrName, replaced);
+                    });
                 });
             }
         }
@@ -834,6 +1003,18 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
     };
 
     proto.connectedCallback = async function (this: any) {
+        // Defer initialization if this element has or is inside an unprocessed structural directive template
+        if (hasForAttribute(this) || hasVirtualForAttribute(this) || isStructuralConditional(this)) {
+            return;
+        }
+        let p = this.parentElement;
+        while (p) {
+            if (hasForAttribute(p) || hasVirtualForAttribute(p) || isStructuralConditional(p)) {
+                return;
+            }
+            p = p.parentElement;
+        }
+
         if (this.initialized) return;
         this.initialized = true;
 
@@ -917,7 +1098,8 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             this.activeValidators = [];
         }
 
-        bindTemplateTree(rootEl, this, this);
+        const boundContext = createComponentContext(this, this.__parentContext);
+        bindTemplateTree(rootEl, boundContext, this);
     };
 }
 

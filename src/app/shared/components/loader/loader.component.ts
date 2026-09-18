@@ -12,10 +12,20 @@ export class LoaderComponent {
     private isHoldingCursor = false;
 
     protected onInit(): void {
+        const host = ((this as any).element || this) as HTMLElement | null;
+        if (host && typeof host.getAttribute === 'function') {
+            const msgAttr = host.getAttribute('message');
+            if (msgAttr) this.message.set(msgAttr);
+
+            const isLoadAttr = host.getAttribute('is-loading');
+            if (isLoadAttr !== null && isLoadAttr !== 'false' && isLoadAttr !== 'null' && isLoadAttr !== '0') {
+                this.isLoading.set(true);
+            }
+        }
+
         // Reactively observe loader state to manage host CSS classes and animated Breeze cursor
         effect(() => {
             const loading = this.isLoading();
-            const host = (this as any).element as HTMLElement | null;
             if (host) {
                 host.classList.toggle('is-loading', loading);
             }

@@ -36,16 +36,18 @@ export class SwitchButtonComponent {
         const host = this as unknown as HTMLElement;
 
         if (host && typeof host.getAttribute === 'function') {
-            if (
-                host.hasAttribute('checked') ||
-                host.getAttribute('checked') === 'true' ||
-                host.getAttribute('is-on') === 'true' ||
-                host.hasAttribute('is-on')
-            ) {
+            const checkedAttr = host.getAttribute('checked');
+            const isOnAttr = host.getAttribute('is-on');
+            const isInitialOn =
+                (checkedAttr !== null && checkedAttr !== 'false' && checkedAttr !== 'null' && checkedAttr !== '0') ||
+                (isOnAttr !== null && isOnAttr !== 'false' && isOnAttr !== 'null' && isOnAttr !== '0');
+            if (isInitialOn) {
                 this.isOn.set(true);
             }
 
-            if (host.hasAttribute('disabled') || host.getAttribute('disabled') === 'true') {
+            const disAttr = host.getAttribute('disabled');
+            const isDis = disAttr !== null && disAttr !== 'false' && disAttr !== 'null' && disAttr !== '0';
+            if (isDis) {
                 this.disabled.set(true);
             }
 

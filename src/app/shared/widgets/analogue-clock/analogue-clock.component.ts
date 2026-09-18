@@ -39,6 +39,33 @@ export class AnalogueClockComponent {
     private ctx: CanvasRenderingContext2D | null = null;
 
     protected onInit(): void {
+        const host = this as unknown as HTMLElement;
+        if (host && typeof host.getAttribute === 'function') {
+            const t = host.getAttribute('title');
+            if (t) this.title.set(t);
+
+            const tz = host.getAttribute('timezone');
+            if (tz) this.timezone.set(tz);
+
+            const s = host.getAttribute('size');
+            if (s) {
+                const n = parseFloat(s);
+                if (!isNaN(n)) this.size.set(n);
+            }
+
+            const sm = host.getAttribute('smooth-seconds');
+            if (sm !== null) this.smoothSeconds.set(sm === 'true' || sm === '');
+
+            const sec = host.getAttribute('show-seconds');
+            if (sec !== null) this.showSeconds.set(sec === 'true' || sec === '');
+
+            const num = host.getAttribute('show-numbers');
+            if (num !== null) this.showNumbers.set(num === 'true' || num === '');
+
+            const db = host.getAttribute('show-date-badge');
+            if (db !== null) this.showDateBadge.set(db === 'true' || db === '');
+        }
+
         // Reactively re-render whenever theme or visual settings change
         effect(() => {
             this.themeService.isDark();
@@ -67,7 +94,11 @@ export class AnalogueClockComponent {
     }
 
     private initCanvas(): void {
-        const canvas = this.canvasEl || (document.querySelector('#clock-canvas-el') as HTMLCanvasElement | null);
+        const host = this as unknown as HTMLElement;
+        const canvas =
+            (host?.querySelector?.('canvas') as HTMLCanvasElement | null) ||
+            this.canvasEl ||
+            (document.querySelector('#clock-canvas-el') as HTMLCanvasElement | null);
         if (!canvas) return;
 
         const size = this.size();

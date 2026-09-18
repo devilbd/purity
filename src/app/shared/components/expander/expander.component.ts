@@ -34,16 +34,24 @@ export class ExpanderComponent {
     public initOnHost(host: HTMLElement): void {
         this.hostEl = host;
 
-        if (
-            host.hasAttribute('is-expanded') ||
-            host.getAttribute('is-expanded') === 'true' ||
-            host.hasAttribute('expanded') ||
-            host.getAttribute('expanded') === 'true'
-        ) {
+        const isExpAttr = host.getAttribute('is-expanded');
+        const expAttr = host.getAttribute('expanded');
+        const isInitialExpanded =
+            (isExpAttr !== null && isExpAttr !== 'false' && isExpAttr !== 'null' && isExpAttr !== '0') ||
+            (expAttr !== null && expAttr !== 'false' && expAttr !== 'null' && expAttr !== '0');
+        if (isInitialExpanded) {
             this.isExpanded.set(true);
         }
 
+        const titleAttr = host.getAttribute('title');
         this.titleEl = host.querySelector('.title') as HTMLElement | null;
+        if (!this.titleEl && titleAttr) {
+            this.titleEl = document.createElement('div');
+            this.titleEl.className = 'title';
+            this.titleEl.textContent = titleAttr;
+            host.insertBefore(this.titleEl, host.firstChild);
+        }
+
         if (this.titleEl) {
             if (!this.titleEl.hasAttribute('role')) {
                 this.titleEl.setAttribute('role', 'button');

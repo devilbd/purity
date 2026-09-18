@@ -1,4 +1,4 @@
-import { Component, Directive, BaseDirective, signal } from '@purity/core';
+import { Component, Directive, BaseDirective, signal, effect } from '@purity/core';
 import './popover.component.scss';
 
 export type PopoverPosition = 'top' | 'bottom' | 'left' | 'right';
@@ -66,8 +66,23 @@ export class PopoverComponent {
             this._portalEl.addEventListener('mouseleave', this._boundOnPopoverLeave);
         }
 
-        // 3. Attach listeners to target DOM element
+        // 3. Attach listeners to target DOM element reactively
         this.bindTargetListeners();
+        effect(() => {
+            if (this.targetFor()) {
+                this.bindTargetListeners();
+            }
+        });
+
+        effect(() => {
+            const pos = this.position();
+            if (pos) {
+                this.effectivePosition.set(pos);
+                if (this.isOpen()) {
+                    this.updatePosition();
+                }
+            }
+        });
 
         // 4. Reposition on scroll and resize
         window.addEventListener('resize', this._boundOnWindowChange, { passive: true });

@@ -53,6 +53,21 @@ export const effect = (fn: Function): (() => void) => {
 };
 
 /**
+ * Executes a function without capturing signal dependencies in the current reactive context.
+ */
+export const untrack = <T>(fn: () => T): T => {
+    const prev = [...context];
+    context.length = 0;
+    try {
+        return fn();
+    } finally {
+        for (const item of prev) {
+            context.push(item);
+        }
+    }
+};
+
+/**
  * Creates a read-only computed signal that automatically derives its value
  * and reacts synchronously whenever any dependent signals change.
  */

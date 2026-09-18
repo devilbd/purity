@@ -77,6 +77,18 @@ export class DateTimePickerComponent {
         this._hostEl = host;
         this.initWorkingState();
 
+        const valAttr = host.getAttribute?.('value') || host.getAttribute?.('selected-date');
+        if (valAttr) {
+            const d = new Date(valAttr);
+            if (!isNaN(d.getTime())) {
+                this.selectedDate.set(d);
+                this.viewDate.set(new Date(d));
+                this.workingDate.set(new Date(d));
+                this.workingHours.set(d.getHours());
+                this.workingMinutes.set(d.getMinutes());
+            }
+        }
+
         const overlay = host.querySelector('.picker-overlay') as HTMLElement | null;
         if (overlay) {
             this._overlayEl = overlay;
@@ -726,6 +738,32 @@ export class DateTimePickerComponent {
                     composed: true,
                 }),
             );
+            host?.dispatchEvent?.(
+                new CustomEvent('change', {
+                    detail: { date, value: date },
+                    bubbles: true,
+                    composed: true,
+                }),
+            );
+        }
+    }
+
+    public get value(): Date | null {
+        return this.selectedDate();
+    }
+
+    public set value(val: any) {
+        if (!val) {
+            this.selectedDate.set(null);
+            return;
+        }
+        const d = val instanceof Date ? val : new Date(val);
+        if (!isNaN(d.getTime())) {
+            this.selectedDate.set(d);
+            this.viewDate.set(new Date(d));
+            this.workingDate.set(new Date(d));
+            this.workingHours.set(d.getHours());
+            this.workingMinutes.set(d.getMinutes());
         }
     }
 }

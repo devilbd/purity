@@ -24,6 +24,16 @@ export class ModalViewComponent {
         const host = this as unknown as HTMLElement;
         this._hostEl = host;
 
+        if (host && typeof host.getAttribute === 'function') {
+            const titleAttr = host.getAttribute('title');
+            if (titleAttr) this.title.set(titleAttr);
+
+            const isOpenAttr = host.getAttribute('is-open') || host.getAttribute('open');
+            if (isOpenAttr !== null && isOpenAttr !== 'false' && isOpenAttr !== 'null' && isOpenAttr !== '0') {
+                this.isOpen.set(true);
+            }
+        }
+
         const backdrop = host.querySelector('.modal-backdrop') as HTMLElement | null;
         if (backdrop && backdrop.parentElement !== document.body) {
             this._backdropEl = backdrop;

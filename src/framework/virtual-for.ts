@@ -295,6 +295,10 @@ export function bindVirtualFor(
 
                 const itemData = currentArray[i];
                 const clone = rowTemplate.cloneNode(true) as HTMLElement;
+                clone.removeAttribute('data-purity-mounted');
+                for (const child of Array.from(clone.querySelectorAll('[data-purity-mounted]'))) {
+                    child.removeAttribute('data-purity-mounted');
+                }
                 clone.style.position = 'absolute';
                 clone.style.top = `${i * itemHeight}px`;
                 clone.style.height = `${itemHeight}px`;
@@ -314,6 +318,8 @@ export function bindVirtualFor(
                     $odd: i % 2 !== 0,
                     __host: componentInstance || (context instanceof Element ? context : (context as any)?.__host),
                 });
+
+                (clone as any).__parentContext = itemContext;
 
                 // Recursively bind handlebars, pipes, directives, and validators inside row
                 bindTemplateTreeFn(clone, itemContext, componentInstance);

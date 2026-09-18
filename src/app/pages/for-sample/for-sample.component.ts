@@ -1,4 +1,6 @@
 import { Component, signal } from '@purity/core';
+import '@components/expander/expander.component';
+import '@components/switch-button/switch-button.component';
 import './for-sample.component.scss';
 
 export interface TeamMember {
@@ -7,6 +9,7 @@ export interface TeamMember {
     role: string;
     status: 'active' | 'busy' | 'offline';
     tags: string[];
+    bio?: string;
 }
 
 @Component({
@@ -24,6 +27,7 @@ export class ForSampleComponent {
             role: 'Lead Architect',
             status: 'active',
             tags: ['TypeScript', 'Reactivity', 'Custom Elements'],
+            bio: 'Architecting reactive primitives, Custom Elements v1 lifecycle bindings, and synchronous signals.',
         },
         {
             id: 2,
@@ -31,6 +35,7 @@ export class ForSampleComponent {
             role: 'Senior Frontend Engineer',
             status: 'busy',
             tags: ['SCSS', 'Adwaita Design', 'Pipes'],
+            bio: 'Crafting Adwaita glassmorphism, responsive SCSS architectures, and custom transform pipes.',
         },
         {
             id: 3,
@@ -38,6 +43,7 @@ export class ForSampleComponent {
             role: 'UI/UX Specialist',
             status: 'offline',
             tags: ['Behaviors', 'Drag & Drop', 'Validation'],
+            bio: 'Designing composable pointer drag behaviors, decoupled form validators, and accessible widgets.',
         },
     ]);
 
@@ -75,5 +81,15 @@ export class ForSampleComponent {
 
     onRemoveMember(id: number) {
         this.members.update((list) => list.filter((m) => m.id !== id));
+    }
+
+    onToggleStatus(id: number) {
+        this.members.update((list) =>
+            list.map((m) =>
+                m.id === id
+                    ? { ...m, status: m.status === 'active' ? 'offline' : 'active' }
+                    : m,
+            ),
+        );
     }
 }

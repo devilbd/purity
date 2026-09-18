@@ -4,7 +4,7 @@
         <span class="count-badge">Total: {{memberCount}}</span>
     </div>
     <p class="for-desc">
-        Demonstrating dynamic loop rendering with <code>&lt;div for="let obj, index of members"&gt;</code>, object property binding, index tracking, and nested loops for arrays:
+        Demonstrating dynamic loop rendering with <code>&lt;div for="let obj, index of members"&gt;</code>, object property binding, index tracking, nested loops, and full interoperability with custom Web Components (including <code>&lt;expander&gt;</code> and <code>&lt;switch-button&gt;</code>):
     </p>
 
     <!-- Input form to add elements dynamically -->
@@ -32,7 +32,7 @@
         </button>
     </div>
 
-    <!-- The Repeated List -->
+    <!-- The Repeated Cards with Nested Components -->
     <div class="members-grid">
         <div for="let obj, index of members" class="member-card window">
             <div class="member-card-header">
@@ -41,19 +41,50 @@
                     <strong class="member-name">{{obj.name | uppercase}}</strong>
                     <span class="status-indicator status-{{obj.status}}">{{obj.status}}</span>
                 </div>
-                <button
-                    type="button"
-                    class="button-cancel delete-btn"
-                    title="Remove member"
-                    onclick="onRemoveMember(obj.id)"
-                >
-                    ✕
-                </button>
+                <div class="member-actions">
+                    <switch-button
+                        checked="{{obj.status === 'active'}}"
+                        title="Toggle status"
+                        onchange="onToggleStatus(obj.id)"
+                    ></switch-button>
+                    <button
+                        type="button"
+                        class="button-cancel delete-btn"
+                        title="Remove member"
+                        onclick="onRemoveMember(obj.id)"
+                    >
+                        ✕
+                    </button>
+                </div>
             </div>
             <div class="member-role">{{obj.role}}</div>
-            <div class="member-tags">
-                <span for="let tag of obj.tags" class="tag-badge">{{tag}}</span>
-            </div>
+
+            <!-- Repeated Expander component projecting item context inside slot -->
+            <expander class="member-expander">
+                <div class="title">Details &amp; Skills</div>
+                <div class="body">
+                    <p class="member-bio">{{obj.bio}}</p>
+                    <div class="member-tags">
+                        <span for="let tag of obj.tags" class="tag-badge">{{tag}}</span>
+                    </div>
+                </div>
+            </expander>
+        </div>
+    </div>
+
+    <!-- Direct Component Repeater Section -->
+    <div class="direct-repeater-section">
+        <h5 class="section-title">Direct Component Repeater (<code>&lt;expander for="let obj of members"&gt;</code>)</h5>
+        <div class="direct-expanders-list">
+            <expander for="let obj, idx of members" class="direct-expander">
+                <div class="title">#{{idx + 1}}: {{obj.name}} — {{obj.role}} ({{obj.status}})</div>
+                <div class="body">
+                    <p class="member-bio">{{obj.bio}}</p>
+                    <div class="member-tags">
+                        <span for="let tag of obj.tags" class="tag-badge">{{tag}}</span>
+                    </div>
+                </div>
+            </expander>
         </div>
     </div>
 </div>
