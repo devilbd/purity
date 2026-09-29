@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "rootDir": "./src/framework",
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./npm-publish/types",
+    "strict": true,
+    "skipLibCheck": true,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "src/framework"
+  ],
+  "exclude": [
+    "src/framework/**/*.spec.ts",
+    "src/framework/**/*.test.ts"
+  ]
+}

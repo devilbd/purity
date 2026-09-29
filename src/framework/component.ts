@@ -1145,8 +1145,9 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
         }
 
         let CustomElementClass: CustomElementConstructor;
+        const isDom = typeof HTMLElement !== 'undefined';
 
-        if (target.prototype instanceof HTMLElement) {
+        if (isDom && target.prototype instanceof HTMLElement) {
             CustomElementClass = target as unknown as CustomElementConstructor;
             if (options.templateUrl && !(CustomElementClass.prototype as any).templateUrl) {
                 (CustomElementClass.prototype as any).templateUrl = options.templateUrl;
@@ -1156,7 +1157,8 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
             }
             attachComponentLifecycle(CustomElementClass.prototype, options);
         } else {
-            class ComponentElement extends HTMLElement {
+            const BaseElement = isDom ? HTMLElement : class {};
+            class ComponentElement extends (BaseElement as typeof HTMLElement) {
                 protected initialized = false;
                 protected activeDirectives: Array<{ destroy: () => void }> = [];
 

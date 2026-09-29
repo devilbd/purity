@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:app": "tsc && vite build",
+    "build:lib": "bash scripts/build-package.sh",
     "build:dev": "tsc && vite build --mode development",
     "build:prod": "tsc && vite build --mode production",
     "preview": "vite preview",
