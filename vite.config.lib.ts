@@ -10,6 +10,7 @@ export default defineConfig({
         lib: {
             entry: {
                 index: path.resolve(import.meta.dirname, 'src/framework/core.ts'),
+                core: path.resolve(import.meta.dirname, 'src/framework/core.ts'),
                 vite: path.resolve(import.meta.dirname, 'src/framework/vite-plugin.ts'),
             },
             formats: ['es', 'cjs'],

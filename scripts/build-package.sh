@@ -34,34 +34,58 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 OUTPUT_DIR="$ROOT_DIR/npm-publish"
+UI_OUTPUT_DIR="$ROOT_DIR/npm-publish-ui"
 TOTAL_START=$(get_time_ms)
 
 echo -e "\n${BOLD}${BLUE}================================================================${NC}"
-echo -e "${BOLD}${BLUE}      ..::: Purity :::.. Standalone NPM Package Builder         ${NC}"
+echo -e "${BOLD}${BLUE}   ..::: Purity :::.. Standalone NPM Packages Builder           ${NC}"
+echo -e "${BOLD}${BLUE}   [1] purity-world  (Core Framework & Reactivity)              ${NC}"
+echo -e "${BOLD}${BLUE}   [2] purity-world-ui (Components, Directives & Styles)        ${NC}"
 echo -e "${BOLD}${BLUE}================================================================${NC}\n"
 
-# Step 1: Clean and Prepare npm-publish directory
-echo -e "${BOLD}${YELLOW}[1/6] Cleaning & Initializing Output Directory (npm-publish/)...${NC}"
+# Step 1: Clean and Prepare Output Directories
+echo -e "${BOLD}${YELLOW}[1/6] Cleaning & Initializing Output Directories...${NC}"
 STEP1_START=$(get_time_ms)
-rm -rf "$OUTPUT_DIR"
+rm -rf "$OUTPUT_DIR" "$UI_OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR/types" "$OUTPUT_DIR/styles" "$OUTPUT_DIR/cursors"
+mkdir -p "$UI_OUTPUT_DIR/types" "$UI_OUTPUT_DIR/styles"
 STEP1_END=$(get_time_ms)
-echo -e "${GREEN}✓ Output directory prepared in $(format_duration $((STEP1_END - STEP1_START)))${NC}"
+echo -e "${GREEN}✓ Output directories prepared in $(format_duration $((STEP1_END - STEP1_START)))${NC}"
 
-# Step 2: Compile Library with Vite (ESM & CJS)
+# Step 2: Compile Library Bundles with Vite (ESM & CommonJS)
 echo -e "\n${BOLD}${YELLOW}[2/6] Compiling Library Bundles with Vite (ESM & CommonJS)...${NC}"
 STEP2_START=$(get_time_ms)
+
+echo -e "  ${CYAN}Compiling purity-world (core, index, vite)...${NC}"
 npx vite build --config "$ROOT_DIR/vite.config.lib.ts"
+
+echo -e "  ${CYAN}Compiling purity-world-ui (components, directives, styles)...${NC}"
+npx vite build --config "$ROOT_DIR/vite.config.ui.ts"
+
+# Ensure CSS from UI build is named style.css
+if [ -f "$UI_OUTPUT_DIR/purity.css" ]; then
+    cp "$UI_OUTPUT_DIR/purity.css" "$UI_OUTPUT_DIR/style.css"
+fi
+
+# Also expose ui bundle inside purity-world for subpath usage purity-world/ui
+cp "$UI_OUTPUT_DIR/index.js" "$OUTPUT_DIR/ui.js"
+cp "$UI_OUTPUT_DIR/index.cjs" "$OUTPUT_DIR/ui.cjs"
+
 STEP2_END=$(get_time_ms)
 echo -e "${GREEN}✓ JavaScript bundles compiled in $(format_duration $((STEP2_END - STEP2_START)))${NC}"
 
 # Step 3: Emit TypeScript Declaration Maps (*.d.ts)
 echo -e "\n${BOLD}${YELLOW}[3/6] Emitting TypeScript Type Definitions (*.d.ts)...${NC}"
 STEP3_START=$(get_time_ms)
+
+echo -e "  ${CYAN}Emitting purity-world declarations...${NC}"
 npx tsc -p "$ROOT_DIR/tsconfig.lib.json"
 
-# Create root convenience re-exports for TypeScript
 cat << 'EOF' > "$OUTPUT_DIR/index.d.ts"
+export * from './types/core';
+EOF
+
+cat << 'EOF' > "$OUTPUT_DIR/core.d.ts"
 export * from './types/core';
 EOF
 
@@ -69,27 +93,82 @@ cat << 'EOF' > "$OUTPUT_DIR/vite.d.ts"
 export * from './types/vite-plugin';
 EOF
 
+echo -e "  ${CYAN}Emitting purity-world-ui declarations...${NC}"
+npx tsc -p "$ROOT_DIR/tsconfig.ui.json"
+
+cat << 'EOF' > "$UI_OUTPUT_DIR/index.d.ts"
+export * from './types/ui';
+EOF
+
+# Convenience copy for purity-world/ui
+cat << 'EOF' > "$OUTPUT_DIR/ui.d.ts"
+export * from './types/ui';
+EOF
+cp -r "$UI_OUTPUT_DIR/types"/* "$OUTPUT_DIR/types/" 2>/dev/null || true
+
+# Normalize path aliases in emitted .d.ts files for external consumers
+echo -e "  ${CYAN}Normalizing declaration import paths...${NC}"
+find "$UI_OUTPUT_DIR/types" "$OUTPUT_DIR/types" -name "*.d.ts" -exec sed -i "s|@purity/core|purity-world/core|g" {} +
+find "$UI_OUTPUT_DIR/types" "$OUTPUT_DIR/types" -name "*.d.ts" -exec sed -i "s|@data/notify.service|../../../../data/notify.service|g" {} +
+find "$UI_OUTPUT_DIR/types" "$OUTPUT_DIR/types" -name "*.d.ts" -exec sed -i "s|@components/radial-context-menu/radial-context-menu.component|../radial-context-menu/radial-context-menu.component|g" {} +
+
 STEP3_END=$(get_time_ms)
 echo -e "${GREEN}✓ Type definitions generated in $(format_duration $((STEP3_END - STEP3_START)))${NC}"
 
 # Step 4: Compile Styles & Copy Design Tokens
 echo -e "\n${BOLD}${YELLOW}[4/6] Compiling Adwaita Styles & Assets...${NC}"
 STEP4_START=$(get_time_ms)
-npx sass "$ROOT_DIR/src/style.scss" "$OUTPUT_DIR/style.css" --style compressed
+
+# Compile master stylesheet (including base and all UI components) and standalone UI stylesheet
+node -e "
+import * as sass from 'sass';
+import fs from 'fs';
+import path from 'path';
+
+const customImporter = {
+    findFileUrl(url) {
+        if (url === '@styles') {
+            return new URL('file://' + path.resolve('src/styles/index.scss'));
+        }
+        return null;
+    }
+};
+
+const fullCss = sass.compile('src/style.scss', {
+    importers: [customImporter],
+    style: 'compressed'
+});
+fs.writeFileSync('$OUTPUT_DIR/style.css', fullCss.css);
+
+const uiCss = sass.compile('src/styles/_ui.scss', {
+    importers: [customImporter],
+    style: 'compressed'
+});
+fs.writeFileSync('$UI_OUTPUT_DIR/style.css', uiCss.css);
+"
+
+# Generate style.d.ts declarations for CSS side-effect imports
+echo "declare const css: string; export default css;" > "$OUTPUT_DIR/style.d.ts"
+echo "declare const css: string; export default css;" > "$UI_OUTPUT_DIR/style.d.ts"
+
 cp -r "$ROOT_DIR/src/styles/"* "$OUTPUT_DIR/styles/"
 if [ -d "$ROOT_DIR/public/cursors" ]; then
     cp -r "$ROOT_DIR/public/cursors/"* "$OUTPUT_DIR/cursors/"
 fi
+
+cp -r "$ROOT_DIR/src/styles/"* "$UI_OUTPUT_DIR/styles/"
+
 STEP4_END=$(get_time_ms)
 echo -e "${GREEN}✓ Styles and design assets packaged in $(format_duration $((STEP4_END - STEP4_START)))${NC}"
 
-# Step 5: Generate NPM Package Manifest & Documentation
-echo -e "\n${BOLD}${YELLOW}[5/6] Generating NPM Package Manifest (package.json) & Docs...${NC}"
+# Step 5: Generate NPM Package Manifests & Docs
+echo -e "\n${BOLD}${YELLOW}[5/6] Generating NPM Package Manifests & Docs...${NC}"
 STEP5_START=$(get_time_ms)
 
 # Extract version from root package.json if available
 VERSION=$(node -p "try { require('./package.json').version } catch(e) { '1.0.0' }")
 
+# Manifest 1: purity-world
 cat << EOF > "$OUTPUT_DIR/package.json"
 {
   "name": "purity-world",
@@ -105,24 +184,35 @@ cat << EOF > "$OUTPUT_DIR/package.json"
       "import": "./index.js",
       "require": "./index.cjs"
     },
+    "./core": {
+      "types": "./core.d.ts",
+      "import": "./core.js",
+      "require": "./core.cjs"
+    },
+    "./ui": {
+      "types": "./ui.d.ts",
+      "import": "./ui.js",
+      "require": "./ui.cjs"
+    },
     "./vite": {
       "types": "./vite.d.ts",
       "import": "./vite.js",
       "require": "./vite.cjs"
     },
-    "./styles": "./style.css",
+    "./styles": {
+      "types": "./style.d.ts",
+      "default": "./style.css"
+    },
     "./styles/*": "./styles/*",
     "./cursors/*": "./cursors/*"
   },
   "files": [
-    "index.js",
-    "index.cjs",
-    "index.d.ts",
-    "vite.js",
-    "vite.cjs",
-    "vite.d.ts",
+    "*.js",
+    "*.cjs",
+    "*.d.ts",
     "types",
     "style.css",
+    "style.d.ts",
     "styles",
     "cursors",
     "README.md",
@@ -157,88 +247,119 @@ cat << 'EOF' > "$OUTPUT_DIR/README.md"
 # Purity Framework
 
 A lightweight, native TypeScript frontend framework built directly on web standards:
-- **Fine-Grained Synchronous Reactivity**: Signals (`signal`, `computed`, `effect`, `untrack`) with sub-microsecond synchronous updates and automatic dependency tracking.
-- **Native Web Components**: Plain TypeScript classes decorated with `@Component` transformed into native Custom Elements (Custom Elements v1) with synchronous template inlining and `<slot>` projection.
-- **Structural Repeaters & Virtual Scrolling**: Declarative `for="let item of items"` and GPU-accelerated `virtual-for` handling 100,000+ items with sub-millisecond scrolling.
-- **Zero Runtime Dependencies**: Pure TypeScript and Web APIs with zero external runtime footprint.
-- **Dependency Injection**: First-class `@Injectable` decorator and `inject()` resolution.
-- **Full HTTP Client**: Interceptor pipelines, resources, typed requests/responses, and progress state.
-- **Signal Router & SEO Engine**: Declarative routes with automated head metadata, OpenGraph, and Schema.org JSON-LD synchronization.
-- **Adwaita Glassmorphic Design System**: Modern translucent glassmorphic surfaces, refined geometry hierarchy, and KDE Plasma Breeze cursors.
-
----
+- **Fine-Grained Synchronous Reactivity**: Signals (`signal`, `computed`, `effect`, `untrack`) with sub-microsecond updates.
+- **Native Web Components**: Plain TypeScript classes decorated with `@Component` transformed into Custom Elements v1.
+- **Dependency Injection**: First-class `@Injectable` and `inject()`.
+- **Full HTTP Client**: Interceptor pipelines, resources, and progress cursors.
+- **Signal Router & SEO Engine**: Declarative routes with automated head metadata.
+- **Adwaita Design System**: Translucent glassmorphism, refined corner radii, and KDE Plasma Breeze cursors.
 
 ## Installation
 
 ```bash
-npm install purity-world
+npm install purity-world purity-world-ui
 ```
 
----
-
-## Vite Configuration
-
-In your `vite.config.ts`, include the Purity Vite plugin to enable synchronous template inlining and decorator transpilation:
+## Usage
 
 ```typescript
-import { defineConfig } from 'vite';
-import { purityPlugin } from 'purity-world/vite';
-
-export default defineConfig({
-  plugins: [purityPlugin()],
-});
+import { signal, computed, Component } from 'purity-world/core';
+import { DropdownComponent, SwitchButtonComponent } from 'purity-world-ui';
+import 'purity-world/styles';
+import 'purity-world-ui/styles';
 ```
 
----
+## License
 
-## Quickstart
+MIT
+EOF
 
-```typescript
-import { Component, signal, computed } from 'purity-world';
-
-@Component({
-  selector: 'counter-widget',
-  template: `
-    <div class="counter-card">
-      <h3>Count: {{ count() }}</h3>
-      <p>Double: {{ doubleCount() }}</p>
-      <button (click)="increment()">Increment</button>
-    </div>
-  `
-})
-export class CounterWidget {
-  count = signal(0);
-  doubleCount = computed(() => this.count() * 2);
-
-  increment() {
-    this.count.update(n => n + 1);
+# Manifest 2: purity-world-ui
+cat << EOF > "$UI_OUTPUT_DIR/package.json"
+{
+  "name": "purity-world-ui",
+  "version": "${VERSION}",
+  "description": "Rich Adwaita glassmorphic UI components, directives, widgets, and behaviors for Purity Framework",
+  "type": "module",
+  "main": "./index.cjs",
+  "module": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs"
+    },
+    "./styles": {
+      "types": "./style.d.ts",
+      "default": "./style.css"
+    },
+    "./styles/*": "./styles/*"
+  },
+  "files": [
+    "*.js",
+    "*.cjs",
+    "*.d.ts",
+    "types",
+    "style.css",
+    "style.d.ts",
+    "styles",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "purity",
+    "purity-world",
+    "ui",
+    "components",
+    "custom-elements",
+    "directives",
+    "adwaita"
+  ],
+  "author": "Purity Contributors",
+  "license": "MIT",
+  "peerDependencies": {
+    "purity-world": ">=1.0.0"
   }
 }
+EOF
+
+cat << 'EOF' > "$UI_OUTPUT_DIR/README.md"
+# Purity World UI
+
+Rich Adwaita glassmorphic UI components, directives, widgets, and interaction behaviors for Purity Framework (`purity-world`).
+
+## Installation
+
+```bash
+npm install purity-world purity-world-ui
 ```
 
-```html
-<!-- index.html -->
-<counter-widget></counter-widget>
-```
-
----
-
-## Styles & Design Tokens
-
-Include pre-compiled Adwaita design tokens and theme rules:
+## Usage
 
 ```typescript
+import { signal } from 'purity-world/core';
+import { DropdownComponent, SwitchButtonComponent, ModalViewComponent } from 'purity-world-ui';
 import 'purity-world/styles';
+import 'purity-world-ui/styles';
 ```
 
-Or consume modular SCSS tokens:
+## Included Components & Directives
 
-```scss
-@use 'purity-world/styles/variables' as *;
-@use 'purity-world/styles/themes';
-```
-
----
+- `<dropdown>` / `[dropdown]` (`DropdownComponent` / `DropdownDirective`)
+- `<switch-button>` (`SwitchButtonComponent`)
+- `<modal-view>` (`ModalViewComponent`)
+- `<date-time-picker>` (`DateTimePickerComponent`)
+- `<notification-component>` (`NotificationComponent`)
+- `<loader-component>` (`LoaderComponent`)
+- `<popover-component>` (`PopoverComponent`)
+- `<radial-context-menu>` (`RadialContextMenuComponent`)
+- `<expander>` (`ExpanderComponent`)
+- `<navigation-menu>` (`NavigationMenuComponent`)
+- `<analogue-clock>` (`AnalogueClockComponent`)
+- `[highlight]` (`HighlightDirective`)
+- `drag` / `draggable`, `droppable` behaviors
+- `ThemeService`, `NotifyService`
 
 ## License
 
@@ -269,52 +390,111 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 EOF
 
+cp "$OUTPUT_DIR/LICENSE" "$UI_OUTPUT_DIR/LICENSE"
+
 STEP5_END=$(get_time_ms)
-echo -e "${GREEN}✓ Package manifest and documentation generated in $(format_duration $((STEP5_END - STEP5_START)))${NC}"
+echo -e "${GREEN}✓ Package manifests and documentation generated in $(format_duration $((STEP5_END - STEP5_START)))${NC}"
 
 # Step 6: Validate Package Integrity & Packing
 echo -e "\n${BOLD}${YELLOW}[6/6] Validating Package Structure & Integrity...${NC}"
 STEP6_START=$(get_time_ms)
 
-# Verification 1: ESM import validation
+# Temporarily link packages into node_modules for local resolution testing
+mkdir -p "$ROOT_DIR/node_modules"
+ln -sfn "$OUTPUT_DIR" "$ROOT_DIR/node_modules/purity-world"
+ln -sfn "$UI_OUTPUT_DIR" "$ROOT_DIR/node_modules/purity-world-ui"
+
+# Verification 1: ESM import validation for purity-world/core
 node --input-type=module -e "
-import { signal, computed, effect } from '$OUTPUT_DIR/index.js';
+import { signal, computed, effect } from 'purity-world/core';
 const s = signal(10);
 const c = computed(() => s() * 2);
 if (c() !== 20) throw new Error('Computed failed');
 s.set(30);
 if (c() !== 60) throw new Error('Signal update failed');
 "
-echo -e "${GREEN}✓ ESM module validation passed${NC}"
+echo -e "${GREEN}✓ purity-world/core ESM validation passed${NC}"
 
-# Verification 2: CommonJS require validation
+# Verification 2: CommonJS require validation for purity-world/core
 node -e "
-const { signal, computed } = require('$OUTPUT_DIR/index.cjs');
+const { signal, computed } = require('purity-world/core');
 const s = signal(5);
 if (s() !== 5) throw new Error('CJS signal failed');
 "
-echo -e "${GREEN}✓ CommonJS bundle validation passed${NC}"
+echo -e "${GREEN}✓ purity-world/core CommonJS validation passed${NC}"
 
 # Verification 3: Vite plugin import validation
 node --input-type=module -e "
-import { purityPlugin } from '$OUTPUT_DIR/vite.js';
+import { purityPlugin } from 'purity-world/vite';
 if (typeof purityPlugin !== 'function') throw new Error('purityPlugin export failed');
 "
-echo -e "${GREEN}✓ Vite plugin export validation passed${NC}"
+echo -e "${GREEN}✓ purity-world/vite plugin export validation passed${NC}"
 
-# Verification 4: NPM Dry-run Pack
-echo -e "\n${CYAN}Running NPM pack dry-run inside npm-publish/...${NC}"
-(cd "$OUTPUT_DIR" && npm pack --dry-run)
+# Verification 4: purity-world-ui ESM exports validation
+node --input-type=module -e "
+import * as ui from 'purity-world-ui';
+import { DropdownComponent, SwitchButtonComponent, ModalViewComponent } from 'purity-world-ui';
+const requiredExports = [
+    'DropdownComponent',
+    'DropdownDirective',
+    'SwitchButtonComponent',
+    'ModalViewComponent',
+    'DateTimePickerComponent',
+    'NotificationComponent',
+    'LoaderComponent',
+    'PopoverComponent',
+    'RadialContextMenuComponent',
+    'ExpanderComponent',
+    'NavigationMenuComponent',
+    'AnalogueClockComponent',
+    'HighlightDirective',
+    'drag',
+    'droppable',
+    'ThemeService',
+    'NotifyService',
+];
+for (const exp of requiredExports) {
+    if (typeof ui[exp] === 'undefined') {
+        throw new Error('Missing expected export: ' + exp);
+    }
+}
+"
+echo -e "${GREEN}✓ purity-world-ui ESM exports validation passed${NC}"
+
+# Verification 5: purity-world-ui CommonJS exports validation
+node -e "
+const ui = require('purity-world-ui');
+if (typeof ui.DropdownComponent === 'undefined') throw new Error('CJS DropdownComponent missing');
+if (typeof ui.SwitchButtonComponent === 'undefined') throw new Error('CJS SwitchButtonComponent missing');
+"
+echo -e "${GREEN}✓ purity-world-ui CommonJS exports validation passed${NC}"
+
+# Cleanup temporary verification links
+rm -f "$ROOT_DIR/node_modules/purity-world" "$ROOT_DIR/node_modules/purity-world-ui"
+
+# Verification 6: Style assets validation
+if [ ! -s "$OUTPUT_DIR/style.css" ] || [ ! -s "$UI_OUTPUT_DIR/style.css" ]; then
+    echo -e "${RED}Error: style.css is empty or missing!${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Stylesheets compiled successfully (${OUTPUT_DIR}/style.css & ${UI_OUTPUT_DIR}/style.css)${NC}"
+
+# Verification 7: NPM Pack
+echo -e "\n${CYAN}Running NPM pack on purity-world...${NC}"
+(cd "$OUTPUT_DIR" && npm pack)
+
+echo -e "\n${CYAN}Running NPM pack on purity-world-ui...${NC}"
+(cd "$UI_OUTPUT_DIR" && npm pack)
 
 STEP6_END=$(get_time_ms)
-
 TOTAL_END=$(get_time_ms)
 TOTAL_DURATION=$((TOTAL_END - TOTAL_START))
 
 echo -e "\n${BOLD}${GREEN}================================================================${NC}"
-echo -e "${BOLD}${GREEN} ✓ Package successfully compiled into 'npm-publish' in $(format_duration $TOTAL_DURATION)! ${NC}"
+echo -e "${BOLD}${GREEN} ✓ Packages successfully built in $(format_duration $TOTAL_DURATION)!               ${NC}"
+echo -e "${BOLD}${GREEN}   1. npm-publish/     -> purity-world                          ${NC}"
+echo -e "${BOLD}${GREEN}   2. npm-publish-ui/  -> purity-world-ui                       ${NC}"
 echo -e "${BOLD}${GREEN}================================================================${NC}"
 echo -e "\n${BOLD}Ready to publish:${NC}"
-echo -e "  ${CYAN}cd npm-publish && npm publish${NC}"
-echo -e "  or"
-echo -e "  ${CYAN}npm publish ./npm-publish${NC}\n"
+echo -e "  ${CYAN}npm publish ./npm-publish${NC}"
+echo -e "  ${CYAN}npm publish ./npm-publish-ui${NC}\n"
