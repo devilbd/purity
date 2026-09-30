@@ -33,6 +33,8 @@ export default defineConfig(({ mode }) => {
         plugins: [decoratorsPlugin(), environmentPlugin(isProd)],
         resolve: {
             alias: {
+                '@package': path.resolve(import.meta.dirname, 'package.json'),
+                'package.json': path.resolve(import.meta.dirname, 'package.json'),
                 '@purity/core': path.resolve(import.meta.dirname, 'src/framework/core.ts'),
                 '@purity': path.resolve(import.meta.dirname, 'src/framework'),
                 '@environments': path.resolve(import.meta.dirname, 'src/environments'),
