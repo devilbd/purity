@@ -7,6 +7,249 @@ export interface IntroSampleSnippet {
 }
 
 export const INTRO_SAMPLE_SNIPPETS: Record<string, IntroSampleSnippet> = {
+    // 0. Getting Started (Purity + Purity UI)
+    'getting-started': {
+        id: 'getting-started',
+        title: '🚀 Getting Started: Purity & Purity UI Setup',
+        ts: `import { Component, signal, inject } from '@purity/core';
+import { ThemeService } from '@data/theme.service';
+import { NotifyService } from '@data/notify.service';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    private themeService = inject(ThemeService);
+    private notify = inject(NotifyService);
+
+    isModalOpen = signal(false);
+    notificationsEnabled = signal(true);
+    clickCount = signal(0);
+
+    isDark() {
+        return this.themeService.isDark();
+    }
+
+    toggleTheme() {
+        this.themeService.toggleTheme();
+    }
+
+    openModal() {
+        this.isModalOpen.set(true);
+    }
+
+    closeModal() {
+        this.isModalOpen.set(false);
+    }
+
+    onToggleNotifications(e: any) {
+        const checked = e?.detail?.checked ?? !this.notificationsEnabled();
+        this.notificationsEnabled.set(checked);
+        if (checked) {
+            this.notify.success('Notifications Enabled', 'You will now receive toast updates.', { duration: 3000 });
+        } else {
+            this.notify.info('Notifications Muted', 'Toast updates have been disabled.', { duration: 2500 });
+        }
+    }
+
+    onAction() {
+        this.clickCount.update(c => c + 1);
+        if (this.notificationsEnabled()) {
+            this.notify.success('Purity UI Action', \`Button clicked \${this.clickCount()} time(s)!\`);
+        }
+    }
+}`,
+        html: `<div class="sample-card window">
+    <div class="card-header">
+        <span class="pill-badge">🚀 Getting Started</span>
+        <h3>Purity + Purity UI Setup</h3>
+        <p>A fully integrated reactive component combining Purity Signals with Adwaita UI controls.</p>
+    </div>
+
+    <!-- Controls Grid -->
+    <div class="controls-grid">
+        <div class="control-box">
+            <span class="box-label">Theme Engine</span>
+            <button type="button" class="button-primary" onclick="toggleTheme()">
+                {{isDark() ? '🌙 Switch to Light' : '☀️ Switch to Dark'}}
+            </button>
+        </div>
+
+        <div class="control-box">
+            <span class="box-label">Switch Button (Purity UI)</span>
+            <switch-button
+                checked="{{notificationsEnabled()}}"
+                onchange="onToggleNotifications(event)"
+            >
+                Enable Notifications
+            </switch-button>
+        </div>
+
+        <div class="control-box">
+            <span class="box-label">Modal View (Purity UI)</span>
+            <button type="button" class="button-secondary" onclick="openModal()">
+                🪟 Open Modal Dialog
+            </button>
+        </div>
+    </div>
+
+    <!-- Interactive Action Box -->
+    <div class="action-box">
+        <div class="status-indicator">
+            <span>Clicks: <strong>{{clickCount()}}</strong></span>
+            <span>Notifications: <strong>{{notificationsEnabled() ? 'Active' : 'Disabled'}}</strong></span>
+        </div>
+        <button type="button" class="button-primary" onclick="onAction()">
+            ⚡ Trigger Reactive Toast
+        </button>
+    </div>
+
+    <!-- Purity UI Modal Component -->
+    <modal-view is-open="{{isModalOpen()}}" onclose="closeModal()">
+        <div class="modal-content">
+            <h4>✨ Purity Framework Ready!</h4>
+            <p>You have successfully configured both <code>purity</code> and <code>purity-ui</code>.</p>
+            <div class="modal-actions">
+                <button type="button" class="button-primary" onclick="closeModal()">Got it!</button>
+            </div>
+        </div>
+    </modal-view>
+
+    <!-- Purity UI Notification Component -->
+    <notification-component></notification-component>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    .card-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        .pill-badge {
+            align-self: flex-start;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill, 999px);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h3 {
+            margin: 0;
+            color: var(--text-main);
+            font-size: 1.35rem;
+            font-weight: 800;
+        }
+
+        p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+        }
+    }
+
+    .controls-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+
+        .control-box {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 14px;
+            background: var(--gnome-card);
+            border: 1px solid var(--gnome-border-subtle);
+            border-radius: var(--radius-card, 12px);
+
+            .box-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: var(--text-secondary);
+                letter-spacing: 0.5px;
+            }
+        }
+    }
+
+    .action-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 16px;
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+
+        .status-indicator {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+
+            strong {
+                color: var(--accent);
+            }
+        }
+    }
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 8px;
+
+        h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-main);
+        }
+
+        p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13.5px;
+            line-height: 1.5;
+
+            code {
+                background: var(--accent-subtle);
+                border: 1px solid var(--accent);
+                color: var(--accent);
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-weight: 600;
+            }
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+    }
+}`,
+    },
+
     // 1. Reactivity
     reactivity: {
         id: 'reactivity',

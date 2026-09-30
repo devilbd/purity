@@ -31,6 +31,229 @@
     <div class="intro-samples-stack">
 
         <!-- ========================================== -->
+        <!-- GETTING STARTED: PURITY & PURITY UI SETUP  -->
+        <!-- ========================================== -->
+        <div class="intro-section-divider">
+            <span class="section-icon">🚀</span>
+            <h3 class="section-title">Getting Started: Purity &amp; Purity UI Setup</h3>
+            <span class="section-badge">Quick Start Guide</span>
+        </div>
+
+        <!-- 0. Architecture Overview: Purity Core & Purity UI -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>📦 Architecture Overview: Purity Core &amp; Purity UI</h4>
+                    <p>Purity is designed as a modern, modular ecosystem consisting of two complementary standalone packages:</p>
+                </div>
+            </div>
+            <div class="getting-started-pkg-grid">
+                <div class="pkg-card">
+                    <div class="pkg-header">
+                        <h5 class="pkg-name">purity-world</h5>
+                        <span class="pkg-badge core">Core Engine</span>
+                    </div>
+                    <p class="pkg-desc">Native TypeScript framework kernel with zero runtime dependencies. Powers fine-grained synchronous reactivity, Custom Elements v1, Dependency Injection, HTTP client &amp; interceptor pipelines, Signal Router, and build-time Vite template inlining.</p>
+                    <div class="pkg-tags">
+                        <span class="pkg-tag">signal()</span>
+                        <span class="pkg-tag">computed()</span>
+                        <span class="pkg-tag">effect()</span>
+                        <span class="pkg-tag">@Component</span>
+                        <span class="pkg-tag">@Injectable</span>
+                        <span class="pkg-tag">HttpClient</span>
+                        <span class="pkg-tag">Router</span>
+                    </div>
+                </div>
+                <div class="pkg-card">
+                    <div class="pkg-header">
+                        <h5 class="pkg-name">purity-world-ui</h5>
+                        <span class="pkg-badge ui">Component Library</span>
+                    </div>
+                    <p class="pkg-desc">Rich Adwaita glassmorphic UI components, standalone widgets, directives, composable behaviors, theme persistence, and KDE Plasma Breeze vector cursors crafted specifically for Purity applications.</p>
+                    <div class="pkg-tags">
+                        <span class="pkg-tag">&lt;switch-button&gt;</span>
+                        <span class="pkg-tag">&lt;modal-view&gt;</span>
+                        <span class="pkg-tag">&lt;dropdown&gt;</span>
+                        <span class="pkg-tag">&lt;date-time-picker&gt;</span>
+                        <span class="pkg-tag">ThemeService</span>
+                        <span class="pkg-tag">NotifyService</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Install Purity & Purity UI Packages -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>Step 1: 📦 Install Purity &amp; Purity UI Packages</h4>
+                    <p>Install both the core reactivity engine (<code>purity-world</code>) and the UI component library (<code>purity-world-ui</code>) via your preferred package manager:</p>
+                </div>
+            </div>
+            <pre data-no-bind><code><span class="cmt"># 1. Install Purity core and UI component library via NPM</span>
+<span class="fn">npm</span> <span class="kw">install</span> <span class="str">purity-world purity-world-ui</span>
+
+<span class="cmt"># Or using PNPM:</span>
+<span class="fn">pnpm</span> <span class="kw">add</span> <span class="str">purity-world purity-world-ui</span>
+
+<span class="cmt"># Or using Yarn:</span>
+<span class="fn">yarn</span> <span class="kw">add</span> <span class="str">purity-world purity-world-ui</span>
+
+<span class="cmt"># 2. Install required development build toolchain (Vite, TypeScript, Sass)</span>
+<span class="fn">npm</span> <span class="kw">install</span> <span class="attr">-D</span> <span class="str">vite typescript sass</span></code></pre>
+        </div>
+
+        <!-- Step 2: Configure Vite Plugin & TypeScript -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>Step 2: ⚙️ Configure Vite Plugin &amp; TypeScript</h4>
+                    <p>Enable <code>purityPlugin()</code> from <code>purity-world/vite</code> in your Vite configuration to automatically inline external HTML templates (<code>templateUrl</code>) at compile time and transpile class decorators with zero runtime overhead:</p>
+                </div>
+            </div>
+            <pre data-no-bind><code><span class="cmt">// vite.config.ts</span>
+<span class="kw">import</span> { <span class="fn">defineConfig</span> } <span class="kw">from</span> <span class="str">'vite'</span>;
+<span class="kw">import</span> { <span class="fn">purityPlugin</span> } <span class="kw">from</span> <span class="str">'purity-world/vite'</span>;
+
+<span class="kw">export default</span> <span class="fn">defineConfig</span>({
+    <span class="attr">plugins</span>: [<span class="fn">purityPlugin</span>()],
+});
+
+<span class="cmt">/* tsconfig.json - Enable standard TypeScript decorator transpilation */</span>
+<span class="str">"{</span>
+  <span class="attr">\"compilerOptions\"</span>: {
+    <span class="attr">\"target\"</span>: <span class="str">\"ES2022\"</span>,
+    <span class="attr">\"module\"</span>: <span class="str">\"ESNext\"</span>,
+    <span class="attr">\"moduleResolution\"</span>: <span class="str">\"bundler\"</span>,
+    <span class="attr">\"strict\"</span>: <span class="num">true</span>,
+    <span class="attr">\"experimentalDecorators\"</span>: <span class="num">true</span>,
+    <span class="attr">\"useDefineForClassFields\"</span>: <span class="num">false</span>
+  }
+<span class="str">}"</span></code></pre>
+        </div>
+
+        <!-- Step 3: Global Styles & Adwaita Theming Setup -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>Step 3: 🎨 Global Styles &amp; Adwaita Theming Setup</h4>
+                    <p>Import core and UI styles to initialize Dark and Light theme variables, glassmorphic surface tokens, and the KDE Plasma Breeze vector cursor hierarchy:</p>
+                </div>
+            </div>
+            <pre data-no-bind><code><span class="cmt">/* src/style.scss - Master styling entry point */</span>
+<span class="kw">@import</span> <span class="str">'purity-world/styles'</span>;
+<span class="kw">@import</span> <span class="str">'purity-world-ui/styles'</span>;
+
+<span class="cmt">/* Base application root styling adhering to Adwaita design tokens */</span>
+<span class="tag">:root</span> {
+    <span class="attr">font-family</span>: <span class="str">system-ui, -apple-system, 'Inter', 'Adwaita Sans', sans-serif</span>;
+    <span class="attr">color</span>: <span class="expr">var(--text-main)</span>;
+    <span class="attr">background-color</span>: <span class="expr">var(--gnome-bg)</span>;
+}
+
+<span class="tag">body</span> {
+    <span class="attr">margin</span>: <span class="num">0</span>;
+    <span class="attr">cursor</span>: <span class="expr">var(--cursor-default)</span>; <span class="cmt">/* KDE Plasma Breeze arrow pointer */</span>
+}</code></pre>
+        </div>
+
+        <!-- Step 4: Bootstrap Application Root & UI Services -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>Step 4: 🚀 Bootstrap Application Root &amp; UI Services</h4>
+                    <p>Wire the root Custom Element with <code>bootstrapApplication()</code> and register global singleton services from <code>purity-world-ui</code> (e.g. <code>ThemeService</code> and <code>NotifyService</code>):</p>
+                </div>
+            </div>
+            <pre data-no-bind><code><span class="cmt">// src/main.ts</span>
+<span class="kw">import</span> <span class="str">'./style.scss'</span>;
+<span class="kw">import</span> { <span class="fn">bootstrapApplication</span> } <span class="kw">from</span> <span class="str">'purity-world/core'</span>;
+<span class="kw">import</span> { <span class="typ">ThemeService</span>, <span class="typ">NotifyService</span> } <span class="kw">from</span> <span class="str">'purity-world-ui'</span>;
+<span class="kw">import</span> { <span class="typ">AppComponent</span> } <span class="kw">from</span> <span class="str">'./app/app.component'</span>;
+
+<span class="fn">bootstrapApplication</span>(<span class="typ">AppComponent</span>, {
+    <span class="attr">providers</span>: [<span class="typ">ThemeService</span>, <span class="typ">NotifyService</span>],
+}).<span class="fn">then</span>(() =&gt; {
+    console.<span class="fn">log</span>(<span class="str">'✨ Purity application initialized with Adwaita UI &amp; Theme Engine!'</span>);
+});</code></pre>
+        </div>
+
+        <!-- Step 5: Building Reactive UI with Purity & Purity UI -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>Step 5: 🧩 Building Reactive UI with Purity &amp; Purity UI</h4>
+                    <p>Combine fine-grained Purity Signals with pre-built Purity UI elements (<code>&lt;switch-button&gt;</code>, <code>&lt;modal-view&gt;</code>, <code>&lt;notification-component&gt;</code>) and reactive services:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this getting-started sample in the interactive playground"
+                    onclick="onLoadSample('getting-started')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="cmt">// 1. Component TypeScript: Reactive Signals &amp; UI Service Injection</span>
+<span class="kw">import</span> { <span class="fn">Component</span>, <span class="fn">signal</span>, <span class="fn">inject</span> } <span class="kw">from</span> <span class="str">'purity-world/core'</span>;
+<span class="kw">import</span> { <span class="typ">ThemeService</span>, <span class="typ">NotifyService</span>, <span class="typ">SwitchButtonComponent</span>, <span class="typ">ModalViewComponent</span> } <span class="kw">from</span> <span class="str">'purity-world-ui'</span>;
+
+<span class="dec">@Component</span>({
+    <span class="attr">selector</span>: <span class="str">'app-root'</span>,
+    <span class="attr">templateUrl</span>: <span class="str">'./app.component.html'</span>,
+})
+<span class="kw">export class</span> <span class="typ">AppComponent</span> {
+    <span class="kw">private</span> theme = <span class="fn">inject</span>(<span class="typ">ThemeService</span>);
+    <span class="kw">private</span> notify = <span class="fn">inject</span>(<span class="typ">NotifyService</span>);
+
+    isModalOpen = <span class="fn">signal</span>(<span class="num">false</span>);
+    notificationsEnabled = <span class="fn">signal</span>(<span class="num">true</span>);
+
+    <span class="fn">toggleTheme</span>() {
+        <span class="kw">this</span>.theme.<span class="fn">toggleTheme</span>(); <span class="cmt">// Toggles between 'dark' and 'light' mode</span>
+    }
+
+    <span class="fn">openModal</span>() {
+        <span class="kw">this</span>.isModalOpen.<span class="fn">set</span>(<span class="num">true</span>);
+    }
+
+    <span class="fn">closeModal</span>() {
+        <span class="kw">this</span>.isModalOpen.<span class="fn">set</span>(<span class="num">false</span>);
+    }
+
+    <span class="fn">onNotify</span>() {
+        <span class="kw">this</span>.notify.<span class="fn">success</span>(<span class="str">'Purity Ready'</span>, <span class="str">'Signals and UI components connected successfully!'</span>);
+    }
+}
+
+<span class="cmt">&lt;!-- 2. HTML Template: Combining Signals with Purity UI Custom Elements --&gt;</span>
+<span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"app-container window"</span><span class="tag">&gt;</span>
+    <span class="tag">&lt;h2&gt;</span>Welcome to Purity Framework<span class="tag">&lt;/h2&gt;</span>
+
+    <span class="cmt">&lt;!-- Purity UI Switch Button bound to reactive signal --&gt;</span>
+    <span class="tag">&lt;switch-button</span> <span class="attr">checked</span>=<span class="str">"{{notificationsEnabled()}}"</span><span class="tag">&gt;</span>
+        Enable Notifications
+    <span class="tag">&lt;/switch-button&gt;</span>
+
+    <span class="cmt">&lt;!-- Primary Action Buttons --&gt;</span>
+    <span class="tag">&lt;div</span> <span class="attr">class</span>=<span class="str">"actions-row"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">class</span>=<span class="str">"button-primary"</span> <span class="attr">onclick</span>=<span class="str">"toggleTheme()"</span><span class="tag">&gt;</span>🌓 Toggle Theme<span class="tag">&lt;/button&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">class</span>=<span class="str">"button-secondary"</span> <span class="attr">onclick</span>=<span class="str">"openModal()"</span><span class="tag">&gt;</span>🪟 Open Modal<span class="tag">&lt;/button&gt;</span>
+        <span class="tag">&lt;button</span> <span class="attr">type</span>=<span class="str">"button"</span> <span class="attr">class</span>=<span class="str">"button-primary"</span> <span class="attr">onclick</span>=<span class="str">"onNotify()"</span><span class="tag">&gt;</span>🔔 Show Toast<span class="tag">&lt;/button&gt;</span>
+    <span class="tag">&lt;/div&gt;</span>
+
+    <span class="cmt">&lt;!-- Purity UI Modal Dialog --&gt;</span>
+    <span class="tag">&lt;modal-view</span> <span class="attr">is-open</span>=<span class="str">"{{isModalOpen()}}"</span> <span class="attr">onclose</span>=<span class="str">"closeModal()"</span><span class="tag">&gt;</span>
+        <span class="tag">&lt;h3&gt;</span>✨ Purity UI Modal<span class="tag">&lt;/h3&gt;</span>
+        <span class="tag">&lt;p&gt;</span>Native Custom Element modal dialog styled to Adwaita design standards.<span class="tag">&lt;/p&gt;</span>
+    <span class="tag">&lt;/modal-view&gt;</span>
+
+    <span class="cmt">&lt;!-- Purity UI Toast Notification Host --&gt;</span>
+    <span class="tag">&lt;notification-component&gt;&lt;/notification-component&gt;</span>
+<span class="tag">&lt;/div&gt;</span></code></pre>
+        </div>
+
+        <!-- ========================================== -->
         <!-- GROUP 1: CORE FRAMEWORK CODE & PRIMITIVES  -->
         <!-- ========================================== -->
         <div class="intro-section-divider">

@@ -71,4 +71,47 @@ describe('IntroComponent & Intro Sample Snippets', () => {
         expect(() => introComponent.onGoToPlayground()).not.toThrow();
         expect(() => introComponent.onTryIt()).not.toThrow();
     });
+
+    it('should retrieve getting-started sample snippet correctly', () => {
+        const snippet = getIntroSampleSnippet('getting-started');
+        expect(snippet).toBeDefined();
+        expect(snippet?.id).toBe('getting-started');
+        expect(snippet?.title).toContain('Getting Started');
+        expect(snippet?.ts).toContain('PlaygroundDemoComponent');
+        expect(snippet?.html).toContain('Purity + Purity UI Setup');
+        expect(snippet?.scss).toBeDefined();
+    });
+
+    it('should have getting-started registered in INTRO_SAMPLE_SNIPPETS', () => {
+        expect(INTRO_SAMPLE_SNIPPETS['getting-started']).toBeDefined();
+        expect(INTRO_SAMPLE_SNIPPETS['getting-started'].id).toBe('getting-started');
+    });
+
+    it('should call loadSnippet on playground-view when getting-started is loaded', () => {
+        const mockPlayground = document.createElement('playground-view') as any;
+        mockPlayground.loadSnippet = vi.fn();
+        document.body.appendChild(mockPlayground);
+
+        try {
+            introComponent.onLoadSample('getting-started');
+            expect(mockPlayground.loadSnippet).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 'getting-started' })
+            );
+        } finally {
+            document.body.removeChild(mockPlayground);
+        }
+    });
+
+    it('should render Getting Started section and package overview in intro template', () => {
+        const sectionTitle = element.querySelector('.intro-section-divider .section-title');
+        expect(sectionTitle?.textContent).toContain('Getting Started');
+
+        const pkgCards = element.querySelectorAll('.getting-started-pkg-grid .pkg-card');
+        expect(pkgCards.length).toBe(2);
+
+        const cardText = element.textContent;
+        expect(cardText).toContain('purity-world');
+        expect(cardText).toContain('purity-world-ui');
+        expect(cardText).toContain('Step 1: 📦 Install Purity & Purity UI Packages');
+    });
 });
