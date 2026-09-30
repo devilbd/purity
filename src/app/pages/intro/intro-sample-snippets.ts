@@ -2833,6 +2833,184 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+    // 32. Dropdown Directive
+    'dropdown': {
+        id: 'dropdown',
+        title: '🔽 Dropdown Directive (<dropdown>)',
+        ts: `import { Component, signal } from '@purity/core';
+import '@directives/dropdown/dropdown.directive';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    selectedCategory = signal('Web Components');
+    selectedFramework = signal('Purity Core');
+    lastActionLog = signal('Ready');
+
+    onSelectCategory(category: string) {
+        this.selectedCategory.set(category);
+        this.lastActionLog.set(\`Category selected: \${category}\`);
+    }
+
+    onSelectFramework(framework: string) {
+        this.selectedFramework.set(framework);
+        this.lastActionLog.set(\`Framework selected: \${framework}\`);
+    }
+
+    onReset() {
+        this.selectedCategory.set('Web Components');
+        this.selectedFramework.set('Purity Core');
+        this.lastActionLog.set('Selections reset to defaults');
+    }
+}`,
+        html: `<div class="sample-card window">
+    <h3>🔽 Dropdown Directive</h3>
+    <p>Declarative dropdowns with body portal teleportation, keyboard navigation, and fine-grained reactive signals.</p>
+
+    <div class="dropdowns-grid">
+        <div class="dropdown-panel">
+            <label class="panel-label">Technology</label>
+            <dropdown label="{{selectedCategory()}}" class="custom-dd">
+                <ul>
+                    <li onclick="onSelectCategory('Web Components')">
+                        <span class="item-icon">🧩</span>
+                        <span class="item-text">Web Components</span>
+                    </li>
+                    <li onclick="onSelectCategory('Fine-Grained Signals')">
+                        <span class="item-icon">⚡</span>
+                        <span class="item-text">Fine-Grained Signals</span>
+                    </li>
+                    <li onclick="onSelectCategory('Custom Elements v1')">
+                        <span class="item-icon">🚀</span>
+                        <span class="item-text">Custom Elements v1</span>
+                    </li>
+                </ul>
+            </dropdown>
+        </div>
+
+        <div class="dropdown-panel">
+            <label class="panel-label">Module / Service</label>
+            <dropdown label="{{selectedFramework()}}" class="custom-dd">
+                <ul>
+                    <li onclick="onSelectFramework('Purity Core')">
+                        <span class="item-icon">📦</span>
+                        <span class="item-text">@purity/core</span>
+                    </li>
+                    <li onclick="onSelectFramework('Theme Engine')">
+                        <span class="item-icon">🌓</span>
+                        <span class="item-text">Theme Engine</span>
+                    </li>
+                    <li onclick="onSelectFramework('Signal Router')">
+                        <span class="item-icon">🗺️</span>
+                        <span class="item-text">Signal Router</span>
+                    </li>
+                </ul>
+            </dropdown>
+        </div>
+    </div>
+
+    <div class="status-output">
+        <div class="status-row">
+            <span class="status-key">Active Selection:</span>
+            <span class="status-pill">{{selectedCategory()}} / {{selectedFramework()}}</span>
+        </div>
+        <div class="status-row">
+            <span class="status-key">Event Log:</span>
+            <span class="status-text">{{lastActionLog()}}</span>
+        </div>
+    </div>
+
+    <div class="actions-row">
+        <button type="button" class="button-secondary" onclick="onReset()">
+            🔄 Reset Selections
+        </button>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    -webkit-backdrop-filter: var(--blur-effect);
+    backdrop-filter: var(--blur-effect);
+    box-shadow: var(--shadow-popup);
+    color: var(--text-main);
+
+    h3 {
+        margin: 0;
+        color: var(--text-main);
+        font-size: 1.25rem;
+    }
+
+    p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+
+    .dropdowns-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+
+        .dropdown-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+
+            .panel-label {
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--text-secondary);
+            }
+        }
+    }
+
+    .status-output {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px 16px;
+        border-radius: var(--radius-card, 12px);
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+
+            .status-key {
+                font-weight: 600;
+                color: var(--text-secondary);
+            }
+
+            .status-pill {
+                color: var(--accent-green, #57e389);
+                font-weight: 700;
+                font-family: var(--font-mono, monospace);
+            }
+
+            .status-text {
+                color: var(--text-main);
+            }
+        }
+    }
+
+    .actions-row {
+        display: flex;
+        justify-content: flex-end;
+    }
+}`,
+    },
 };
 
 export function getIntroSampleSnippet(sampleId: string): IntroSampleSnippet | null {
