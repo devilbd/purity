@@ -143,7 +143,7 @@ purity/
         │   └── radial-context-menu/ # Radial menu icon SVGs
         ├── pages/               # Application pages, views & feature showcases (header, footer, intro, playground, demo, router-sample, analogue-clock-sample, date-time-picker-sample, popover-sample, radial-context-menu-sample, switch-button-sample, http-sample, modal-sample, notification-sample, directive-sample, forms-validation, for-sample, if-sample, virtual-for-sample, pipe-sample)
         └── shared/
-            ├── behaviors/       # Composable DOM behaviors (draggable, droppable)
+            ├── behaviors/       # Composable DOM behaviors (draggable, droppable, resizable)
             ├── directives/      # Reusable DOM directives (dropdown, highlight)
             ├── pipes/           # Reusable transform pipes (date, transform-sample, uppercase)
             ├── validators/      # Form & field validation classes (forms-validation)

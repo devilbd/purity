@@ -79,6 +79,23 @@ export {
     type DroppableOptions,
 } from './app/shared/behaviors/droppable/droppable';
 
+export {
+    resizable,
+    resizable as resize,
+    resizableAll,
+    type ResizableOptions,
+    type ResizableInstance,
+    type ResizeHandle,
+    type ResizeCornerHandle,
+    type ResizeEdgeHandle,
+    type CanonicalHandle,
+    type CanonicalCorner,
+    type CanonicalEdge,
+    type ResizeData,
+    type ResizeStartData,
+    type ResizeEndData,
+} from './app/shared/behaviors/resizable/resizable';
+
 // Interceptors
 export {
     AuthInterceptor,

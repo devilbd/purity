@@ -18,6 +18,7 @@ import '@pages/router-sample/router-sample.component';
 import '@pages/popover-sample/popover-sample.component';
 import '@pages/switch-button-sample/switch-button-sample.component';
 import '@pages/expander-sample/expander-sample.component';
+import '@pages/resizable-sample/resizable-sample.component';
 import '@components/loader/loader.component';
 
 @Component({

@@ -1,0 +1,169 @@
+@use '@styles' as *;
+
+/* ==========================================================================
+   Purity Design System - Resizable Behavior Styles
+   Adwaita glassmorphism corner handles & KDE Plasma Breeze cursor tokens.
+   ========================================================================== */
+
+.resizable-container {
+    position: relative;
+    box-sizing: border-box;
+
+    &.is-resizing {
+        user-select: none !important;
+        transition: none !important; /* CRITICAL: instantaneous resize without layout transition delay */
+        will-change: width, height, transform, left, top;
+        z-index: 1000 !important;
+
+        .resize-handle {
+            opacity: 1 !important;
+        }
+    }
+
+    &:hover .resize-handle {
+        opacity: 0.85;
+    }
+
+    &.is-disabled {
+        .resize-handle {
+            display: none !important;
+            pointer-events: none !important;
+        }
+    }
+}
+
+body.is-resizing-active {
+    user-select: none !important;
+}
+
+.resize-handle {
+    position: absolute;
+    box-sizing: border-box;
+    z-index: 100;
+    touch-action: none;
+    opacity: 0.45;
+    transition: opacity var(--transition-fast) var(--ease-gnome),
+                background-color var(--transition-fast) var(--ease-gnome),
+                border-color var(--transition-fast) var(--ease-gnome),
+                transform var(--transition-fast) var(--ease-gnome),
+                box-shadow var(--transition-fast) var(--ease-gnome);
+
+    &:hover,
+    &.is-active {
+        opacity: 1 !important;
+    }
+}
+
+/* Corner Handles */
+.resize-handle-corner {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-control, 4px);
+    background: var(--gnome-surface, rgba(255, 255, 255, 0.15));
+    border: 1px solid var(--gnome-border, rgba(255, 255, 255, 0.25));
+    backdrop-filter: var(--blur-subtle, blur(8px));
+    -webkit-backdrop-filter: var(--blur-subtle, blur(8px));
+
+    &:hover,
+    &.is-active {
+        background: var(--accent, #3584e4);
+        border-color: var(--accent, #3584e4);
+        box-shadow: 0 0 8px rgba(53, 132, 228, 0.55);
+        transform: scale(1.15);
+    }
+}
+
+.resize-handle-nw {
+    top: 0;
+    left: 0;
+    border-top-left-radius: inherit;
+    cursor: var(--cursor-nwse-resize, nwse-resize);
+}
+
+.resize-handle-ne {
+    top: 0;
+    right: 0;
+    border-top-right-radius: inherit;
+    cursor: var(--cursor-nesw-resize, nesw-resize);
+}
+
+.resize-handle-se {
+    bottom: 0;
+    right: 0;
+    border-bottom-right-radius: inherit;
+    cursor: var(--cursor-nwse-resize, nwse-resize);
+}
+
+.resize-handle-sw {
+    bottom: 0;
+    left: 0;
+    border-bottom-left-radius: inherit;
+    cursor: var(--cursor-nesw-resize, nesw-resize);
+}
+
+/* Edge Handles (Optional) */
+.resize-handle-edge {
+    background: transparent;
+
+    &:hover,
+    &.is-active {
+        background: rgba(53, 132, 228, 0.25);
+    }
+}
+
+.resize-handle-n {
+    top: 0;
+    left: 14px;
+    right: 14px;
+    height: 8px;
+    cursor: var(--cursor-ns-resize, ns-resize);
+}
+
+.resize-handle-s {
+    bottom: 0;
+    left: 14px;
+    right: 14px;
+    height: 8px;
+    cursor: var(--cursor-ns-resize, ns-resize);
+}
+
+.resize-handle-w {
+    top: 14px;
+    bottom: 14px;
+    left: 0;
+    width: 8px;
+    cursor: var(--cursor-ew-resize, ew-resize);
+}
+
+.resize-handle-e {
+    top: 14px;
+    bottom: 14px;
+    right: 0;
+    width: 8px;
+    cursor: var(--cursor-ew-resize, ew-resize);
+}
+
+/* Themes */
+.resizable-theme-minimal {
+    .resize-handle-corner {
+        opacity: 0;
+        background: transparent;
+        border: none;
+
+        &:hover,
+        &.is-active {
+            opacity: 0.85 !important;
+            background: var(--accent, #3584e4);
+            border: 1px solid var(--accent, #3584e4);
+        }
+    }
+}
+
+.resizable-theme-invisible {
+    .resize-handle {
+        opacity: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+}

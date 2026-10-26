@@ -691,6 +691,45 @@ count.<span class="fn">update</span>(n =&gt; n + <span class="num">1</span>); <s
 });</code></pre>
         </div>
 
+        <!-- 10b. Composable Behavior: Resizable -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>10b. 📐 Composable Behavior: Resizable (<code>behaviors/resizable</code>)</h4>
+                    <p>Container resizing by dragging corner handles with Adwaita glassmorphism, KDE Plasma Breeze cursors, min/max bounds, snap grids, and aspect ratio locking:</p>
+                </div>
+                <button
+                    type="button"
+                    class="sample-edit-btn"
+                    title="Load and edit this sample in the interactive playground"
+                    onclick="onLoadSample('resizable')"
+                >
+                    🎮 Edit in Playground
+                </button>
+            </div>
+            <pre data-no-bind><code><span class="kw">import</span> { <span class="fn">resizable</span> } <span class="kw">from</span> <span class="str">'./shared/behaviors/resizable/resizable'</span>;
+
+<span class="cmt">// 1. Simply pass a selector or HTMLElement to equip 4 corner resize handles</span>
+<span class="kw">const</span> resizer = <span class="fn">resizable</span>(<span class="str">'#my-box'</span>);
+
+<span class="cmt">// 2. Advanced configuration with boundaries, grid snapping &amp; aspect ratio</span>
+<span class="kw">const</span> customResizer = <span class="fn">resizable</span>(<span class="str">'#window-card'</span>, {
+    minWidth: 200,
+    minHeight: 120,
+    maxWidth: 800,
+    maxHeight: 600,
+    snap: 10,           <span class="cmt">// Snap to 10px grid</span>
+    aspectRatio: <span class="kw">false</span>, <span class="cmt">// Or true / 16 / 9</span>
+    onResize: (el, data) =&gt; {
+        console.<span class="fn">log</span>(<span class="str">`Size: ${data.width}x${data.height} via ${data.handle}`</span>);
+    },
+});
+
+<span class="cmt">// 3. Programmatic sizing and cleanup</span>
+customResizer.<span class="fn">setDimensions</span>(400, 250);
+customResizer.<span class="fn">destroy</span>();</code></pre>
+        </div>
+
         <!-- ========================================== -->
         <!-- GROUP 2: WEB COMPONENTS & TEMPLATING       -->
         <!-- ========================================== -->

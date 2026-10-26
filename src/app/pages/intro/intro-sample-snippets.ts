@@ -1256,6 +1256,142 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
+    // 9b. Resizable
+    resizable: {
+        id: 'resizable',
+        title: '📐 Composable Resizable Behavior',
+        ts: `import { Component, signal } from '@purity/core';
+import { resizable, type ResizableInstance } from '@behaviors/resizable/resizable';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    private resizer?: ResizableInstance | null;
+    public currentWidth = signal<number>(340);
+    public currentHeight = signal<number>(200);
+
+    protected onInit() {
+        this.resizer = resizable('#resizable-box', {
+            minWidth: 180,
+            minHeight: 120,
+            maxWidth: 600,
+            maxHeight: 400,
+            snap: 10,
+            onResize: (_, data) => {
+                this.currentWidth.set(Math.round(data.width));
+                this.currentHeight.set(Math.round(data.height));
+            },
+        });
+    }
+
+    protected onDestroy() {
+        this.resizer?.destroy();
+    }
+
+    public setPreset(w: number, h: number) {
+        this.resizer?.setDimensions(w, h);
+        this.currentWidth.set(w);
+        this.currentHeight.set(h);
+    }
+}`,
+        html: `<div class="sample-card window">
+    <div class="header-row">
+        <h3>📐 Resizable Container Behavior</h3>
+        <span class="badge-pill">Adwaita Glass</span>
+    </div>
+    <p>Drag any of the 4 corner handles to smoothly resize the container.</p>
+
+    <div class="actions-row">
+        <button type="button" class="button-secondary" onclick="setPreset(420, 240)">
+            🔲 Medium (420×240)
+        </button>
+        <button type="button" class="button-secondary" onclick="setPreset(260, 150)">
+            ▫ Small (260×150)
+        </button>
+        <span class="dimension-pill">{{currentWidth()}} × {{currentHeight()}} px</span>
+    </div>
+
+    <div id="resizable-box" class="demo-box">
+        <div class="box-inner">
+            <span class="icon">📐</span>
+            <strong>Drag Corners to Resize</strong>
+            <span>Min: 180×120px | Snap: 10px</span>
+        </div>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.sample-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    border-radius: var(--radius-window, 16px);
+    background: var(--gnome-surface);
+    backdrop-filter: var(--blur-effect);
+    border: 1px solid var(--gnome-border);
+
+    .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        h3 { margin: 0; font-size: 16px; color: var(--text-primary); }
+        .badge-pill {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            background: rgba(53, 132, 228, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(53, 132, 228, 0.3);
+        }
+    }
+
+    .actions-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .dimension-pill {
+            margin-left: auto;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--accent);
+            background: rgba(53, 132, 228, 0.12);
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+        }
+    }
+
+    .demo-box {
+        width: 340px;
+        height: 200px;
+        border-radius: var(--radius-card, 12px);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--gnome-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+        .box-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 13px;
+
+            .icon { font-size: 28px; }
+            strong { color: var(--text-primary); }
+            span { font-size: 11px; opacity: 0.8; }
+        }
+    }
+}`,
+    },
+
     // 10. Components
     components: {
         id: 'components',

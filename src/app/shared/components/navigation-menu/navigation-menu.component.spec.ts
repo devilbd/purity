@@ -128,4 +128,25 @@ describe('NavigationMenuComponent', () => {
         navMenu.onDestroy();
         expect(destroySpy).toHaveBeenCalled();
     });
+
+    it('should navigate to resizable-sample and auto-expand demo container', () => {
+        const demoWindow = document.createElement('div');
+        demoWindow.id = 'demo-window';
+        demoWindow.className = 'demo-hidden';
+        document.body.appendChild(demoWindow);
+
+        const resizableTarget = document.createElement('div');
+        resizableTarget.id = 'resizable-sample';
+        demoWindow.appendChild(resizableTarget);
+
+        navMenu.handleNavigate({
+            name: 'Resizable Behavior',
+            data: { hash: '#resizable-sample' },
+        });
+
+        expect(demoWindow.classList.contains('demo-visible')).toBe(true);
+        expect(demoWindow.classList.contains('demo-hidden')).toBe(false);
+
+        demoWindow.remove();
+    });
 });

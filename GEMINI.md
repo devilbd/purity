@@ -115,7 +115,8 @@ purity/
         └── shared/
             ├── behaviors/       # Composable DOM behaviors
             │   ├── draggable/   # Pointer-based drag interaction with boundary & snap support
-            │   └── droppable/   # Drop target registration & hover/drop detection
+            │   ├── droppable/   # Drop target registration & hover/drop detection
+            │   └── resizable/   # Container resize behavior with Adwaita corner handles & Breeze cursors
             ├── directives/      # Reusable DOM directives
             │   ├── dropdown/    # <dropdown> / [dropdown] glassmorphic overlay menu directive
             │   └── highlight/   # [highlight] reactive DOM highlight directive

@@ -7,6 +7,7 @@ import { NotifyService } from '@data/notify.service';
 import { FirebaseService, initGoogleAnalytics, logAnalyticsEvent } from '@data/firebase';
 import { drag } from '@behaviors/draggable/draggable';
 import { droppable } from '@behaviors/droppable/droppable';
+import { resizable, resize } from '@behaviors/resizable/resizable';
 import { transform } from 'sucrase';
 import Prism from '@external/prism-loader';
 import { type CodePreset, PLAYGROUND_PRESETS } from './playground-presets';
@@ -687,6 +688,8 @@ export class PlaygroundComponent {
             logAnalyticsEvent,
             drag,
             droppable,
+            resizable,
+            resize,
             LoaderComponent,
             ModalViewComponent,
             NotificationComponent,

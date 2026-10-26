@@ -8,6 +8,7 @@
 // Behaviors
 @use '../app/shared/behaviors/draggable/draggable';
 @use '../app/shared/behaviors/droppable/droppable';
+@use '../app/shared/behaviors/resizable/resizable';
 
 // Directives
 @use '../app/shared/directives/highlight/highlight.directive';

@@ -38,6 +38,21 @@ describe('IntroComponent & Intro Sample Snippets', () => {
         expect(INTRO_SAMPLE_SNIPPETS['dropdown'].id).toBe('dropdown');
     });
 
+    it('should retrieve resizable sample snippet correctly', () => {
+        const snippet = getIntroSampleSnippet('resizable');
+        expect(snippet).toBeDefined();
+        expect(snippet?.id).toBe('resizable');
+        expect(snippet?.title).toContain('Resizable Behavior');
+        expect(snippet?.ts).toContain('@behaviors/resizable/resizable');
+        expect(snippet?.html).toContain('resizable-box');
+        expect(snippet?.scss).toBeDefined();
+    });
+
+    it('should have resizable registered in INTRO_SAMPLE_SNIPPETS', () => {
+        expect(INTRO_SAMPLE_SNIPPETS['resizable']).toBeDefined();
+        expect(INTRO_SAMPLE_SNIPPETS['resizable'].id).toBe('resizable');
+    });
+
     it('should dispatch custom event when onLoadSample is called without playground element', () => {
         let dispatchedDetail: any = null;
         const listener = (e: Event) => {

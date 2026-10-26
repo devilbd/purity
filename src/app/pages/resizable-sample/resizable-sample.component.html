@@ -1,0 +1,92 @@
+<div class="resizable-sample-root window">
+    <div class="sample-header">
+        <div class="header-content">
+            <span class="badge-pill">Behavior</span>
+            <h3>Resizable Container Behavior (<code>behaviors/resizable</code>)</h3>
+            <p class="sample-description">
+                Interactive container resizing via draggable corner handles with KDE Plasma Breeze cursors, GPU-accelerated dimensions, min/max bounds clamping, aspect ratio locking, and snap grids.
+            </p>
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <!-- Interactive Controls Bar -->
+        <div class="controls-toolbar">
+            <div class="button-group">
+                <button type="button" class="button-secondary" onclick="resetDimensions()">
+                    ↺ Reset (360×200)
+                </button>
+                <button type="button" class="button-secondary" onclick="setPreset(480, 260)">
+                    🔲 Medium (480×260)
+                </button>
+                <button type="button" class="button-secondary" onclick="setPreset(240, 140)">
+                    ▫ Small (240×140)
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary {{isAspectLocked() ? 'active-toggle' : ''}}"
+                    onclick="toggleAspectRatio()"
+                >
+                    {{isAspectLocked() ? '🔒 16:9 Locked' : '🔓 Free Aspect'}}
+                </button>
+                <button
+                    type="button"
+                    class="button-secondary {{isSnapActive() ? 'active-toggle' : ''}}"
+                    onclick="toggleSnap()"
+                >
+                    {{isSnapActive() ? '⚡ Snap 20px ON' : '∿ Free Snap'}}
+                </button>
+            </div>
+        </div>
+
+        <!-- Telemetry Display -->
+        <div class="telemetry-bar">
+            <div class="telemetry-item">
+                <span class="telemetry-label">Width:</span>
+                <span class="status-pill status-metric">{{currentWidth()}}px</span>
+            </div>
+            <div class="telemetry-item">
+                <span class="telemetry-label">Height:</span>
+                <span class="status-pill status-metric">{{currentHeight()}}px</span>
+            </div>
+            <div class="telemetry-item">
+                <span class="telemetry-label">Active Handle:</span>
+                <span class="status-pill {{activeHandle() !== 'none' ? 'status-active' : 'status-idle'}}">
+                    {{activeHandle() !== 'none' ? activeHandle().toUpperCase() : 'Idle'}}
+                </span>
+            </div>
+            <span class="last-action">{{lastAction()}}</span>
+        </div>
+
+        <!-- Resizable Playground Workspace -->
+        <div class="workspace-arena">
+            <!-- Primary Resizable Box -->
+            <div id="resizable-demo-box" class="resizable-target-box">
+                <div class="box-header">
+                    <span class="box-icon">📐</span>
+                    <span class="box-title">Resizable Box</span>
+                    <span class="box-badge">Adwaita Glass</span>
+                </div>
+                <div class="box-body">
+                    <p>Drag any of the <strong>4 corner handles</strong> to resize this container.</p>
+                    <div class="bounds-info">
+                        <span>Min: 200×120px</span>
+                        <span>Max: 680×380px</span>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <span class="dimension-indicator">{{currentWidth()}} × {{currentHeight()}} px</span>
+                </div>
+            </div>
+
+            <!-- Secondary Aspect Ratio Locked Mini Card -->
+            <div id="resizable-mini-card" class="resizable-target-mini">
+                <div class="mini-content">
+                    <span class="mini-icon">🖼️</span>
+                    <span class="mini-title">Aspect Locked</span>
+                    <span class="mini-sub">Fixed Ratio</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

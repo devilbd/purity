@@ -80,6 +80,7 @@ export class NavigationMenuComponent {
                     { name: 'Toast Notify', image: '🔔', data: { hash: '#notification-sample' } },
                     { name: 'Radial Menu', image: '🔘', data: { hash: '#radial-context-menu-sample' } },
                     { name: 'Async Loader', image: '⏳', data: { hash: '#app-loader' } },
+                    { name: 'Resizable Behavior', image: '📐', data: { hash: '#resizable-sample' } },
                 ],
             },
             {
