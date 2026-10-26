@@ -7,8 +7,10 @@ import '@pages/demo/demo.component';
 import '@pages/footer/footer.component';
 import '@components/notification/notification.component';
 import '@components/navigation-menu/navigation-menu.component';
+import '@components/profile-avatar/profile-avatar.component';
 import type { DemoComponent } from '@pages/demo/demo.component';
 import type { PlaygroundComponent } from '@pages/playground/playground.component';
+import type { ProfileAvatarComponent } from '@components/profile-avatar/profile-avatar.component';
 
 @Component({
     selector: 'app-component',
@@ -22,6 +24,9 @@ export class AppComponent {
 
     @ViewChild('#playground-window')
     playgroundComponent?: (PlaygroundComponent & HTMLElement) | null;
+
+    @ViewChild('#app-profile-avatar')
+    profileAvatar?: (ProfileAvatarComponent & HTMLElement) | null;
 
     get demoVisibilityClass(): string {
         return this.showDemo() ? 'demo-visible' : 'demo-hidden';

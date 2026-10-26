@@ -1,0 +1,198 @@
+@use '@styles' as *;
+
+/* ==========================================================================
+   Purity Design System - Profile Avatar Component
+   ========================================================================== */
+
+:host,
+profile-avatar {
+    display: inline-block;
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    width: 140px;
+    height: 140px;
+    z-index: 1000;
+    box-sizing: border-box;
+
+    @media (max-width: 768px) {
+        top: 16px;
+        left: 16px;
+        width: 110px;
+        height: 110px;
+    }
+
+    @media (max-width: 540px) {
+        top: 12px;
+        left: 12px;
+        width: 76px;
+        height: 76px;
+    }
+}
+
+.profile-avatar-container {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: var(--cursor-pointer);
+    user-select: none;
+    -webkit-user-select: none;
+    outline: none;
+
+    @media (max-width: 768px) {
+        width: 110px;
+        height: 110px;
+    }
+
+    @media (max-width: 540px) {
+        width: 76px;
+        height: 76px;
+    }
+
+    &:focus-visible .profile-avatar-circle {
+        box-shadow:
+            0 0 0 3px rgba(53, 132, 228, 0.5),
+            0 8px 24px rgba(0, 0, 0, 0.45),
+            0 0 20px var(--accent-shadow);
+    }
+}
+
+/* Backlight Aura Glow */
+.profile-avatar-aura {
+    position: absolute;
+    inset: -8px;
+    border-radius: var(--radius-pill, 999px);
+    background: radial-gradient(circle, var(--accent-shadow, rgba(53, 132, 228, 0.4)) 0%, rgba(53, 132, 228, 0) 70%);
+    opacity: 0.5;
+    filter: blur(10px);
+    pointer-events: none;
+    transition:
+        opacity var(--transition-normal, 0.28s) var(--ease-gnome),
+        transform var(--transition-normal, 0.28s) var(--ease-spring);
+    z-index: 0;
+}
+
+/* Circular Blue Border & Layered Shadow Effects */
+.profile-avatar-circle {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-pill, 999px);
+    border: 3.5px solid var(--accent, #3584e4);
+    box-sizing: border-box;
+    overflow: hidden;
+    background: var(--gnome-surface-solid, #242424);
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.4),
+        0 2px 10px rgba(0, 0, 0, 0.25),
+        0 0 20px var(--accent-shadow, rgba(53, 132, 228, 0.35)),
+        inset 0 1px 2px rgba(255, 255, 255, 0.25);
+    transition:
+        transform var(--transition-normal, 0.28s) var(--ease-spring),
+        box-shadow var(--transition-normal, 0.28s) var(--ease-gnome),
+        border-color var(--transition-fast, 0.18s) ease;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Profile Picture Image */
+.profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-pill, 999px);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: transform var(--transition-normal, 0.28s) var(--ease-gnome);
+}
+
+/* Hover & Active States */
+.profile-avatar-container:hover {
+    .profile-avatar-aura {
+        opacity: 0.95;
+        transform: scale(1.15);
+    }
+
+    .profile-avatar-circle {
+        transform: translateY(-2px) scale(1.04);
+        border-color: var(--accent-hover, #4791eb);
+        box-shadow:
+            0 14px 32px rgba(0, 0, 0, 0.5),
+            0 4px 12px rgba(0, 0, 0, 0.25),
+            0 0 24px var(--accent-hover, #4791eb),
+            0 0 40px var(--accent-shadow, rgba(53, 132, 228, 0.45)),
+            inset 0 1px 2px rgba(255, 255, 255, 0.35);
+    }
+
+    .profile-avatar-img {
+        transform: scale(1.06);
+    }
+}
+
+.profile-avatar-container:active .profile-avatar-circle {
+    transform: translateY(0) scale(1.01);
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.4),
+        0 0 16px var(--accent-active, #1c71d8);
+}
+
+/* Popover Content */
+.profile-avatar-popover-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    padding: 4px 6px;
+
+    .popover-avatar-hand {
+        font-size: 22px;
+        line-height: 1;
+        display: inline-block;
+        transform-origin: 70% 70%;
+        animation: avatar-wave 1.8s infinite ease-in-out;
+    }
+
+    .popover-avatar-text {
+        font-family: var(--font-main);
+        font-size: var(--font-size-base, 15px);
+        font-weight: 600;
+        color: var(--text-main);
+        letter-spacing: -0.01em;
+    }
+}
+
+@keyframes avatar-wave {
+    0% {
+        transform: rotate(0deg);
+    }
+    10% {
+        transform: rotate(14deg);
+    }
+    20% {
+        transform: rotate(-8deg);
+    }
+    30% {
+        transform: rotate(14deg);
+    }
+    40% {
+        transform: rotate(-4deg);
+    }
+    50% {
+        transform: rotate(10deg);
+    }
+    60% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}

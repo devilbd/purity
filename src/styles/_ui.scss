@@ -15,6 +15,7 @@
 @use '../app/shared/directives/dropdown/dropdown.directive';
 
 // Components
+@use '../app/shared/components/profile-avatar/profile-avatar.component';
 @use '../app/shared/components/date-time-picker/date-time-picker.component';
 @use '../app/shared/components/expander/expander.component';
 @use '../app/shared/components/loader/loader.component';

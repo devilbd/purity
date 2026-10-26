@@ -19,6 +19,10 @@ export {
 
 // Components
 export {
+    ProfileAvatarComponent,
+} from './app/shared/components/profile-avatar/profile-avatar.component';
+
+export {
     SwitchButtonComponent,
 } from './app/shared/components/switch-button/switch-button.component';
 

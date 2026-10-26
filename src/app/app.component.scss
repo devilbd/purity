@@ -10,6 +10,13 @@
     box-sizing: border-box;
 }
 
+profile-avatar {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    z-index: 1000;
+}
+
 .app-main {
     display: flex;
     flex-direction: column;

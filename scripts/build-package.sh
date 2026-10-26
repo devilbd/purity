@@ -437,6 +437,7 @@ import { DropdownComponent, SwitchButtonComponent, ModalViewComponent } from 'pu
 const requiredExports = [
     'DropdownComponent',
     'DropdownDirective',
+    'ProfileAvatarComponent',
     'SwitchButtonComponent',
     'ModalViewComponent',
     'DateTimePickerComponent',
@@ -465,6 +466,7 @@ echo -e "${GREEN}✓ purity-world-ui ESM exports validation passed${NC}"
 node -e "
 const ui = require('purity-world-ui');
 if (typeof ui.DropdownComponent === 'undefined') throw new Error('CJS DropdownComponent missing');
+if (typeof ui.ProfileAvatarComponent === 'undefined') throw new Error('CJS ProfileAvatarComponent missing');
 if (typeof ui.SwitchButtonComponent === 'undefined') throw new Error('CJS SwitchButtonComponent missing');
 "
 echo -e "${GREEN}✓ purity-world-ui CommonJS exports validation passed${NC}"

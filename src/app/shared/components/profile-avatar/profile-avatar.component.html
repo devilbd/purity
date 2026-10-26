@@ -1,0 +1,25 @@
+<div
+    class="profile-avatar-container"
+    id="profile-avatar-badge"
+    role="img"
+    aria-label="User Profile Picture"
+    tabindex="0"
+>
+    <div class="profile-avatar-aura" aria-hidden="true"></div>
+    <div class="profile-avatar-circle">
+        <img
+            class="profile-avatar-img"
+            src="{{avatarUrl()}}"
+            alt="User Profile Picture"
+            draggable="false"
+            loading="eager"
+        />
+    </div>
+</div>
+
+<popover id="profile-avatar-popover" target-for="'#profile-avatar-badge'" position="bottom">
+    <div class="profile-avatar-popover-content">
+        <span class="popover-avatar-hand" aria-hidden="true">👋</span>
+        <span class="popover-avatar-text">{{greeting()}}</span>
+    </div>
+</popover>
