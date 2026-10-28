@@ -13,6 +13,11 @@ export class IntroComponent {
         playground?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    onGoToMcpSetup() {
+        const mcpEl = document.querySelector('#mcp-intro-section');
+        mcpEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     onLoadSample(sampleId: string) {
         const snippet = getIntroSampleSnippet(sampleId);
         const playgroundEl = document.querySelector('playground-view') as (PlaygroundComponent & HTMLElement) | null;

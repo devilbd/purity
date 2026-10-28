@@ -13,6 +13,9 @@
             <button class="button-secondary try-it-btn" onclick="onTryIt()">
                 🚀 Full Demo ...
             </button>
+            <button class="button-secondary try-it-btn" onclick="onGoToMcpSetup()">
+                🤖 MCP Server Setup
+            </button>
             <a
                 href="https://github.com/devilbd/purity"
                 target="_blank"
@@ -1702,6 +1705,93 @@ customResizer.<span class="fn">destroy</span>();</code></pre>
     <span class="fn">onSelect</span>(item: <span class="typ">string</span>) {
         <span class="kw">this</span>.selected.<span class="fn">set</span>(item);
     }
+}</code></pre>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- GROUP 4: AI & MODEL CONTEXT PROTOCOL (MCP) -->
+        <!-- ========================================== -->
+        <div class="intro-section-divider" id="mcp-intro-section">
+            <span class="section-icon">🤖</span>
+            <h3 class="section-title">Model Context Protocol (MCP) AI Server Setup</h3>
+            <span class="section-badge">Setup Guide</span>
+        </div>
+
+        <!-- 33. Purity MCP Server Overview & Setup -->
+        <div class="intro-sample-card">
+            <div class="sample-header">
+                <div class="sample-title-box">
+                    <h4>33. 🤖 Model Context Protocol (MCP) AI Integration</h4>
+                    <p>How to build and configure the official Purity MCP Server for AI development environments (Google Antigravity / AGY, Cursor, Claude Desktop, VS Code, Windsurf):</p>
+                </div>
+                <a
+                    href="https://github.com/devilbd/purity/blob/main/AI/README.md"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="sample-edit-btn"
+                    title="Read more about Purity MCP Server on GitHub"
+                >
+                    Read more ...
+                </a>
+            </div>
+            <pre data-no-bind><code><span class="cmt"># Step 1: Build the official Purity MCP Server in workspace</span>
+<span class="kw">cd</span> AI
+<span class="fn">npm</span> <span class="kw">install</span>
+<span class="fn">npm</span> run build
+
+<span class="cmt"># Step 2: Verify MCP Server executable</span>
+<span class="fn">node</span> dist/index.js <span class="attr">--help</span>
+
+<span class="cmt">/* Step 3: Configure MCP in your preferred AI Environment */</span>
+
+<span class="cmt">// 1. Cursor (.cursor/mcp.json)</span>
+{
+  <span class="attr">"mcpServers"</span>: {
+    <span class="attr">"purity"</span>: {
+      <span class="attr">"command"</span>: <span class="str">"node"</span>,
+      <span class="attr">"args"</span>: [<span class="str">"${workspaceFolder}/AI/dist/index.js"</span>]
+    }
+  }
+}
+
+<span class="cmt">// 2. Google Antigravity / AGY (~/.gemini/antigravity/mcp/)</span>
+{
+  <span class="attr">"mcpServers"</span>: {
+    <span class="attr">"purity"</span>: {
+      <span class="attr">"command"</span>: <span class="str">"node"</span>,
+      <span class="attr">"args"</span>: [<span class="str">"/run/media/{logged_user}/d/Development/purity/AI/dist/index.js"</span>]
+    }
+  }
+}
+
+<span class="cmt">// 3. Claude Desktop (claude_desktop_config.json)</span>
+{
+  <span class="attr">"mcpServers"</span>: {
+    <span class="attr">"purity"</span>: {
+      <span class="attr">"command"</span>: <span class="str">"node"</span>,
+      <span class="attr">"args"</span>: [<span class="str">"/absolute/path/to/purity/AI/dist/index.js"</span>]
+    }
+  }
+}
+
+<span class="cmt">// 4. VS Code (cline_mcp_settings.json / roo_code_mcp_settings.json)</span>
+{
+  <span class="attr">"mcpServers"</span>: {
+    <span class="attr">"purity"</span>: {
+      <span class="attr">"command"</span>: <span class="str">"node"</span>,
+      <span class="attr">"args"</span>: [<span class="str">"/absolute/path/to/purity/AI/dist/index.js"</span>]
+    }
+  }
+}
+
+<span class="cmt">// 5. Windsurf (~/.codeium/windsurf/mcp_config.json)</span>
+{
+  <span class="attr">"mcpServers"</span>: {
+    <span class="attr">"purity"</span>: {
+      <span class="attr">"command"</span>: <span class="str">"node"</span>,
+      <span class="attr">"args"</span>: [<span class="str">"/absolute/path/to/purity/AI/dist/index.js"</span>]
+    }
+  }
 }</code></pre>
         </div>
     </div>

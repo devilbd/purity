@@ -3390,6 +3390,241 @@ export class PlaygroundDemoComponent {
     }
 }`,
     },
+
+    // 33. MCP AI Server Setup & Tool Integration
+    'mcp-ai': {
+        id: 'mcp-ai',
+        title: '🤖 Purity Model Context Protocol (MCP) AI Server & Setup',
+        ts: `import { Component, signal, computed, inject } from '@purity/core';
+import { NotifyService } from '@data/notify.service';
+
+@Component({
+    selector: 'playground-demo',
+    templateUrl: './template.html',
+})
+export class PlaygroundDemoComponent {
+    private notify = inject(NotifyService);
+
+    selectedClient = signal<'antigravity' | 'cursor' | 'claude' | 'vscode'>('antigravity');
+    scaffoldType = signal<'component' | 'service' | 'pipe'>('component');
+    artifactName = signal<string>('profile-card');
+    copied = signal<boolean>(false);
+
+    clientConfig = computed(() => {
+        const client = this.selectedClient();
+        const argPath = client === 'cursor'
+            ? '\${workspaceFolder}/AI/dist/index.js'
+            : '/run/media/{user}/Development/purity/AI/dist/index.js';
+
+        return JSON.stringify(
+            {
+                mcpServers: {
+                    purity: {
+                        command: 'node',
+                        args: [argPath],
+                    },
+                },
+            },
+            null,
+            2
+        );
+    });
+
+    scaffoldPreview = computed(() => {
+        const name = this.artifactName() || 'my-feature';
+        const kebab = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        const pascal = kebab
+            .split('-')
+            .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+            .join('');
+
+        if (this.scaffoldType() === 'component') {
+            return \`import { Component, signal } from '@purity/core';\\nimport './\${kebab}.component.scss';\\n\\n@Component({\\n    selector: '\${kebab}',\\n    templateUrl: './\${kebab}.component.html',\\n})\\nexport class \${pascal}Component {\\n    title = signal<string>('\${pascal} Ready');\\n    count = signal<number>(0);\\n\\n    increment() {\\n        this.count.update(n => n + 1);\\n    }\\n}\`;
+        } else if (this.scaffoldType() === 'service') {
+            return \`import { Injectable, signal } from '@purity/core';\\n\\n@Injectable('\${pascal}Service')\\nexport class \${pascal}Service {\\n    items = signal([]);\\n    addItem(item: any) {\\n        this.items.update(list => [...list, item]);\\n    }\\n}\`;
+        } else {
+            return \`import { Pipe, BasePipe, type PipeTransform } from '@purity/core';\\n\\n@Pipe('\${kebab}')\\nexport class \${pascal}Pipe extends BasePipe implements PipeTransform {\\n    transform(val: unknown) {\\n        return \\\`✨ \${val}\\\`;\\n    }\\n}\`;
+        }
+    });
+
+    setClient(client: 'antigravity' | 'cursor' | 'claude' | 'vscode') {
+        this.selectedClient.set(client);
+    }
+
+    setType(type: 'component' | 'service' | 'pipe') {
+        this.scaffoldType.set(type);
+    }
+
+    onNameChange(e: any) {
+        this.artifactName.set(e.target.value);
+    }
+
+    copyConfig() {
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(this.clientConfig()).catch(() => {});
+        }
+        this.copied.set(true);
+        this.notify.success('MCP Config Copied', \`Configuration for \${this.selectedClient()} copied.\`);
+        setTimeout(() => this.copied.set(false), 2000);
+    }
+}`,
+        html: `<div class="mcp-demo-card window">
+    <div class="card-header">
+        <span class="pill-badge">🤖 MCP AI Server</span>
+        <h3>Purity Model Context Protocol AI Explorer</h3>
+        <p>Configure your AI assistant and preview live scaffold generation adhering to Purity synchronous signals.</p>
+    </div>
+
+    <!-- AI Client Config Switcher -->
+    <div class="section-box">
+        <div class="box-header">
+            <h4>1. Select AI Client</h4>
+            <button type="button" class="button-primary copy-btn" onclick="copyConfig()">
+                {{copied() ? '✓ Copied' : '📋 Copy JSON'}}
+            </button>
+        </div>
+        <div class="button-group">
+            <button type="button" class="button-secondary {{selectedClient() === 'antigravity' ? 'active-toggle' : ''}}" onclick="setClient('antigravity')">
+                🪐 Antigravity
+            </button>
+            <button type="button" class="button-secondary {{selectedClient() === 'cursor' ? 'active-toggle' : ''}}" onclick="setClient('cursor')">
+                ⚡ Cursor
+            </button>
+            <button type="button" class="button-secondary {{selectedClient() === 'claude' ? 'active-toggle' : ''}}" onclick="setClient('claude')">
+                🧠 Claude
+            </button>
+            <button type="button" class="button-secondary {{selectedClient() === 'vscode' ? 'active-toggle' : ''}}" onclick="setClient('vscode')">
+                💻 VS Code
+            </button>
+        </div>
+        <pre class="code-preview" data-no-bind><code>{{clientConfig()}}</code></pre>
+    </div>
+
+    <!-- Live Scaffold Simulation -->
+    <div class="section-box">
+        <div class="box-header">
+            <h4>2. Live purity_scaffold Tool Output</h4>
+        </div>
+        <div class="scaffold-bar">
+            <div class="type-buttons">
+                <button type="button" class="button-secondary {{scaffoldType() === 'component' ? 'active-toggle' : ''}}" onclick="setType('component')">
+                    Component
+                </button>
+                <button type="button" class="button-secondary {{scaffoldType() === 'service' ? 'active-toggle' : ''}}" onclick="setType('service')">
+                    Service
+                </button>
+                <button type="button" class="button-secondary {{scaffoldType() === 'pipe' ? 'active-toggle' : ''}}" onclick="setType('pipe')">
+                    Pipe
+                </button>
+            </div>
+            <input
+                type="text"
+                class="input-primary"
+                value="{{artifactName()}}"
+                placeholder="Artifact name"
+                oninput="onNameChange(event)"
+            />
+        </div>
+        <pre class="code-preview" data-no-bind><code>{{scaffoldPreview()}}</code></pre>
+    </div>
+</div>`,
+        scss: `@use '@styles' as *;
+
+.mcp-demo-card {
+    background: var(--gnome-surface);
+    border: 1px solid var(--gnome-border);
+    border-radius: var(--radius-window, 16px);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .card-header {
+        .pill-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            background: var(--accent-subtle);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            text-transform: uppercase;
+        }
+
+        h3 {
+            margin: 8px 0 4px 0;
+            color: var(--text-main);
+            font-size: 1.25rem;
+        }
+
+        p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+    }
+
+    .section-box {
+        background: var(--gnome-card);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-card, 12px);
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            h4 {
+                margin: 0;
+                font-size: 14px;
+                color: var(--text-main);
+            }
+        }
+    }
+
+    .button-group,
+    .type-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .active-toggle {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+    }
+
+    .scaffold-bar {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+
+        input {
+            flex: 1;
+            min-width: 160px;
+            padding: 6px 10px;
+        }
+    }
+
+    .code-preview {
+        margin: 0;
+        padding: 10px 14px;
+        background: var(--gnome-surface);
+        border: 1px solid var(--gnome-border-subtle);
+        border-radius: var(--radius-control, 8px);
+        font-family: var(--font-mono, monospace);
+        font-size: 12px;
+        color: var(--text-main);
+        white-space: pre-wrap;
+    }
+}`,
+    },
 };
 
 export function getIntroSampleSnippet(sampleId: string): IntroSampleSnippet | null {

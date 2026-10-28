@@ -129,4 +129,47 @@ describe('IntroComponent & Intro Sample Snippets', () => {
         expect(cardText).toContain('purity-world-ui');
         expect(cardText).toContain('Step 1: 📦 Install Purity & Purity UI Packages');
     });
+
+    it('should retrieve mcp-ai sample snippet correctly', () => {
+        const snippet = getIntroSampleSnippet('mcp-ai');
+        expect(snippet).toBeDefined();
+        expect(snippet?.id).toBe('mcp-ai');
+        expect(snippet?.title).toContain('Model Context Protocol (MCP) AI');
+        expect(snippet?.ts).toContain('PlaygroundDemoComponent');
+        expect(snippet?.html).toContain('MCP AI Server');
+        expect(snippet?.scss).toBeDefined();
+    });
+
+    it('should have mcp-ai registered in INTRO_SAMPLE_SNIPPETS', () => {
+        expect(INTRO_SAMPLE_SNIPPETS['mcp-ai']).toBeDefined();
+        expect(INTRO_SAMPLE_SNIPPETS['mcp-ai'].id).toBe('mcp-ai');
+    });
+
+    it('should render MCP AI setup section with Read more link and no studio in intro template', () => {
+        const mcpSection = element.querySelector('#mcp-intro-section');
+        expect(mcpSection).not.toBeNull();
+        expect(mcpSection?.textContent).toContain('Model Context Protocol (MCP) AI Server Setup');
+
+        // Studio should NOT be present in intro
+        const mcpSampleEl = element.querySelector('mcp-sample');
+        expect(mcpSampleEl).toBeNull();
+
+        // Sample 33 title should NOT contain @modelcontextprotocol/sdk
+        const sampleCards = element.querySelectorAll('.intro-sample-card');
+        const lastCard = sampleCards[sampleCards.length - 1];
+        const sampleHeader = lastCard?.querySelector('.sample-title-box h4');
+        expect(sampleHeader?.textContent).toContain('33. 🤖 Model Context Protocol (MCP) AI Integration');
+        expect(sampleHeader?.textContent).not.toContain('@modelcontextprotocol/sdk');
+
+        // Link should be 'Read more ...' opening GitHub docs in new tab
+        const readMoreLink = lastCard?.querySelector('a.sample-edit-btn') as HTMLAnchorElement | null;
+        expect(readMoreLink).not.toBeNull();
+        expect(readMoreLink?.textContent?.trim()).toBe('Read more ...');
+        expect(readMoreLink?.getAttribute('href')).toBe('https://github.com/devilbd/purity/blob/main/AI/README.md');
+        expect(readMoreLink?.getAttribute('target')).toBe('_blank');
+    });
+
+    it('should handle onGoToMcpSetup without error', () => {
+        expect(() => introComponent.onGoToMcpSetup()).not.toThrow();
+    });
 });

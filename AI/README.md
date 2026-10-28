@@ -94,7 +94,7 @@ Add to your MCP server configuration:
   "mcpServers": {
     "purity": {
       "command": "node",
-      "args": ["/run/media/devilbd/d/Development/purity/AI/dist/index.js"]
+      "args": ["/run/media/{logged_user}/d/Development/purity/AI/dist/index.js"]
     }
   }
 }

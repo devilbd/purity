@@ -220,6 +220,7 @@
             background: var(--gnome-card);
             border: 1px solid var(--gnome-border);
             color: var(--text-main);
+            text-decoration: none;
             cursor: var(--cursor-pointer);
             flex-shrink: 0;
             transition: all var(--transition-fast) ease;
