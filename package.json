@@ -16,7 +16,10 @@
     "test:detailed": "bash scripts/run-tests.sh",
     "deploy": "bash scripts/build-and-deploy.sh",
     "deploy:hosting": "bash scripts/build-and-deploy.sh --only hosting",
-    "build:deploy": "bash scripts/build-and-deploy.sh"
+    "build:deploy": "bash scripts/build-and-deploy.sh",
+    "mcp": "node AI/dist/index.js",
+    "build:mcp": "npm run --prefix AI build",
+    "test:mcp": "npm run --prefix AI test"
   },
   "devDependencies": {
     "@types/prismjs": "^1.26.6",

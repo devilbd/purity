@@ -79,7 +79,7 @@ web_modules/
 out
 
 # Nuxt.js build / generate output
-dist/
+/dist/
 npm-publish/
 npm-publish-ui/
 temp-test-project/
