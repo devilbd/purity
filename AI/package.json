@@ -1,6 +1,6 @@
 {
   "name": "purity-mcp",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Official Model Context Protocol (MCP) server for the Purity framework - Supercharging AI-assisted development with scaffolding, code validation, component inspection, API documentation, and template conversion",
   "type": "module",
   "main": "./dist/index.js",
