@@ -79,4 +79,53 @@ export class ValidBoxComponent {
     expect(result.valid).toBe(false);
     expect(result.issues.some(i => i.rule === 'foreign-lifecycle-hook')).toBe(true);
   });
+
+  it('should flag native addEventListener and dispatchEvent', async () => {
+    const code = `export class SampleComponent {
+  setup() {
+    this.addEventListener('click', () => {});
+    this.dispatchEvent(new CustomEvent('update'));
+  }
+}`;
+    const result = await handleValidate({ code, fileName: 'sample.component.ts' });
+    expect(result.valid).toBe(false);
+    expect(result.issues.some(i => i.rule === 'no-native-event-listeners')).toBe(true);
+  });
+
+  it('should flag querySelector and getElementById', async () => {
+    const code = `export class SampleComponent {
+  findChild() {
+    const child = document.querySelector('.child');
+    const header = document.getElementById('header');
+  }
+}`;
+    const result = await handleValidate({ code, fileName: 'sample.component.ts' });
+    expect(result.valid).toBe(false);
+    expect(result.issues.some(i => i.rule === 'no-query-selectors')).toBe(true);
+  });
+
+  it('should allow @ViewChild and signals/effects communication', async () => {
+    const code = `import { Component, signal, effect, ViewChild } from '@purity/core';
+import { ChildComponent } from '@components/child/child.component';
+
+@Component({ selector: 'parent-comp', templateUrl: './parent.html' })
+export class ParentCompComponent {
+  @ViewChild()
+  child?: ChildComponent;
+
+  readonly activeId = signal('1');
+
+  protected onInit(): void {
+    effect(() => {
+      if (this.child) {
+        this.child.activeId.set(this.activeId());
+      }
+    });
+  }
+}`;
+    const result = await handleValidate({ code, fileName: 'parent-comp.component.ts' });
+    expect(result.valid).toBe(true);
+    expect(result.score).toBe(100);
+    expect(result.issues).toHaveLength(0);
+  });
 });

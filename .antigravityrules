@@ -18,6 +18,15 @@ Every AI agent working in this repository MUST strictly adhere to the rules, con
 - Event handlers in templates (e.g. `onclick="handleClick()"`) evaluate in the component context. NEVER expose components to `window` or manually manipulate `document.body` for component lifecycle.
 - Overlays (modals, toasts, pickers) use `position: fixed` with appropriate `z-index` (1000, 9999, 10000) and must not manually detach/reparent elements.
 
+### Child Queries & Prohibition of Query Selectors (`@ViewChild`)
+- Direct DOM query selectors (`querySelector`, `querySelectorAll`, `getElementById`, `getElementsByClassName`, `getElementsByTagName`) are strictly prohibited in application and component code.
+- ALWAYS use the `@ViewChild` decorator (`@ViewChild()`, `@ViewChild('#id')`) to query and hold references to child custom elements or DOM nodes.
+
+### Component Communication & Prohibition of Native Events
+- Native event listeners and event dispatching (`addEventListener`, `removeEventListener`, `dispatchEvent`, `new CustomEvent(...)`) are strictly prohibited in components and application code.
+- **Nested Components (Parent-Child)**: Use synchronous `signal()`, `computed()`, and `effect()`. Parents synchronize or mutate signals directly on child instances obtained via `@ViewChild()`, or bind signals via template attributes.
+- **Distant / Non-Nested Components**: Use a shared `@Injectable` service variant (`@Injectable('ServiceName')`) holding reactive signals and actions, resolved via `inject()`.
+
 ### Reactivity System (`@purity/core`)
 - Use synchronous primitives: `signal(initialValue)`, `computed(() => expr)`, and `effect(() => {})`.
 - Signals are accessed via getter syntax: `mySignal()`.

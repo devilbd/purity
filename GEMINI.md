@@ -225,6 +225,14 @@ Purity features a synchronous reactive primitives engine:
   }
   ```
 
+  > [!IMPORTANT]
+  > **Strict Mandate: No Query Selectors & No Native Event Listeners / Dispatching**:
+  > - **Never use query selectors**: `querySelector`, `querySelectorAll`, `getElementById`, `getElementsByClassName`, and `getElementsByTagName` are strictly prohibited in application and component code. Always use `@ViewChild` decorators instead.
+  > - **Never use native event listeners or event dispatching**: `addEventListener`, `removeEventListener`, `dispatchEvent`, and `new CustomEvent(...)` are strictly prohibited in components and application code.
+  > - **Component Communication Protocol**:
+  >   - **Nested Components (Parent-Child / Child-Parent)**: Communicate exclusively via **signals and effects** (`signal()`, `computed()`, `effect()`). Parent components mutate or synchronize signals on child instances obtained via `@ViewChild()`, or pass reactive signals through template bindings.
+  >   - **Distant / Non-Nested Components**: Communicate via a shared **`@Injectable` service variant** (`@Injectable('ServiceName')` holding reactive signals and methods, injected via `inject()`).
+
 * **Structural Array Repeater (`for="let obj of myArray"`) & Custom Component Interoperability**:
   Components support declarative structural loop templates with `for="let item of items"` or `for="let obj, index of myArray"`. The engine automatically creates scoped item contexts, tracks array signals reactively, supports nested loops, and seamlessly updates on array mutations (`.update()`, `.set()`):
 
@@ -794,12 +802,18 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
    - Event handlers (`onclick`, `oninput`, `onchange`, etc.) automatically evaluate within the component/item instance context. Never expose components or services to `window` or mutate `document.body` manually inside lifecycle hooks.
    - Overlays (e.g. `<modal-view>`, `<notification-component>`, `<date-time-picker>`) use `position: fixed` with proper z-indexes (`1000` / `9999` / `10000`) for viewport-wide display without manual DOM detaching/re-parenting.
 
-5. **Component Lifecycle & Closure Binding**:
-   - Setup DOM queries, behaviors, and event listener closures inside `protected onInit()`.
-   - Clean up event listeners, behaviors, or timers inside `onDestroy()` / `disconnectedCallback()`.
+5. **Component Communication & DOM Querying Mandates**:
+   - **No Native Event Listeners / Dispatching**: Nowhere should native `addEventListener`, `removeEventListener`, `dispatchEvent`, or `new CustomEvent(...)` be used.
+   - **Nested Components (Parent-Child)**: Use signals and effects (`signal()`, `computed()`, `effect()`) for event/state synchronization. Parent components directly read/mutate signals on child instances obtained via `@ViewChild()`, or pass signals through template attribute bindings.
+   - **Distant / Non-Nested Components**: Use an `@Injectable` service variant (`@Injectable('ServiceName')`) holding reactive signals and actions, injected via `inject()`.
+   - **No Query Selectors (`@ViewChild` Mandatory)**: Direct DOM query selectors (`querySelector`, `querySelectorAll`, `getElementById`, etc.) are prohibited in application code. Use `@ViewChild` decorators exclusively.
+
+6. **Component Lifecycle & Initialization**:
+   - Initialize state, child component synchronization, and behaviors inside `protected onInit()`.
+   - Clean up behaviors, intervals, or timers inside `onDestroy()` / `disconnectedCallback()`.
    - Never initialize event listener closures in class field initializers.
 
-6. **Layout, Spacing & Sizing Standards**:
+7. **Layout, Spacing & Sizing Standards**:
    To maintain visual rhythm, consistent sizing, and pixel-perfect alignment across all current and future views, components, widgets, and sections:
    - **Page Container Width**: `.app-component-root` is constrained to `max-width: var(--header-max-width, 1366px); margin: 0 auto; width: 100%; box-sizing: border-box;`.
    - **Top-Level Section Spacing**: The root container uses `display: flex; flex-direction: column; gap: var(--spacing-lg, 16px);`.
@@ -817,7 +831,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
      - Pills & Badges: `border-radius: var(--radius-pill, 999px); padding: 2px 7px;` (or `3px 10px;`).
      - Control Groups / Toolbars: `display: flex; gap: 8px` to `12px; align-items: center;`.
 
-7. **GNOME 50 Adwaita Design Language Mandate**:
+8. **GNOME 50 Adwaita Design Language Mandate**:
    Every visual element, page, view, component, widget, and interactive control in Purity MUST strictly adhere to the **GNOME 50 Adwaita** design language:
    - **Glassmorphic Surfaces**: Translucent window backgrounds using `var(--gnome-surface)`, frosted blur filters (`var(--blur-effect)`, `var(--blur-subtle)`), and hairline specular borders (`var(--gnome-border)`, `var(--gnome-border-subtle)`).
    - **Rounded Geometry Hierarchy**:
@@ -835,7 +849,7 @@ Behaviors enhance DOM elements without requiring complex inheritance trees:
      - All cursors across the framework, components, buttons, draggable widgets, resize handles, and inputs strictly use KDE Plasma Breeze design tokens (`var(--cursor-default)`, `var(--cursor-pointer)`, `var(--cursor-text)`, `var(--cursor-grab)`, `var(--cursor-grabbing)`, `var(--cursor-not-allowed)`, `var(--cursor-progress)`, `var(--cursor-wait)`).
      - HTTP requests (`HttpClient`) and active UI loaders (`LoaderComponent`) automatically drive the 23-frame animated progress cursor (`var(--cursor-progress)`) with reference counting.
 
-8. **TypeScript Configuration**:
+9. **TypeScript Configuration**:
    - The project uses strict TypeScript settings: `"verbatimModuleSyntax": true`, `"noUnusedLocals": true`, `"erasableSyntaxOnly": true`.
 
 ---
