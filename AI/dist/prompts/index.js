@@ -17,6 +17,10 @@ ${hasInputs ? `3. Inputs/Attributes: ${hasInputs}` : ''}
 - Decorated with \`@Component({ selector: '${name}', templateUrl: './${name}.component.html' })\`.
 - Reactive state managed solely via synchronous \`signal()\`, \`computed()\`, and \`effect()\` from \`@purity/core\`.
 - All methods mutate state with \`.set()\` or \`.update()\`.
+- NEVER use native \`addEventListener\`, \`removeEventListener\`, \`dispatchEvent\`, or \`CustomEvent\`.
+- For events and state communication between nested components (parent/child), use signals and effects.
+- For events and state communication between non-nested or distant components, use a shared \`@Injectable\` service variant with signals/effects.
+- NEVER use query selectors (\`querySelector\`, \`querySelectorAll\`, \`getElementById\`, etc.). ALWAYS use \`@ViewChild\` decorators instead to reference child elements or components.
 - External template inlined synchronously at build time with Vite (\`?raw\`).
 - If iterating arrays, use structural repeater \`for="let item of items"\` or \`virtual-for\` if high volume.
 - If using conditionals, use \`if="expr"\`, \`else-if="expr"\`, \`else\`.
@@ -44,7 +48,7 @@ Please generate the complete, production-ready code files for:
         };
     });
     // Prompt 2: Review Code
-    server.prompt('purity-review-code', 'Perform a comprehensive 10-point architectural audit of Purity code', {
+    server.prompt('purity-review-code', 'Perform a comprehensive 12-point architectural audit of Purity code', {
         code: z.string().describe('The TypeScript, HTML, or SCSS code to audit'),
         fileName: z.string().optional().describe('File name with extension (e.g. "user.component.ts")'),
     }, async ({ code, fileName }) => {
@@ -54,7 +58,7 @@ Please generate the complete, production-ready code files for:
 ${code}
 \`\`\`
 
-Audit against the 10 Non-Negotiable Purity Framework Rules:
+Audit against the 12 Non-Negotiable Purity Framework Rules:
 1. **Reactivity**: Are signals mutated via \`.set()\` or \`.update()\`? (NEVER \`signal = val\` or \`signal.value = val\`).
 2. **Read Syntax**: Are signals invoked as functions in expressions (\`mySignal()\`)?
 3. **No External State**: Zero imports from RxJS, Redux, Zustand, MobX.
@@ -65,6 +69,8 @@ Audit against the 10 Non-Negotiable Purity Framework Rules:
 8. **Design System Leakage**: Does the code contain the internal string "GNOME 50"? (Must use "Adwaita" publicly).
 9. **Breeze Cursors & Tokens**: Are KDE Breeze cursor tokens and Adwaita corner radii used?
 10. **Template Directives**: Are repeaters \`for="let item of items"\` and conditionals \`if="expr"\` instead of Angular/Vue directives?
+11. **No Native Event Listeners / Dispatching**: Are native \`addEventListener\`, \`removeEventListener\`, \`dispatchEvent\`, or \`CustomEvent\` used? (Forbidden! Events between nested components must use signals and effects; distant/non-nested components must use a shared \`@Injectable\` service).
+12. **No Query Selectors (@ViewChild Mandatory)**: Are direct DOM query selectors (\`querySelector\`, \`querySelectorAll\`, \`getElementById\`, etc.) used? (Forbidden! Always use \`@ViewChild\` decorators to reference child components or elements).
 
 Provide a structured report listing:
 - Status (PASS / FAIL)
@@ -97,6 +103,8 @@ ${sourceCode}
 
 ### Conversion Directives:
 - Convert state hooks / ref / properties to Purity \`signal()\`, \`computed()\`, or \`effect()\`.
+- Replace native event listeners / dispatching with signals and effects (nested components) or an \`@Injectable\` service (distant components).
+- Replace DOM query selectors (\`querySelector\`, \`getElementById\`, \`useRef\`) with Purity's \`@ViewChild\` decorator. NEVER use \`querySelector\`.
 - Separate code into:
   1. \`${componentName}.component.ts\` (\`@Component({ selector: '${componentName}', templateUrl: './${componentName}.component.html' })\`)
   2. \`${componentName}.component.html\` (Purity Handlebars bindings, \`for="let item of items"\`, \`if="expr"\`, slots)

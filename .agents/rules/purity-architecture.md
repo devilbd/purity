@@ -2,6 +2,9 @@
 
 ## 1. Core Architectural Constraints
 - **Native Web Components**: Standard classes decorated with `@Component` transformed into Custom Elements. External templates (`templateUrl`) inlined at build time. Declarative `<slot>`, structural `for="let item of items"` / `virtual-for`, and structural `if="expr"` / `else-if` / `else`.
+- **Prohibition of Native Events & Listeners**: Nowhere should native `addEventListener`, `removeEventListener`, `dispatchEvent`, or `CustomEvent` be used.
+- **Component Communication Protocol**: For nested components (parent-child), communicate via signals and effects. If components are far away and not nested, a shared `@Injectable` service variant shall do the job.
+- **Prohibition of Query Selectors (`@ViewChild` Mandatory)**: Nowhere should DOM query selectors (`querySelector`, `querySelectorAll`, `getElementById`, etc.) be used. Instead, `@ViewChild` decorators MUST be used to query child components or DOM elements.
 - **Fine-Grained Reactivity**: Use `signal()`, `computed()`, `effect()` from `@purity/core`. Synchronous updates with sub-microsecond latency.
 - **Dependency Injection**: Services decorated with `@Injectable('Name')` / `@Service('Name')`, resolved via `inject(Token)`.
 - **HTTP Client & Interceptors**: `HttpClient` service consuming centralized class-based interceptors (`HttpInterceptor`) under `@interceptors/*`.

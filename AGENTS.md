@@ -19,7 +19,21 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 
 ---
 
-## 2. Design System & Theming Mandate (GNOME 50 Adwaita & KDE Breeze Cursors)
+## 2. Component Communication, DOM Querying & Event Mandates
+
+- **Prohibition of Native DOM Event Listeners & Dispatching**:
+  - Nowhere should native `addEventListener`, `removeEventListener`, `dispatchEvent`, or `new CustomEvent(...)` be used in component or application code.
+  - Declarative template event bindings (`onclick="handler()"`, `oninput="handler($event)"`) evaluate in the component instance context.
+- **Component Communication Protocol**:
+  - **Nested Components (Parent-Child / Child-Parent)**: Must communicate exclusively via **signals and effects** (`signal()`, `computed()`, `effect()`). Parent components synchronize or mutate signals directly on child instances queried via `@ViewChild()`, or pass signals through template bindings.
+  - **Distant / Non-Nested Components**: Must communicate via a shared **`@Injectable` service variant** (`@Injectable('ServiceName')` holding reactive signals and actions, injected via `inject()`).
+- **Prohibition of Query Selectors (`@ViewChild` Mandatory)**:
+  - Nowhere should direct DOM query selectors (`querySelector`, `querySelectorAll`, `getElementById`, `getElementsByClassName`, `getElementsByTagName`) be used.
+  - Instead of query selectors, **`@ViewChild` decorators** (`@ViewChild(selector?: string)`) MUST be used to query child components or DOM elements.
+
+---
+
+## 3. Design System & Theming Mandate (GNOME 50 Adwaita & KDE Breeze Cursors)
 
 - **Aesthetics**: Glassmorphic surfaces (`var(--gnome-surface)`, `var(--gnome-card)`), frosted blur (`var(--blur-effect)`), subtle specular borders (`var(--gnome-border)`).
 - **Corner Radii Hierarchy**:
@@ -34,7 +48,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 
 ---
 
-## 3. TypeScript & Path Aliases Rules
+## 4. TypeScript & Path Aliases Rules
 
 - **Strict Mode**: `"verbatimModuleSyntax": true`, `"erasableSyntaxOnly": true`, `"noUnusedLocals": true`, `"strict": true`.
 - **Path Aliases Mandatory (NO Relative `../` Traversal)**:
@@ -42,7 +56,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 
 ---
 
-## 4. Testing Framework & Conventions
+## 5. Testing Framework & Conventions
 
 - **Framework**: **Vitest** paired with **happy-dom** (native Custom Elements v1 and DOM API simulation).
 - **Configuration & Runner**:
@@ -57,7 +71,7 @@ For complete deep-dive documentation, also see [GEMINI.md](file:///run/media/dev
 
 ---
 
-## 5. Naming Conventions
+## 6. Naming Conventions
 
 - **Files**: `kebab-case.role.ts` (e.g., `auth.interceptor.ts`, `date-time-picker.component.ts`, `highlight.directive.ts`, `_variables.scss`).
 - **Classes**: `PascalCase` with role suffix (`AppComponent`, `AuthInterceptor`, `DatePipe`, `UserValidator`).

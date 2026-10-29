@@ -26,7 +26,7 @@ This server bridges your AI development environments (**Claude Desktop**, **Curs
 | 🎨 **Resources** | `purity://catalog/*` | Live catalog of all UI components (`switch-button`, `modal-view`, `expander`, `popover`, etc.). |
 | 📋 **Resources** | `purity://templates/*` | Dynamic starter templates for any Purity construct. |
 | 💬 **Prompts** | `purity-create-component` | Guided workflow to design and implement production-ready Purity Custom Elements. |
-| 💬 **Prompts** | `purity-review-code` | 10-point architectural and quality audit prompt. |
+| 💬 **Prompts** | `purity-review-code` | 12-point architectural and quality audit prompt. |
 | 💬 **Prompts** | `purity-migrate-component`| Seamless migration prompt from React / Angular / Vue to Purity. |
 | 💬 **Prompts** | `purity-debug-reactivity` | Reactivity troubleshooter diagnosing signal access, untracked dependencies, and effect loops. |
 
@@ -158,10 +158,20 @@ Generates complete, production-ready Purity boilerplate files adhering to all ar
 ---
 
 ### `purity_validate`
-Audits TypeScript, HTML, or SCSS against Purity's 10 non-negotiable rules:
+Audits TypeScript, HTML, or SCSS against Purity's 12 non-negotiable rules:
 - **`code`** *(optional)*: Raw code string to validate
 - **`filePath`** *(optional)*: Path to file on disk to validate
 - **`fileName`** *(optional)*: Virtual filename (e.g. `'my.component.ts'`, `'card.component.scss'`)
+
+*Checks Include:*
+- Synchronous signals (`.set()`, `.update()`, no direct `.value` assignment)
+- Strictly zero imports from RxJS, Redux, Zustand, MobX
+- Mandatory path aliases (no `../` relative traversal)
+- Zero inline `style="..."` attributes (modular SCSS with `@use '@styles' as *;`)
+- Adwaita design tokens and KDE Breeze cursor tokens
+- No foreign templates or lifecycle hooks
+- **Prohibition of native event listeners and dispatching** (`addEventListener`, `removeEventListener`, `dispatchEvent`, `CustomEvent`) — communication must use signals/effects (nested) or `@Injectable` services (distant)
+- **Prohibition of query selectors** (`querySelector`, `querySelectorAll`, `getElementById`, etc.) — `@ViewChild` decorators are mandatory
 
 *Returns:*
 - Numerical score (0 to 100)
@@ -222,7 +232,7 @@ Connect to these resources in your MCP client:
 Invoke these prompts in your AI chat:
 
 - **`purity-create-component`**: Guides the AI step-by-step in generating an end-to-end Purity Custom Element with signals, templates, SCSS, and unit tests.
-- **`purity-review-code`**: Directs the AI to run a rigorous 10-point compliance audit against Purity rules.
+- **`purity-review-code`**: Directs the AI to run a rigorous 12-point compliance audit against Purity rules (signals, lifecycle, `@ViewChild`, no querySelector, no native addEventListener/dispatchEvent, Adwaita tokens, Breeze cursors).
 - **`purity-migrate-component`**: Instructs the AI to migrate React, Angular, or Vue components into Purity Custom Elements.
 - **`purity-debug-reactivity`**: Directs the AI to analyze reactivity bugs (signal subscriptions, untracked dependencies, effect loops).
 

@@ -9,6 +9,9 @@ export function analyzePurityCode(
   const isScss = fileName.endsWith('.scss');
   const isHtml = fileName.endsWith('.html');
   const isTs = fileName.endsWith('.ts');
+  const isSpec = fileName.endsWith('.spec.ts') || fileName.endsWith('.test.ts');
+  const isBehavior = fileName.includes('.behavior.') || fileName.includes('/behaviors/');
+  const isFrameworkInternal = fileName.includes('src/framework/');
 
   // Rule 1: No relative parent imports (../) in TS/SCSS
   if (isTs || isScss) {
@@ -252,6 +255,42 @@ export function analyzePurityCode(
           codeSnippet: line.trim(),
           suggestion: 'Use KDE Plasma Breeze cursor token: `cursor: var(--cursor-grab, grab);`.',
           fix: line.replace('cursor: grab;', 'cursor: var(--cursor-grab, grab);'),
+        });
+      }
+    });
+  }
+
+  // Rule 12: No native DOM event listeners or event dispatching (use signals/effects for nested, service for distant)
+  if (isTs && !isSpec && !isBehavior && !isFrameworkInternal) {
+    lines.forEach((line, index) => {
+      const isComment = line.trim().startsWith('//') || line.trim().startsWith('*') || line.trim().startsWith('/*');
+      if (isComment) return;
+      if (line.match(/\b(addEventListener|removeEventListener|dispatchEvent|CustomEvent)\b/)) {
+        issues.push({
+          rule: 'no-native-event-listeners',
+          severity: 'error',
+          line: index + 1,
+          message: 'Native DOM event listeners (`addEventListener`/`removeEventListener`) and event dispatching (`dispatchEvent`/`CustomEvent`) are prohibited.',
+          codeSnippet: line.trim(),
+          suggestion: 'For events/communication between nested components, use signals and effects. For non-nested/distant components, use a shared @Injectable service variant with signals/effects.',
+        });
+      }
+    });
+  }
+
+  // Rule 13: No DOM query selectors (use @ViewChild decorators instead)
+  if (isTs && !isSpec && !isBehavior && !isFrameworkInternal) {
+    lines.forEach((line, index) => {
+      const isComment = line.trim().startsWith('//') || line.trim().startsWith('*') || line.trim().startsWith('/*');
+      if (isComment) return;
+      if (line.match(/\b(querySelector|querySelectorAll|getElementById|getElementsByClassName|getElementsByTagName)\s*\(/)) {
+        issues.push({
+          rule: 'no-query-selectors',
+          severity: 'error',
+          line: index + 1,
+          message: 'Direct DOM query selectors (`querySelector`, `querySelectorAll`, `getElementById`, etc.) are prohibited.',
+          codeSnippet: line.trim(),
+          suggestion: "Use '@ViewChild' decorators instead of query selectors to reference child components or DOM elements.",
         });
       }
     });

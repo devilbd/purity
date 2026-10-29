@@ -14,7 +14,7 @@ export class IntroComponent {
     }
 
     onGoToMcpSetup() {
-        const mcpEl = document.querySelector('#mcp-intro-section');
+        const mcpEl = document.querySelector('#step-6-mcp');
         mcpEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 

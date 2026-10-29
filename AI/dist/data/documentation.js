@@ -77,8 +77,14 @@ Components in Purity are standard TypeScript classes decorated with \`@Component
 - \`protected onDestroy(): void\`: Invoked when element is removed from DOM.
 - \`disconnectedCallback(): void\`: Native custom element cleanup.
 
-## Queries
-- \`@ViewChild(selector?: string)\`: Injects reference to child custom element or DOM element. Inferred from property name if selector is omitted.`,
+## Queries & Child Elements
+- \`@ViewChild(selector?: string)\`: Injects reference to child custom element or DOM element. Inferred from property name if selector is omitted.
+- **NEVER use query selectors**: Direct DOM queries (\`querySelector\`, \`querySelectorAll\`, \`getElementById\`, etc.) are strictly prohibited. Always use \`@ViewChild\`.
+
+## Component Communication & Events
+- **NEVER use native event listeners / dispatch**: Native \`addEventListener\`, \`removeEventListener\`, \`dispatchEvent\`, and \`CustomEvent\` are strictly prohibited.
+- **Nested Components (Parent-Child)**: Use synchronous \`signal()\` and \`effect()\`. Parents synchronize or mutate signals directly on child instances queried via \`@ViewChild()\`, or pass signals via template bindings.
+- **Distant / Non-Nested Components**: Use a shared \`@Injectable\` service variant with signals and effects injected via \`inject()\`.`,
         examples: [
             `import { Component, signal, ViewChild } from '@purity/core';
 import { SwitchButtonComponent } from '@components/switch-button/switch-button.component';
@@ -588,7 +594,7 @@ describe('Signal Reactivity', () => {
     rules: {
         topic: 'rules',
         title: 'Architectural Rules & Quality Checklist',
-        summary: '10 non-negotiable rules for all AI agents and developers working in Purity.',
+        summary: '12 non-negotiable rules for all AI agents and developers working in Purity.',
         content: `# Purity Non-Negotiable Rules
 
 1. **Signals**: Use \`signal()\`, \`computed()\`, \`effect()\`, \`untrack()\`. Never use external state libraries.
@@ -600,7 +606,9 @@ describe('Signal Reactivity', () => {
 7. **Styles**: Always \`@use '@styles' as *;\`. NEVER use inline \`style="..."\` in templates.
 8. **Cursors**: Use Breeze tokens: \`var(--cursor-pointer)\`, \`var(--cursor-default)\`, etc.
 9. **Confidential Reference**: NEVER output "GNOME 50" to user-facing UI or copy. Publicly describe as "Adwaita".
-10. **Testing**: Colocate tests as \`*.spec.ts\` and run with \`npm test\`.`,
+10. **Testing**: Colocate tests as \`*.spec.ts\` and run with \`npm test\`.
+11. **No Native Event Listeners / Dispatch**: Nowhere should native \`addEventListener\`, \`removeEventListener\`, \`dispatchEvent\`, or custom events be used. For events between nested components, use signals and effects. If components are far away and not nested, an \`@Injectable\` service variant shall do the job.
+12. **No Query Selectors (@ViewChild Mandatory)**: Nowhere should DOM query selectors (\`querySelector\`, \`querySelectorAll\`, \`getElementById\`, etc.) be used. Instead of query selectors, \`@ViewChild\` decorators MUST be used.`,
         examples: [
             `// COMPLIANT:
 import { Component, signal } from '@purity/core';

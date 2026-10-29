@@ -94,6 +94,37 @@ export class DataService {
   getData() { return this.http.get('/api/items'); }
 }
 \`\`\`
+
+## 6. Component Communication & @ViewChild (No Query Selectors or Native Events)
+\`\`\`typescript
+import { Component, signal, effect, ViewChild, inject } from '@purity/core';
+import { SharedStateService } from '@data/shared-state.service';
+import { ChildWidgetComponent } from '@components/child-widget/child-widget.component';
+
+@Component({ selector: 'parent-widget', templateUrl: './parent-widget.component.html' })
+export class ParentWidgetComponent {
+  // Query child elements/components via @ViewChild (NEVER use querySelector)
+  @ViewChild()
+  childWidget?: ChildWidgetComponent;
+
+  // Distant / Non-Nested component communication: Shared @Injectable Service
+  sharedState = inject(SharedStateService);
+
+  // Nested component communication: Signals and Effects
+  protected onInit(): void {
+    effect(() => {
+      if (this.childWidget) {
+        this.childWidget.status.set(this.sharedState.currentStatus());
+      }
+    });
+  }
+}
+\`\`\`
+**Mandatory Architectural Rules**:
+- NEVER use native \`addEventListener\`, \`removeEventListener\`, \`dispatchEvent\`, or \`CustomEvent\`.
+- For events/communication between **nested components**: Use **signals and effects**.
+- For events/communication between **distant / non-nested components**: Use a shared **\`@Injectable\` service variant**.
+- NEVER use DOM query selectors (\`querySelector\`, \`querySelectorAll\`, \`getElementById\`, etc.): ALWAYS use **\`@ViewChild\` decorators**.
 `;
       return {
         contents: [

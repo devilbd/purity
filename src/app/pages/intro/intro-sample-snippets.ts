@@ -3391,7 +3391,7 @@ export class PlaygroundDemoComponent {
 }`,
     },
 
-    // 33. MCP AI Server Setup & Tool Integration
+    // Step 6: MCP AI Server Setup & Tool Integration
     'mcp-ai': {
         id: 'mcp-ai',
         title: '🤖 Purity Model Context Protocol (MCP) AI Server & Setup',

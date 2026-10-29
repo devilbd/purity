@@ -146,23 +146,20 @@ describe('IntroComponent & Intro Sample Snippets', () => {
     });
 
     it('should render MCP AI setup section with Read more link and no studio in intro template', () => {
-        const mcpSection = element.querySelector('#mcp-intro-section');
-        expect(mcpSection).not.toBeNull();
-        expect(mcpSection?.textContent).toContain('Model Context Protocol (MCP) AI Server Setup');
+        const step6Card = element.querySelector('#step-6-mcp');
+        expect(step6Card).not.toBeNull();
 
         // Studio should NOT be present in intro
         const mcpSampleEl = element.querySelector('mcp-sample');
         expect(mcpSampleEl).toBeNull();
 
-        // Sample 33 title should NOT contain @modelcontextprotocol/sdk
-        const sampleCards = element.querySelectorAll('.intro-sample-card');
-        const lastCard = sampleCards[sampleCards.length - 1];
-        const sampleHeader = lastCard?.querySelector('.sample-title-box h4');
-        expect(sampleHeader?.textContent).toContain('33. 🤖 Model Context Protocol (MCP) AI Integration');
+        // Step 6 title should be 'Step 6: 🤖 Model Context Protocol (MCP) AI Integration' and NOT contain @modelcontextprotocol/sdk
+        const sampleHeader = step6Card?.querySelector('.sample-title-box h4');
+        expect(sampleHeader?.textContent).toContain('Step 6: 🤖 Model Context Protocol (MCP) AI Integration');
         expect(sampleHeader?.textContent).not.toContain('@modelcontextprotocol/sdk');
 
         // Link should be 'Read more ...' opening GitHub docs in new tab
-        const readMoreLink = lastCard?.querySelector('a.sample-edit-btn') as HTMLAnchorElement | null;
+        const readMoreLink = step6Card?.querySelector('a.sample-edit-btn') as HTMLAnchorElement | null;
         expect(readMoreLink).not.toBeNull();
         expect(readMoreLink?.textContent?.trim()).toBe('Read more ...');
         expect(readMoreLink?.getAttribute('href')).toBe('https://github.com/devilbd/purity/blob/main/AI/README.md');
