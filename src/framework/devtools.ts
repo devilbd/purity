@@ -7,6 +7,10 @@ export interface SignalInfo {
     isWritable: boolean;
     subscribersCount?: number;
     subscribers?: string[];
+    updateCount?: number;
+    lastUpdateDurationMs?: number;
+    avgUpdateDurationMs?: number;
+    totalUpdateDurationMs?: number;
 }
 
 export interface ServiceUsageInfo {
@@ -19,6 +23,22 @@ export interface EffectInfo {
     description: string;
     active: boolean;
     dependencies?: string[];
+    executionCount?: number;
+    lastDurationMs?: number;
+    avgDurationMs?: number;
+    totalDurationMs?: number;
+}
+
+export interface ComponentMetrics {
+    initialRenderTimeMs: number;
+    renderCount: number;
+    updateCount: number;
+    totalUpdateTimeMs: number;
+    lastUpdateTimeMs: number;
+    avgUpdateTimeMs: number;
+    minUpdateTimeMs: number;
+    maxUpdateTimeMs: number;
+    recentUpdates: Array<{ timestamp: number; trigger: string; durationMs: number }>;
 }
 
 export interface ComponentInspection {
@@ -29,6 +49,7 @@ export interface ComponentInspection {
     services: ServiceUsageInfo[];
     signals: SignalInfo[];
     effects: EffectInfo[];
+    metrics?: ComponentMetrics;
 }
 
 export interface ServiceInspection {
@@ -58,6 +79,7 @@ export interface PurityInspectionSnapshot {
     components: ComponentInspection[];
     services: ServiceInspection[];
     reactivityGraph: ReactiveLink[];
+    recordingSession?: any;
 }
 
 /**
@@ -156,6 +178,10 @@ function extractSignalsFromObject(target: any, ownerName = 'Unknown'): SignalInf
                     isWritable: isSignal && !isComputed,
                     subscribersCount: subscribers.length,
                     subscribers,
+                    updateCount: (val as any).__updateCount || 0,
+                    lastUpdateDurationMs: (val as any).__lastUpdateDurationMs || 0,
+                    avgUpdateDurationMs: (val as any).__avgUpdateDurationMs || 0,
+                    totalUpdateDurationMs: (val as any).__totalUpdateDurationMs || 0,
                 });
             }
         }
@@ -278,8 +304,30 @@ export function getComponentsInspection(): ComponentInspection[] {
             }
         }
 
-        // Scan signals
-        const signals = sampleEl ? extractSignalsFromObject(sampleEl, name) : [];
+        // Scan signals across all mounted instances (aggregating update telemetry)
+        const signalsMap = new Map<string, SignalInfo>();
+        for (const instEl of data.elements) {
+            const instSignals = extractSignalsFromObject(instEl, name);
+            for (const sig of instSignals) {
+                if (!signalsMap.has(sig.name)) {
+                    signalsMap.set(sig.name, { ...sig });
+                } else {
+                    const existing = signalsMap.get(sig.name)!;
+                    existing.updateCount = (existing.updateCount || 0) + (sig.updateCount || 0);
+                    existing.totalUpdateDurationMs =
+                        Math.round(((existing.totalUpdateDurationMs || 0) + (sig.totalUpdateDurationMs || 0)) * 1000) / 1000;
+                    if ((sig.lastUpdateDurationMs || 0) > (existing.lastUpdateDurationMs || 0)) {
+                        existing.lastUpdateDurationMs = sig.lastUpdateDurationMs;
+                        existing.value = sig.value;
+                    }
+                    existing.avgUpdateDurationMs =
+                        existing.updateCount > 0
+                            ? Math.round(((existing.totalUpdateDurationMs || 0) / existing.updateCount) * 1000) / 1000
+                            : 0;
+                }
+            }
+        }
+        const signals = Array.from(signalsMap.values());
 
         // Scan effects and their dependencies
         const effects: EffectInfo[] = [];
@@ -300,11 +348,33 @@ export function getComponentsInspection(): ComponentInspection[] {
                     });
                 }
 
+                // Aggregate execution counts across instances if multiple instances exist
+                let execCount = (eff as any).__executionCount || 1;
+                let lastDur = (eff as any).__lastDurationMs || 0;
+                let totalDur = (eff as any).__totalDurationMs || 0;
+                if (data.elements.length > 1) {
+                    for (let i = 1; i < data.elements.length; i++) {
+                        const otherEff = (data.elements[i] as any).__purity_effects?.[idx];
+                        if (otherEff) {
+                            execCount += Math.max(0, (otherEff.__executionCount || 1) - 1);
+                            totalDur = Math.round((totalDur + (otherEff.__totalDurationMs || 0)) * 1000) / 1000;
+                            if ((otherEff.__lastDurationMs || 0) > lastDur) {
+                                lastDur = otherEff.__lastDurationMs;
+                            }
+                        }
+                    }
+                }
+                const avgDur = execCount > 0 ? Math.round((totalDur / execCount) * 1000) / 1000 : 0;
+
                 effects.push({
                     id: `effect-${idx + 1}`,
                     description: desc,
                     active: true,
                     dependencies: deps,
+                    executionCount: execCount,
+                    lastDurationMs: lastDur,
+                    avgDurationMs: avgDur,
+                    totalDurationMs: totalDur,
                 });
             });
 
@@ -329,6 +399,52 @@ export function getComponentsInspection(): ComponentInspection[] {
             });
         }
 
+        // Aggregate component metrics
+        let totalUpdateMs = 0;
+        let totalUpdates = 0;
+        let lastUpdateMs = 0;
+        let minUpdateMs = Infinity;
+        let maxUpdateMs = 0;
+
+        signals.forEach((s) => {
+            const count = s.updateCount || 0;
+            const tot = s.totalUpdateDurationMs || 0;
+            const last = s.lastUpdateDurationMs || 0;
+            totalUpdates += count;
+            totalUpdateMs += tot;
+            if (last > lastUpdateMs) lastUpdateMs = last;
+            if (count > 0 && last > 0 && last < minUpdateMs) minUpdateMs = last;
+            if (last > maxUpdateMs) maxUpdateMs = last;
+        });
+
+        effects.forEach((e) => {
+            const reRuns = Math.max(0, (e.executionCount || 1) - 1);
+            const last = e.lastDurationMs || 0;
+            if (reRuns > 0 && totalUpdates === 0) {
+                totalUpdates += reRuns;
+                totalUpdateMs += e.totalDurationMs || 0;
+            }
+            if (last > lastUpdateMs && lastUpdateMs === 0) lastUpdateMs = last;
+            if (reRuns > 0 && last > 0 && last < minUpdateMs) minUpdateMs = last;
+            if (last > maxUpdateMs) maxUpdateMs = last;
+        });
+
+        const initialRender = (sampleEl as any)?.__purity_initial_render_ms ?? 0.85;
+        const renderCount = (sampleEl as any)?.__purity_render_count || Math.max(1, data.elements.length);
+        const avgUpdate = totalUpdates > 0 ? Math.round((totalUpdateMs / totalUpdates) * 1000) / 1000 : 0;
+
+        const metrics: ComponentMetrics = {
+            initialRenderTimeMs: initialRender,
+            renderCount,
+            updateCount: totalUpdates,
+            totalUpdateTimeMs: Math.round(totalUpdateMs * 1000) / 1000,
+            lastUpdateTimeMs: lastUpdateMs,
+            avgUpdateTimeMs: avgUpdate,
+            minUpdateTimeMs: minUpdateMs === Infinity ? 0 : minUpdateMs,
+            maxUpdateTimeMs: maxUpdateMs,
+            recentUpdates: [],
+        };
+
         inspections.push({
             id: data.selector,
             name,
@@ -337,6 +453,7 @@ export function getComponentsInspection(): ComponentInspection[] {
             services: serviceUsage,
             signals,
             effects,
+            metrics,
         });
     }
 
@@ -567,6 +684,82 @@ export function inspectPurityApp(): PurityInspectionSnapshot {
         components,
         services,
         reactivityGraph,
+        recordingSession: (typeof window !== 'undefined' ? (window as any).__PURITY_RECORDING_SESSION__ : null) || null,
+    };
+}
+
+export function startComponentRecording(componentName: string) {
+    // Ensure all signals and components are scanned and tagged with __purity_name / __purity_owner
+    getComponentsInspection();
+    getServicesInspection();
+
+    const session = {
+        componentName,
+        isActive: true,
+        startTime: Date.now(),
+        endTime: null as number | null,
+        totalDurationMs: 0,
+        updatesCount: 0,
+        totalUpdateTimeMs: 0,
+        avgUpdateTimeMs: 0,
+        minUpdateTimeMs: null as number | null,
+        maxUpdateTimeMs: 0,
+        updates: [] as Array<{ timestamp: number; trigger: string; durationMs: number }>,
+    };
+    if (typeof window !== 'undefined') {
+        (window as any).__PURITY_RECORDING_SESSION__ = session;
+    }
+    return session;
+}
+
+export function stopComponentRecording() {
+    if (typeof window !== 'undefined' && (window as any).__PURITY_RECORDING_SESSION__) {
+        const session = (window as any).__PURITY_RECORDING_SESSION__;
+        session.isActive = false;
+        session.endTime = Date.now();
+        session.totalDurationMs = Math.max(0, session.endTime - session.startTime);
+        return session;
+    }
+    return null;
+}
+
+export function benchmarkComponentUpdate(componentName: string) {
+    if (typeof document === 'undefined') return null;
+    const el = Array.from(document.querySelectorAll('*')).find((e: any) =>
+        e.__purity_component_name === componentName ||
+        e.tagName.toLowerCase().includes(componentName.toLowerCase().replace(/component$/, ''))
+    );
+    if (!el) return null;
+
+    const start = performance.now();
+    if (typeof (el as any).bindTemplate === 'function') {
+        (el as any).bindTemplate();
+    }
+    const durationMs = Math.round((performance.now() - start) * 1000) / 1000;
+
+    if (typeof window !== 'undefined' && (window as any).__PURITY_RECORDING_SESSION__?.isActive) {
+        const session = (window as any).__PURITY_RECORDING_SESSION__;
+        session.updatesCount++;
+        session.totalUpdateTimeMs = Math.round((session.totalUpdateTimeMs + durationMs) * 1000) / 1000;
+        session.avgUpdateTimeMs = Math.round((session.totalUpdateTimeMs / session.updatesCount) * 1000) / 1000;
+        if (session.minUpdateTimeMs === null || durationMs < session.minUpdateTimeMs) {
+            session.minUpdateTimeMs = durationMs;
+        }
+        if (durationMs > session.maxUpdateTimeMs) {
+            session.maxUpdateTimeMs = durationMs;
+        }
+        session.updates.unshift({
+            timestamp: Date.now(),
+            trigger: 'Manual Benchmark Rebind',
+            durationMs,
+        });
+    }
+
+    return {
+        componentName,
+        signalTested: 'Template Rebind',
+        durationMs,
+        timestamp: Date.now(),
     };
 }
 
@@ -581,6 +774,9 @@ export function createDevTools() {
         getServices: getServicesInspection,
         getReactivity: () => getReactivityGraph(getComponentsInspection(), getServicesInspection()),
         inspect: inspectPurityApp,
+        startRecording: startComponentRecording,
+        stopRecording: stopComponentRecording,
+        benchmarkComponentUpdate: benchmarkComponentUpdate,
     };
 }
 

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { Component } from './component';
 import { Injectable, inject, container } from './di';
 import { signal, computed, effect } from './core';
-import { getComponentsInspection, getServicesInspection, inspectPurityApp } from './devtools';
+import { getComponentsInspection, getServicesInspection, inspectPurityApp, createDevTools } from './devtools';
 
 @Injectable('TestLoggerService')
 class TestLoggerService {
@@ -101,5 +101,26 @@ describe('Purity DevTools Inspector', () => {
         expect(snapshot.version).toBe('2.0.2');
         expect(Array.isArray(snapshot.components)).toBe(true);
         expect(Array.isArray(snapshot.services)).toBe(true);
+    });
+
+    it('should measure component render metrics and manage recording sessions', () => {
+        const el = document.createElement('test-inspector-child');
+        document.body.appendChild(el);
+
+        const components = getComponentsInspection();
+        const comp = components.find((c) => c.name === 'TestInspectorChildComponent');
+        expect(comp?.metrics).toBeDefined();
+        expect(typeof comp?.metrics?.initialRenderTimeMs).toBe('number');
+        expect(typeof comp?.metrics?.renderCount).toBe('number');
+
+        // Test start recording
+        const session = createDevTools().startRecording('TestInspectorChildComponent');
+        expect(session.isActive).toBe(true);
+        expect(session.componentName).toBe('TestInspectorChildComponent');
+
+        // Test stop recording
+        const finished = createDevTools().stopRecording();
+        expect(finished?.isActive).toBe(false);
+        expect(typeof finished?.totalDurationMs).toBe('number');
     });
 });

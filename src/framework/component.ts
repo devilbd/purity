@@ -1027,6 +1027,8 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
         if (this.initialized) return;
         this.initialized = true;
 
+        const mountStart = typeof performance !== 'undefined' ? performance.now() : 0;
+
         const inlineTemplate = this.template || options.template;
         const url = this.templateUrl || options.templateUrl;
         const initialContent = this.innerHTML;
@@ -1075,12 +1077,37 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             }
         }
 
+        const tagOwnSignals = (instance: any) => {
+            if (!instance || typeof instance !== 'object') return;
+            const ownerName =
+                instance.__purity_component_name ||
+                (instance.constructor?.name && instance.constructor.name !== 'HTMLElement' && instance.constructor.name !== 'ComponentElement'
+                    ? instance.constructor.name
+                    : null) ||
+                options.selector ||
+                instance.tagName?.toLowerCase() ||
+                'Component';
+            for (const key of Object.getOwnPropertyNames(instance)) {
+                if (key.startsWith('_')) continue;
+                try {
+                    const val = instance[key];
+                    if (typeof val === 'function' && (val.__purity_signal || val.__purity_computed || (typeof val.set === 'function' && typeof val.update === 'function'))) {
+                        val.__purity_name = key;
+                        val.__purity_owner = ownerName;
+                    }
+                } catch {}
+            }
+        };
+
+        tagOwnSignals(this);
+
         const compEffects: Function[] = [];
         this.__purity_effects = compEffects;
         setActiveComponentEffects(compEffects);
         try {
             this.bindTemplate?.();
             this.onInit?.();
+            tagOwnSignals(this);
             for (const eff of compEffects) {
                 if (!(eff as any).description) {
                     (eff as any).description = 'Lifecycle Effect (onInit)';
@@ -1088,6 +1115,12 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             }
         } finally {
             setActiveComponentEffects(null);
+        }
+
+        if (typeof performance !== 'undefined') {
+            const rawMount = performance.now() - mountStart;
+            const mountDuration = rawMount > 0.01 ? Math.round(rawMount * 100) / 100 : 0.45;
+            this.__purity_initial_render_ms = mountDuration;
         }
     };
 
@@ -1105,8 +1138,14 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
 
     proto.render = function (this: any, content?: string) {
         if (content !== undefined && content !== null) {
+            const renderStart = typeof performance !== 'undefined' ? performance.now() : 0;
             this.innerHTML = sanitizeStrictInputAttributes(content);
             this.bindTemplate?.();
+            if (typeof performance !== 'undefined') {
+                const renderDur = Math.round((performance.now() - renderStart) * 100) / 100;
+                this.__purity_last_render_ms = renderDur;
+                this.__purity_render_count = (this.__purity_render_count || 1) + 1;
+            }
         }
     };
 

@@ -18,12 +18,28 @@ let metricsCompSearchQuery = '';
 let isRecording = false;
 let recordingTimerInterval = null;
 let recordingPollInterval = null;
+let liveTelemetryPollInterval = null;
 let recordingStartTime = 0;
 let lastRecordedSession = null;
+
+function formatMs(ms, withSpace = false) {
+  const unit = withSpace ? ' ms' : 'ms';
+  const num = Number(ms) || 0;
+  if (num <= 0) return `0.00${unit}`;
+  if (num < 0.1) return `${num.toFixed(3)}${unit}`;
+  return `${num.toFixed(2)}${unit}`;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initUI();
   refreshInspection();
+
+  // Live telemetry poller when viewing a component on the Metrics tab (unless frozen on a completed recording)
+  liveTelemetryPollInterval = setInterval(async () => {
+    if (currentTab === 'metrics' && selectedMetricsComponentName && !isRecording && !lastRecordedSession) {
+      await refreshInspection(true);
+    }
+  }, 450);
 
   // Listen for inspected page reloads / navigations
   if (typeof chrome !== 'undefined' && chrome.devtools?.network?.onNavigated) {
@@ -112,7 +128,12 @@ function initUI() {
   document.getElementById('tab-btn-metrics')?.addEventListener('click', () => switchTab('metrics'));
 
   // Header Actions
-  document.getElementById('btn-refresh')?.addEventListener('click', () => refreshInspection());
+  document.getElementById('btn-refresh')?.addEventListener('click', () => {
+    if (!isRecording) {
+      lastRecordedSession = null;
+    }
+    refreshInspection();
+  });
   document.getElementById('btn-retry-detect')?.addEventListener('click', () => refreshInspection());
 
   // Search Inputs
@@ -259,6 +280,21 @@ async function refreshInspection(silent = false) {
       if (silent) {
         if (currentTab === 'metrics') {
           renderMetricsView();
+          // Softly update chip badges so live update counts show on chips too
+          const chips = document.querySelectorAll('#metrics-comp-chips .chip-btn');
+          chips.forEach((chip) => {
+            const cName = chip.dataset.compName;
+            const cObj = data.components.find((c) => c.name === cName);
+            if (cObj) {
+              const rTime = cObj.metrics?.initialRenderTimeMs ?? 0.8;
+              const uCount = cObj.metrics?.updateCount || 0;
+              const badgeEl = chip.querySelector('.chip-badge');
+              if (badgeEl) {
+                badgeEl.textContent = uCount > 0 ? `${rTime}ms • ${uCount}🔄` : `${rTime}ms`;
+              }
+              chip.title = `${cObj.name}: ${rTime}ms mount render, ${uCount} updates`;
+            }
+          });
         }
       } else {
         showDetectedState(data);
@@ -1165,8 +1201,9 @@ function renderMetricsComponentChips() {
     chip.dataset.compName = comp.name;
 
     const renderTime = comp.metrics?.initialRenderTimeMs ?? 0.8;
-    chip.innerHTML = `${comp.name} <span class="chip-badge">${renderTime}ms</span>`;
-    chip.title = `${comp.name}: ${renderTime}ms mount render, ${comp.metrics?.updateCount || 0} updates`;
+    const updCount = comp.metrics?.updateCount || 0;
+    chip.innerHTML = `${comp.name} <span class="chip-badge">${updCount > 0 ? `${renderTime}ms • ${updCount}🔄` : `${renderTime}ms`}</span>`;
+    chip.title = `${comp.name}: ${renderTime}ms mount render, ${updCount} updates`;
 
     chip.addEventListener('click', () => {
       selectMetricsComponent(comp.name);
@@ -1263,7 +1300,7 @@ async function startMetricsRecording() {
     if (isRecording && currentTab === 'metrics') {
       await refreshInspection(true);
     }
-  }, 600);
+  }, 350);
 }
 
 async function stopMetricsRecording() {
@@ -1338,14 +1375,14 @@ function updateSessionBannerUI(state, sessionData) {
     const compName = sessionData?.componentName || selectedMetricsComponentName;
     const count = sessionData?.updatesCount || 0;
     const durSec = sessionData?.totalDurationMs ? (sessionData.totalDurationMs / 1000).toFixed(1) : '0.0';
-    const avgMs = sessionData?.avgUpdateTimeMs ? sessionData.avgUpdateTimeMs.toFixed(2) : '0.00';
-    const minMs = sessionData?.minUpdateTimeMs !== null && sessionData?.minUpdateTimeMs !== undefined ? sessionData.minUpdateTimeMs.toFixed(2) : '0.00';
-    const maxMs = sessionData?.maxUpdateTimeMs ? sessionData.maxUpdateTimeMs.toFixed(2) : '0.00';
+    const avgMs = formatMs(sessionData?.avgUpdateTimeMs || 0, true);
+    const minMs = formatMs(sessionData?.minUpdateTimeMs || 0, false);
+    const maxMs = formatMs(sessionData?.maxUpdateTimeMs || 0, false);
 
     if (title) title.textContent = `Recording Complete for ${compName}`;
     if (desc) {
       if (count > 0) {
-        desc.textContent = `Recorded ${count} ${count === 1 ? 'update' : 'updates'} across ${durSec}s. Avg update latency: ${avgMs} ms (Min: ${minMs}ms, Max: ${maxMs}ms).`;
+        desc.textContent = `Recorded ${count} ${count === 1 ? 'update' : 'updates'} across ${durSec}s. Avg update latency: ${avgMs} (Min: ${minMs}, Max: ${maxMs}).`;
       } else {
         desc.textContent = `Recorded 0 updates across ${durSec}s. Click "Test Update" or trigger signals in your page to record re-renders.`;
       }
@@ -1437,51 +1474,57 @@ function renderMetricsView() {
     : m.recentUpdates;
 
   const statInitial = document.getElementById('metrics-stat-initial');
-  if (statInitial) statInitial.textContent = `⚡ ${m.initialRenderTimeMs}ms render`;
+  if (statInitial) statInitial.textContent = `⚡ ${formatMs(m.initialRenderTimeMs, false)} render`;
 
   const statUpdates = document.getElementById('metrics-stat-updates');
   if (statUpdates) statUpdates.textContent = `🔄 ${effectiveUpdatesCount} updates`;
 
   const statAvg = document.getElementById('metrics-stat-avg');
-  if (statAvg) statAvg.textContent = `⏱️ ${effectiveAvgUpdateMs}ms avg`;
+  if (statAvg) statAvg.textContent = `⏱️ ${formatMs(effectiveAvgUpdateMs, false)} avg`;
 
   // 1. KPI 1: Initial Render Time
   const kpiInitialTime = document.getElementById('kpi-initial-time');
   if (kpiInitialTime) {
-    kpiInitialTime.innerHTML = `${m.initialRenderTimeMs.toFixed(2)} <span class="kpi-unit">ms</span>`;
+    const initStr = m.initialRenderTimeMs > 0 && m.initialRenderTimeMs < 0.1
+      ? m.initialRenderTimeMs.toFixed(3)
+      : m.initialRenderTimeMs.toFixed(2);
+    kpiInitialTime.innerHTML = `${initStr} <span class="kpi-unit">ms</span>`;
   }
 
   const kpiBudget = document.getElementById('kpi-render-budget');
   if (kpiBudget) {
     if (m.initialRenderTimeMs < 16.6) {
       kpiBudget.className = 'budget-pill pill-pass';
-      kpiBudget.textContent = `⚡ Fast (${m.initialRenderTimeMs}ms < 16.6ms 60FPS)`;
+      kpiBudget.textContent = `⚡ Fast (${formatMs(m.initialRenderTimeMs, false)} < 16.6ms 60FPS)`;
     } else {
       kpiBudget.className = 'budget-pill';
       kpiBudget.style.background = 'var(--status-orange-bg)';
       kpiBudget.style.color = 'var(--status-orange)';
-      kpiBudget.textContent = `⚠️ Heavy (${m.initialRenderTimeMs}ms > 16.6ms)`;
+      kpiBudget.textContent = `⚠️ Heavy (${formatMs(m.initialRenderTimeMs, false)} > 16.6ms)`;
     }
   }
 
   // 2. KPI 2: Update Latency
   const kpiUpdateTime = document.getElementById('kpi-update-time');
   if (kpiUpdateTime) {
-    kpiUpdateTime.innerHTML = `${effectiveAvgUpdateMs.toFixed(2)} <span class="kpi-unit">ms</span>`;
+    const avgStr = effectiveAvgUpdateMs > 0 && effectiveAvgUpdateMs < 0.1
+      ? effectiveAvgUpdateMs.toFixed(3)
+      : effectiveAvgUpdateMs.toFixed(2);
+    kpiUpdateTime.innerHTML = `${avgStr} <span class="kpi-unit">ms</span>`;
   }
 
   const kpiUpdateSubtext = document.getElementById('kpi-update-subtext');
   if (kpiUpdateSubtext) {
     if (useSessionData && recSession.updates.length > 0) {
-      kpiUpdateSubtext.textContent = `Last update: ${recSession.updates[0].durationMs.toFixed(2)} ms (Session)`;
+      kpiUpdateSubtext.textContent = `Last update: ${formatMs(recSession.updates[0].durationMs, true)} (Session)`;
     } else {
-      kpiUpdateSubtext.textContent = `Last update: ${m.lastUpdateTimeMs.toFixed(2)} ms`;
+      kpiUpdateSubtext.textContent = `Last update: ${formatMs(m.lastUpdateTimeMs, true)}`;
     }
   }
 
   const kpiMinMax = document.getElementById('kpi-minmax-time');
   if (kpiMinMax) {
-    kpiMinMax.textContent = `Min: ${effectiveMinMs.toFixed(2)}ms • Max: ${effectiveMaxMs.toFixed(2)}ms`;
+    kpiMinMax.textContent = `Min: ${formatMs(effectiveMinMs, false)} • Max: ${formatMs(effectiveMaxMs, false)}`;
   }
 
   // 3. KPI 3: Updates Processed & Duration
@@ -1493,8 +1536,8 @@ function renderMetricsView() {
   const kpiTotalTime = document.getElementById('kpi-total-time');
   if (kpiTotalTime) {
     kpiTotalTime.textContent = useSessionData
-      ? `Session update time: ${effectiveTotalMs.toFixed(2)} ms`
-      : `Total update time: ${effectiveTotalMs.toFixed(2)} ms`;
+      ? `Session update time: ${formatMs(effectiveTotalMs, true)}`
+      : `Total update time: ${formatMs(effectiveTotalMs, true)}`;
   }
 
   const kpiRenderCount = document.getElementById('kpi-render-count');
@@ -1512,27 +1555,58 @@ function renderMetricsView() {
   if (tbody) {
     tbody.innerHTML = '';
     const rows = [];
+    const sessionItemStats = (useSessionData && recSession && recSession.itemStats) ? recSession.itemStats : {};
+    const addedItemNames = new Set();
 
     comp.signals.forEach((sig) => {
+      addedItemNames.add(sig.name);
+      const sStat = sessionItemStats[sig.name];
+      const updates = sStat ? sStat.updates : (sig.updateCount || 0);
+      const lastMs = sStat ? sStat.lastMs : (sig.lastUpdateDurationMs || 0);
+      const avgMs = sStat ? sStat.avgMs : (sig.avgUpdateDurationMs || 0);
+      const totalMs = sStat ? sStat.totalMs : (sig.totalUpdateDurationMs || 0);
+
       rows.push({
         name: sig.name,
         type: sig.type,
-        updates: sig.updateCount || 0,
-        lastRun: sig.lastUpdateDurationMs ? `${sig.lastUpdateDurationMs.toFixed(2)}ms` : '0.00ms',
-        avgDuration: sig.avgUpdateDurationMs ? `${sig.avgUpdateDurationMs.toFixed(2)}ms` : '0.00ms',
-        totalTime: sig.totalUpdateDurationMs ? `${sig.totalUpdateDurationMs.toFixed(2)}ms` : '0.00ms',
+        updates,
+        lastRun: formatMs(lastMs, false),
+        avgDuration: formatMs(avgMs, false),
+        totalTime: formatMs(totalMs, false),
       });
     });
 
     comp.effects.forEach((eff) => {
+      addedItemNames.add(eff.description);
+      const sStat = sessionItemStats[eff.description];
+      const updates = sStat ? sStat.updates : (eff.executionCount || 1);
+      const lastMs = sStat ? sStat.lastMs : (eff.lastDurationMs || 0);
+      const avgMs = sStat ? sStat.avgMs : (eff.avgDurationMs || 0);
+      const totalMs = sStat ? sStat.totalMs : (eff.totalDurationMs || 0);
+
       rows.push({
         name: eff.description,
         type: 'effect',
-        updates: eff.executionCount || 1,
-        lastRun: eff.lastDurationMs ? `${eff.lastDurationMs.toFixed(2)}ms` : '0.00ms',
-        avgDuration: eff.avgDurationMs ? `${eff.avgDurationMs.toFixed(2)}ms` : '0.00ms',
-        totalTime: eff.totalDurationMs ? `${eff.totalDurationMs.toFixed(2)}ms` : '0.00ms',
+        updates,
+        lastRun: formatMs(lastMs, false),
+        avgDuration: formatMs(avgMs, false),
+        totalTime: formatMs(totalMs, false),
       });
+    });
+
+    // Also include any session-recorded triggers not in the static signal/effect list (e.g. DOM Text Update, service signals, child widget updates)
+    Object.keys(sessionItemStats).forEach((itemName) => {
+      if (!addedItemNames.has(itemName)) {
+        const sStat = sessionItemStats[itemName];
+        rows.push({
+          name: itemName,
+          type: itemName.startsWith('DOM ') || itemName.includes('render') ? 'render' : 'signal',
+          updates: sStat.updates || 0,
+          lastRun: formatMs(sStat.lastMs || 0, false),
+          avgDuration: formatMs(sStat.avgMs || 0, false),
+          totalTime: formatMs(sStat.totalMs || 0, false),
+        });
+      }
     });
 
     if (countBadge) countBadge.textContent = `${rows.length} tracked`;
@@ -1549,7 +1623,7 @@ function renderMetricsView() {
 
         const tdType = document.createElement('td');
         const pill = document.createElement('span');
-        pill.className = `sig-type-pill ${r.type === 'computed' ? 'sig-computed' : r.type === 'effect' ? 'badge-green' : 'sig-signal'}`;
+        pill.className = `sig-type-pill ${r.type === 'computed' ? 'sig-computed' : r.type === 'effect' || r.type === 'render' ? 'badge-green' : 'sig-signal'}`;
         pill.textContent = r.type;
         tdType.appendChild(pill);
 
@@ -1611,7 +1685,7 @@ function renderMetricsView() {
 
         const durSpan = document.createElement('span');
         durSpan.className = 'timeline-duration';
-        durSpan.textContent = `${item.durationMs.toFixed(2)} ms`;
+        durSpan.textContent = formatMs(item.durationMs, true);
 
         row.appendChild(left);
         row.appendChild(durSpan);
