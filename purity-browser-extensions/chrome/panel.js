@@ -348,14 +348,14 @@ function showProductionModeState(data) {
   const badge = document.getElementById('app-badge');
   if (badge) {
     badge.className = 'badge badge-prod';
-    badge.textContent = `Purity ${data.version || '2.1.0'} • Production Mode`;
+    badge.textContent = `Purity ${data.version || '2.1.1'} • Production Mode`;
   }
 
   const prodName = document.getElementById('prod-app-name');
   if (prodName) prodName.textContent = data.appName || 'Purity';
 
   const prodVer = document.getElementById('prod-app-version');
-  if (prodVer) prodVer.textContent = `v${data.version || '2.1.0'}`;
+  if (prodVer) prodVer.textContent = `v${data.version || '2.1.1'}`;
 
   document.getElementById('nav-tabs')?.classList.add('hidden');
   document.getElementById('view-not-detected')?.classList.add('hidden');
@@ -370,7 +370,7 @@ function showDetectedState(data) {
   const badge = document.getElementById('app-badge');
   if (badge) {
     badge.className = 'badge badge-success';
-    badge.textContent = `Purity ${data.version || '2.1.0'} • Dev Mode`;
+    badge.textContent = `Purity ${data.version || '2.1.1'} • Dev Mode`;
   }
 
   document.getElementById('nav-tabs')?.classList.remove('hidden');

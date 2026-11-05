@@ -16,7 +16,7 @@ import { registerPrompts } from './prompts/index.js';
 export function createPurityMcpServer(): McpServer {
   const server = new McpServer({
     name: 'purity-mcp',
-    version: '2.1.0',
+    version: '2.1.1',
   });
 
   // Tool 1: purity_scaffold

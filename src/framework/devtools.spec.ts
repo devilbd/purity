@@ -98,7 +98,7 @@ describe('Purity DevTools Inspector', () => {
         const snapshot = inspectPurityApp();
         expect(snapshot.detected).toBe(true);
         expect(snapshot.framework).toBe('Purity');
-        expect(snapshot.version).toBe('2.1.0');
+        expect(snapshot.version).toBe('2.1.1');
         expect(Array.isArray(snapshot.components)).toBe(true);
         expect(Array.isArray(snapshot.services)).toBe(true);
     });
@@ -130,7 +130,7 @@ describe('Purity DevTools Inspector', () => {
             environment: {
                 production: true,
                 enableDebugTools: false,
-                version: '2.1.0',
+                version: '2.1.1',
             },
         };
 

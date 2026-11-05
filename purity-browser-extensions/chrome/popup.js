@@ -64,7 +64,7 @@ async function checkPurityStatus() {
     } else if (data.productionMode) {
       if (badge) {
         badge.className = 'badge badge-danger';
-        badge.textContent = `Purity ${data.version || '2.1.0'} • Prod Mode`;
+        badge.textContent = `Purity ${data.version || '2.1.1'} • Prod Mode`;
       }
       if (statusText) {
         statusText.textContent = 'Production mode detected. Purity DevTools cannot be used in production mode — the tool is viable only in Development Mode.';
@@ -76,7 +76,7 @@ async function checkPurityStatus() {
     } else {
       if (badge) {
         badge.className = 'badge badge-success';
-        badge.textContent = `Purity ${data.version || '2.1.0'} • Dev Mode`;
+        badge.textContent = `Purity ${data.version || '2.1.1'} • Dev Mode`;
       }
       if (statusText) {
         statusText.textContent = `Purity is active in Development Mode! Open Developer Tools to inspect components, services, and reactivity.`;

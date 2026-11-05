@@ -718,7 +718,7 @@ export function inspectPurityApp(): PurityInspectionSnapshot {
             devMode: false,
             message: 'Purity DevTools cannot be used on production mode builds. The tool is viable only in development mode (production: false).',
             framework: 'Purity',
-            version: appEnv?.version || '2.1.0',
+            version: appEnv?.version || '2.1.1',
             timestamp: Date.now(),
             components: [],
             services: [],
@@ -736,7 +736,7 @@ export function inspectPurityApp(): PurityInspectionSnapshot {
         productionMode: false,
         devMode: true,
         framework: 'Purity',
-        version: appEnv?.version || '2.1.0',
+        version: appEnv?.version || '2.1.1',
         timestamp: Date.now(),
         components,
         services,
@@ -829,7 +829,7 @@ export function benchmarkComponentUpdate(componentName: string) {
 export function createDevTools() {
     return {
         isPurity: true,
-        version: '2.1.0',
+        version: '2.1.1',
         isProductionMode,
         getComponents: getComponentsInspection,
         getServices: getServicesInspection,
