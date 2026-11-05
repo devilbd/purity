@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purity Inspector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="inspector-app">
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="brand">
+        <img src="icons/icon-48.png" alt="Purity" class="brand-logo">
+        <div class="brand-text">
+          <span class="brand-title">Purity Inspector</span>
+          <span id="app-badge" class="badge badge-checking">Checking...</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-refresh" class="btn-icon" title="Refresh Application State" type="button">
+          <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-1.19"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Tab Bar -->
+    <nav id="nav-tabs" class="tab-bar">
+      <button id="tab-btn-components" class="tab-btn active" type="button">
+        <span class="tab-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+        </span>
+        <span class="tab-label">Components</span>
+        <span id="badge-comp-count" class="tab-badge">0</span>
+      </button>
+
+      <button id="tab-btn-services" class="tab-btn" type="button">
+        <span class="tab-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </span>
+        <span class="tab-label">Services</span>
+        <span id="badge-serv-count" class="tab-badge">0</span>
+      </button>
+    </nav>
+
+    <!-- Main Views Container -->
+    <main class="inspector-main">
+      <!-- 1. Not Detected State -->
+      <section id="view-not-detected" class="view-panel empty-state">
+        <div class="empty-icon-wrap">
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h2 class="empty-title">No Purity Application Detected</h2>
+        <p class="empty-desc">
+          The active tab does not appear to be running a Purity application.
+          Please open or navigate to a Purity frontend app and refresh.
+        </p>
+        <button id="btn-retry-detect" class="btn-primary" type="button">
+          Check Page Again
+        </button>
+      </section>
+
+      <!-- 2. Components Tab View -->
+      <section id="view-components" class="view-panel split-view">
+        <!-- Master Pane -->
+        <aside class="master-pane">
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="comp-search-input" type="text" placeholder="Filter components..." class="search-input">
+          </div>
+          <div id="comp-items-list" class="items-list scrollable">
+            <!-- Dynamic Component Items -->
+          </div>
+        </aside>
+
+        <!-- Detail Pane -->
+        <section id="comp-detail-pane" class="detail-pane scrollable">
+          <div id="comp-detail-empty" class="detail-placeholder">
+            <span>Select a component to inspect its services, signals, and effects.</span>
+          </div>
+          <div id="comp-detail-content" class="detail-content hidden">
+            <!-- Header -->
+            <div class="detail-header">
+              <div class="detail-title-group">
+                <h3 id="comp-detail-name" class="detail-name">ComponentName</h3>
+                <span id="comp-detail-selector" class="code-badge">&lt;tag&gt;</span>
+              </div>
+              <span id="comp-detail-count" class="pill-badge pill-info">1 in DOM</span>
+            </div>
+
+            <!-- Services Section -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <span class="section-title">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  Injected Services (@Injectable)
+                </span>
+                <span id="comp-services-count" class="tab-badge">0</span>
+              </div>
+              <div id="comp-services-list" class="sub-items-grid">
+                <!-- Injected Services list -->
+              </div>
+            </div>
+
+            <!-- Signals Section -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <span class="section-title">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  Signals & Computed
+                </span>
+                <span id="comp-signals-count" class="tab-badge">0</span>
+              </div>
+              <div id="comp-signals-list" class="sub-items-table">
+                <!-- Signals list -->
+              </div>
+            </div>
+
+            <!-- Effects Section -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <span class="section-title">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                  </svg>
+                  Reactive Effects & Directives
+                </span>
+                <span id="comp-effects-count" class="tab-badge">0</span>
+              </div>
+              <div id="comp-effects-list" class="sub-items-list">
+                <!-- Effects list -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <!-- 3. Services Tab View -->
+      <section id="view-services" class="view-panel split-view hidden">
+        <!-- Master Pane -->
+        <aside class="master-pane">
+          <div class="search-box">
+            <svg class="search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="serv-search-input" type="text" placeholder="Filter services..." class="search-input">
+          </div>
+          <div id="serv-items-list" class="items-list scrollable">
+            <!-- Dynamic Services list -->
+          </div>
+        </aside>
+
+        <!-- Detail Pane -->
+        <section id="serv-detail-pane" class="detail-pane scrollable">
+          <div id="serv-detail-empty" class="detail-placeholder">
+            <span>Select a service to inspect its dependencies and dependents.</span>
+          </div>
+          <div id="serv-detail-content" class="detail-content hidden">
+            <!-- Header -->
+            <div class="detail-header">
+              <div class="detail-title-group">
+                <h3 id="serv-detail-name" class="detail-name">ServiceName</h3>
+                <span class="pill-badge pill-purple">@Injectable</span>
+              </div>
+              <span class="pill-badge pill-info">Singleton</span>
+            </div>
+
+            <!-- Service Dependencies Section -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <span class="section-title">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                  Service Dependencies (Depends On)
+                </span>
+                <span id="serv-deps-count" class="tab-badge">0</span>
+              </div>
+              <div id="serv-deps-list" class="sub-items-grid">
+                <!-- Other services it depends on -->
+              </div>
+            </div>
+
+            <!-- Service Dependents Section -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <span class="section-title">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <polyline points="9 21 3 21 3 15"></polyline>
+                    <line x1="21" y1="3" x2="14" y2="10"></line>
+                    <line x1="3" y1="21" x2="10" y2="14"></line>
+                  </svg>
+                  Depended On By (Used By)
+                </span>
+                <span id="serv-dependents-count" class="tab-badge">0</span>
+              </div>
+              <div id="serv-dependents-list" class="sub-items-grid">
+                <!-- Components or services that inject this service -->
+              </div>
+            </div>
+
+            <!-- Service Signals Section -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <span class="section-title">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  Service Signals
+                </span>
+                <span id="serv-signals-count" class="tab-badge">0</span>
+              </div>
+              <div id="serv-signals-list" class="sub-items-table">
+                <!-- Signals owned by this service -->
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="inspector.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

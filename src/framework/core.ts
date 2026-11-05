@@ -8,6 +8,14 @@ export type ReadonlySignal<T> = () => T;
 export type ComputedSignal<T> = ReadonlySignal<T>;
 
 const context: Function[] = [];
+let activeComponentEffects: Function[] | null = null;
+
+/**
+ * Sets the active array collecting component effects during bindTemplate and onInit.
+ */
+export const setActiveComponentEffects = (effects: Function[] | null): void => {
+    activeComponentEffects = effects;
+};
 
 /**
  * Reactivity Primitives
@@ -22,6 +30,9 @@ export const signal = <T>(initialValue: T): Signal<T> => {
         return value;
     }) as Signal<T>;
 
+    (getter as any).__purity_signal = true;
+    (getter as any).__purity_type = 'signal';
+
     getter.set = (nextValue: T) => {
         if (Object.is(value, nextValue)) return;
         value = nextValue;
@@ -35,7 +46,11 @@ export const signal = <T>(initialValue: T): Signal<T> => {
     return getter;
 };
 
-export const effect = (fn: Function): (() => void) => {
+export interface EffectOptions {
+    description?: string;
+}
+
+export const effect = (fn: Function, options?: EffectOptions | string): (() => void) => {
     let active = true;
     const execute = () => {
         if (!active) return;
@@ -46,7 +61,18 @@ export const effect = (fn: Function): (() => void) => {
             context.pop();
         }
     };
+
+    const desc = typeof options === 'string' ? options : options?.description;
+    if (desc) {
+        (execute as any).description = desc;
+    }
+
     execute();
+
+    if (activeComponentEffects) {
+        activeComponentEffects.push(execute);
+    }
+
     return () => {
         active = false;
     };
@@ -78,7 +104,11 @@ export const computed = <T>(fn: () => T): ReadonlySignal<T> => {
         internalSignal.set(fn());
     });
 
-    return (() => internalSignal()) as ReadonlySignal<T>;
+    const computedGetter = (() => internalSignal()) as ReadonlySignal<T>;
+    (computedGetter as any).__purity_computed = true;
+    (computedGetter as any).__purity_type = 'computed';
+
+    return computedGetter;
 };
 
 /**

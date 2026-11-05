@@ -1,4 +1,5 @@
-import { effect, untrack } from './core';
+import { effect, untrack, setActiveComponentEffects } from './core';
+import { container } from './di';
 import { bindDirectives } from './directive';
 import { bindValidators } from './validator';
 import { executePipe } from './pipe';
@@ -14,7 +15,7 @@ export interface ComponentOptions {
 
 const templateCache = new Map<string, string>();
 const expressionCache = new Map<string, Function>();
-export const componentRegistry = new Map<string, any>();
+export const componentRegistry: Map<string, any> = ((globalThis as any).__PURITY_COMPONENT_REGISTRY__ ??= new Map<string, any>());
 
 /**
  * Transforms template pipe expressions (e.g. `value | myPipe: true : arg2`)
@@ -290,7 +291,15 @@ export function mountComponentOnElement(el: HTMLElement, ComponentClass: any): v
 
     const activeTarget = (ComponentClass as any).__target || ComponentClass;
     if (typeof activeTarget === 'function') {
-        const userInstance = new (activeTarget as any)();
+        const compName = activeTarget.name || ComponentClass.name || 'Component';
+        container.setCurrentComponent(compName);
+        let userInstance: any;
+        try {
+            userInstance = new (activeTarget as any)();
+        } finally {
+            container.setCurrentComponent(null);
+        }
+        (el as any).__purity_component_name = compName;
         const frameworkProtectedMethods = new Set([
             'render',
             'connectedCallback',
@@ -812,7 +821,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
 
             effect(() => {
                 dynamicNode.nodeValue = evaluateExpression(expr, context);
-            });
+            }, `Text Binding: {{ ${expr} }}`);
 
             lastIndex = match.index + match[0].length;
         }
@@ -876,7 +885,7 @@ function bindTemplateTree(rootEl: HTMLElement, context: any, componentInstance: 
                     untrack(() => {
                         applyBoundAttribute(el, attrName, replaced);
                     });
-                });
+                }, `Attribute [${attrName}]: "${rawValue}"`);
             }
         }
     }
@@ -1066,8 +1075,20 @@ function attachComponentLifecycle(proto: any, options: ComponentOptions) {
             }
         }
 
-        this.bindTemplate?.();
-        this.onInit?.();
+        const compEffects: Function[] = [];
+        this.__purity_effects = compEffects;
+        setActiveComponentEffects(compEffects);
+        try {
+            this.bindTemplate?.();
+            this.onInit?.();
+            for (const eff of compEffects) {
+                if (!(eff as any).description) {
+                    (eff as any).description = 'Lifecycle Effect (onInit)';
+                }
+            }
+        } finally {
+            setActiveComponentEffects(null);
+        }
     };
 
     proto.disconnectedCallback = function (this: any) {
@@ -1166,7 +1187,15 @@ export function Component(selectorOrOptions?: string | ComponentOptions): any {
                     super();
 
                     const activeTarget = (this.constructor as any).__target || target;
-                    const userInstance = new (activeTarget as any)();
+                    const compName = activeTarget.name || target.name || 'Component';
+                    container.setCurrentComponent(compName);
+                    let userInstance: any;
+                    try {
+                        userInstance = new (activeTarget as any)();
+                    } finally {
+                        container.setCurrentComponent(null);
+                    }
+                    (this as any).__purity_component_name = compName;
 
                     const frameworkProtectedMethods = new Set([
                         'render',
@@ -1324,13 +1353,14 @@ function applyViewChild(target: any, propertyKey: string, explicitSelector?: str
 
 export const ChildView = ViewChild;
 
-export const defineComponent = (name: string, component: any) => {
+export function defineComponent(name: string, component: any): void {
     if (typeof customElements === 'undefined') return;
     const lower = name.toLowerCase();
-    componentRegistry.set(lower, component);
+    const registry: Map<string, any> = ((globalThis as any).__PURITY_COMPONENT_REGISTRY__ ??= new Map<string, any>());
+    registry.set(lower, component);
     const validName = name.includes('-') ? name : `${name}-component`;
     if (!name.includes('-')) {
-        componentRegistry.set(validName.toLowerCase(), component);
+        registry.set(validName.toLowerCase(), component);
     }
     if (!customElements.get(validName)) {
         try {
@@ -1341,4 +1371,4 @@ export const defineComponent = (name: string, component: any) => {
     } else {
         console.error(`Component ${validName} is already defined`);
     }
-};
+}
