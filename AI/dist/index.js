@@ -35,7 +35,7 @@ Transport:
     process.exit(0);
 }
 if (args.includes('--version') || args.includes('-v')) {
-    process.stderr.write(`purity-mcp v1.0.0\n`);
+    process.stderr.write(`purity-mcp v2.0.1\n`);
     process.exit(0);
 }
 async function main() {
