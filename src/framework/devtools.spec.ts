@@ -98,7 +98,7 @@ describe('Purity DevTools Inspector', () => {
         const snapshot = inspectPurityApp();
         expect(snapshot.detected).toBe(true);
         expect(snapshot.framework).toBe('Purity');
-        expect(snapshot.version).toBe('2.0.2');
+        expect(snapshot.version).toBe('2.1.0');
         expect(Array.isArray(snapshot.components)).toBe(true);
         expect(Array.isArray(snapshot.services)).toBe(true);
     });

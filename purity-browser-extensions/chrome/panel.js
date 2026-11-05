@@ -327,7 +327,7 @@ function showDetectedState(data) {
   const badge = document.getElementById('app-badge');
   if (badge) {
     badge.className = 'badge badge-success';
-    badge.textContent = `Purity ${data.version || '2.0.2'}`;
+    badge.textContent = `Purity ${data.version || '2.1.0'}`;
   }
 
   document.getElementById('nav-tabs')?.classList.remove('hidden');

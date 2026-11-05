@@ -59,7 +59,7 @@ async function checkPurityStatus() {
     } else {
       if (badge) {
         badge.className = 'badge badge-success';
-        badge.textContent = `Purity ${data.version || '2.0.2'}`;
+        badge.textContent = `Purity ${data.version || '2.1.0'}`;
       }
       if (statusText) {
         statusText.textContent = `Purity is active! Open Developer Tools to inspect components, services, and reactivity.`;

@@ -40,7 +40,7 @@ Transport:
 }
 
 if (args.includes('--version') || args.includes('-v')) {
-  process.stderr.write(`purity-mcp v2.0.2\n`);
+  process.stderr.write(`purity-mcp v2.1.0\n`);
   process.exit(0);
 }
 

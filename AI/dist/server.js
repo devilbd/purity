@@ -10,7 +10,7 @@ import { registerPrompts } from './prompts/index.js';
 export function createPurityMcpServer() {
     const server = new McpServer({
         name: 'purity-mcp',
-        version: '2.0.2',
+        version: '2.1.0',
     });
     // Tool 1: purity_scaffold
     server.tool('purity_scaffold', 'Scaffolds production-ready Purity framework artifacts (components, services, pipes, directives, validators, interceptors, behaviors, pages) with 100% adherence to Adwaita design system and Vitest unit tests', scaffoldSchema, async (params) => {

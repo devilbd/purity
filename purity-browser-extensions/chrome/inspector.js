@@ -1099,7 +1099,7 @@ function inspectPurityAppInPage() {
   return {
     detected: true,
     framework: 'Purity',
-    version: appRef?.environment?.version || '2.0.2',
+    version: appRef?.environment?.version || '2.1.0',
     appName: appRef?.environment?.appName || 'Purity App',
     components,
     services,

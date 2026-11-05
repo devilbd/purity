@@ -679,7 +679,7 @@ export function inspectPurityApp(): PurityInspectionSnapshot {
     return {
         detected: true,
         framework: 'Purity',
-        version: '2.0.2',
+        version: '2.1.0',
         timestamp: Date.now(),
         components,
         services,
@@ -769,7 +769,7 @@ export function benchmarkComponentUpdate(componentName: string) {
 export function createDevTools() {
     return {
         isPurity: true,
-        version: '2.0.2',
+        version: '2.1.0',
         getComponents: getComponentsInspection,
         getServices: getServicesInspection,
         getReactivity: () => getReactivityGraph(getComponentsInspection(), getServicesInspection()),
