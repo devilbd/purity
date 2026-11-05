@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purity Inspector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body class="launcher-body">
+  <div class="launcher-card">
+    <div class="launcher-header">
+      <img src="icons/icon-48.png" alt="Purity" class="brand-logo">
+      <div class="launcher-brand">
+        <h3 class="launcher-title">Purity DevTools</h3>
+        <span id="app-badge" class="badge badge-checking">Checking...</span>
+      </div>
+    </div>
+
+    <div class="launcher-body-content">
+      <p id="launcher-status" class="launcher-status">
+        Purity DevTools is integrated directly into Firefox Developer Tools.
+      </p>
+
+      <div id="launcher-actions" class="launcher-actions">
+        <button id="btn-open-browser-tab" class="btn-launcher-primary" type="button">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          Open in New Browser Tab
+        </button>
+      </div>
+
+      <div id="launcher-prod-notice" class="launcher-prod-box hidden">
+        <div class="prod-box-title">🔒 Production Mode Disabled</div>
+        <div class="prod-box-desc">
+          Purity DevTools cannot be used in production mode. Run your app in development mode (<code>npm run dev</code> or <code>production: false</code>) to use the inspector.
+        </div>
+      </div>
+
+      <div id="launcher-instructions" class="launcher-instruction-box">
+        <div class="step-row">
+          <span class="step-num">1</span>
+          <span>Press <kbd>F12</kbd> (or right-click ➔ <strong>Inspect</strong>)</span>
+        </div>
+        <div class="step-row">
+          <span class="step-num">2</span>
+          <span>Select the <strong>Purity</strong> tab in Developer Tools</span>
+        </div>
+      </div>
+
+      <div id="launcher-app-info" class="launcher-meta hidden">
+        <div class="meta-item">
+          <span class="meta-label">Components</span>
+          <span id="meta-comps-count" class="meta-value">0</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Services</span>
+          <span id="meta-servs-count" class="meta-value">0</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Reactivity</span>
+          <span id="meta-react-count" class="meta-value">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="inspector.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

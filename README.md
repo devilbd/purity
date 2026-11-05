@@ -49,7 +49,7 @@
 - 🧭 **Draggable Floating Navigation Menu (`<navigation-menu>`)**: Floating draggable orb with glassmorphic styling, hover drag handle, and integrated radial context menu for app-wide section and subsection navigation.
 - 🗺️ **Signal Router & Layout Engine (`router.ts`, `<router-layout>`)**: Native type-safe routing engine supporting dynamic parameters (`:id`), query strings (`?tab=...`), route guards (`canActivate`), programmatic navigation (`Router.navigate`), `<router-layout>` subview host, and `routerLink` directive with automated `.active-link` state management.
 - 🔎 **SEO & Head Metadata Engine (`SeoService`, `MetaService`)**: Dynamic `<title>`, `<meta>` tags, OpenGraph social sharing cards, Twitter Cards, Schema.org JSON-LD structured data, crawler-friendly noscript fallbacks, XML sitemaps, robots directives, and automated Router SEO synchronization for SPAs.
-- 🛠️ **Chrome DevTools Extension (`Purity Inspector`)**: Dedicated Manifest V3 browser extension integrating directly into Chrome Developer Tools to inspect component trees, Dependency Injection, live signals & computeds, interactive reactivity graphs, and microsecond update latency profiling. See [Chrome Extension README](purity-browser-extensions/chrome/README.md).
+- 🛠️ **Browser DevTools Extensions (`Purity Inspector`)**: Dedicated Manifest V3 browser extensions for **Google Chrome** and **Mozilla Firefox** integrating directly into Developer Tools to inspect component trees, Dependency Injection, live signals & computeds, interactive reactivity graphs, and microsecond update latency profiling. See [Chrome Extension README](purity-browser-extensions/chrome/README.md) and [Mozilla Extension README](purity-browser-extensions/mozilla/README.md).
 - 🚀 **Application Bootstrapping & Environment Profiles**: Clean `bootstrapApplication()` API with DI integration and separate build environment files (`environment.ts`, `environment.prod.ts`) swapped seamlessly by Vite.
 - 🎨 **GNOME Adwaita Design**: Modern, translucent glassmorphic design system built with SCSS.
 
@@ -94,8 +94,9 @@ purity/
 ├── scripts/                     # Automation & deployment scripts
 │   ├── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
 │   └── run-tests.sh             # High-resolution test discovery, telemetry & execution runner
-├── purity-browser-extensions/   # Official browser DevTools extensions (Chrome Manifest V3)
-│   └── chrome/                  # Purity Inspector Chrome DevTools extension
+├── purity-browser-extensions/   # Official browser DevTools extensions (Chrome & Mozilla Manifest V3)
+│   ├── chrome/                  # Purity Inspector Chrome DevTools extension
+│   └── mozilla/                 # Purity Inspector Mozilla Firefox DevTools extension
 ├── index.html                   # HTML entry point mounting <app-component> with rich SEO & JSON-LD
 ├── package.json                 # Dependencies & scripts
 ├── tsconfig.json                # Strict TypeScript configuration

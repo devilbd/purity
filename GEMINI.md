@@ -38,8 +38,9 @@ purity/
 ├── scripts/                     # Automation & deployment scripts
 │   ├── build-and-deploy.sh      # Automated build, verification & Firebase deployment script
 │   └── run-tests.sh             # High-resolution test discovery, telemetry & execution runner
-├── purity-browser-extensions/   # Official browser DevTools extensions (Chrome Manifest V3)
-│   └── chrome/                  # Purity Inspector Chrome DevTools extension
+├── purity-browser-extensions/   # Official browser DevTools extensions (Chrome & Mozilla Manifest V3)
+│   ├── chrome/                  # Purity Inspector Chrome DevTools extension
+│   └── mozilla/                 # Purity Inspector Mozilla Firefox DevTools extension
 ├── index.html                   # Application entry HTML mounting <app-component> with rich SEO & JSON-LD
 ├── package.json                 # Project dependencies, scripts (Vite + TypeScript + Sass)
 ├── tsconfig.json                # Strict TypeScript configuration
