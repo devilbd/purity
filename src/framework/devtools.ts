@@ -5,6 +5,8 @@ export interface SignalInfo {
     type: 'signal' | 'computed';
     value: any;
     isWritable: boolean;
+    subscribersCount?: number;
+    subscribers?: string[];
 }
 
 export interface ServiceUsageInfo {
@@ -16,6 +18,7 @@ export interface EffectInfo {
     id: string;
     description: string;
     active: boolean;
+    dependencies?: string[];
 }
 
 export interface ComponentInspection {
@@ -36,6 +39,17 @@ export interface ServiceInspection {
     signals: SignalInfo[];
 }
 
+export interface ReactiveLink {
+    id: string;
+    signalName: string;
+    signalType: 'signal' | 'computed';
+    signalValue: any;
+    source: string; // Component or Service name
+    effectId: string;
+    effectDescription: string;
+    targetComponent: string;
+}
+
 export interface PurityInspectionSnapshot {
     detected: boolean;
     framework: string;
@@ -43,6 +57,7 @@ export interface PurityInspectionSnapshot {
     timestamp: number;
     components: ComponentInspection[];
     services: ServiceInspection[];
+    reactivityGraph: ReactiveLink[];
 }
 
 /**
@@ -89,7 +104,7 @@ function serializeValue(val: any, depth = 0): any {
 /**
  * Inspects an object (component or service) to discover signals and their current values.
  */
-function extractSignalsFromObject(target: any): SignalInfo[] {
+function extractSignalsFromObject(target: any, ownerName = 'Unknown'): SignalInfo[] {
     if (!target || typeof target !== 'object') return [];
     const signals: SignalInfo[] = [];
     const visited = new Set<string>();
@@ -117,11 +132,30 @@ function extractSignalsFromObject(target: any): SignalInfo[] {
                     currentVal = `[Error evaluating: ${String(err)}]`;
                 }
 
+                // Tag signal with metadata for reactive relationship discovery
+                try {
+                    (val as any).__purity_name = propKey;
+                    (val as any).__purity_owner = ownerName;
+                } catch {}
+
+                const subscribers: string[] = [];
+                const subsSet: Set<any> | undefined = (val as any).subscriptions;
+                if (subsSet && typeof subsSet.forEach === 'function') {
+                    subsSet.forEach((eff: any) => {
+                        const effDesc =
+                            eff.description ||
+                            (eff.name && eff.name !== 'execute' ? eff.name : 'Reactive Effect');
+                        subscribers.push(effDesc);
+                    });
+                }
+
                 signals.push({
                     name: propKey,
                     type: isComputed ? 'computed' : 'signal',
                     value: currentVal,
                     isWritable: isSignal && !isComputed,
+                    subscribersCount: subscribers.length,
+                    subscribers,
                 });
             }
         }
@@ -245,18 +279,32 @@ export function getComponentsInspection(): ComponentInspection[] {
         }
 
         // Scan signals
-        const signals = sampleEl ? extractSignalsFromObject(sampleEl) : [];
+        const signals = sampleEl ? extractSignalsFromObject(sampleEl, name) : [];
 
-        // Scan effects
+        // Scan effects and their dependencies
         const effects: EffectInfo[] = [];
         if (sampleEl) {
             const rawEffects: Function[] = (sampleEl as any).__purity_effects || [];
             rawEffects.forEach((eff, idx) => {
-                const desc = (eff as any).description || (eff.name && eff.name !== 'execute' ? `Reactive Effect (${eff.name})` : `Reactive Effect #${idx + 1}`);
+                const desc =
+                    (eff as any).description ||
+                    (eff.name && eff.name !== 'execute' ? `Reactive Effect (${eff.name})` : `Reactive Effect #${idx + 1}`);
+
+                const deps: string[] = [];
+                const depSet: Set<any> | undefined = (eff as any).__dependencies;
+                if (depSet && typeof depSet.forEach === 'function') {
+                    depSet.forEach((sig) => {
+                        if (sig && sig.__purity_name) {
+                            deps.push(sig.__purity_name);
+                        }
+                    });
+                }
+
                 effects.push({
                     id: `effect-${idx + 1}`,
                     description: desc,
                     active: true,
+                    dependencies: deps,
                 });
             });
 
@@ -339,7 +387,7 @@ export function getServicesInspection(): ServiceInspection[] {
             }
         }
 
-        const signals = instance ? extractSignalsFromObject(instance) : [];
+        const signals = instance ? extractSignalsFromObject(instance, name) : [];
 
         serviceMap.set(name, {
             name,
@@ -354,11 +402,162 @@ export function getServicesInspection(): ServiceInspection[] {
 }
 
 /**
+ * Builds the visual reactivity relationship graph linking signals to their subscribed effects.
+ */
+export function getReactivityGraph(
+    components: ComponentInspection[],
+    services: ServiceInspection[],
+): ReactiveLink[] {
+    const links: ReactiveLink[] = [];
+    const seen = new Set<string>();
+
+    // Map all signals by name and source
+    const signalLookup = new Map<string, { type: 'signal' | 'computed'; value: any; source: string }>();
+
+    for (const comp of components) {
+        for (const sig of comp.signals) {
+            signalLookup.set(`${comp.name}.${sig.name}`, {
+                type: sig.type,
+                value: sig.value,
+                source: comp.name,
+            });
+            // Also store unqualified for local component lookups
+            if (!signalLookup.has(sig.name)) {
+                signalLookup.set(sig.name, {
+                    type: sig.type,
+                    value: sig.value,
+                    source: comp.name,
+                });
+            }
+        }
+    }
+
+    for (const serv of services) {
+        for (const sig of serv.signals) {
+            signalLookup.set(`${serv.name}.${sig.name}`, {
+                type: sig.type,
+                value: sig.value,
+                source: serv.name,
+            });
+            if (!signalLookup.has(sig.name)) {
+                signalLookup.set(sig.name, {
+                    type: sig.type,
+                    value: sig.value,
+                    source: serv.name,
+                });
+            }
+        }
+    }
+
+    // 1. Traverse each component's effects and their recorded signal dependencies
+    for (const comp of components) {
+        for (const eff of comp.effects) {
+            if (eff.dependencies && eff.dependencies.length > 0) {
+                for (const sigName of eff.dependencies) {
+                    const lookup = signalLookup.get(`${comp.name}.${sigName}`) || signalLookup.get(sigName);
+                    const linkId = `${lookup?.source || comp.name}-${sigName}->${comp.name}-${eff.id}`;
+
+                    if (!seen.has(linkId)) {
+                        seen.add(linkId);
+                        links.push({
+                            id: linkId,
+                            signalName: sigName,
+                            signalType: lookup?.type || 'signal',
+                            signalValue: lookup?.value,
+                            source: lookup?.source || comp.name,
+                            effectId: eff.id,
+                            effectDescription: eff.description,
+                            targetComponent: comp.name,
+                        });
+                    }
+                }
+            } else {
+                // If explicit dependencies were not captured (e.g. dynamic expression),
+                // match signals used in the effect's expression / description:
+                const desc = eff.description || '';
+                const matchRegex = /([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
+                let m: RegExpExecArray | null;
+                while ((m = matchRegex.exec(desc)) !== null) {
+                    const candidate = m[1];
+                    const lookup = signalLookup.get(`${comp.name}.${candidate}`) || signalLookup.get(candidate);
+                    if (lookup) {
+                        const linkId = `${lookup.source}-${candidate}->${comp.name}-${eff.id}`;
+                        if (!seen.has(linkId)) {
+                            seen.add(linkId);
+                            links.push({
+                                id: linkId,
+                                signalName: candidate,
+                                signalType: lookup.type,
+                                signalValue: lookup.value,
+                                source: lookup.source,
+                                effectId: eff.id,
+                                effectDescription: eff.description,
+                                targetComponent: comp.name,
+                            });
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 2. Also check signals that have direct subscribers recorded
+    for (const comp of components) {
+        for (const sig of comp.signals) {
+            if (sig.subscribers && sig.subscribers.length > 0) {
+                sig.subscribers.forEach((subDesc, sIdx) => {
+                    const linkId = `${comp.name}-${sig.name}->${comp.name}-sub-${sIdx}`;
+                    if (!seen.has(linkId)) {
+                        seen.add(linkId);
+                        links.push({
+                            id: linkId,
+                            signalName: sig.name,
+                            signalType: sig.type,
+                            signalValue: sig.value,
+                            source: comp.name,
+                            effectId: `sub-${sIdx + 1}`,
+                            effectDescription: subDesc,
+                            targetComponent: comp.name,
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    for (const serv of services) {
+        for (const sig of serv.signals) {
+            if (sig.subscribers && sig.subscribers.length > 0) {
+                sig.subscribers.forEach((subDesc, sIdx) => {
+                    const linkId = `${serv.name}-${sig.name}->sub-${sIdx}`;
+                    if (!seen.has(linkId)) {
+                        seen.add(linkId);
+                        links.push({
+                            id: linkId,
+                            signalName: sig.name,
+                            signalType: sig.type,
+                            signalValue: sig.value,
+                            source: serv.name,
+                            effectId: `sub-${sIdx + 1}`,
+                            effectDescription: subDesc,
+                            targetComponent: 'Application',
+                        });
+                    }
+                });
+            }
+        }
+    }
+
+    return links;
+}
+
+/**
  * Creates the full DevTools inspector API snapshot.
  */
 export function inspectPurityApp(): PurityInspectionSnapshot {
     const components = getComponentsInspection();
     const services = getServicesInspection();
+    const reactivityGraph = getReactivityGraph(components, services);
 
     return {
         detected: true,
@@ -367,6 +566,7 @@ export function inspectPurityApp(): PurityInspectionSnapshot {
         timestamp: Date.now(),
         components,
         services,
+        reactivityGraph,
     };
 }
 
@@ -379,6 +579,7 @@ export function createDevTools() {
         version: '2.0.2',
         getComponents: getComponentsInspection,
         getServices: getServicesInspection,
+        getReactivity: () => getReactivityGraph(getComponentsInspection(), getServicesInspection()),
         inspect: inspectPurityApp,
     };
 }

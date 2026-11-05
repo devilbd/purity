@@ -28,6 +28,7 @@
 
     <!-- Tab Bar -->
     <nav id="nav-tabs" class="tab-bar">
+      <!-- 1. Components Tab -->
       <button id="tab-btn-components" class="tab-btn active" type="button">
         <span class="tab-icon">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -40,6 +41,7 @@
         <span id="badge-comp-count" class="tab-badge">0</span>
       </button>
 
+      <!-- 2. Services Tab -->
       <button id="tab-btn-services" class="tab-btn" type="button">
         <span class="tab-icon">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -50,11 +52,22 @@
         <span class="tab-label">Services</span>
         <span id="badge-serv-count" class="tab-badge">0</span>
       </button>
+
+      <!-- 3. Reactivity Graph Tab -->
+      <button id="tab-btn-reactivity" class="tab-btn" type="button">
+        <span class="tab-icon">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </span>
+        <span class="tab-label">Reactivity</span>
+        <span id="badge-react-count" class="tab-badge">0</span>
+      </button>
     </nav>
 
     <!-- Main Views Container -->
     <main class="inspector-main">
-      <!-- 1. Not Detected State -->
+      <!-- Not Detected State -->
       <section id="view-not-detected" class="view-panel empty-state">
         <div class="empty-icon-wrap">
           <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -73,9 +86,8 @@
         </button>
       </section>
 
-      <!-- 2. Components Tab View -->
+      <!-- 1. Components Tab View -->
       <section id="view-components" class="view-panel split-view">
-        <!-- Master Pane -->
         <aside class="master-pane">
           <div class="search-box">
             <svg class="search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
@@ -84,12 +96,9 @@
             </svg>
             <input id="comp-search-input" type="text" placeholder="Filter components..." class="search-input">
           </div>
-          <div id="comp-items-list" class="items-list scrollable">
-            <!-- Dynamic Component Items -->
-          </div>
+          <div id="comp-items-list" class="items-list scrollable"></div>
         </aside>
 
-        <!-- Detail Pane -->
         <section id="comp-detail-pane" class="detail-pane scrollable">
           <div id="comp-detail-empty" class="detail-placeholder">
             <span>Select a component to inspect its services, signals, and effects.</span>
@@ -101,7 +110,15 @@
                 <h3 id="comp-detail-name" class="detail-name">ComponentName</h3>
                 <span id="comp-detail-selector" class="code-badge">&lt;tag&gt;</span>
               </div>
-              <span id="comp-detail-count" class="pill-badge pill-info">1 in DOM</span>
+              <div class="detail-header-actions">
+                <span id="comp-detail-count" class="pill-badge pill-info">1 in DOM</span>
+                <button id="btn-comp-view-reactivity" class="btn-pill-action" title="View in Reactivity Graph" type="button">
+                  <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                  Reactivity
+                </button>
+              </div>
             </div>
 
             <!-- Services Section -->
@@ -116,9 +133,7 @@
                 </span>
                 <span id="comp-services-count" class="tab-badge">0</span>
               </div>
-              <div id="comp-services-list" class="sub-items-grid">
-                <!-- Injected Services list -->
-              </div>
+              <div id="comp-services-list" class="sub-items-grid"></div>
             </div>
 
             <!-- Signals Section -->
@@ -132,9 +147,7 @@
                 </span>
                 <span id="comp-signals-count" class="tab-badge">0</span>
               </div>
-              <div id="comp-signals-list" class="sub-items-table">
-                <!-- Signals list -->
-              </div>
+              <div id="comp-signals-list" class="sub-items-table"></div>
             </div>
 
             <!-- Effects Section -->
@@ -148,17 +161,14 @@
                 </span>
                 <span id="comp-effects-count" class="tab-badge">0</span>
               </div>
-              <div id="comp-effects-list" class="sub-items-list">
-                <!-- Effects list -->
-              </div>
+              <div id="comp-effects-list" class="sub-items-list"></div>
             </div>
           </div>
         </section>
       </section>
 
-      <!-- 3. Services Tab View -->
+      <!-- 2. Services Tab View -->
       <section id="view-services" class="view-panel split-view hidden">
-        <!-- Master Pane -->
         <aside class="master-pane">
           <div class="search-box">
             <svg class="search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
@@ -167,12 +177,9 @@
             </svg>
             <input id="serv-search-input" type="text" placeholder="Filter services..." class="search-input">
           </div>
-          <div id="serv-items-list" class="items-list scrollable">
-            <!-- Dynamic Services list -->
-          </div>
+          <div id="serv-items-list" class="items-list scrollable"></div>
         </aside>
 
-        <!-- Detail Pane -->
         <section id="serv-detail-pane" class="detail-pane scrollable">
           <div id="serv-detail-empty" class="detail-placeholder">
             <span>Select a service to inspect its dependencies and dependents.</span>
@@ -199,9 +206,7 @@
                 </span>
                 <span id="serv-deps-count" class="tab-badge">0</span>
               </div>
-              <div id="serv-deps-list" class="sub-items-grid">
-                <!-- Other services it depends on -->
-              </div>
+              <div id="serv-deps-list" class="sub-items-grid"></div>
             </div>
 
             <!-- Service Dependents Section -->
@@ -218,9 +223,7 @@
                 </span>
                 <span id="serv-dependents-count" class="tab-badge">0</span>
               </div>
-              <div id="serv-dependents-list" class="sub-items-grid">
-                <!-- Components or services that inject this service -->
-              </div>
+              <div id="serv-dependents-list" class="sub-items-grid"></div>
             </div>
 
             <!-- Service Signals Section -->
@@ -234,14 +237,126 @@
                 </span>
                 <span id="serv-signals-count" class="tab-badge">0</span>
               </div>
-              <div id="serv-signals-list" class="sub-items-table">
-                <!-- Signals owned by this service -->
-              </div>
+              <div id="serv-signals-list" class="sub-items-table"></div>
             </div>
           </div>
         </section>
       </section>
+
+      <!-- 3. Reactivity Graph Tab View -->
+      <section id="view-reactivity" class="view-panel reactivity-view hidden">
+        <!-- Component Filter & Selection Header -->
+        <div class="reactivity-controls">
+          <div class="react-top-row">
+            <div class="search-box react-search">
+              <svg class="search-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="react-comp-search" type="text" placeholder="Filter components to inspect reactivity..." class="search-input">
+            </div>
+
+            <div class="reactivity-legend">
+              <span class="legend-item"><span class="legend-dot dot-signal"></span> Signal</span>
+              <span class="legend-item"><span class="legend-dot dot-computed"></span> Computed</span>
+              <span class="legend-item"><span class="legend-dot dot-effect"></span> Effect</span>
+            </div>
+          </div>
+
+          <!-- Component Quick Filter Chips -->
+          <div class="react-chips-bar">
+            <span class="chips-title">Components:</span>
+            <div id="react-comp-chips" class="chips-scroll-list scrollable-h">
+              <!-- Dynamically populated component filter buttons -->
+            </div>
+          </div>
+
+          <!-- Active Inspected Component Banner -->
+          <div id="react-active-banner" class="react-active-banner hidden">
+            <div class="banner-left">
+              <span class="banner-label">Inspecting Component:</span>
+              <span id="react-active-comp-name" class="banner-title">ComponentName</span>
+              <span id="react-active-comp-tag" class="code-badge">&lt;tag&gt;</span>
+            </div>
+            <div class="banner-metrics">
+              <span id="react-metric-signals" class="mini-badge">0 signals</span>
+              <span id="react-metric-effects" class="mini-badge">0 effects</span>
+              <span id="react-metric-links" class="mini-badge">0 connections</span>
+              <button id="btn-react-clear" class="btn-clear-comp" title="Clear selection to choose another component" type="button">✕ Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reactivity Graph Container -->
+        <div id="reactivity-graph-container" class="reactivity-graph-container scrollable">
+          <!-- Prompt shown when no component is chosen -->
+          <div id="reactivity-prompt" class="detail-placeholder">
+            <div class="prompt-icon">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <h3 class="prompt-title">Choose a Component to Inspect</h3>
+            <p class="prompt-desc">
+              Filter and select a component above to view only its reactive signals and effects graph for optimal performance.
+            </p>
+          </div>
+
+          <div id="reactivity-empty" class="detail-placeholder hidden">
+            <span>No reactive signals or effects found on this component.</span>
+          </div>
+
+          <!-- Visual Graph (Only rendered when component is chosen) -->
+          <div id="reactivity-canvas-wrap" class="reactivity-canvas-wrap hidden">
+            <!-- Left: Signals Column -->
+            <div class="graph-col graph-signals-col">
+              <div class="col-title">
+                <span>Component Signals</span>
+                <span id="signals-node-count" class="mini-badge">0</span>
+              </div>
+              <div id="graph-signals-nodes" class="nodes-list"></div>
+            </div>
+
+            <!-- Center: Interactive SVG Connectors -->
+            <svg id="reactivity-svg" class="reactivity-svg" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="grad-active" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#3584e4" stop-opacity="0.95"/>
+                  <stop offset="100%" stop-color="#9141ac" stop-opacity="0.95"/>
+                </linearGradient>
+                <linearGradient id="grad-default" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#3584e4" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#9141ac" stop-opacity="0.4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+
+            <!-- Right: Effects Column -->
+            <div class="graph-col graph-effects-col">
+              <div class="col-title">
+                <span>Subscribed Effects</span>
+                <span id="effects-node-count" class="mini-badge">0</span>
+              </div>
+              <div id="graph-effects-nodes" class="nodes-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <!-- Bottom-right Resize Handle -->
+    <div id="window-resize-handle" class="window-resize-handle" title="Drag to resize inspector (double-click to reset)">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+        <circle cx="19" cy="5" r="1.5"/>
+        <circle cx="19" cy="12" r="1.5"/>
+        <circle cx="12" cy="12" r="1.5"/>
+        <circle cx="19" cy="19" r="1.5"/>
+        <circle cx="12" cy="19" r="1.5"/>
+        <circle cx="5" cy="19" r="1.5"/>
+      </svg>
+    </div>
   </div>
 
   <script src="inspector.js"></script>

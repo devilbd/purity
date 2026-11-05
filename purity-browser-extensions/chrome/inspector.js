@@ -73,6 +73,7 @@ function inspectPurityAppInPage() {
       version: 'Unknown',
       components: [],
       services: [],
+      reactivityGraph: [],
     };
   }
 
@@ -132,11 +133,23 @@ function inspectPurityAppInPage() {
             } catch (e) {
               currentVal = `[Error: ${String(e)}]`;
             }
+
+            const subscribers = [];
+            const subsSet = val.subscriptions;
+            if (subsSet && typeof subsSet.forEach === 'function') {
+              subsSet.forEach((eff) => {
+                const effDesc = eff.description || (eff.name && eff.name !== 'execute' ? eff.name : 'Reactive Effect');
+                subscribers.push(effDesc);
+              });
+            }
+
             compEntry.signals.push({
               name: key,
               type: isComputed ? 'computed' : 'signal',
               value: currentVal,
               isWritable: isSignal && !isComputed,
+              subscribersCount: subscribers.length,
+              subscribers,
             });
           }
         }
@@ -168,10 +181,20 @@ function inspectPurityAppInPage() {
       const rawEffects = el.__purity_effects || [];
       rawEffects.forEach((eff, idx) => {
         const desc = eff.description || (eff.name && eff.name !== 'execute' ? `Reactive Effect (${eff.name})` : `Reactive Effect #${idx + 1}`);
+        const deps = [];
+        const depSet = eff.__dependencies;
+        if (depSet && typeof depSet.forEach === 'function') {
+          depSet.forEach((sig) => {
+            if (sig && sig.__purity_name) {
+              deps.push(sig.__purity_name);
+            }
+          });
+        }
         compEntry.effects.push({
           id: `effect-${idx + 1}`,
           description: desc,
           active: true,
+          dependencies: deps,
         });
       });
 
@@ -181,6 +204,7 @@ function inspectPurityAppInPage() {
           id: `directive-${idx + 1}`,
           description: `Active Directive Binding #${idx + 1}`,
           active: true,
+          dependencies: [],
         });
       });
     }
@@ -211,11 +235,23 @@ function inspectPurityAppInPage() {
             } catch (e) {
               currentVal = `[Error: ${String(e)}]`;
             }
+
+            const subscribers = [];
+            const subsSet = val.subscriptions;
+            if (subsSet && typeof subsSet.forEach === 'function') {
+              subsSet.forEach((eff) => {
+                const effDesc = eff.description || (eff.name && eff.name !== 'execute' ? eff.name : 'Reactive Effect');
+                subscribers.push(effDesc);
+              });
+            }
+
             sData.signals.push({
               name: key,
               type: isComputed ? 'computed' : 'signal',
               value: currentVal,
               isWritable: isSignal && !isComputed,
+              subscribersCount: subscribers.length,
+              subscribers,
             });
           }
         }
@@ -260,6 +296,101 @@ function inspectPurityAppInPage() {
     signals: serv.signals,
   })).sort((a, b) => a.name.localeCompare(b.name));
 
+  // Build reactivity relationships
+  const reactivityGraph = [];
+  const seenLinks = new Set();
+
+  for (const comp of components) {
+    for (const eff of comp.effects) {
+      if (eff.dependencies && eff.dependencies.length > 0) {
+        for (const sigName of eff.dependencies) {
+          const linkId = `${comp.name}-${sigName}->${comp.name}-${eff.id}`;
+          if (!seenLinks.has(linkId)) {
+            seenLinks.add(linkId);
+            reactivityGraph.push({
+              id: linkId,
+              signalName: sigName,
+              signalType: 'signal',
+              signalValue: null,
+              source: comp.name,
+              effectId: eff.id,
+              effectDescription: eff.description,
+              targetComponent: comp.name,
+            });
+          }
+        }
+      } else {
+        const desc = eff.description || '';
+        const matchRegex = /([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g;
+        let m;
+        while ((m = matchRegex.exec(desc)) !== null) {
+          const candidate = m[1];
+          const hasSig = comp.signals.some((s) => s.name === candidate);
+          if (hasSig) {
+            const linkId = `${comp.name}-${candidate}->${comp.name}-${eff.id}`;
+            if (!seenLinks.has(linkId)) {
+              seenLinks.add(linkId);
+              reactivityGraph.push({
+                id: linkId,
+                signalName: candidate,
+                signalType: 'signal',
+                signalValue: null,
+                source: comp.name,
+                effectId: eff.id,
+                effectDescription: eff.description,
+                targetComponent: comp.name,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    for (const sig of comp.signals) {
+      if (sig.subscribers && sig.subscribers.length > 0) {
+        sig.subscribers.forEach((subDesc, sIdx) => {
+          const linkId = `${comp.name}-${sig.name}->sub-${sIdx}`;
+          if (!seenLinks.has(linkId)) {
+            seenLinks.add(linkId);
+            reactivityGraph.push({
+              id: linkId,
+              signalName: sig.name,
+              signalType: sig.type,
+              signalValue: sig.value,
+              source: comp.name,
+              effectId: `sub-${sIdx + 1}`,
+              effectDescription: subDesc,
+              targetComponent: comp.name,
+            });
+          }
+        });
+      }
+    }
+  }
+
+  for (const serv of services) {
+    for (const sig of serv.signals) {
+      if (sig.subscribers && sig.subscribers.length > 0) {
+        sig.subscribers.forEach((subDesc, sIdx) => {
+          const linkId = `${serv.name}-${sig.name}->sub-${sIdx}`;
+          if (!seenLinks.has(linkId)) {
+            seenLinks.add(linkId);
+            reactivityGraph.push({
+              id: linkId,
+              signalName: sig.name,
+              signalType: sig.type,
+              signalValue: sig.value,
+              source: serv.name,
+              effectId: `sub-${sIdx + 1}`,
+              effectDescription: subDesc,
+              targetComponent: 'Application',
+            });
+          }
+        });
+      }
+    }
+  }
+
   return {
     detected: true,
     framework: 'Purity',
@@ -267,5 +398,6 @@ function inspectPurityAppInPage() {
     appName: appRef?.environment?.appName || 'Purity App',
     components,
     services,
+    reactivityGraph,
   };
 }

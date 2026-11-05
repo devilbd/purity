@@ -1,43 +1,194 @@
 /**
- * Purity Inspector - Popup UI Controller
+ * Purity Inspector - Popup UI Controller with Dual-Tab + Reactivity Visualizer & Resizer
  */
 
 // Application state
 let currentSnapshot = null;
 let selectedComponentName = null;
 let selectedServiceName = null;
-let currentTab = 'components'; // 'components' | 'services'
+let selectedReactComponentName = null;
+let currentTab = 'components'; // 'components' | 'services' | 'reactivity'
 let compSearchQuery = '';
 let servSearchQuery = '';
+let reactCompSearchQuery = '';
 
 document.addEventListener('DOMContentLoaded', () => {
+  initResizer();
   initUI();
   refreshInspection();
 });
 
+/**
+ * ----------------------------------------------------
+ * RESIZABLE WINDOW & PERSISTENCE
+ * ----------------------------------------------------
+ */
+function initResizer() {
+  const DEFAULT_WIDTH = 660;
+  const DEFAULT_HEIGHT = 560;
+  const MIN_WIDTH = 500;
+  const MAX_WIDTH = 800;
+  const MIN_HEIGHT = 400;
+  const MAX_HEIGHT = 600;
+
+  // Restore saved size from localStorage
+  try {
+    const saved = localStorage.getItem('purity_inspector_size');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed?.width && parsed?.height) {
+        const clampedW = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, parsed.width));
+        const clampedH = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, parsed.height));
+        document.body.style.width = `${clampedW}px`;
+        document.body.style.height = `${clampedH}px`;
+      }
+    }
+  } catch (e) {
+    console.warn('[Purity Inspector] Failed to read stored size:', e);
+  }
+
+  const handle = document.getElementById('window-resize-handle');
+  if (!handle) return;
+
+  let isResizing = false;
+  let startX = 0;
+  let startY = 0;
+  let startWidth = 0;
+  let startHeight = 0;
+
+  handle.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    isResizing = true;
+    handle.classList.add('resizing');
+    handle.setPointerCapture(e.pointerId);
+
+    startX = e.clientX;
+    startY = e.clientY;
+    startWidth = document.body.offsetWidth;
+    startHeight = document.body.offsetHeight;
+  });
+
+  handle.addEventListener('pointermove', (e) => {
+    if (!isResizing) return;
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+
+    const newWidth = Math.max(MIN_WIDTH, Math.min(MAX_WIDTH, startWidth + deltaX));
+    const newHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, startHeight + deltaY));
+
+    document.body.style.width = `${newWidth}px`;
+    document.body.style.height = `${newHeight}px`;
+
+    if (currentTab === 'reactivity') {
+      requestAnimationFrame(drawCurrentReactivityLines);
+    }
+  });
+
+  const stopResize = () => {
+    if (!isResizing) return;
+    isResizing = false;
+    handle.classList.remove('resizing');
+
+    const finalWidth = document.body.offsetWidth;
+    const finalHeight = document.body.offsetHeight;
+
+    try {
+      localStorage.setItem(
+        'purity_inspector_size',
+        JSON.stringify({ width: finalWidth, height: finalHeight }),
+      );
+    } catch {}
+
+    if (currentTab === 'reactivity') {
+      setTimeout(drawCurrentReactivityLines, 50);
+    }
+  };
+
+  handle.addEventListener('pointerup', stopResize);
+  handle.addEventListener('pointercancel', stopResize);
+
+  // Double-click resets size to default
+  handle.addEventListener('dblclick', () => {
+    document.body.style.width = `${DEFAULT_WIDTH}px`;
+    document.body.style.height = `${DEFAULT_HEIGHT}px`;
+    try {
+      localStorage.setItem(
+        'purity_inspector_size',
+        JSON.stringify({ width: DEFAULT_WIDTH, height: DEFAULT_HEIGHT }),
+      );
+    } catch {}
+    if (currentTab === 'reactivity') {
+      setTimeout(drawCurrentReactivityLines, 50);
+    }
+  });
+}
+
+/**
+ * ----------------------------------------------------
+ * UI INITIALIZATION & TAB CONTROLS
+ * ----------------------------------------------------
+ */
 function initUI() {
-  // Tab Buttons
   const tabBtnComponents = document.getElementById('tab-btn-components');
   const tabBtnServices = document.getElementById('tab-btn-services');
+  const tabBtnReactivity = document.getElementById('tab-btn-reactivity');
 
   tabBtnComponents?.addEventListener('click', () => switchTab('components'));
   tabBtnServices?.addEventListener('click', () => switchTab('services'));
+  tabBtnReactivity?.addEventListener('click', () => switchTab('reactivity'));
 
-  // Refresh and Retry Buttons
   document.getElementById('btn-refresh')?.addEventListener('click', () => refreshInspection());
   document.getElementById('btn-retry-detect')?.addEventListener('click', () => refreshInspection());
 
   // Search Inputs
-  const compSearchInput = document.getElementById('comp-search-input');
-  compSearchInput?.addEventListener('input', (e) => {
+  document.getElementById('comp-search-input')?.addEventListener('input', (e) => {
     compSearchQuery = (e.target.value || '').trim().toLowerCase();
     renderComponentsList();
   });
 
-  const servSearchInput = document.getElementById('serv-search-input');
-  servSearchInput?.addEventListener('input', (e) => {
+  document.getElementById('serv-search-input')?.addEventListener('input', (e) => {
     servSearchQuery = (e.target.value || '').trim().toLowerCase();
     renderServicesList();
+  });
+
+  const reactCompSearch = document.getElementById('react-comp-search');
+  reactCompSearch?.addEventListener('input', (e) => {
+    reactCompSearchQuery = (e.target.value || '').trim().toLowerCase();
+    renderReactivityComponentChips();
+  });
+
+  reactCompSearch?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const matching = getFilteredComponentsForReactivity();
+      if (matching.length > 0) {
+        selectReactivityComponent(matching[0].name);
+      }
+    }
+  });
+
+  document.getElementById('btn-react-clear')?.addEventListener('click', () => {
+    clearReactivityComponentSelection();
+  });
+
+  document.getElementById('btn-comp-view-reactivity')?.addEventListener('click', () => {
+    if (selectedComponentName) {
+      selectReactivityComponent(selectedComponentName);
+      switchTab('reactivity');
+    }
+  });
+
+  // Re-draw curves on scroll or container resize
+  const graphContainer = document.getElementById('reactivity-graph-container');
+  graphContainer?.addEventListener('scroll', () => {
+    if (currentTab === 'reactivity') {
+      requestAnimationFrame(drawCurrentReactivityLines);
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (currentTab === 'reactivity') {
+      requestAnimationFrame(drawCurrentReactivityLines);
+    }
   });
 }
 
@@ -46,24 +197,30 @@ function switchTab(tab) {
 
   const tabBtnComponents = document.getElementById('tab-btn-components');
   const tabBtnServices = document.getElementById('tab-btn-services');
+  const tabBtnReactivity = document.getElementById('tab-btn-reactivity');
+
   const viewComponents = document.getElementById('view-components');
   const viewServices = document.getElementById('view-services');
+  const viewReactivity = document.getElementById('view-reactivity');
 
-  if (tab === 'components') {
-    tabBtnComponents?.classList.add('active');
-    tabBtnServices?.classList.remove('active');
-    viewComponents?.classList.remove('hidden');
-    viewServices?.classList.add('hidden');
-  } else {
-    tabBtnServices?.classList.add('active');
-    tabBtnComponents?.classList.remove('active');
-    viewServices?.classList.remove('hidden');
-    viewComponents?.classList.add('hidden');
+  tabBtnComponents?.classList.toggle('active', tab === 'components');
+  tabBtnServices?.classList.toggle('active', tab === 'services');
+  tabBtnReactivity?.classList.toggle('active', tab === 'reactivity');
+
+  viewComponents?.classList.toggle('hidden', tab !== 'components');
+  viewServices?.classList.toggle('hidden', tab !== 'services');
+  viewReactivity?.classList.toggle('hidden', tab !== 'reactivity');
+
+  if (tab === 'reactivity') {
+    renderReactivityComponentChips();
+    renderReactivityView();
   }
 }
 
 /**
- * Executes the inspector in the active tab's MAIN world context.
+ * ----------------------------------------------------
+ * INSPECTOR RUNNER & TELEMETRY FETCH
+ * ----------------------------------------------------
  */
 async function refreshInspection() {
   const badge = document.getElementById('app-badge');
@@ -75,11 +232,10 @@ async function refreshInspection() {
   try {
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!activeTab || !activeTab.id) {
-      showNotDetectedState('No active tab found.');
+      showNotDetectedState();
       return;
     }
 
-    // Execute inspector function in MAIN world
     const results = await chrome.scripting.executeScript({
       target: { tabId: activeTab.id },
       world: 'MAIN',
@@ -100,7 +256,7 @@ async function refreshInspection() {
   }
 }
 
-function showNotDetectedState(reason) {
+function showNotDetectedState() {
   const badge = document.getElementById('app-badge');
   if (badge) {
     badge.className = 'badge badge-warning';
@@ -111,6 +267,7 @@ function showNotDetectedState(reason) {
   document.getElementById('view-not-detected')?.classList.remove('hidden');
   document.getElementById('view-components')?.classList.add('hidden');
   document.getElementById('view-services')?.classList.add('hidden');
+  document.getElementById('view-reactivity')?.classList.add('hidden');
 }
 
 function showDetectedState(data) {
@@ -123,29 +280,38 @@ function showDetectedState(data) {
   document.getElementById('nav-tabs')?.classList.remove('hidden');
   document.getElementById('view-not-detected')?.classList.add('hidden');
 
-  // Update badge counts
+  // Update tab badge counts
   const compCount = document.getElementById('badge-comp-count');
   if (compCount) compCount.textContent = String(data.components.length);
 
   const servCount = document.getElementById('badge-serv-count');
   if (servCount) servCount.textContent = String(data.services.length);
 
-  // Render lists
+  const reactCount = document.getElementById('badge-react-count');
+  const totalLinks = data.reactivityGraph?.length || 0;
+  if (reactCount) reactCount.textContent = String(totalLinks);
+
+  // Populate component quick-filter chips for Reactivity Tab
+  renderReactivityComponentChips();
+
+  // Render Components and Services
   renderComponentsList();
   renderServicesList();
 
-  // If nothing is selected, select the first component by default
   if (!selectedComponentName && data.components.length > 0) {
     selectComponent(data.components[0].name);
   } else if (selectedComponentName) {
     selectComponent(selectedComponentName);
   }
 
-  // If nothing is selected for services, select first service
   if (!selectedServiceName && data.services.length > 0) {
     selectService(data.services[0].name);
   } else if (selectedServiceName) {
     selectService(selectedServiceName);
+  }
+
+  if (selectedReactComponentName) {
+    selectReactivityComponent(selectedReactComponentName);
   }
 
   switchTab(currentTab);
@@ -153,10 +319,9 @@ function showDetectedState(data) {
 
 /**
  * ----------------------------------------------------
- * COMPONENTS VIEW
+ * 1. COMPONENTS TAB VIEW
  * ----------------------------------------------------
  */
-
 function renderComponentsList() {
   const listEl = document.getElementById('comp-items-list');
   if (!listEl || !currentSnapshot) return;
@@ -199,7 +364,6 @@ function renderComponentsList() {
     header.appendChild(tagSpan);
     row.appendChild(header);
 
-    // Badges summary
     const badges = document.createElement('div');
     badges.className = 'item-row-badges';
 
@@ -246,7 +410,6 @@ function selectComponent(compName) {
   placeholder?.classList.add('hidden');
   content?.classList.remove('hidden');
 
-  // Set Header
   const nameEl = document.getElementById('comp-detail-name');
   if (nameEl) nameEl.textContent = comp.name;
 
@@ -383,10 +546,9 @@ function selectComponent(compName) {
 
 /**
  * ----------------------------------------------------
- * SERVICES VIEW
+ * 2. SERVICES TAB VIEW
  * ----------------------------------------------------
  */
-
 function renderServicesList() {
   const listEl = document.getElementById('serv-items-list');
   if (!listEl || !currentSnapshot) return;
@@ -426,7 +588,6 @@ function renderServicesList() {
     header.appendChild(tagSpan);
     row.appendChild(header);
 
-    // Badges summary
     const badges = document.createElement('div');
     badges.className = 'item-row-badges';
 
@@ -469,7 +630,6 @@ function selectService(servName) {
   placeholder?.classList.add('hidden');
   content?.classList.remove('hidden');
 
-  // Header
   const nameEl = document.getElementById('serv-detail-name');
   if (nameEl) nameEl.textContent = serv.name;
 
@@ -524,9 +684,7 @@ function selectService(servName) {
         const card = document.createElement('div');
         card.className = 'service-card';
 
-        // Check if dependent is a component in the snapshot
         const isComponent = currentSnapshot?.components.some((c) => c.name === depName);
-
         card.title = isComponent ? `Go to Component ${depName}` : `Go to Service ${depName}`;
         card.addEventListener('click', () => {
           if (isComponent) {
@@ -609,6 +767,390 @@ function selectService(servName) {
       });
     }
   }
+}
+
+/**
+ * ----------------------------------------------------
+ * 3. REACTIVITY GRAPH TAB VIEW (FILTERED BY COMPONENT FOR PERFORMANCE)
+ * ----------------------------------------------------
+ */
+
+function getFilteredComponentsForReactivity() {
+  if (!currentSnapshot || !currentSnapshot.components) return [];
+  return currentSnapshot.components.filter((c) => {
+    if (!reactCompSearchQuery) return true;
+    return (
+      c.name.toLowerCase().includes(reactCompSearchQuery) ||
+      c.selector.toLowerCase().includes(reactCompSearchQuery)
+    );
+  });
+}
+
+function renderReactivityComponentChips() {
+  const container = document.getElementById('react-comp-chips');
+  if (!container || !currentSnapshot) return;
+
+  container.innerHTML = '';
+  const components = getFilteredComponentsForReactivity();
+
+  if (components.length === 0) {
+    const emptyNotice = document.createElement('span');
+    emptyNotice.className = 'empty-notice';
+    emptyNotice.style.padding = '2px 8px';
+    emptyNotice.textContent = 'No matching components.';
+    container.appendChild(emptyNotice);
+    return;
+  }
+
+  components.forEach((comp) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    const isSelected = comp.name === selectedReactComponentName;
+    chip.className = `chip-btn ${isSelected ? 'active' : ''}`;
+    chip.dataset.compName = comp.name;
+
+    const count = (comp.signals?.length || 0) + (comp.effects?.length || 0);
+    chip.innerHTML = `${comp.name} <span class="chip-badge">${count}</span>`;
+    chip.title = `${comp.name} (${comp.signals?.length || 0} signals, ${comp.effects?.length || 0} effects)`;
+
+    chip.addEventListener('click', () => {
+      selectReactivityComponent(comp.name);
+    });
+
+    container.appendChild(chip);
+  });
+}
+
+function selectReactivityComponent(compName) {
+  selectedReactComponentName = compName;
+  renderReactivityComponentChips();
+
+  const activeChip = document.querySelector(`#react-comp-chips .chip-btn[data-comp-name="${compName}"]`);
+  activeChip?.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+
+  renderReactivityView();
+}
+
+function clearReactivityComponentSelection() {
+  selectedReactComponentName = null;
+  renderReactivityComponentChips();
+  renderReactivityView();
+}
+
+function renderReactivityView() {
+  if (!currentSnapshot) return;
+
+  const promptEl = document.getElementById('reactivity-prompt');
+  const bannerEl = document.getElementById('react-active-banner');
+  const emptyEl = document.getElementById('reactivity-empty');
+  const canvasWrap = document.getElementById('reactivity-canvas-wrap');
+  const signalsCol = document.getElementById('graph-signals-nodes');
+  const effectsCol = document.getElementById('graph-effects-nodes');
+
+  if (!promptEl || !bannerEl || !emptyEl || !canvasWrap || !signalsCol || !effectsCol) return;
+
+  signalsCol.innerHTML = '';
+  effectsCol.innerHTML = '';
+  clearReactivityLines();
+
+  // Case 1: No component chosen yet -> show prompt, keep DOM lightweight & fast
+  if (!selectedReactComponentName) {
+    promptEl.classList.remove('hidden');
+    bannerEl.classList.add('hidden');
+    emptyEl.classList.add('hidden');
+    canvasWrap.classList.add('hidden');
+    return;
+  }
+
+  // Case 2: Component selected
+  const comp = currentSnapshot.components.find((c) => c.name === selectedReactComponentName);
+  if (!comp) {
+    promptEl.classList.remove('hidden');
+    bannerEl.classList.add('hidden');
+    emptyEl.classList.add('hidden');
+    canvasWrap.classList.add('hidden');
+    return;
+  }
+
+  // Hide prompt, show banner
+  promptEl.classList.add('hidden');
+  bannerEl.classList.remove('hidden');
+
+  // Update banner text
+  const bannerName = document.getElementById('react-active-comp-name');
+  if (bannerName) bannerName.textContent = comp.name;
+
+  const bannerTag = document.getElementById('react-active-comp-tag');
+  if (bannerTag) bannerTag.textContent = `<${comp.selector}>`;
+
+  // Filter links for this component
+  const rawLinks = currentSnapshot.reactivityGraph || [];
+  const compLinks = rawLinks.filter((link) => {
+    return link.source === comp.name || link.targetComponent === comp.name;
+  });
+
+  // Update banner metrics
+  const metricSig = document.getElementById('react-metric-signals');
+  if (metricSig) metricSig.textContent = `${comp.signals.length} ${comp.signals.length === 1 ? 'signal' : 'signals'}`;
+
+  const metricEff = document.getElementById('react-metric-effects');
+  if (metricEff) metricEff.textContent = `${comp.effects.length} ${comp.effects.length === 1 ? 'effect' : 'effects'}`;
+
+  const metricLinks = document.getElementById('react-metric-links');
+  if (metricLinks) metricLinks.textContent = `${compLinks.length} ${compLinks.length === 1 ? 'connection' : 'connections'}`;
+
+  // If component has neither signals nor effects
+  if (comp.signals.length === 0 && comp.effects.length === 0) {
+    emptyEl.classList.remove('hidden');
+    const emptySpan = emptyEl.querySelector('span');
+    if (emptySpan) emptySpan.textContent = `No reactive signals or effects found on <${comp.selector}>.`;
+    canvasWrap.classList.add('hidden');
+    return;
+  }
+
+  emptyEl.classList.add('hidden');
+  canvasWrap.classList.remove('hidden');
+
+  // Update node counts
+  const sigCountEl = document.getElementById('signals-node-count');
+  if (sigCountEl) sigCountEl.textContent = String(comp.signals.length);
+
+  // 1. Render Signal Nodes for this chosen component
+  comp.signals.forEach((sig) => {
+    const sigKey = `${comp.name}.${sig.name}`;
+    const node = document.createElement('div');
+    node.className = 'graph-node';
+    node.setAttribute('data-node-type', 'signal');
+    node.setAttribute('data-sig-key', sigKey);
+    node.setAttribute('data-sig-name', sig.name);
+
+    const header = document.createElement('div');
+    header.className = 'node-header';
+
+    const title = document.createElement('span');
+    title.className = 'node-title';
+    title.textContent = sig.name;
+
+    const pill = document.createElement('span');
+    pill.className = `sig-type-pill ${sig.type === 'computed' ? 'sig-computed' : 'sig-signal'}`;
+    pill.textContent = sig.type;
+
+    header.appendChild(title);
+    header.appendChild(pill);
+    node.appendChild(header);
+
+    const source = document.createElement('span');
+    source.className = 'node-source';
+    source.textContent = `component: <${comp.selector}>`;
+    node.appendChild(source);
+
+    if (sig.value !== undefined && sig.value !== null) {
+      const valBadge = document.createElement('span');
+      valBadge.className = 'signal-val-badge';
+      valBadge.textContent = formatValue(sig.value);
+      node.appendChild(valBadge);
+    }
+
+    // Right port anchor
+    const port = document.createElement('div');
+    port.className = 'port-anchor port-right';
+    node.appendChild(port);
+
+    // Hover highlight
+    node.addEventListener('mouseenter', () => highlightReactiveGroup(sigKey, null));
+    node.addEventListener('mouseleave', () => unhighlightAll());
+
+    signalsCol.appendChild(node);
+  });
+
+  // 2. Render Effect Nodes for this chosen component
+  const effectMap = new Map();
+  comp.effects.forEach((eff) => {
+    effectMap.set(eff.id, {
+      id: eff.id,
+      description: eff.description,
+      targetComponent: comp.name,
+    });
+  });
+
+  compLinks.forEach((link) => {
+    if (link.targetComponent === comp.name && !effectMap.has(link.effectId)) {
+      let alreadyHasDesc = false;
+      for (const existing of effectMap.values()) {
+        if (existing.description === link.effectDescription) {
+          alreadyHasDesc = true;
+          break;
+        }
+      }
+      if (!alreadyHasDesc) {
+        effectMap.set(link.effectId, {
+          id: link.effectId,
+          description: link.effectDescription,
+          targetComponent: comp.name,
+        });
+      }
+    }
+  });
+
+  const effCountEl = document.getElementById('effects-node-count');
+  if (effCountEl) effCountEl.textContent = String(effectMap.size);
+
+  effectMap.forEach((eff) => {
+    const effKey = `${comp.name}.${eff.id}`;
+    const node = document.createElement('div');
+    node.className = 'graph-node';
+    node.setAttribute('data-node-type', 'effect');
+    node.setAttribute('data-eff-key', effKey);
+    node.setAttribute('data-eff-id', eff.id);
+    node.setAttribute('data-eff-desc', eff.description);
+
+    // Left port anchor
+    const port = document.createElement('div');
+    port.className = 'port-anchor port-left';
+    node.appendChild(port);
+
+    const header = document.createElement('div');
+    header.className = 'node-header';
+
+    const title = document.createElement('span');
+    title.className = 'node-subtext';
+    title.textContent = eff.description;
+
+    header.appendChild(title);
+    node.appendChild(header);
+
+    const target = document.createElement('span');
+    target.className = 'node-source';
+    target.textContent = `target: <${comp.selector}>`;
+    node.appendChild(target);
+
+    // Hover highlight
+    node.addEventListener('mouseenter', () => highlightReactiveGroup(null, effKey));
+    node.addEventListener('mouseleave', () => unhighlightAll());
+
+    effectsCol.appendChild(node);
+  });
+
+  // Schedule drawing SVG connection lines after nodes mount
+  setTimeout(drawCurrentReactivityLines, 40);
+}
+
+function clearReactivityLines() {
+  const svg = document.getElementById('reactivity-svg');
+  if (!svg) return;
+  const paths = svg.querySelectorAll('.react-link-path');
+  paths.forEach((p) => p.remove());
+}
+
+function drawCurrentReactivityLines() {
+  const svg = document.getElementById('reactivity-svg');
+  const canvasWrap = document.getElementById('reactivity-canvas-wrap');
+  if (!svg || !canvasWrap || currentTab !== 'reactivity' || !selectedReactComponentName || !currentSnapshot) return;
+
+  clearReactivityLines();
+
+  const wrapRect = canvasWrap.getBoundingClientRect();
+  if (wrapRect.width === 0 || wrapRect.height === 0) return;
+
+  svg.setAttribute('width', String(wrapRect.width));
+  svg.setAttribute('height', String(wrapRect.height));
+
+  const comp = currentSnapshot.components.find((c) => c.name === selectedReactComponentName);
+  if (!comp) return;
+
+  const rawLinks = currentSnapshot.reactivityGraph || [];
+  const compLinks = rawLinks.filter((link) => {
+    return link.source === comp.name || link.targetComponent === comp.name;
+  });
+
+  compLinks.forEach((link) => {
+    const sigKey = `${link.source}.${link.signalName}`;
+    const effKey = `${link.targetComponent}.${link.effectId}`;
+
+    const sigNode = document.querySelector(`[data-sig-key="${sigKey}"]`) ||
+                    document.querySelector(`[data-sig-name="${link.signalName}"]`);
+
+    let effNode = document.querySelector(`[data-eff-key="${effKey}"]`) ||
+                  document.querySelector(`[data-eff-id="${link.effectId}"]`);
+
+    if (!effNode && link.effectDescription) {
+      effNode = document.querySelector(`[data-eff-desc="${CSS.escape(link.effectDescription)}"]`);
+    }
+
+    if (!sigNode || !effNode) return;
+
+    const sigPort = sigNode.querySelector('.port-right');
+    const effPort = effNode.querySelector('.port-left');
+
+    if (!sigPort || !effPort) return;
+
+    const sigRect = sigPort.getBoundingClientRect();
+    const effRect = effPort.getBoundingClientRect();
+
+    const x1 = sigRect.left + sigRect.width / 2 - wrapRect.left;
+    const y1 = sigRect.top + sigRect.height / 2 - wrapRect.top;
+
+    const x2 = effRect.left + effRect.width / 2 - wrapRect.left;
+    const y2 = effRect.top + effRect.height / 2 - wrapRect.top;
+
+    // Cubic Bézier curve
+    const dx = Math.abs(x2 - x1) * 0.55;
+    const pathData = `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathData);
+    path.setAttribute('class', 'react-link-path');
+    path.setAttribute('data-link-sig', sigNode.getAttribute('data-sig-key') || sigKey);
+    path.setAttribute('data-link-eff', effNode.getAttribute('data-eff-key') || effKey);
+
+    svg.appendChild(path);
+  });
+}
+
+function highlightReactiveGroup(activeSigKey, activeEffKey) {
+  const allNodes = document.querySelectorAll('.graph-node');
+  const allPaths = document.querySelectorAll('.react-link-path');
+
+  allNodes.forEach((n) => n.classList.remove('active-highlight'));
+  allPaths.forEach((p) => p.classList.remove('highlighted'));
+
+  if (activeSigKey) {
+    const sigNode = document.querySelector(`[data-sig-key="${activeSigKey}"]`);
+    sigNode?.classList.add('active-highlight');
+
+    allPaths.forEach((path) => {
+      if (path.getAttribute('data-link-sig') === activeSigKey) {
+        path.classList.add('highlighted');
+        const effKey = path.getAttribute('data-link-eff');
+        if (effKey) {
+          const effNode = document.querySelector(`[data-eff-key="${effKey}"]`);
+          effNode?.classList.add('active-highlight');
+        }
+      }
+    });
+  } else if (activeEffKey) {
+    const effNode = document.querySelector(`[data-eff-key="${activeEffKey}"]`);
+    effNode?.classList.add('active-highlight');
+
+    allPaths.forEach((path) => {
+      if (path.getAttribute('data-link-eff') === activeEffKey) {
+        path.classList.add('highlighted');
+        const sigKey = path.getAttribute('data-link-sig');
+        if (sigKey) {
+          const sigNode = document.querySelector(`[data-sig-key="${sigKey}"]`);
+          sigNode?.classList.add('active-highlight');
+        }
+      }
+    });
+  }
+}
+
+function unhighlightAll() {
+  const allNodes = document.querySelectorAll('.graph-node');
+  const allPaths = document.querySelectorAll('.react-link-path');
+
+  allNodes.forEach((n) => n.classList.remove('active-highlight'));
+  allPaths.forEach((p) => p.classList.remove('highlighted'));
 }
 
 function formatValue(val) {

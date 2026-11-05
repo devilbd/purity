@@ -60,6 +60,10 @@
 body {
   width: 660px;
   height: 560px;
+  min-width: 500px;
+  max-width: 800px;
+  min-height: 400px;
+  max-height: 600px;
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -67,6 +71,7 @@ body {
   line-height: 1.4;
   overflow: hidden;
   user-select: none;
+  position: relative;
 }
 
 .inspector-app {
@@ -74,6 +79,7 @@ body {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 /* Header */
@@ -337,6 +343,7 @@ body {
 
 .scrollable::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 .scrollable::-webkit-scrollbar-thumb {
@@ -434,6 +441,32 @@ body {
   justify-content: space-between;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
+}
+
+.detail-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-pill-action {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-pill-action:hover {
+  background: var(--surface-active);
+  border-color: var(--accent-color);
 }
 
 .detail-title-group {
@@ -645,6 +678,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
 .effect-name {
@@ -659,6 +693,7 @@ body {
   font-size: 10px;
   font-weight: 600;
   color: var(--status-green);
+  flex-shrink: 0;
 }
 
 .status-dot-sm {
@@ -666,4 +701,421 @@ body {
   height: 6px;
   border-radius: 50%;
   background-color: var(--status-green);
+}
+
+/* --------------------------------------------------
+ * 3. REACTIVITY GRAPH VIEW STYLING
+ * -------------------------------------------------- */
+.reactivity-view {
+  flex-direction: column;
+  height: 100%;
+}
+
+.reactivity-controls {
+  padding: 8px 16px;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.react-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.react-search {
+  flex: 1;
+  padding: 0;
+  border-bottom: none;
+}
+
+.react-search .search-icon {
+  left: 8px;
+}
+
+.react-search .search-input {
+  padding-left: 26px;
+}
+
+.react-chips-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.chips-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.chips-scroll-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+  flex: 1;
+}
+
+.scrollable-h::-webkit-scrollbar {
+  height: 4px;
+}
+
+.scrollable-h::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-pill);
+}
+
+.chip-btn {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.chip-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.chip-btn.active {
+  background: var(--accent-color);
+  color: #ffffff;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 6px rgba(53, 132, 228, 0.4);
+}
+
+.chip-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+}
+
+.chip-btn.active .chip-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Active Inspected Component Banner */
+.react-active-banner {
+  background: var(--surface-color);
+  border: 1px solid rgba(53, 132, 228, 0.35);
+  border-radius: var(--radius-card);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(90deg, rgba(53, 132, 228, 0.1) 0%, rgba(145, 65, 172, 0.1) 100%);
+  animation: bannerFadeIn 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes bannerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.banner-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.banner-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.banner-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-color);
+  white-space: nowrap;
+}
+
+.banner-metrics {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn-clear-comp {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  border-radius: var(--radius-pill);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: 4px;
+}
+
+.btn-clear-comp:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.reactivity-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-signal {
+  background-color: var(--accent-color);
+}
+
+.dot-computed {
+  background-color: var(--status-purple);
+}
+
+.dot-effect {
+  background-color: var(--status-green);
+}
+
+.reactivity-graph-container {
+  flex: 1;
+  position: relative;
+  overflow: auto;
+  padding: 16px;
+}
+
+/* Reactivity Empty & Selection Prompt */
+.prompt-icon {
+  color: var(--accent-color);
+  margin-bottom: 12px;
+  display: inline-flex;
+  padding: 14px;
+  background: var(--surface-active);
+  border-radius: 50%;
+  border: 1px solid rgba(53, 132, 228, 0.3);
+}
+
+.prompt-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.prompt-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 380px;
+  line-height: 1.5;
+}
+
+.reactivity-canvas-wrap {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  min-height: 100%;
+  gap: 100px;
+}
+
+.reactivity-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.react-link-path {
+  fill: none;
+  stroke: url(#grad-default);
+  stroke-width: 1.5;
+  transition: all 0.15s ease;
+}
+
+.react-link-path.highlighted {
+  stroke: url(#grad-active);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 5px rgba(53, 132, 228, 0.7));
+}
+
+.graph-col {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 3;
+}
+
+.col-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.nodes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.graph-node {
+  background: var(--header-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-control);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.graph-node:hover {
+  border-color: var(--accent-color);
+  transform: translateX(2px);
+  background: var(--surface-hover);
+}
+
+.graph-node.active-highlight {
+  border-color: var(--accent-color);
+  background: var(--surface-active);
+  box-shadow: 0 0 8px rgba(53, 132, 228, 0.3);
+}
+
+.node-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.node-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.node-source {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.node-subtext {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* Port anchors */
+.port-anchor {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  border: 1.5px solid var(--bg-color);
+  box-shadow: 0 0 4px rgba(53, 132, 228, 0.6);
+}
+
+.port-right {
+  right: -5px;
+}
+
+.port-left {
+  left: -5px;
+  background-color: var(--status-purple);
+  box-shadow: 0 0 4px rgba(145, 65, 172, 0.6);
+}
+
+/* --------------------------------------------------
+ * WINDOW RESIZE HANDLE
+ * -------------------------------------------------- */
+.window-resize-handle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: nwse-resize;
+  color: var(--text-muted);
+  z-index: 1000;
+  touch-action: none;
+  background: transparent;
+  transition: color 0.15s ease;
+}
+
+.window-resize-handle:hover,
+.window-resize-handle.resizing {
+  color: var(--accent-color);
 }

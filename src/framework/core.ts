@@ -26,12 +26,18 @@ export const signal = <T>(initialValue: T): Signal<T> => {
 
     const getter = (() => {
         const running = context[context.length - 1];
-        if (running) subscriptions.add(running);
+        if (running) {
+            subscriptions.add(running);
+            if ((running as any).__dependencies) {
+                (running as any).__dependencies.add(getter);
+            }
+        }
         return value;
     }) as Signal<T>;
 
     (getter as any).__purity_signal = true;
     (getter as any).__purity_type = 'signal';
+    (getter as any).subscriptions = subscriptions;
 
     getter.set = (nextValue: T) => {
         if (Object.is(value, nextValue)) return;
@@ -52,8 +58,11 @@ export interface EffectOptions {
 
 export const effect = (fn: Function, options?: EffectOptions | string): (() => void) => {
     let active = true;
+    const dependencies = new Set<any>();
+
     const execute = () => {
         if (!active) return;
+        dependencies.clear();
         context.push(execute);
         try {
             fn();
@@ -61,6 +70,8 @@ export const effect = (fn: Function, options?: EffectOptions | string): (() => v
             context.pop();
         }
     };
+
+    (execute as any).__dependencies = dependencies;
 
     const desc = typeof options === 'string' ? options : options?.description;
     if (desc) {
@@ -75,6 +86,11 @@ export const effect = (fn: Function, options?: EffectOptions | string): (() => v
 
     return () => {
         active = false;
+        dependencies.forEach((sig) => {
+            if (sig && sig.subscriptions && typeof sig.subscriptions.delete === 'function') {
+                sig.subscriptions.delete(execute);
+            }
+        });
     };
 };
 
@@ -97,16 +113,19 @@ export const untrack = <T>(fn: () => T): T => {
  * Creates a read-only computed signal that automatically derives its value
  * and reacts synchronously whenever any dependent signals change.
  */
-export const computed = <T>(fn: () => T): ReadonlySignal<T> => {
+export const computed = <T>(fn: () => T, description?: string): ReadonlySignal<T> => {
     const internalSignal = signal<T>(undefined as unknown as T);
 
-    effect(() => {
+    const compEffect = effect(() => {
         internalSignal.set(fn());
-    });
+    }, description || 'Computed Signal Calculation');
 
     const computedGetter = (() => internalSignal()) as ReadonlySignal<T>;
     (computedGetter as any).__purity_computed = true;
     (computedGetter as any).__purity_type = 'computed';
+    (computedGetter as any).__internalSignal = internalSignal;
+    (computedGetter as any).subscriptions = (internalSignal as any).subscriptions;
+    (computedGetter as any).__compEffect = compEffect;
 
     return computedGetter;
 };
