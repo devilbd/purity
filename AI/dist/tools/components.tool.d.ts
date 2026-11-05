@@ -5,13 +5,13 @@ export declare const lookupComponentSchema: {
 };
 export declare const listComponentsSchema: {
     category: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
-        all: "all";
         core: "core";
-        form: "form";
-        layout: "layout";
-        navigation: "navigation";
         overlay: "overlay";
+        form: "form";
+        navigation: "navigation";
         widget: "widget";
+        layout: "layout";
+        all: "all";
     }>>>;
 };
 export declare function handleLookupComponent(params: {

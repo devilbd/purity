@@ -2,14 +2,14 @@ import { z } from 'zod';
 import { ScaffoldType, ScaffoldResult } from '../types.js';
 export declare const scaffoldSchema: {
     type: z.ZodEnum<{
-        behavior: "behavior";
         component: "component";
-        directive: "directive";
-        interceptor: "interceptor";
-        page: "page";
-        pipe: "pipe";
         service: "service";
+        pipe: "pipe";
+        directive: "directive";
         validator: "validator";
+        interceptor: "interceptor";
+        behavior: "behavior";
+        page: "page";
     }>;
     name: z.ZodString;
     selector: z.ZodOptional<z.ZodString>;
