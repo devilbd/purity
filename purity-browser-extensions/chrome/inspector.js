@@ -399,5 +399,99 @@ function inspectPurityAppInPage() {
     components,
     services,
     reactivityGraph,
+    recordingSession: (typeof window !== 'undefined' ? window.__PURITY_RECORDING_SESSION__ : null) || null,
+  };
+}
+
+/**
+ * Starts recording re-render and value update measurements for a component.
+ */
+function startRecordingInPage(componentName) {
+  if (typeof window !== 'undefined' && window.__PURITY_DEVTOOLS__ && typeof window.__PURITY_DEVTOOLS__.startRecording === 'function') {
+    return window.__PURITY_DEVTOOLS__.startRecording(componentName);
+  }
+
+  const session = {
+    componentName,
+    isActive: true,
+    startTime: Date.now(),
+    endTime: null,
+    totalDurationMs: 0,
+    updatesCount: 0,
+    totalUpdateTimeMs: 0,
+    avgUpdateTimeMs: 0,
+    minUpdateTimeMs: null,
+    maxUpdateTimeMs: 0,
+    updates: [],
+  };
+
+  if (typeof window !== 'undefined') {
+    window.__PURITY_RECORDING_SESSION__ = session;
+  }
+  return session;
+}
+
+/**
+ * Stops the active component recording session and returns the telemetry.
+ */
+function stopRecordingInPage() {
+  if (typeof window !== 'undefined' && window.__PURITY_DEVTOOLS__ && typeof window.__PURITY_DEVTOOLS__.stopRecording === 'function') {
+    return window.__PURITY_DEVTOOLS__.stopRecording();
+  }
+
+  if (typeof window !== 'undefined' && window.__PURITY_RECORDING_SESSION__) {
+    const session = window.__PURITY_RECORDING_SESSION__;
+    session.isActive = false;
+    session.endTime = Date.now();
+    session.totalDurationMs = Math.max(0, session.endTime - session.startTime);
+    return session;
+  }
+  return null;
+}
+
+/**
+ * Triggers a live benchmark/update measurement for a specific component.
+ */
+function benchmarkComponentInPage(componentName) {
+  if (typeof window !== 'undefined' && window.__PURITY_DEVTOOLS__ && typeof window.__PURITY_DEVTOOLS__.benchmarkComponentUpdate === 'function') {
+    return window.__PURITY_DEVTOOLS__.benchmarkComponentUpdate(componentName);
+  }
+
+  const el = Array.from(document.querySelectorAll('*')).find((e) =>
+    e.__purity_component_name === componentName ||
+    e.tagName.toLowerCase().includes(componentName.toLowerCase().replace(/component$/, ''))
+  );
+
+  if (!el) return null;
+
+  const start = performance.now();
+  if (typeof el.bindTemplate === 'function') {
+    el.bindTemplate();
+  }
+  const durationMs = Math.round((performance.now() - start) * 1000) / 1000;
+
+  if (typeof window !== 'undefined' && window.__PURITY_RECORDING_SESSION__ && window.__PURITY_RECORDING_SESSION__.isActive) {
+    const session = window.__PURITY_RECORDING_SESSION__;
+    session.updatesCount++;
+    session.totalUpdateTimeMs = Math.round((session.totalUpdateTimeMs + durationMs) * 1000) / 1000;
+    session.avgUpdateTimeMs = Math.round((session.totalUpdateTimeMs / session.updatesCount) * 1000) / 1000;
+    if (session.minUpdateTimeMs === null || durationMs < session.minUpdateTimeMs) {
+      session.minUpdateTimeMs = durationMs;
+    }
+    if (durationMs > session.maxUpdateTimeMs) {
+      session.maxUpdateTimeMs = durationMs;
+    }
+    session.updates.unshift({
+      timestamp: Date.now(),
+      trigger: 'Manual Benchmark Rebind',
+      durationMs,
+    });
+  }
+
+  return {
+    componentName,
+    signalTested: 'Template Rebind',
+    durationMs,
+    timestamp: Date.now(),
   };
 }

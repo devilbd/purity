@@ -39,15 +39,28 @@ An official DevTools extension for the **Purity Framework** built with **Manifes
      - Hovering/clicking a **Signal** illuminates its node, all outgoing reactive curves, and all dependent effects that re-run when it changes.
      - Hovering/clicking an **Effect** illuminates its node, all incoming reactive curves, and all upstream signals that feed it.
 
-5. **Resizable Window with Memory**:
-   - Resizable via the corner drag handle in the bottom-right corner.
-   - Persists chosen dimensions in `localStorage` and automatically restores them on launch.
-   - Double-clicking the resize handle resets to the default size.
+5. **Tab 4: Metrics & Profiler (Start/Stop Recording & Re-render Telemetry)**:
+   - **Component-Scoped Performance Profiling**: Filter and choose a component to profile exact microsecond-resolution render times and value update latency.
+   - **Start / Stop Recording Controls**:
+     - Dedicated **"Start Recording"** button initiates an active measurement recording session for the chosen component.
+     - Live recording session indicator with pulsing red glow and timer (`00:04`).
+     - Real-time polling automatically captures re-renders, signal mutations, and effect executions triggered as the user interacts with the webpage.
+     - **"Stop Recording"** concludes the session, freezes the recorded telemetry, and computes session KPIs:
+       - Total recorded updates and total session duration.
+       - Min, Max, and Average update latency across the entire recording session.
+       - Chronological updates log specific to the recorded interaction.
+   - **Key Performance Indicators (KPIs)**:
+     - **Initial Render Time**: Time taken for template inlining, slot projection, DOM compilation, and mounting (evaluated against the 16.6ms 60 FPS frame budget).
+     - **Value Update / Re-render Latency**: Live measurement of how much time is needed when signals change and trigger subscribed effects (displaying average, last, minimum, and maximum duration in milliseconds).
+     - **Updates Processed**: Total count of value mutations and cumulative execution time spent updating.
+   - **Signal & Effect Breakdown Table**: Comprehensive table tracking each signal and effect, displaying individual update counts, last execution duration, average latency, and total time spent.
+   - **Recent Updates Timeline / Log**: Chronological live log with timestamps, triggers, and precise duration badges.
+   - **Interactive Benchmark Button ("Test Update")**: Triggers an on-demand reactive signal mutation test directly on the active webpage component and immediately measures the roundtrip update latency!
 
-6. **Adwaita Glassmorphic Design System**:
-   - Translucent frosted glass surfaces with specular borders.
-   - Smooth GNOME transitions and system typography.
-   - Native dark mode baseline with light mode support.
+6. **Dedicated F12 Developer Tools Tab (Like Angular DevTools)**:
+   - Native integration directly into Chrome DevTools panel tab strip (alongside *Elements*, *Console*, *Sources*, *Network*).
+   - Stays permanently open side-by-side or docked at the bottom while interacting with your application.
+   - Automatically synchronizes with page reload (`F5`) and client-side route navigations.
 
 ---
 
@@ -55,12 +68,16 @@ An official DevTools extension for the **Purity Framework** built with **Manifes
 
 ```
 purity-browser-extensions/chrome/
-├── manifest.json       # Manifest V3 extension configuration
-├── background.js       # Background service worker (lifecycle & messaging)
-├── inspector.js        # MAIN-world in-page inspector script
-├── popup.html          # Three-tab inspector interface (Components, Services, Reactivity)
-├── popup.css           # Adwaita glassmorphic styles with visual graph & resize handle
-├── popup.js            # Controller handling inspection, tabs, graph visualization, and resizing
+├── manifest.json       # Manifest V3 extension configuration (devtools_page & host permissions)
+├── devtools.html       # DevTools background entry page
+├── devtools.js         # Registers the top-level "Purity" panel in Chrome DevTools
+├── panel.html          # Full DevTools interface (Components, Services, Reactivity, Metrics)
+├── panel.css           # Adwaita glassmorphic styles tailored for full DevTools viewport
+├── panel.js            # Main DevTools panel controller
+├── inspector.js        # MAIN-world in-page telemetry & inspection script
+├── popup.html          # Toolbar action launcher card pointing to F12 DevTools
+├── popup.css           # Launcher card styling
+├── popup.js            # Quick status checker for toolbar icon
 ├── icons/              # Extension icons (16px, 48px, 128px)
 └── README.md           # Setup and usage guide
 ```
@@ -81,4 +98,20 @@ purity-browser-extensions/chrome/
    purity-browser-extensions/chrome
    ```
 6. Open your Purity application (e.g., `http://localhost:5173` or any deployed Purity app).
-7. Click the **Purity Inspector** icon in your browser toolbar to inspect components, services, dependency graphs, and live signal-to-effect reactive connections!
+7. **Use in F12 Developer Tools (Recommended — Like Angular DevTools)**:
+   - Press **F12** (or `Ctrl+Shift+I` / right-click and choose **Inspect**).
+   - In the top DevTools panel tabs (alongside *Elements*, *Console*, *Sources*, *Network*), click **"Purity"**.
+   - The inspector stays permanently open docked alongside your app, automatically refreshes on page reload (`F5`), and never closes while interacting with the page!
+8. **Use as Standalone Browser Tab or Toolbar Popup**:
+   - Click the **Purity Inspector** icon in your browser extension toolbar.
+   - Click **"Open in New Browser Tab"** to open the full Purity Inspector inside its own dedicated browser tab.
+
+---
+
+## 🛠️ Troubleshooting & DevTools Tips
+
+- **DevTools Tab Not Showing**:
+  1. DevTools must be opened on a regular web page (e.g. `http://localhost:5173`), **not** on internal browser pages like `chrome://extensions` or `about:blank`, because Chrome security disables extension tabs on internal pages.
+  2. If DevTools was already open when you reloaded the extension, close DevTools (<kbd>F12</kbd>) and re-open it. Chrome only attaches extension panels when DevTools launches.
+  3. If your DevTools window is narrow, Chrome moves tabs into the `>>` overflow chevron at the far right of the tab bar. Click `>>` to reveal "Purity".
+  4. You can also click the extension toolbar icon and click **"Open in New Browser Tab"** to view Purity DevTools in a standard browser tab.
