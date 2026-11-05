@@ -1,117 +1,320 @@
 # Purity Chrome Inspector Extension
 
-An official DevTools extension for the **Purity Framework** built with **Manifest V3**.
+[![Manifest V3](https://img.shields.io/badge/Chrome_Extension-Manifest_V3-4285F4?logo=googlechrome&logoColor=white)](https://developer.chrome.com/docs/extensions/mv3/intro/)
+[![Purity Framework](https://img.shields.io/badge/Purity-DevTools-10b981)](https://github.com/devilbd/purity)
+[![Zero Build](https://img.shields.io/badge/Build-Zero_Compilation_Required-brightgreen)](https://developer.chrome.com/docs/extensions/mv3/getstarted/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](https://github.com/devilbd/purity/blob/main/LICENSE)
+
+An official, zero-build Chrome DevTools extension for the **[Purity Framework](https://github.com/devilbd/purity)** built on **Chrome Extensions Manifest V3**.
+
+Purity Inspector integrates directly into Google Chrome's Developer Tools panel (alongside *Elements*, *Console*, *Sources*, and *Network*). It provides deep, real-time introspection into Purity components, fine-grained reactive signals, computed values, active effects, the Dependency Injection container, and live microsecond-resolution render/update profiling.
 
 ---
 
-## 🔍 Features
+## 📋 Table of Contents
 
-1. **Automatic Detection**:
-   - Detects whether the active tab is running a Purity application.
-   - Shows active Purity version and status indicator in real time.
+- [📥 How to Download the Extension](#-how-to-download-the-extension)
+  - [Method 1: Clone the Entire Repository (Recommended)](#method-1-clone-the-entire-repository-recommended)
+  - [Method 2: Download Only the Chrome Extension Folder (Fastest & Lightest)](#method-2-download-only-the-chrome-extension-folder-fastest--lightest)
+  - [Method 3: Download as a ZIP Archive via GitHub Web](#method-3-download-as-a-zip-archive-via-github-web)
+  - [Method 4: Quick Terminal One-Liner (curl / tar)](#method-4-quick-terminal-one-liner-curl--tar)
+- [🛠️ How to Set Up & Install in Google Chrome](#️-how-to-set-up--install-in-google-chrome)
+  - [Prerequisites & Supported Browsers](#prerequisites--supported-browsers)
+  - [Step-by-Step Installation Walkthrough](#step-by-step-installation-walkthrough)
+- [🚀 How to Launch and Inspect Purity Applications](#-how-to-launch-and-inspect-purity-applications)
+  - [Mode 1: Dedicated Chrome DevTools Panel (Recommended)](#mode-1-dedicated-chrome-devtools-panel-recommended)
+  - [Mode 2: Toolbar Popup & Standalone Browser Tab](#mode-2-toolbar-popup--standalone-browser-tab)
+- [🔍 Features & Inspection Capabilities](#-features--inspection-capabilities)
+  - [1. Automatic Detection & App Telemetry](#1-automatic-detection--app-telemetry)
+  - [2. Tab 1: Components View](#2-tab-1-components-view)
+  - [3. Tab 2: Services View (Dependency Injection)](#3-tab-2-services-view-dependency-injection)
+  - [4. Tab 3: Reactivity Graph (Interactive Bipartite Visualizer)](#4-tab-3-reactivity-graph-interactive-bipartite-visualizer)
+  - [5. Tab 4: Metrics & Profiler (Start/Stop Recording & Telemetry)](#5-tab-4-metrics--profiler-startstop-recording--telemetry)
+- [🔄 How to Update or Reload After Changes](#-how-to-update-or-reload-after-changes)
+- [🛠️ Troubleshooting & FAQ](#️-troubleshooting--faq)
+- [📁 Directory Structure](#-directory-structure)
 
-2. **Tab 1: Components View**:
-   - Displays all registered and mounted Purity components as names (e.g. `AppComponent`, `HeaderComponent`, `DateRangePickerComponent`).
-   - Filter components via instant search.
-   - **Clicking a component reveals**:
-     - **Injected Services (`@Injectable`)**: which services the component uses, with direct shortcut navigation to the Services tab.
-     - **Signals & Computed Values**: property names, reactive types (`signal` vs `computed`), and live reactive values formatted with syntax colors.
-     - **Reactive Effects & Directives**: all active template binding effects, `onInit` effects, active directives, and form validators.
+---
 
-3. **Tab 2: Services View**:
-   - Displays all registered `@Injectable` services in the Dependency Injection container.
-   - Filter services via instant search.
-   - **Clicking a service reveals**:
-     - **Service Dependencies ("Depends on")**: represents which other services this service depends on (e.g. `Router` depending on `SeoService` or `HttpClient`).
-     - **Depended On By ("Used by")**: represents which components and other services inject/depend on this service (e.g. `ThemeService` used by `HeaderComponent`, `AnalogueClockComponent`).
-     - **Service Signals**: signals managed inside the service with live values.
+## 📥 How to Download the Extension
 
-4. **Tab 3: Reactivity Graph (High-Performance On-Demand Component Visualizer)**:
-   - **On-Demand Component Scoping**: To ensure peak rendering performance and prevent DOM clutter in large applications, signals and effects are rendered **only after a component is chosen**.
-   - **Component Filter & Quick Chips**:
-     - Fast search box (`#react-comp-search`) to filter components dynamically or select via `Enter`.
-     - Horizontal chip bar listing components with signal and effect count badges.
-     - Direct **"Reactivity"** shortcut button from Tab 1 (Components) to jump straight into a component's reactivity graph.
-   - **Active Component Banner**: Displays the currently inspected component tag, along with live counts for signals, effects, and active reactive connections, plus a one-click `✕ Clear` button.
-   - **Visual Bipartite Graph**: Visualizes the selected component's Signals/Computeds (left) and subscribed Effects/Directives (right).
-   - **Dynamic SVG Connectors**: Renders smooth cubic Bézier curves connecting the chosen component's signals to their subscriber effects.
-   - **Interactive Highlights**:
-     - Hovering/clicking a **Signal** illuminates its node, all outgoing reactive curves, and all dependent effects that re-run when it changes.
-     - Hovering/clicking an **Effect** illuminates its node, all incoming reactive curves, and all upstream signals that feed it.
+Choose any of the following methods to download the extension files to your local computer:
 
-5. **Tab 4: Metrics & Profiler (Start/Stop Recording & Re-render Telemetry)**:
-   - **Component-Scoped Performance Profiling**: Filter and choose a component to profile exact microsecond-resolution render times and value update latency.
-   - **Start / Stop Recording Controls**:
-     - Dedicated **"Start Recording"** button initiates an active measurement recording session for the chosen component.
-     - Live recording session indicator with pulsing red glow and timer (`00:04`).
-     - Real-time polling automatically captures re-renders, signal mutations, and effect executions triggered as the user interacts with the webpage.
-     - **"Stop Recording"** concludes the session, freezes the recorded telemetry, and computes session KPIs:
-       - Total recorded updates and total session duration.
-       - Min, Max, and Average update latency across the entire recording session.
-       - Chronological updates log specific to the recorded interaction.
-   - **Key Performance Indicators (KPIs)**:
-     - **Initial Render Time**: Time taken for template inlining, slot projection, DOM compilation, and mounting (evaluated against the 16.6ms 60 FPS frame budget).
-     - **Value Update / Re-render Latency**: Live measurement of how much time is needed when signals change and trigger subscribed effects (displaying average, last, minimum, and maximum duration in milliseconds).
-     - **Updates Processed**: Total count of value mutations and cumulative execution time spent updating.
-   - **Signal & Effect Breakdown Table**: Comprehensive table tracking each signal and effect, displaying individual update counts, last execution duration, average latency, and total time spent.
-   - **Recent Updates Timeline / Log**: Chronological live log with timestamps, triggers, and precise duration badges.
-   - **Interactive Benchmark Button ("Test Update")**: Triggers an on-demand reactive signal mutation test directly on the active webpage component and immediately measures the roundtrip update latency!
+### Method 1: Clone the Entire Repository (Recommended)
 
-6. **Dedicated F12 Developer Tools Tab (Like Angular DevTools)**:
-   - Native integration directly into Chrome DevTools panel tab strip (alongside *Elements*, *Console*, *Sources*, *Network*).
-   - Stays permanently open side-by-side or docked at the bottom while interacting with your application.
-   - Automatically synchronizes with page reload (`F5`) and client-side route navigations.
+If you are developing with or contributing to the Purity framework, clone the official Git repository:
+
+```bash
+git clone https://github.com/devilbd/purity.git
+cd purity/purity-browser-extensions/chrome
+```
+
+The extension files will be immediately available in the `purity/purity-browser-extensions/chrome` directory.
+
+### Method 2: Download Only the Chrome Extension Folder (Fastest & Lightest)
+
+If you only want the Chrome extension without cloning the rest of the framework codebase:
+
+#### Option A: Using `degit` (Zero-config one-liner)
+
+```bash
+npx degit devilbd/purity/purity-browser-extensions/chrome purity-chrome-extension
+cd purity-chrome-extension
+```
+
+#### Option B: Using Git Sparse-Checkout
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/devilbd/purity.git purity-extension
+cd purity-extension
+git sparse-checkout set purity-browser-extensions/chrome
+```
+
+The extension will be located at `purity-extension/purity-browser-extensions/chrome`.
+
+### Method 3: Download as a ZIP Archive via GitHub Web
+
+1. Open your browser and navigate to the repository: [https://github.com/devilbd/purity](https://github.com/devilbd/purity)
+2. Click the green **Code** button at the top-right of the file list.
+3. Select **Download ZIP** (or directly download: `https://github.com/devilbd/purity/archive/refs/heads/main.zip`).
+4. Once downloaded, extract the ZIP file to your preferred folder (e.g. `Downloads/` or `Desktop/`).
+5. Open the extracted folder and locate the extension directory:
+   ```text
+   purity-main/purity-browser-extensions/chrome
+   ```
+
+### Method 4: Quick Terminal One-Liner (curl / tar)
+
+On Linux or macOS, you can extract just the Chrome extension directory in a single command:
+
+```bash
+mkdir -p purity-chrome-extension && curl -sSL https://github.com/devilbd/purity/tarball/main | tar -xz -C purity-chrome-extension --strip-components=3 "*/purity-browser-extensions/chrome"
+```
+
+---
+
+## 🛠️ How to Set Up & Install in Google Chrome
+
+The Purity Chrome Inspector requires **zero build step** or compilation. It is pure standard web technology ready to be loaded as an unpacked extension immediately.
+
+### Prerequisites & Supported Browsers
+
+- **Google Chrome** (v88+ with Manifest V3 support)
+- Any modern **Chromium-based browser**:
+  - Microsoft Edge
+  - Brave Browser
+  - Arc Browser
+  - Vivaldi
+  - Opera
+
+---
+
+### Step-by-Step Installation Walkthrough
+
+#### Step 1: Open Chrome Extensions Page
+Open Google Chrome and navigate to the extensions management page:
+- In the address bar, type:
+  ```text
+  chrome://extensions/
+  ```
+  and press <kbd>Enter</kbd>.
+- Alternatively, click the Chrome menu (**⋮** three dots in the upper-right corner) ➔ **Extensions** ➔ **Manage Extensions**.
+
+---
+
+#### Step 2: Enable "Developer mode"
+In the top-right corner of the `chrome://extensions` page, find the toggle switch labeled **Developer mode** and switch it **ON**.
+
+```text
+[ Developer mode   (●) ]
+```
+
+When enabled, a secondary toolbar containing three buttons will appear in the top-left:
+- **Load unpacked**
+- **Pack extension**
+- **Update**
+
+---
+
+#### Step 3: Click "Load unpacked"
+Click the **Load unpacked** button in the top toolbar.
+
+---
+
+#### Step 4: Select the Extension Folder
+A system file chooser dialog will appear. Browse to and select the `chrome` folder:
+
+```text
+/path/to/purity/purity-browser-extensions/chrome
+```
+
+> [!IMPORTANT]
+> **Select the folder containing `manifest.json`!**
+> Ensure you select the `chrome/` directory directly (which contains `manifest.json`, `devtools.html`, etc.). Do **NOT** select the parent directory `purity-browser-extensions/`. Selecting the wrong folder will cause Chrome to display a *"Manifest file is missing or unreadable"* error.
+
+---
+
+#### Step 5: Verify Successful Installation
+Once selected, the extension card will immediately appear on your `chrome://extensions` page:
+
+- **Name**: Purity Inspector
+- **Version**: 1.0.0
+- **Description**: Inspect Purity framework components, services, dependency injection, signals, and effects.
+- **Status**: Enabled (blue toggle switch)
+
+---
+
+#### Step 6: (Recommended) Pin to Chrome Toolbar
+1. Click the **Extensions** puzzle icon (🧩) in the top-right corner of Chrome's toolbar.
+2. Locate **Purity Inspector**.
+3. Click the **Pin** icon (📌) next to it so the Purity icon remains visible in your browser toolbar for fast one-click access.
+
+---
+
+## 🚀 How to Launch and Inspect Purity Applications
+
+### Mode 1: Dedicated Chrome DevTools Panel (Recommended)
+
+Like Angular DevTools, Vue DevTools, or React Developer Tools, Purity Inspector runs as a first-class citizen inside Chrome DevTools:
+
+1. Open your Purity web application in Chrome:
+   - For local development: `http://localhost:5173` (or your local dev server port).
+   - Or any deployed Purity web application.
+2. Open Chrome Developer Tools:
+   - Press <kbd>F12</kbd> (Windows/Linux) or <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>I</kbd> (macOS).
+   - Or right-click anywhere on the page and select **Inspect**.
+3. In the top DevTools panel tabs (*Elements*, *Console*, *Sources*, *Network*...), locate and click the **Purity** tab.
+   > [!TIP]
+   > If your DevTools window is narrow, Chrome moves trailing tabs into the overflow menu marked with double chevrons (`>>`). Click `>>` to reveal and select **Purity**.
+4. The Purity DevTools panel will connect to the page and display real-time telemetry. It stays docked, auto-refreshes on page reload (<kbd>F5</kbd>), and updates live as you interact with the page!
+
+---
+
+### Mode 2: Toolbar Popup & Standalone Browser Tab
+
+1. Click the **Purity Inspector** icon in your browser's top toolbar.
+2. A status launcher card will pop up showing whether a Purity application is detected on the active tab.
+3. Click **"Open in New Browser Tab"** to launch the full inspector in its own dedicated, full-screen browser window. This is ideal for dual-monitor setups or side-by-side inspection.
+
+---
+
+## 🔍 Features & Inspection Capabilities
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│  Purity DevTools [v2.1.1] [🟢 Active]               [🔄 Refresh]        │
+├──────────────┬──────────────┬──────────────────┬───────────────────────┤
+│  Components  │   Services   │ Reactivity Graph │  Metrics & Profiler   │
+│     (12)     │     (5)      │       (24)       │        (0.2ms)        │
+└──────────────┴──────────────┴──────────────────┴───────────────────────┘
+```
+
+### 1. Automatic Detection & App Telemetry
+- Inspects the active tab in real time to detect if a Purity application is mounted.
+- Displays the active Purity framework version, total component count, and reactive state.
+- Automatically handles tab changes, SPA route navigations, and live reloads.
+
+### 2. Tab 1: Components View
+- **Component Tree & Discovery**: Lists all registered and mounted Purity components (e.g. `AppComponent`, `HeaderComponent`, `DateTimePickerComponent`).
+- **Instant Search**: Filter through component trees dynamically with debounced fuzzy search.
+- **Deep Inspection Panel**:
+  - **Injected Services (`@Injectable`)**: Reveals every service injected into the selected component with direct click-through navigation to the Services tab.
+  - **Signals & Computeds**: Displays reactive property names, signal types (`signal` vs `computed`), and live reactive values formatted with syntax colors.
+  - **Effects & Directives**: Lists all active template-binding effects, `onInit` effects, applied directives (`[highlight]`, `[dropdown]`), and form validators.
+  - **Shortcut Navigation**: One-click **"Reactivity"** button jumping directly into that component's visual reactivity graph.
+
+### 3. Tab 2: Services View (Dependency Injection)
+- **DI Registry**: Displays all singleton and transient `@Injectable` services registered in the Purity Dependency Injection container.
+- **Dependency Flow**:
+  - **Depends on**: Details which upstream services or providers this service injects (e.g., `Router` depending on `SeoService` and `HttpClient`).
+  - **Used by / Depended on by**: Details which downstream components and services depend on this service (e.g., `ThemeService` consumed by `HeaderComponent`, `AnalogueClockComponent`).
+- **Internal Service State**: Real-time signal values maintained inside service instances.
+
+### 4. Tab 3: Reactivity Graph (Interactive Bipartite Visualizer)
+- **On-Demand Component Scoping**: To ensure peak 60 FPS performance and zero DOM clutter on large applications, reactivity graphs are rendered dynamically for the selected component.
+- **Component Selector & Quick Chips**: Search for components or click chips displaying live signal and effect counts.
+- **Bipartite Node Visualization**:
+  - **Left column**: Signals & Computeds with current values.
+  - **Right column**: Subscribed Effects, Directives, and DOM bindings.
+- **Dynamic Bézier SVG Connectors**: Smooth cubic Bézier curves connecting signals to their subscribed effect nodes.
+- **Interactive Highlighting**:
+  - Hovering/clicking a **Signal** illuminates its node, all outgoing reactive curves, and all dependent effects that re-evaluate when that signal mutates.
+  - Hovering/clicking an **Effect** illuminates its node, all incoming curves, and all upstream signals that trigger it.
+
+### 5. Tab 4: Metrics & Profiler (Start/Stop Recording & Telemetry)
+- **Performance Profiling**: Microsecond-resolution telemetry for initial render time and reactive update latency.
+- **Start / Stop Recording Controls**:
+  - Click **"Start Recording"** to monitor live user interactions, signal mutations, and effect re-runs.
+  - Visual recording indicator with elapsed duration timer.
+  - Click **"Stop Recording"** to freeze telemetry and calculate session KPIs:
+    - Min, Max, and Average update latency.
+    - Total updates processed across the session.
+- **Initial Render Budget**: Evaluates template inlining, slot projection, DOM compilation, and mounting against the 16.6ms 60 FPS frame budget.
+- **Signal & Effect Breakdown Table**: Comprehensive table displaying update frequencies, last execution duration, average latency, and cumulative execution time.
+- **Interactive Benchmark Button ("Test Update")**: Triggers an on-demand reactive signal mutation test directly on the active webpage component to measure real-time roundtrip update latency.
+
+---
+
+## 🔄 How to Update or Reload After Changes
+
+When modifying the extension files or pulling new updates from Git:
+
+1. Open `chrome://extensions/`.
+2. Locate the **Purity Inspector** card.
+3. Click the circular **Reload** icon (🔄) on the card.
+4. If Chrome DevTools was already open on a tab, close it (<kbd>F12</kbd>) and re-open it to load the updated extension bundle.
+
+---
+
+## 🛠️ Troubleshooting & FAQ
+
+### 1. The "Purity" tab does not appear in Chrome DevTools
+- **Check the page URL**: Chrome disallows extension panels on internal browser URLs (`chrome://*`, `chrome-extension://*`, `about:blank`, or the Chrome Web Store). Make sure you have opened a standard HTTP/HTTPS page (such as `http://localhost:5173`).
+- **Check the tab overflow**: If your DevTools window is narrow, Chrome moves additional tabs into the `>>` chevron on the right side of the tab strip. Click `>>` to find **Purity**.
+- **Close and reopen DevTools**: Chrome only initializes extension panels when DevTools launches. Press <kbd>F12</kbd> twice to reload DevTools.
+
+### 2. Error: "Manifest file is missing or unreadable"
+- You selected the parent directory `purity-browser-extensions` instead of `purity-browser-extensions/chrome`.
+- When clicking **Load unpacked**, navigate *inside* `purity-browser-extensions/` and select the `chrome` folder where `manifest.json` is located.
+
+### 3. "Purity DevTools cannot be used in production mode"
+- In production builds (where `environment.production === true`), debug inspection hooks are disabled by default for security and performance.
+- To inspect your app, run it in development mode (`npm run dev` or ensure `production: false` in your environment config).
+
+### 4. Keyboard Shortcuts Cheatsheet
+
+| Shortcut | Action |
+|---|---|
+| <kbd>F12</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>I</kbd> | Open Chrome DevTools (Windows / Linux) |
+| <kbd>Cmd</kbd>+<kbd>Option</kbd>+<kbd>I</kbd> | Open Chrome DevTools (macOS) |
+| <kbd>F5</kbd> or <kbd>Ctrl</kbd>+<kbd>R</kbd> | Reload page & re-synchronize Purity telemetry |
+| <kbd>Esc</kbd> | Toggle DevTools bottom drawer console |
 
 ---
 
 ## 📁 Directory Structure
 
-```
+```text
 purity-browser-extensions/chrome/
-├── manifest.json       # Manifest V3 extension configuration (devtools_page & host permissions)
+├── manifest.json       # Manifest V3 extension configuration & permissions
 ├── devtools.html       # DevTools background entry page
 ├── devtools.js         # Registers the top-level "Purity" panel in Chrome DevTools
-├── panel.html          # Full DevTools interface (Components, Services, Reactivity, Metrics)
-├── panel.css           # Adwaita glassmorphic styles tailored for full DevTools viewport
-├── panel.js            # Main DevTools panel controller
-├── inspector.js        # MAIN-world in-page telemetry & inspection script
-├── popup.html          # Toolbar action launcher card pointing to F12 DevTools
-├── popup.css           # Launcher card styling
-├── popup.js            # Quick status checker for toolbar icon
-├── icons/              # Extension icons (16px, 48px, 128px)
-└── README.md           # Setup and usage guide
+├── panel.html          # Main DevTools panel interface (Components, Services, Reactivity, Metrics)
+├── panel.css           # Adwaita glassmorphic styling tailored for DevTools viewports
+├── panel.js            # DevTools panel controller & visualizer logic
+├── inspector.js        # MAIN-world in-page telemetry & inspection agent
+├── popup.html          # Browser toolbar launcher card
+├── popup.css           # Toolbar launcher styling
+├── popup.js            # Quick status checker for browser toolbar action
+├── icons/              # Extension icons
+│   ├── icon-16.png     # 16x16 icon for favicon & tab
+│   ├── icon-48.png     # 48x48 icon for extensions management
+│   └── icon-128.png    # 128x128 high-res icon for installation & Web Store
+└── README.md           # This setup, download, and usage guide
 ```
 
 ---
 
-## 🚀 How to Load and Test in Google Chrome
+## 📄 License
 
-1. Open Google Chrome (or any Chromium browser: Brave, Edge, Vivaldi, Arc).
-2. In the URL address bar, enter:
-   ```text
-   chrome://extensions/
-   ```
-3. Enable **Developer mode** using the toggle switch located in the upper-right corner.
-4. Click the **Load unpacked** button in the top toolbar.
-5. In the file picker dialog, select this folder:
-   ```text
-   purity-browser-extensions/chrome
-   ```
-6. Open your Purity application (e.g., `http://localhost:5173` or any deployed Purity app).
-7. **Use in F12 Developer Tools (Recommended — Like Angular DevTools)**:
-   - Press **F12** (or `Ctrl+Shift+I` / right-click and choose **Inspect**).
-   - In the top DevTools panel tabs (alongside *Elements*, *Console*, *Sources*, *Network*), click **"Purity"**.
-   - The inspector stays permanently open docked alongside your app, automatically refreshes on page reload (`F5`), and never closes while interacting with the page!
-8. **Use as Standalone Browser Tab or Toolbar Popup**:
-   - Click the **Purity Inspector** icon in your browser extension toolbar.
-   - Click **"Open in New Browser Tab"** to open the full Purity Inspector inside its own dedicated browser tab.
-
----
-
-## 🛠️ Troubleshooting & DevTools Tips
-
-- **DevTools Tab Not Showing**:
-  1. DevTools must be opened on a regular web page (e.g. `http://localhost:5173`), **not** on internal browser pages like `chrome://extensions` or `about:blank`, because Chrome security disables extension tabs on internal pages.
-  2. If DevTools was already open when you reloaded the extension, close DevTools (<kbd>F12</kbd>) and re-open it. Chrome only attaches extension panels when DevTools launches.
-  3. If your DevTools window is narrow, Chrome moves tabs into the `>>` overflow chevron at the far right of the tab bar. Click `>>` to reveal "Purity".
-  4. You can also click the extension toolbar icon and click **"Open in New Browser Tab"** to view Purity DevTools in a standard browser tab.
+Purity Inspector is open-source software licensed under the [MIT License](https://github.com/devilbd/purity/blob/main/LICENSE).
