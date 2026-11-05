@@ -497,8 +497,6 @@ function inspectPurityAppInPage() {
     return profiler;
   }
 
-  const profiler = getOrInstallProfiler();
-
   // Scan DOM for all Purity custom elements
   const appRef = typeof window !== 'undefined' ? window.__PURITY_APP__ : null;
   const registry = typeof globalThis !== 'undefined' && globalThis.__PURITY_COMPONENT_REGISTRY__
@@ -527,6 +525,8 @@ function inspectPurityAppInPage() {
   if (!isPurityDetected) {
     return {
       detected: false,
+      productionMode: false,
+      devMode: false,
       framework: 'Purity',
       version: 'Unknown',
       components: [],
@@ -535,6 +535,59 @@ function inspectPurityAppInPage() {
       recordingSession: null,
     };
   }
+
+  // Check if the Purity application is running in Production Mode
+  let env = appRef?.environment || null;
+  if (!env && typeof globalThis !== 'undefined' && globalThis.__PURITY_CONTAINER__) {
+    try {
+      const di = globalThis.__PURITY_CONTAINER__;
+      if (di.instances && di.instances.has('ENVIRONMENT')) {
+        env = di.instances.get('ENVIRONMENT');
+      }
+    } catch {}
+  }
+
+  let isProdBuildVersion = false;
+  if (env && typeof env.buildVersion === 'string' && env.buildVersion.includes('-prod')) {
+    isProdBuildVersion = true;
+  } else if (typeof document !== 'undefined') {
+    const footerEl = document.querySelector('footer-component');
+    if (footerEl && typeof footerEl.buildVersion === 'function') {
+      try {
+        const bv = footerEl.buildVersion();
+        if (typeof bv === 'string' && bv.includes('-prod')) {
+          isProdBuildVersion = true;
+        }
+      } catch {}
+    }
+  }
+
+  const isProductionMode = Boolean(
+    (env && (env.production === true || env.enableDebugTools === false)) ||
+    isProdBuildVersion ||
+    (typeof window !== 'undefined' &&
+      typeof window.__PURITY_DEVTOOLS__?.isProductionMode === 'function' &&
+      window.__PURITY_DEVTOOLS__.isProductionMode())
+  );
+
+  if (isProductionMode) {
+    return {
+      detected: true,
+      productionMode: true,
+      devMode: false,
+      framework: 'Purity',
+      version: env?.version || '2.1.0',
+      buildVersion: env?.buildVersion || null,
+      appName: env?.appName || 'Purity',
+      message: 'Purity DevTools cannot be used in production mode. The tool is viable only in development mode (production: false).',
+      components: [],
+      services: [],
+      reactivityGraph: [],
+      recordingSession: null,
+    };
+  }
+
+  const profiler = getOrInstallProfiler();
 
   const componentMap = new Map();
   const discoveredServices = new Map();
@@ -1098,9 +1151,12 @@ function inspectPurityAppInPage() {
 
   return {
     detected: true,
+    productionMode: false,
+    devMode: true,
     framework: 'Purity',
-    version: appRef?.environment?.version || '2.1.0',
-    appName: appRef?.environment?.appName || 'Purity App',
+    version: env?.version || appRef?.environment?.version || '2.1.0',
+    buildVersion: env?.buildVersion || null,
+    appName: env?.appName || appRef?.environment?.appName || 'Purity (Dev)',
     components,
     services,
     reactivityGraph,
@@ -1112,9 +1168,16 @@ function inspectPurityAppInPage() {
  * Starts recording re-render and value update measurements for a chosen component.
  */
 function startRecordingInPage(componentName) {
+  if (typeof window !== 'undefined' && window.__PURITY_APP__?.environment) {
+    const env = window.__PURITY_APP__.environment;
+    if (env.production === true || env.enableDebugTools === false) {
+      return null;
+    }
+  }
   if (typeof window !== 'undefined' && typeof window.__PURITY_INSPECT_FN__ === 'function') {
     try {
-      window.__PURITY_INSPECT_FN__();
+      const snap = window.__PURITY_INSPECT_FN__();
+      if (snap && snap.productionMode) return null;
     } catch {}
   }
 
@@ -1144,6 +1207,12 @@ function startRecordingInPage(componentName) {
  * Stops the active component recording session and returns the final session telemetry.
  */
 function stopRecordingInPage() {
+  if (typeof window !== 'undefined' && window.__PURITY_APP__?.environment) {
+    const env = window.__PURITY_APP__.environment;
+    if (env.production === true || env.enableDebugTools === false) {
+      return null;
+    }
+  }
   if (typeof window !== 'undefined' && window.__PURITY_RECORDING_SESSION__) {
     const session = window.__PURITY_RECORDING_SESSION__;
     session.isActive = false;
@@ -1158,9 +1227,16 @@ function stopRecordingInPage() {
  * Triggers a live benchmark/update measurement for a specific component.
  */
 function benchmarkComponentInPage(componentName) {
+  if (typeof window !== 'undefined' && window.__PURITY_APP__?.environment) {
+    const env = window.__PURITY_APP__.environment;
+    if (env.production === true || env.enableDebugTools === false) {
+      return null;
+    }
+  }
   if (typeof window !== 'undefined' && typeof window.__PURITY_INSPECT_FN__ === 'function') {
     try {
-      window.__PURITY_INSPECT_FN__();
+      const snap = window.__PURITY_INSPECT_FN__();
+      if (snap && snap.productionMode) return null;
     } catch {}
   }
 

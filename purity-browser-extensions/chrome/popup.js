@@ -18,6 +18,9 @@ async function checkPurityStatus() {
   const badge = document.getElementById('app-badge');
   const statusText = document.getElementById('launcher-status');
   const appInfo = document.getElementById('launcher-app-info');
+  const actionsBox = document.getElementById('launcher-actions');
+  const instructionsBox = document.getElementById('launcher-instructions');
+  const prodNoticeBox = document.getElementById('launcher-prod-notice');
 
   try {
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -56,14 +59,31 @@ async function checkPurityStatus() {
       if (statusText) {
         statusText.textContent = 'No Purity application detected on active tab. Open a Purity app to inspect.';
       }
+      prodNoticeBox?.classList.add('hidden');
+      appInfo?.classList.add('hidden');
+    } else if (data.productionMode) {
+      if (badge) {
+        badge.className = 'badge badge-danger';
+        badge.textContent = `Purity ${data.version || '2.1.0'} • Prod Mode`;
+      }
+      if (statusText) {
+        statusText.textContent = 'Production mode detected. Purity DevTools cannot be used in production mode — the tool is viable only in Development Mode.';
+      }
+      actionsBox?.classList.add('hidden');
+      instructionsBox?.classList.add('hidden');
+      appInfo?.classList.add('hidden');
+      prodNoticeBox?.classList.remove('hidden');
     } else {
       if (badge) {
         badge.className = 'badge badge-success';
-        badge.textContent = `Purity ${data.version || '2.1.0'}`;
+        badge.textContent = `Purity ${data.version || '2.1.0'} • Dev Mode`;
       }
       if (statusText) {
-        statusText.textContent = `Purity is active! Open Developer Tools to inspect components, services, and reactivity.`;
+        statusText.textContent = `Purity is active in Development Mode! Open Developer Tools to inspect components, services, and reactivity.`;
       }
+      prodNoticeBox?.classList.add('hidden');
+      actionsBox?.classList.remove('hidden');
+      instructionsBox?.classList.remove('hidden');
 
       if (appInfo) {
         appInfo.classList.remove('hidden');

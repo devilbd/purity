@@ -98,6 +98,32 @@
         </button>
       </section>
 
+      <!-- Production Mode Blocked State -->
+      <section id="view-production-mode" class="view-panel empty-state prod-blocked-state hidden">
+        <div class="empty-icon-wrap prod-icon-wrap">
+          <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <rect x="9" y="10" width="6" height="5" rx="1"></rect>
+            <path d="M10 10V8a2 2 0 1 1 4 0v2"></path>
+          </svg>
+        </div>
+        <h2 class="empty-title">Production Mode Detected — DevTools Disabled</h2>
+        <p class="empty-desc">
+          The inspected application (<strong id="prod-app-name">Purity</strong> <span id="prod-app-version" class="code-badge">v2.1.0</span>) is running in <strong>Production Mode</strong>.
+          Purity DevTools cannot be used in production mode and is viable only in <strong>Development Mode</strong>.
+        </p>
+        <div class="prod-info-card">
+          <div class="prod-info-header">How to use Purity DevTools in Development Mode:</div>
+          <ul class="prod-info-list">
+            <li>Run your local development server using <code>npm run dev</code> (or <code>vite</code>).</li>
+            <li>Ensure your environment configuration sets <code>production: false</code> and <code>enableDebugTools: true</code> in <code>bootstrapApplication(AppComponent, { environment })</code>.</li>
+          </ul>
+        </div>
+        <button id="btn-retry-prod-check" class="btn-primary" type="button">
+          Re-check Environment Mode
+        </button>
+      </section>
+
       <!-- 1. Components Tab View -->
       <section id="view-components" class="view-panel split-view">
         <aside class="master-pane">

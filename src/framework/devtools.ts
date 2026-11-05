@@ -73,6 +73,9 @@ export interface ReactiveLink {
 
 export interface PurityInspectionSnapshot {
     detected: boolean;
+    productionMode?: boolean;
+    devMode?: boolean;
+    message?: string;
     framework: string;
     version: string;
     timestamp: number;
@@ -80,6 +83,37 @@ export interface PurityInspectionSnapshot {
     services: ServiceInspection[];
     reactivityGraph: ReactiveLink[];
     recordingSession?: any;
+}
+
+/**
+ * Checks whether the active Purity application is running in Production Mode.
+ * DevTools inspection and profiling are strictly restricted to Development Mode.
+ */
+export function isProductionMode(): boolean {
+    try {
+        if (typeof window !== 'undefined' && (window as any).__PURITY_APP__?.environment) {
+            const env = (window as any).__PURITY_APP__.environment;
+            if (
+                env.production === true ||
+                env.enableDebugTools === false ||
+                (typeof env.buildVersion === 'string' && env.buildVersion.includes('-prod'))
+            ) {
+                return true;
+            }
+        }
+        const env = container.getServiceInstance('ENVIRONMENT');
+        if (
+            env &&
+            (env.production === true ||
+                env.enableDebugTools === false ||
+                (typeof env.buildVersion === 'string' && env.buildVersion.includes('-prod')))
+        ) {
+            return true;
+        }
+    } catch {
+        // Ignore resolution errors
+    }
+    return false;
 }
 
 /**
@@ -213,6 +247,7 @@ function extractSignalsFromObject(target: any, ownerName = 'Unknown'): SignalInf
  * Inspects all components in the active Purity application.
  */
 export function getComponentsInspection(): ComponentInspection[] {
+    if (isProductionMode()) return [];
     const registry: Map<string, any> = (globalThis as any).__PURITY_COMPONENT_REGISTRY__ || new Map();
     const componentMap = new Map<string, {
         name: string;
@@ -469,6 +504,7 @@ export function getComponentsInspection(): ComponentInspection[] {
  * Inspects all registered and resolved services in the application.
  */
 export function getServicesInspection(): ServiceInspection[] {
+    if (isProductionMode()) return [];
     const registeredNames = container.getAllRegisteredServices();
     const serviceMap = new Map<string, ServiceInspection>();
 
@@ -672,14 +708,35 @@ export function getReactivityGraph(
  * Creates the full DevTools inspector API snapshot.
  */
 export function inspectPurityApp(): PurityInspectionSnapshot {
+    const prod = isProductionMode();
+    const appEnv = (typeof window !== 'undefined' && (window as any).__PURITY_APP__?.environment) || null;
+
+    if (prod) {
+        return {
+            detected: true,
+            productionMode: true,
+            devMode: false,
+            message: 'Purity DevTools cannot be used on production mode builds. The tool is viable only in development mode (production: false).',
+            framework: 'Purity',
+            version: appEnv?.version || '2.1.0',
+            timestamp: Date.now(),
+            components: [],
+            services: [],
+            reactivityGraph: [],
+            recordingSession: null,
+        };
+    }
+
     const components = getComponentsInspection();
     const services = getServicesInspection();
     const reactivityGraph = getReactivityGraph(components, services);
 
     return {
         detected: true,
+        productionMode: false,
+        devMode: true,
         framework: 'Purity',
-        version: '2.1.0',
+        version: appEnv?.version || '2.1.0',
         timestamp: Date.now(),
         components,
         services,
@@ -689,6 +746,7 @@ export function inspectPurityApp(): PurityInspectionSnapshot {
 }
 
 export function startComponentRecording(componentName: string) {
+    if (isProductionMode()) return null;
     // Ensure all signals and components are scanned and tagged with __purity_name / __purity_owner
     getComponentsInspection();
     getServicesInspection();
@@ -713,6 +771,7 @@ export function startComponentRecording(componentName: string) {
 }
 
 export function stopComponentRecording() {
+    if (isProductionMode()) return null;
     if (typeof window !== 'undefined' && (window as any).__PURITY_RECORDING_SESSION__) {
         const session = (window as any).__PURITY_RECORDING_SESSION__;
         session.isActive = false;
@@ -724,6 +783,7 @@ export function stopComponentRecording() {
 }
 
 export function benchmarkComponentUpdate(componentName: string) {
+    if (isProductionMode()) return null;
     if (typeof document === 'undefined') return null;
     const el = Array.from(document.querySelectorAll('*')).find((e: any) =>
         e.__purity_component_name === componentName ||
@@ -770,6 +830,7 @@ export function createDevTools() {
     return {
         isPurity: true,
         version: '2.1.0',
+        isProductionMode,
         getComponents: getComponentsInspection,
         getServices: getServicesInspection,
         getReactivity: () => getReactivityGraph(getComponentsInspection(), getServicesInspection()),

@@ -115,12 +115,36 @@ describe('Purity DevTools Inspector', () => {
 
         // Test start recording
         const session = createDevTools().startRecording('TestInspectorChildComponent');
-        expect(session.isActive).toBe(true);
-        expect(session.componentName).toBe('TestInspectorChildComponent');
+        expect(session?.isActive).toBe(true);
+        expect(session?.componentName).toBe('TestInspectorChildComponent');
 
         // Test stop recording
         const finished = createDevTools().stopRecording();
         expect(finished?.isActive).toBe(false);
         expect(typeof finished?.totalDurationMs).toBe('number');
+    });
+
+    it('should block inspection and recording when running in production mode', () => {
+        const prevApp = (window as any).__PURITY_APP__;
+        (window as any).__PURITY_APP__ = {
+            environment: {
+                production: true,
+                enableDebugTools: false,
+                version: '2.1.0',
+            },
+        };
+
+        try {
+            const snapshot = inspectPurityApp();
+            expect(snapshot.detected).toBe(true);
+            expect(snapshot.productionMode).toBe(true);
+            expect(snapshot.devMode).toBe(false);
+            expect(snapshot.components).toEqual([]);
+            expect(snapshot.services).toEqual([]);
+            expect(snapshot.reactivityGraph).toEqual([]);
+            expect(createDevTools().startRecording('TestInspectorChildComponent')).toBeNull();
+        } finally {
+            (window as any).__PURITY_APP__ = prevApp;
+        }
     });
 });

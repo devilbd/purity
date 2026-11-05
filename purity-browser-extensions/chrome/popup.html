@@ -21,7 +21,7 @@
         Purity DevTools is integrated directly into Chrome Developer Tools.
       </p>
 
-      <div class="launcher-actions">
+      <div id="launcher-actions" class="launcher-actions">
         <button id="btn-open-browser-tab" class="btn-launcher-primary" type="button">
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -32,7 +32,14 @@
         </button>
       </div>
 
-      <div class="launcher-instruction-box">
+      <div id="launcher-prod-notice" class="launcher-prod-box hidden">
+        <div class="prod-box-title">🔒 Production Mode Disabled</div>
+        <div class="prod-box-desc">
+          Purity DevTools cannot be used in production mode. Run your app in development mode (<code>npm run dev</code> or <code>production: false</code>) to use the inspector.
+        </div>
+      </div>
+
+      <div id="launcher-instructions" class="launcher-instruction-box">
         <div class="step-row">
           <span class="step-num">1</span>
           <span>Press <kbd>F12</kbd> (or right-click ➔ <strong>Inspect</strong>)</span>

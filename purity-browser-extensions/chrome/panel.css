@@ -147,6 +147,12 @@ html, body {
   color: var(--status-orange);
 }
 
+.badge-prod {
+  background: rgba(237, 51, 59, 0.16);
+  color: #f66151;
+  border: 1px solid rgba(237, 51, 59, 0.3);
+}
+
 .btn-icon {
   background: transparent;
   border: none;
@@ -286,6 +292,52 @@ html, body {
 
 .btn-primary:hover {
   background-color: var(--accent-hover);
+}
+
+.prod-icon-wrap {
+  color: #f66151;
+  background: rgba(237, 51, 59, 0.12);
+  padding: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(237, 51, 59, 0.25);
+}
+
+.prod-info-card {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  padding: 14px 18px;
+  max-width: 480px;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.prod-info-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.prod-info-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.prod-info-list li {
+  margin-bottom: 4px;
+}
+
+.prod-info-list code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent-color);
 }
 
 /* --------------------------------------------------

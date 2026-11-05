@@ -34,9 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
   initUI();
   refreshInspection();
 
-  // Live telemetry poller when viewing a component on the Metrics tab (unless frozen on a completed recording)
+  // Live telemetry poller when viewing a component on the Metrics tab (unless frozen on a completed recording or in production mode)
   liveTelemetryPollInterval = setInterval(async () => {
-    if (currentTab === 'metrics' && selectedMetricsComponentName && !isRecording && !lastRecordedSession) {
+    if (
+      currentSnapshot &&
+      !currentSnapshot.productionMode &&
+      currentTab === 'metrics' &&
+      selectedMetricsComponentName &&
+      !isRecording &&
+      !lastRecordedSession
+    ) {
       await refreshInspection(true);
     }
   }, 450);
@@ -135,6 +142,7 @@ function initUI() {
     refreshInspection();
   });
   document.getElementById('btn-retry-detect')?.addEventListener('click', () => refreshInspection());
+  document.getElementById('btn-retry-prod-check')?.addEventListener('click', () => refreshInspection());
 
   // Search Inputs
   const compSearch = document.getElementById('comp-search-input');
@@ -275,6 +283,9 @@ async function refreshInspection(silent = false) {
 
     if (!data || !data.detected) {
       if (!silent) showNotDetectedState();
+    } else if (data.productionMode) {
+      currentSnapshot = data;
+      showProductionModeState(data);
     } else {
       currentSnapshot = data;
       if (silent) {
@@ -317,6 +328,38 @@ function showNotDetectedState() {
 
   document.getElementById('nav-tabs')?.classList.add('hidden');
   document.getElementById('view-not-detected')?.classList.remove('hidden');
+  document.getElementById('view-production-mode')?.classList.add('hidden');
+  document.getElementById('view-components')?.classList.add('hidden');
+  document.getElementById('view-services')?.classList.add('hidden');
+  document.getElementById('view-reactivity')?.classList.add('hidden');
+  document.getElementById('view-metrics')?.classList.add('hidden');
+}
+
+function showProductionModeState(data) {
+  if (isRecording) {
+    clearInterval(recordingTimerInterval);
+    clearInterval(recordingPollInterval);
+    recordingTimerInterval = null;
+    recordingPollInterval = null;
+    isRecording = false;
+    updateRecordButtonUI(false);
+  }
+
+  const badge = document.getElementById('app-badge');
+  if (badge) {
+    badge.className = 'badge badge-prod';
+    badge.textContent = `Purity ${data.version || '2.1.0'} • Production Mode`;
+  }
+
+  const prodName = document.getElementById('prod-app-name');
+  if (prodName) prodName.textContent = data.appName || 'Purity';
+
+  const prodVer = document.getElementById('prod-app-version');
+  if (prodVer) prodVer.textContent = `v${data.version || '2.1.0'}`;
+
+  document.getElementById('nav-tabs')?.classList.add('hidden');
+  document.getElementById('view-not-detected')?.classList.add('hidden');
+  document.getElementById('view-production-mode')?.classList.remove('hidden');
   document.getElementById('view-components')?.classList.add('hidden');
   document.getElementById('view-services')?.classList.add('hidden');
   document.getElementById('view-reactivity')?.classList.add('hidden');
@@ -327,11 +370,12 @@ function showDetectedState(data) {
   const badge = document.getElementById('app-badge');
   if (badge) {
     badge.className = 'badge badge-success';
-    badge.textContent = `Purity ${data.version || '2.1.0'}`;
+    badge.textContent = `Purity ${data.version || '2.1.0'} • Dev Mode`;
   }
 
   document.getElementById('nav-tabs')?.classList.remove('hidden');
   document.getElementById('view-not-detected')?.classList.add('hidden');
+  document.getElementById('view-production-mode')?.classList.add('hidden');
 
   // Update tab badge counts
   const compCount = document.getElementById('badge-comp-count');
