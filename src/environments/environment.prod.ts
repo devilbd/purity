@@ -5,7 +5,7 @@ export const environment: Environment = {
     production: true,
     appName: 'Purity',
     version: packageJson.version,
-    buildVersion: `v${packageJson.version}-prod.20260824`,
+    buildVersion: `v${packageJson.version}-prod.20261105`,
     enableDebugTools: false,
     firebase: {
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY || '',
